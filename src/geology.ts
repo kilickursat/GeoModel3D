@@ -1,58 +1,15 @@
-export type Lithology = "Clay"|"Sandstone"|"Granite";
-
-export interface Interval { from:number; to:number; lithology:Lithology }
-export interface Borehole { id:string; x:number; y:number; z:number; intervals:Interval[] }
-
-export interface ContactPoint { x:number; y:number; z:number; unit:Lithology }
-
-export const COLORS:Record<Lithology,number>={Clay:0x9b7653,Sandstone:0xc8a96b,Granite:0x8b9299};
-
-export function contactsFromBoreholes(boreholes:Borehole[]):ContactPoint[]{
-  const out:ContactPoint[]=[];
-  for(const b of boreholes){
-    let depth=0;
-    for(const i of b.intervals){
-      depth+=i.from;
-      out.push({x:b.x,y:b.y,z:b.z-depth,unit:i.lithology});
-      depth=i.to;
-    }
-  }
-  return out;
-}
-
-function idw(x:number,y:number,points:ContactPoint[],unit:Lithology,p=2):number{
-  let n=0,d=0;
-  for(const q of points){
-    if(q.unit!==unit) continue;
-    const dist=Math.hypot(x-q.x,y-q.y);
-    const w=1/Math.max(dist**p,1e-6);
-    n+=w*q.z; d+=w;
-  }
-  return d?n/d:0;
-}
-
-export function interpolateSurface(points:ContactPoint[],unit:Lithology,nx=18,ny=18){
-  const same=points.filter(p=>p.unit===unit);
-  if(same.length<3) return {positions:new Float32Array(),indices:new Uint32Array()};
-  const minX=Math.min(...same.map(p=>p.x)),maxX=Math.max(...same.map(p=>p.x));
-  const minY=Math.min(...same.map(p=>p.y)),maxY=Math.max(...same.map(p=>p.y));
-  const pos:number[]=[];
-  for(let j=0;j<ny;j++) for(let i=0;i<nx;i++){
-    const x=minX+(maxX-minX)*i/(nx-1), y=minY+(maxY-minY)*j/(ny-1);
-    pos.push(x,y,idw(x,y,same,unit));
-  }
-  const ind:number[]=[];
-  for(let j=0;j<ny-1;j++) for(let i=0;i<nx-1;i++){
-    const a=j*nx+i,b=a+1,c=a+nx,d=c+1;
-    ind.push(a,c,b,b,c,d);
-  }
-  return {positions:new Float32Array(pos),indices:new Uint32Array(ind)};
-}
-
+export type Lithology="Alluvium"|"Weathered Rock"|"Sandstone"|"Mudstone"|"Granite";
+export interface Interval{from:number;to:number;lithology:Lithology}
+export interface Borehole{id:string;x:number;y:number;z:number;intervals:Interval[]}
+export interface ContactPoint{x:number;y:number;z:number;unit:Lithology}
+export const COLORS:Record<Lithology,number>={Alluvium:0xb7a58a,"Weathered Rock":0x8f806d,Sandstone:0xc99b62,Mudstone:0x6f7180,Granite:0x929aa1};
 export const sampleBoreholes:Borehole[]=[
-{id:"BH-01",x:0,y:0,z:100,intervals:[{from:0,to:12,lithology:"Clay"},{from:12,to:30,lithology:"Sandstone"},{from:30,to:60,lithology:"Granite"}]},
-{id:"BH-02",x:70,y:5,z:100,intervals:[{from:0,to:18,lithology:"Clay"},{from:18,to:34,lithology:"Sandstone"},{from:34,to:60,lithology:"Granite"}]},
-{id:"BH-03",x:8,y:65,z:100,intervals:[{from:0,to:8,lithology:"Clay"},{from:8,to:28,lithology:"Sandstone"},{from:28,to:60,lithology:"Granite"}]},
-{id:"BH-04",x:72,y:68,z:100,intervals:[{from:0,to:15,lithology:"Clay"},{from:15,to:31,lithology:"Sandstone"},{from:31,to:60,lithology:"Granite"}]},
-{id:"BH-05",x:38,y:36,z:100,intervals:[{from:0,to:10,lithology:"Clay"},{from:10,to:25,lithology:"Sandstone"},{from:25,to:60,lithology:"Granite"}]}
-];
+{id:"BH-001",x:0,y:0,z:120,intervals:[{from:0,to:6,lithology:"Alluvium"},{from:6,to:18,lithology:"Weathered Rock"},{from:18,to:42,lithology:"Sandstone"},{from:42,to:68,lithology:"Mudstone"},{from:68,to:110,lithology:"Granite"}]},
+{id:"BH-002",x:80,y:4,z:118,intervals:[{from:0,to:9,lithology:"Alluvium"},{from:9,to:23,lithology:"Weathered Rock"},{from:23,to:48,lithology:"Sandstone"},{from:48,to:76,lithology:"Mudstone"},{from:76,to:108,lithology:"Granite"}]},
+{id:"BH-003",x:5,y:72,z:123,intervals:[{from:0,to:4,lithology:"Alluvium"},{from:4,to:14,lithology:"Weathered Rock"},{from:14,to:34,lithology:"Sandstone"},{from:34,to:62,lithology:"Mudstone"},{from:62,to:112,lithology:"Granite"}]},
+{id:"BH-004",x:78,y:75,z:121,intervals:[{from:0,to:11,lithology:"Alluvium"},{from:11,to:25,lithology:"Weathered Rock"},{from:25,to:51,lithology:"Sandstone"},{from:51,to:79,lithology:"Mudstone"},{from:79,to:109,lithology:"Granite"}]},
+{id:"BH-005",x:39,y:38,z:126,intervals:[{from:0,to:7,lithology:"Alluvium"},{from:7,to:19,lithology:"Weathered Rock"},{from:19,to:39,lithology:"Sandstone"},{from:39,to:69,lithology:"Mudstone"},{from:69,to:114,lithology:"Granite"}]},
+{id:"BH-006",x:108,y:42,z:116,intervals:[{from:0,to:13,lithology:"Alluvium"},{from:13,to:29,lithology:"Weathered Rock"},{from:29,to:55,lithology:"Sandstone"},{from:55,to:82,lithology:"Mudstone"},{from:82,to:106,lithology:"Granite"}]}];
+export function contactsFromBoreholes(bs:Borehole[]):ContactPoint[]{const out:ContactPoint[]=[];for(const b of bs)for(const i of b.intervals)out.push({x:b.x,y:b.y,z:b.z-i.to,unit:i.lithology});return out}
+function idw(x:number,y:number,p:ContactPoint[],u:Lithology){let n=0,d=0;for(const q of p){if(q.unit!==u)continue;const r=Math.hypot(x-q.x,y-q.y),w=1/Math.max(r*r,1e-4);n+=w*q.z;d+=w}return d?n/d:0}
+export function interpolateSurface(points:ContactPoint[],unit:Lithology,nx=28,ny=28){const same=points.filter(p=>p.unit===unit);if(same.length<3)return{positions:new Float32Array(),indices:new Uint32Array()};const minX=Math.min(...same.map(p=>p.x)),maxX=Math.max(...same.map(p=>p.x)),minY=Math.min(...same.map(p=>p.y)),maxY=Math.max(...same.map(p=>p.y));const pos:number[]=[];for(let j=0;j<ny;j++)for(let i=0;i<nx;i++){const x=minX+(maxX-minX)*i/(nx-1),y=minY+(maxY-minY)*j/(ny-1);pos.push(x,y,idw(x,y,same,unit))}const ind:number[]=[];for(let j=0;j<ny-1;j++)for(let i=0;i<nx-1;i++){const a=j*nx+i,b=a+1,c=a+nx,d=c+1;ind.push(a,c,b,b,c,d)}return{positions:new Float32Array(pos),indices:new Uint32Array(ind)}}
