@@ -1,52 +1,50 @@
 # GeoModel3D
 
-Browser-native geological modelling engine built with TypeScript and Three.js.
+**Project-agnostic, browser-native 3D geological modelling engine.**
 
-## v0.1 prototype
+GeoModel3D is an open foundation for constructing, interrogating and visualising subsurface geological models from heterogeneous geological observations.
 
-The first prototype demonstrates:
+## Prototype 0.2
+- TypeScript + Three.js + Vite
+- Six synthetic boreholes
+- Five geological units: Alluvium, Weathered Rock, Sandstone, Mudstone, Granite
+- Borehole-derived geological contacts
+- IDW-interpolated horizons
+- 3D borehole logs
+- Generic underground alignment object
+- Interactive vertical clipping control
 
-- Synthetic borehole data
-- Lithology interval parsing
-- Geological contact extraction
-- IDW interpolation
-- Delaunay triangulation
-- 3D geological surface rendering
-- Borehole visualization
-- Lithology colouring
-- Interactive clipping plane
-- Sample TBM alignment and trajectory
+The reference dataset is synthetic; it is intended to exercise the modelling pipeline, not represent a real site.
 
-## Run
+## Core concept
+Data → observations → contacts → surfaces → volumes → properties → sections → 3D model
 
-```bash
-npm install
-npm run dev
-```
+Potential inputs: boreholes, geological maps, survey data, point clouds, CSV, GeoJSON, DXF, LAS and structured observations extracted from reports.
 
-Then open the local Vite URL.
+## Planned packages
+packages/geology-core
+packages/geology-import
+packages/geology-interpolation
+packages/geology-surface
+packages/geology-volume
+packages/geology-section
+packages/geology-analysis
+packages/geology-three
 
-## Architecture
-
-```
-Boreholes -> Contacts -> Interpolation -> Geological Surface -> Three.js
-                                                   |
-                                                   +-> TBM alignment
-```
-
-The geological core is deliberately separated from the rendering layer so future implementations can add kriging, RBF interpolation, volumetric cells, uncertainty fields, and TBM/AI coupling without rewriting the viewer.
+## Deployment
+This is a static Vite application. `npm install && npm run build` produces `dist/`, deployable to GitHub Pages, Cloudflare Pages, Vercel, Netlify or equivalent static hosting. No backend is required for the core viewer.
 
 ## Roadmap
-
-1. Multiple geological horizons and volumes
-2. Fault surfaces
-3. RMR/GSI/UCS/RQD property fields
-4. Arbitrary geological sections
-5. Tunnel-aligned coordinate system
-6. TBM operational data sampling
-7. Geological uncertainty
-8. Online/recursive geological updating
+1. Real geological reference datasets
+2. TIN/constrained surfaces
+3. Geological volumes and pinch-outs
+4. Arbitrary section planes
+5. Generic properties and uncertainty
+6. CSV/GeoJSON/DXF/LAS import
+7. Geological map draping
+8. Large-model streaming/LOD
+9. WebGPU acceleration
+10. Optional AI/document extraction input pipeline
 
 ## License
-
 MIT
