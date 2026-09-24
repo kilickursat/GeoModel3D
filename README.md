@@ -4,47 +4,55 @@
 
 GeoModel3D is an open foundation for constructing, interrogating and visualising subsurface geological models from heterogeneous geological observations.
 
-## Prototype 0.2
+## Prototype 0.3
+
+The core viewer now represents geology as explicit 3D model primitives rather than only interpolated display grids:
+
 - TypeScript + Three.js + Vite
 - Six synthetic boreholes
-- Five geological units: Alluvium, Weathered Rock, Sandstone, Mudstone, Granite
-- Borehole-derived geological contacts
-- IDW-interpolated horizons
+- Five geological units
+- Triangulated (TIN) geological horizons
+- Closed geological volumes between adjacent horizons
 - 3D borehole logs
-- Generic underground alignment object
-- Interactive vertical clipping control
+- Vertical section plane with computed horizon intersections
+- Interactive volume visibility and section offset
 
-The reference dataset is synthetic; it is intended to exercise the modelling pipeline, not represent a real site.
+The reference dataset remains synthetic. It exercises the modelling kernel and is not a real geological site.
 
-## Core concept
-Data → observations → contacts → surfaces → volumes → properties → sections → 3D model
+## Model pipeline
 
-Potential inputs: boreholes, geological maps, survey data, point clouds, CSV, GeoJSON, DXF, LAS and structured observations extracted from reports.
+Boreholes → contacts → TIN horizons → geological volumes → sections → Three.js
 
-## Planned packages
-packages/geology-core
-packages/geology-import
-packages/geology-interpolation
-packages/geology-surface
-packages/geology-volume
-packages/geology-section
-packages/geology-analysis
-packages/geology-three
+The current volume builder assumes each demo borehole contains the same ordered lithological stack. The data model is intentionally small so it can be replaced with real heterogeneous observations later.
+
+## Architecture
+
+Core modelling logic is separated from the viewer:
+
+- `src/geology.ts` — observation schema and reference dataset
+- `src/tin.ts` — browser-native 2D Delaunay triangulation
+- `src/volume.ts` — TIN surface and closed-volume geometry
+- `src/model.ts` — horizon/volume assembly
+- `src/section.ts` — triangle/plane section intersection
+- `src/main.ts` — Three.js rendering and interaction
+
+## Planned next
+
+1. Real public geological datasets and import adapters
+2. Missing/eroded units, pinch-outs and unconformities
+3. Constrained TIN boundaries and geological map contacts
+4. Generic numeric properties and uncertainty fields
+5. CSV/GeoJSON/DXF/LAS import
+6. Arbitrary section orientation and section export
+7. Geological map draping
+8. Streaming/LOD for large models
+9. WebGPU renderer path
+10. Optional AI/document extraction input pipeline for Georeport3D
 
 ## Deployment
-This is a static Vite application. `npm install && npm run build` produces `dist/`, deployable to GitHub Pages, Cloudflare Pages, Vercel, Netlify or equivalent static hosting. No backend is required for the core viewer.
 
-## Roadmap
-1. Real geological reference datasets
-2. TIN/constrained surfaces
-3. Geological volumes and pinch-outs
-4. Arbitrary section planes
-5. Generic properties and uncertainty
-6. CSV/GeoJSON/DXF/LAS import
-7. Geological map draping
-8. Large-model streaming/LOD
-9. WebGPU acceleration
-10. Optional AI/document extraction input pipeline
+This remains a static Vite application. `npm install && npm run build` produces `dist/` for GitHub Pages, Cloudflare Pages, Vercel, Netlify or equivalent static hosting.
 
 ## License
+
 MIT
