@@ -6,6 +6,7 @@ import pkg from "../package.json";
 import {GeoProject,UnitDef,sampleProjects,boreholeDepth} from "./geology";
 import {buildGeologicalModel,GeoModel,unitVolume,unitCubicMetres,modelBounds,footprintArea} from "./model";
 import {volumeGeometry} from "./volume";
+import {terrainOutside,convexHull} from "./terrain";
 import {computeSection,offsetRange,principalAzimuth,Section} from "./section";
 import {sectionSvg,sectionCsv} from "./sectionSvg";
 import {importFiles,toProjectJson,toBoreholeCsv} from "./io";
@@ -63,7 +64,7 @@ let imported:GeoProject|null=null;
 let model:GeoModel;
 let section:Section;
 let origin={x:0,y:0,z:0},extent=1,sectionBuffer=1;
-const view={azimuth:0,offset:0,ve:1,cut:false,flip:false,exact:false,volumes:true,horizons:true,boreholes:true,labels:true,terrain:true,panel:innerWidth>760,hidden:new Set<string>()};
+const view={azimuth:0,offset:0,ve:1,cut:true,flip:false,exact:false,volumes:true,horizons:true,boreholes:true,labels:true,terrain:true,panel:innerWidth>760,hidden:new Set<string>()};
 
 interface UnitMaterials { lit:THREE.MeshStandardNodeMaterial; flat:THREE.MeshBasicNodeMaterial }
 const volumeMeshes:Array<THREE.Mesh<THREE.BufferGeometry,THREE.Material>>=[];
@@ -177,53 +178,25 @@ function buildContent(){
 }
 function niceCeil(v:number){const p=10**Math.floor(Math.log10(v));return Math.ceil(v/p)*p}
 
-// The terrain grid beyond the model footprint: real data around the model, cut with it, never covering it.
+// The terrain grid around the model footprint: real data, clipped exactly at the footprint, drawn before the
+// model and translucent so it never veils it, and cut with it.
 function buildTerrain(){
   terrainMesh=null;
   const t=model.project.terrain,at=model.terrainAt;
   if(!t||!at||!model.triangles.length)return;
-  const hull=convexHull(model.boreholes);
-  const step=Math.max(1,Math.ceil(Math.max(t.ncols,t.nrows)/256));
-  const cols=Math.floor((t.ncols-1)/step)+1,rows=Math.floor((t.nrows-1)/step)+1;
-  const pos=new Float32Array(cols*rows*3),ok=new Uint8Array(cols*rows);
-  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
-    const x=t.x0+c*step*t.dx,y=t.y0+r*step*t.dy,z=at(x,y),i=r*cols+c;
-    pos.set([x-origin.x,y-origin.y,(Number.isFinite(z)?z:0)-origin.z],i*3);
-    ok[i]=Number.isFinite(z)?1:0;
-  }
-  const index:number[]=[];
-  for(let r=0;r<rows-1;r++)for(let c=0;c<cols-1;c++){
-    const a=r*cols+c,b=a+1,d=a+cols,e=d+1;
-    if(!(ok[a]&&ok[b]&&ok[d]&&ok[e]))continue;
-    // Drop only cells entirely inside the footprint: a slight overlap at the edge beats a jagged gap.
-    const xs=[c,c+1].map(k=>t.x0+k*step*t.dx),ys=[r,r+1].map(k=>t.y0+k*step*t.dy);
-    if(xs.every(x=>ys.every(y=>insideHull(hull,x,y))))continue;
-    index.push(a,b,e,a,e,d);
-  }
+  const {positions,index}=terrainOutside(t,at,convexHull(model.boreholes),extent*0.25);
   if(!index.length)return;
+  const pos=new Float32Array(positions.length);
+  for(let i=0;i<positions.length;i+=3){pos[i]=positions[i]-origin.x;pos[i+1]=positions[i+1]-origin.y;pos[i+2]=positions[i+2]-origin.z}
   const geo=new THREE.BufferGeometry();
   geo.setAttribute("position",new THREE.BufferAttribute(pos,3));
   geo.setIndex(index);
   geo.computeVertexNormals();
-  const material=new THREE.MeshStandardNodeMaterial({color:0x5f6f66,roughness:1,metalness:0,transparent:true,opacity:.42,depthWrite:false,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1});
+  const material=new THREE.MeshStandardNodeMaterial({color:0x5f6f66,roughness:1,metalness:0,transparent:true,opacity:.42,depthWrite:false});
   material.maskNode=keepFragment;
   terrainMesh=new THREE.Mesh(geo,material);
+  terrainMesh.renderOrder=-1;
   content.add(terrainMesh);
-}
-function convexHull(points:Array<{x:number;y:number}>){
-  const p=[...points].sort((a,b)=>a.x-b.x||a.y-b.y);
-  const cross=(o:{x:number;y:number},a:{x:number;y:number},b:{x:number;y:number})=>(a.x-o.x)*(b.y-o.y)-(a.y-o.y)*(b.x-o.x);
-  const lower:typeof p=[],upper:typeof p=[];
-  for(const q of p){while(lower.length>=2&&cross(lower[lower.length-2],lower[lower.length-1],q)<=0)lower.pop();lower.push(q)}
-  for(const q of [...p].reverse()){while(upper.length>=2&&cross(upper[upper.length-2],upper[upper.length-1],q)<=0)upper.pop();upper.push(q)}
-  return [...lower.slice(0,-1),...upper.slice(0,-1)];
-}
-function insideHull(hull:Array<{x:number;y:number}>,x:number,y:number){
-  for(let i=0;i<hull.length;i++){
-    const a=hull[i],b=hull[(i+1)%hull.length];
-    if((b.x-a.x)*(y-a.y)-(b.y-a.y)*(x-a.x)<0)return false;
-  }
-  return hull.length>2;
 }
 // Shift the projection centre away from the open section view so the model sits in the free part of the screen.
 function updateViewOffset(){
@@ -360,11 +333,11 @@ toolbar.innerHTML=`<button class="import">Import data…</button>
   <label><input type="checkbox" data-view="boreholes" checked>Boreholes</label>
   <label><input type="checkbox" data-view="labels" checked>Labels</label>
   <label><input type="checkbox" data-view="terrain" checked>Terrain</label>
-  <label><input type="checkbox" data-view="cut">Cut at section</label>
+  <label><input type="checkbox" data-view="cut" checked>Cut at section</label>
   <label><input type="checkbox" data-view="flip">Keep other side</label>
   <label title="Unlit legend colours: what you see is the legend colour, independent of lighting"><input type="checkbox" data-view="exact">Exact colours</label>
 </div>
-<div class="backend">Renderer: ${backendName}${wantWebGPU&&backendName!=="WebGPU"?" (WebGPU unavailable)":""} · <a href="?backend=${backendName==="WebGPU"?"webgl":"webgpu"}">use ${backendName==="WebGPU"?"WebGL 2":"WebGPU"}</a></div>`;
+<div class="backend">Renderer: ${backendName}${wantWebGPU&&backendName!=="WebGPU"?" (WebGPU unavailable here)":` · <a href="?backend=${backendName==="WebGPU"?"webgl":"webgpu"}">use ${backendName==="WebGPU"?"WebGL 2":"WebGPU"}</a>`}</div>`;
 app.appendChild(toolbar);
 const fileInput=toolbar.querySelector<HTMLInputElement>(".file")!;
 

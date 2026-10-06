@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.5.1 — 2026-10-06
+
+### Fixed
+- In the see-through view, the terrain was drawn over the translucent model and veiled it, so the model looked buried in the ground. The terrain is now drawn before the model.
+- The terrain overlapped the model along the footprint edge. It is now clipped exactly at the footprint, and its collar correction is taken from the footprint boundary, so it meets the model's ground without a step.
+
+### Changed
+- The viewer opens cut at the section, with opaque units, instead of in the see-through view.
+- The terrain shown around the model is limited to a margin of a quarter of the model's size.
+- The "use WebGPU" link is hidden where WebGPU is unavailable.
+
 ## 0.5.0 — 2026-10-06
 
 ### Added

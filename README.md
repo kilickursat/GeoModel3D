@@ -102,7 +102,8 @@ The viewer uses three.js's `WebGPURenderer` with TSL node materials, so one shad
 - **The cut-away is a shader mask**, so it behaves identically on both backends.
 - **Frames are drawn only when something changes**, so an idle model costs nothing. This matters on machines without a graphics card.
 - **Exact colours** shows units unlit in their legend colours, for reading colours rather than shapes.
-- **Terrain beyond the model** is drawn translucent, so it never hides the model.
+- **The model opens cut at a section**: opaque units with the section face toward you. Untick "Cut at section" for the see-through view.
+- **Terrain around the model** is clipped exactly at the model's footprint, limited to a margin of a quarter of the model's size, drawn translucent and before the model, so it never veils it.
 
 ## Architecture
 
