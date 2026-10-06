@@ -2,7 +2,7 @@ import * as THREE from "three";
 import {OrbitControls} from "three/addons/controls/OrbitControls.js";
 import {COLORS,Lithology,sampleBoreholes} from "./geology";
 import {buildGeologicalModel} from "./model";
-import {volumeGeometry} from "./volume";
+import {volumeGeometry,TINSurface} from "./volume";
 import {surfaceSectionSegments} from "./section";
 import "./style.css";
 
@@ -33,6 +33,7 @@ scene.add(grid);
 
 const units:Lithology[]=["Alluvium","Weathered Rock","Sandstone","Mudstone","Granite"];
 const modelData=buildGeologicalModel(sampleBoreholes,units);
+const horizons:Array<[string,TINSurface]>=[["Ground",modelData.ground],...modelData.bottoms.entries()];
 const modelGroup=new THREE.Group();
 const sectionGroup=new THREE.Group();
 scene.add(modelGroup,sectionGroup);
@@ -54,7 +55,7 @@ function addVolume(unit:Lithology){
 }
 units.forEach(addVolume);
 
-for(const [id,surface] of [["Ground",modelData.ground],...Array.from(modelData.bottoms.entries())]){
+for(const [id,surface] of horizons){
   const g=new THREE.BufferGeometry();
   const pos=new Float32Array(surface.points.flatMap(p=>[p.x,p.y,p.z]));
   const ind=new Uint32Array(surface.triangles.flatMap(t=>[t.a,t.b,t.c]));
@@ -113,7 +114,7 @@ function updateSection(){
   sectionPlaneMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),sectionNormal);
 
   sectionGroup.clear();
-  for(const [id,surface] of [["Ground",modelData.ground],...Array.from(modelData.bottoms.entries())]){
+  for(const [id,surface] of horizons){
     const points=surfaceSectionSegments(surface,sectionPlane);
     if(!points.length)continue;
     const pos=new Float32Array(points.length*3);
