@@ -77,3 +77,4 @@ button,select,input{font:inherit}
   .section-view{left:12px;right:12px;width:auto;bottom:auto;top:calc(30vh + 70px);height:34vh}
   .notice{right:12px;top:auto;bottom:220px}
 }
+.legend .tag{font-size:9px;color:#d08a4c;border:1px solid rgba(208,138,76,.5);border-radius:3px;padding:0 3px;flex:none}

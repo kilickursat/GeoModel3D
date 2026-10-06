@@ -3,8 +3,8 @@ import {uniform,positionWorld,dot} from "three/tsl";
 import {OrbitControls} from "three/addons/controls/OrbitControls.js";
 import {CSS2DRenderer,CSS2DObject} from "three/addons/renderers/CSS2DRenderer.js";
 import pkg from "../package.json";
-import {GeoProject,sampleProjects,boreholeDepth} from "./geology";
-import {buildGeologicalModel,GeoModel,unitVolume,unitCubicMetres,horizonSurface,modelBounds,footprintArea} from "./model";
+import {GeoProject,UnitDef,sampleProjects,boreholeDepth} from "./geology";
+import {buildGeologicalModel,GeoModel,unitVolume,unitCubicMetres,modelBounds,footprintArea} from "./model";
 import {volumeGeometry} from "./volume";
 import {computeSection,offsetRange,principalAzimuth,Section} from "./section";
 import {sectionSvg,sectionCsv} from "./sectionSvg";
@@ -63,12 +63,13 @@ let imported:GeoProject|null=null;
 let model:GeoModel;
 let section:Section;
 let origin={x:0,y:0,z:0},extent=1,sectionBuffer=1;
-const view={azimuth:0,offset:0,ve:1,cut:false,flip:false,exact:false,volumes:true,horizons:true,boreholes:true,labels:true,panel:innerWidth>760,hidden:new Set<string>()};
+const view={azimuth:0,offset:0,ve:1,cut:false,flip:false,exact:false,volumes:true,horizons:true,boreholes:true,labels:true,terrain:true,panel:innerWidth>760,hidden:new Set<string>()};
 
 interface UnitMaterials { lit:THREE.MeshStandardNodeMaterial; flat:THREE.MeshBasicNodeMaterial }
 const volumeMeshes:Array<THREE.Mesh<THREE.BufferGeometry,THREE.Material>>=[];
 const horizonLines:THREE.LineSegments[]=[];
 let holeMesh:THREE.InstancedMesh|null=null;
+let terrainMesh:THREE.Mesh|null=null;
 let holeInfo:Array<{hole:number;interval:number}>=[];
 let labels:CSS2DObject[]=[];
 
@@ -121,18 +122,23 @@ function buildContent(){
     content.add(mesh);
   });
 
-  model.horizons.forEach((_,k)=>{
+  // Horizons are drawn along the edges of the borehole triangulation; a subdivided mesh would only add noise.
+  model.horizons.forEach((h,k)=>{
     if(!model.triangles.length)return;
-    const s=horizonSurface(model,k),geo=new THREE.BufferGeometry();
-    geo.setAttribute("position",new THREE.BufferAttribute(new Float32Array(s.points.flatMap(p=>[p.x-origin.x,p.y-origin.y,p.z-origin.z])),3));
-    geo.setIndex(s.triangles.flatMap(t=>[t.a,t.b,t.c]));
+    const pos:number[]=[];
+    for(const chain of model.edgeChains)for(let j=0;j<chain.length-1;j++){
+      const a=chain[j],b=chain[j+1];
+      pos.push(model.nodes[a].x-origin.x,model.nodes[a].y-origin.y,h.z[a]-origin.z,model.nodes[b].x-origin.x,model.nodes[b].y-origin.y,h.z[b]-origin.z);
+    }
+    const geo=new THREE.BufferGeometry();
+    geo.setAttribute("position",new THREE.Float32BufferAttribute(pos,3));
     const material=new THREE.LineBasicNodeMaterial({color:k===0?0xdfeaf0:0xffffff,transparent:true,opacity:k===0?.22:.07,depthWrite:false});
     material.maskNode=keepFragment;
-    const line=new THREE.LineSegments(new THREE.WireframeGeometry(geo),material);
-    geo.dispose();
+    const line=new THREE.LineSegments(geo,material);
     horizonLines.push(line);
     content.add(line);
   });
+  buildTerrain();
 
   const radius=extent*0.0045,segments:Array<{hole:number;interval:number;top:number;bottom:number;color:string}>=[];
   model.boreholes.forEach((bh,hole)=>{
@@ -170,6 +176,55 @@ function buildContent(){
   content.add(grid);
 }
 function niceCeil(v:number){const p=10**Math.floor(Math.log10(v));return Math.ceil(v/p)*p}
+
+// The terrain grid beyond the model footprint: real data around the model, cut with it, never covering it.
+function buildTerrain(){
+  terrainMesh=null;
+  const t=model.project.terrain,at=model.terrainAt;
+  if(!t||!at||!model.triangles.length)return;
+  const hull=convexHull(model.boreholes);
+  const step=Math.max(1,Math.ceil(Math.max(t.ncols,t.nrows)/256));
+  const cols=Math.floor((t.ncols-1)/step)+1,rows=Math.floor((t.nrows-1)/step)+1;
+  const pos=new Float32Array(cols*rows*3),ok=new Uint8Array(cols*rows);
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    const x=t.x0+c*step*t.dx,y=t.y0+r*step*t.dy,z=at(x,y),i=r*cols+c;
+    pos.set([x-origin.x,y-origin.y,(Number.isFinite(z)?z:0)-origin.z],i*3);
+    ok[i]=Number.isFinite(z)?1:0;
+  }
+  const index:number[]=[];
+  for(let r=0;r<rows-1;r++)for(let c=0;c<cols-1;c++){
+    const a=r*cols+c,b=a+1,d=a+cols,e=d+1;
+    if(!(ok[a]&&ok[b]&&ok[d]&&ok[e]))continue;
+    // Drop only cells entirely inside the footprint: a slight overlap at the edge beats a jagged gap.
+    const xs=[c,c+1].map(k=>t.x0+k*step*t.dx),ys=[r,r+1].map(k=>t.y0+k*step*t.dy);
+    if(xs.every(x=>ys.every(y=>insideHull(hull,x,y))))continue;
+    index.push(a,b,e,a,e,d);
+  }
+  if(!index.length)return;
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute("position",new THREE.BufferAttribute(pos,3));
+  geo.setIndex(index);
+  geo.computeVertexNormals();
+  const material=new THREE.MeshStandardNodeMaterial({color:0x5f6f66,roughness:1,metalness:0,transparent:true,opacity:.42,depthWrite:false,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1});
+  material.maskNode=keepFragment;
+  terrainMesh=new THREE.Mesh(geo,material);
+  content.add(terrainMesh);
+}
+function convexHull(points:Array<{x:number;y:number}>){
+  const p=[...points].sort((a,b)=>a.x-b.x||a.y-b.y);
+  const cross=(o:{x:number;y:number},a:{x:number;y:number},b:{x:number;y:number})=>(a.x-o.x)*(b.y-o.y)-(a.y-o.y)*(b.x-o.x);
+  const lower:typeof p=[],upper:typeof p=[];
+  for(const q of p){while(lower.length>=2&&cross(lower[lower.length-2],lower[lower.length-1],q)<=0)lower.pop();lower.push(q)}
+  for(const q of [...p].reverse()){while(upper.length>=2&&cross(upper[upper.length-2],upper[upper.length-1],q)<=0)upper.pop();upper.push(q)}
+  return [...lower.slice(0,-1),...upper.slice(0,-1)];
+}
+function insideHull(hull:Array<{x:number;y:number}>,x:number,y:number){
+  for(let i=0;i<hull.length;i++){
+    const a=hull[i],b=hull[(i+1)%hull.length];
+    if((b.x-a.x)*(y-a.y)-(b.y-a.y)*(x-a.x)<0)return false;
+  }
+  return hull.length>2;
+}
 // Shift the projection centre away from the open section view so the model sits in the free part of the screen.
 function updateViewOffset(){
   const open=view.panel&&innerWidth>760;
@@ -268,6 +323,7 @@ function applyDisplay(){
   }
   for(const l of horizonLines)l.visible=view.horizons;
   if(holeMesh)holeMesh.visible=view.boreholes;
+  if(terrainMesh)terrainMesh.visible=view.terrain;
   for(const l of labels)l.visible=view.boreholes&&view.labels&&(!view.cut||clipPlane.distanceToPoint(l.position)>=0);
   invalidate();
 }
@@ -291,7 +347,7 @@ const datasetSelect=ui.querySelector<HTMLSelectElement>(".dataset")!;
 const toolbar=document.createElement("div");
 toolbar.className="toolbar";
 toolbar.innerHTML=`<button class="import">Import data…</button>
-<input class="file" type="file" multiple hidden accept=".csv,.tsv,.txt,.ags,.json">
+<input class="file" type="file" multiple hidden accept=".csv,.tsv,.txt,.ags,.json,.asc,.xyz">
 <details class="menu"><summary>Export</summary><div>
   <button data-export="project">Project (JSON)</button>
   <button data-export="boreholes">Boreholes (CSV)</button>
@@ -303,6 +359,7 @@ toolbar.innerHTML=`<button class="import">Import data…</button>
   <label><input type="checkbox" data-view="horizons" checked>Horizons</label>
   <label><input type="checkbox" data-view="boreholes" checked>Boreholes</label>
   <label><input type="checkbox" data-view="labels" checked>Labels</label>
+  <label><input type="checkbox" data-view="terrain" checked>Terrain</label>
   <label><input type="checkbox" data-view="cut">Cut at section</label>
   <label><input type="checkbox" data-view="flip">Keep other side</label>
   <label title="Unlit legend colours: what you see is the legend colour, independent of lighting"><input type="checkbox" data-view="exact">Exact colours</label>
@@ -341,7 +398,7 @@ app.appendChild(tooltip);
 const dropZone=document.createElement("div");
 dropZone.className="drop";
 dropZone.hidden=true;
-dropZone.innerHTML="<div>Drop borehole files<br><span>CSV tables · AGS4 · GeoModel3D or Georeport3D JSON</span></div>";
+dropZone.innerHTML="<div>Drop borehole or terrain files<br><span>CSV tables · AGS4 · GeoModel3D or Georeport3D JSON · terrain grid (.asc, .xyz)</span></div>";
 app.appendChild(dropZone);
 
 function renderPanel(){
@@ -351,9 +408,17 @@ function renderPanel(){
   const count=(n:number,what:string)=>`${n} ${what}${n===1?"":"s"}`;
   const stats=[count(model.boreholes.length,"borehole"),count(model.units.length,"unit"),count(model.horizons.length,"horizon")];
   if(model.triangles.length)stats.push(`footprint ${fmtArea(footprintArea(model))}`);
+  if(project.terrain)stats.push(`terrain ${fmt(project.terrain.dx,1)} m grid`);
   if(project.crs)stats.push(esc(project.crs));
   ui.querySelector(".stats")!.innerHTML=stats.join(" · ");
-  ui.querySelector(".legend")!.innerHTML=model.units.map((u,k)=>`<label title="${esc(u.name)}"><input type="checkbox" data-unit="${esc(u.id)}"${view.hidden.has(u.id)?"":" checked"}><i style="background:${u.color}"></i><span class="name">${esc(u.name)}</span><span class="vol">${model.triangles.length?fmtVolume(unitCubicMetres(model,k)):""}</span></label>`).join("");
+  ui.querySelector(".legend")!.innerHTML=model.units.map((u,k)=>{
+    const title=[u.name,u.erosive?"Erosive base: cuts down into older units":"",unitProperties(u)].filter(Boolean).join("\n");
+    return `<label title="${esc(title)}"><input type="checkbox" data-unit="${esc(u.id)}"${view.hidden.has(u.id)?"":" checked"}><i style="background:${u.color}"></i><span class="name">${esc(u.name)}</span>${u.erosive?'<span class="tag">erosive</span>':""}<span class="vol">${model.triangles.length?fmtVolume(unitCubicMetres(model,k)):""}</span></label>`;
+  }).join("");
+}
+function unitProperties(u:UnitDef){
+  const p=[u.gamma!==undefined?`γ ${fmt(u.gamma,1)} kN/m³`:"",u.gammaSat!==undefined?`γsat ${fmt(u.gammaSat,1)} kN/m³`:""].filter(Boolean).join(" · ");
+  return p&&u.source?`${p} (${u.source})`:p;
 }
 
 function syncControls(){
@@ -412,7 +477,7 @@ function loadProject(p:GeoProject,importWarnings:string[]=[]){
 async function importFileList(list:FileList|File[]){
   try{
     const files=await Promise.all([...list].map(async f=>({name:f.name,text:await f.text()})));
-    const result=importFiles(files);
+    const result=importFiles(files,project);
     imported=result.project;
     loadProject(result.project,result.warnings);
   }catch(err){
@@ -447,7 +512,7 @@ app.addEventListener("click",e=>{
 });
 toolbar.querySelectorAll<HTMLInputElement>("[data-view]").forEach(input=>{
   input.onchange=()=>{
-    const key=input.dataset.view as "volumes"|"horizons"|"boreholes"|"labels"|"cut"|"flip"|"exact";
+    const key=input.dataset.view as "volumes"|"horizons"|"boreholes"|"labels"|"terrain"|"cut"|"flip"|"exact";
     view[key]=input.checked;
     if(key==="cut"||key==="flip")updateSection();else applyDisplay();
     syncControls();
@@ -495,7 +560,14 @@ function updateTooltip(){
   }
   if(!html&&view.volumes){
     const hit=raycaster.intersectObjects(volumeMeshes.filter(m=>m.visible)).find(kept);
-    if(hit){const k=hit.object.userData.unit;html=`<b>${esc(model.units[k].name)}</b><span>${fmtVolume(unitCubicMetres(model,k))} in the model</span>`}
+    if(hit){
+      const u=model.units[hit.object.userData.unit],props=unitProperties(u);
+      html=`<b>${esc(u.name)}</b>${u.erosive?" · erosive base":""}<span>${fmtVolume(unitCubicMetres(model,hit.object.userData.unit))} in the model · elevation ${fmt(hit.point.z/view.ve+origin.z,1)} m</span>${props?`<span>${esc(props)}</span>`:""}`;
+    }
+  }
+  if(!html&&terrainMesh?.visible){
+    const hit=raycaster.intersectObject(terrainMesh).find(kept);
+    if(hit)html=`<b>Terrain</b> · ${fmt(hit.point.z/view.ve+origin.z,2)} m<span>${esc(project.terrain?.source??"terrain grid")}, outside the model</span>`;
   }
   tooltip.hidden=!html;
   if(html){
