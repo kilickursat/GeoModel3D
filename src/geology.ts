@@ -1,12 +1,16 @@
 import valleyDemo from "./data/valley-demo.json";
+import channelDemo from "./data/channel-demo.json";
+import {TerrainGrid} from "./terrain";
 
-// Geological units are listed in stratigraphic order, youngest (top) to oldest (bottom).
-export interface UnitDef { id:string; name:string; color:string }
+// Geological units are listed in stratigraphic order, youngest (top) to oldest (bottom). An erosive unit's base
+// is an unconformity that cuts down into older units. Unit weights are in kN/m³; `source` records where the
+// properties come from.
+export interface UnitDef { id:string; name:string; color:string; erosive?:boolean; gamma?:number; gammaSat?:number; source?:string }
 // Depths are metres below the collar; `unit` refers to UnitDef.id.
 export interface Interval { from:number; to:number; unit:string }
 // Collar position (x, y) and elevation (z) in the project coordinate system; `depth` is the final depth when it exceeds the logged intervals.
 export interface Borehole { id:string; x:number; y:number; z:number; depth?:number; intervals:Interval[] }
-export interface GeoProject { name:string; description?:string; crs?:string; base?:number; units:UnitDef[]; boreholes:Borehole[] }
+export interface GeoProject { name:string; description?:string; crs?:string; base?:number; units:UnitDef[]; boreholes:Borehole[]; terrain?:TerrainGrid }
 
 export const referenceProject:GeoProject={
   name:"Synthetic layer-cake",
@@ -28,7 +32,14 @@ export const referenceProject:GeoProject={
   ]
 };
 
-export const valleyProject=valleyDemo as GeoProject;
-export const sampleProjects:GeoProject[]=[valleyProject,referenceProject];
+// JSON has no NaN: grid cells without data are stored as null.
+function fromJson(p:unknown):GeoProject{
+  const project=p as GeoProject;
+  if(project.terrain)project.terrain={...project.terrain,z:project.terrain.z.map(v=>v===null?NaN:v)};
+  return project;
+}
+export const valleyProject=fromJson(valleyDemo);
+export const channelProject=fromJson(channelDemo);
+export const sampleProjects:GeoProject[]=[valleyProject,channelProject,referenceProject];
 
 export function boreholeDepth(b:Borehole){return Math.max(b.depth??0,...b.intervals.map(i=>i.to))}

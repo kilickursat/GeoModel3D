@@ -122,6 +122,41 @@ describe("project files",()=>{
   });
 });
 
+describe("unit properties and terrain",()=>{
+  it("reads erosive flags, unit weights and their source from a unit table",()=>{
+    const units="unit,name,colour,erosive,unit_weight,gamma_sat,source\nclay,Clay,#aa7744,,18.5,19.2,Lab report 7\nrock,Rock,#446677,no,240,,\ngravel,Gravel,,yes,,,";
+    const collars="hole_id,x,y,z\nA,0,0,10\nB,30,0,11\nC,0,40,9";
+    const intervals="hole_id,from,to,unit\nA,0,2,gravel\nA,2,4,clay\nA,4,9,rock\nB,0,6,clay\nB,6,8,rock\nC,0,2,clay\nC,2,7,rock";
+    const {project,warnings}=importFiles([{name:"units.csv",text:units},{name:"collars.csv",text:collars},{name:"intervals.csv",text:intervals}]);
+    expect(project.units.find(u=>u.id==="clay")).toEqual({id:"clay",name:"Clay",color:"#aa7744",gamma:18.5,gammaSat:19.2,source:"Lab report 7"});
+    expect(project.units.find(u=>u.id==="gravel")!.erosive).toBe(true);
+    expect(project.units.find(u=>u.id==="rock")!.erosive).toBeUndefined();
+    expect(warnings).toEqual([expect.stringMatching(/Rock: unit weight 240 kN\/m³ is outside 10–30/)]);
+  });
+
+  it("attaches a terrain grid to the current project or to boreholes imported with it",()=>{
+    const asc="ncols 4\nnrows 3\nxllcenter 0\nyllcenter 0\ncellsize 20\n1 2 3 4\n5 6 7 8\n9 10 11 12\n";
+    const alone=importFiles([{name:"dem.asc",text:asc}],valleyProject);
+    expect(alone.project.boreholes).toBe(valleyProject.boreholes);
+    expect(alone.project.terrain).toMatchObject({x0:0,y0:0,dx:20,ncols:4,nrows:3});
+    expect(alone.warnings[0]).toMatch(/Terrain from dem.asc: 4 × 3 cells of 20 × 20 m/);
+    const together=importFiles([{name:"site.csv",text:combined},{name:"dem.asc",text:asc}]);
+    expect(together.project.boreholes.length).toBe(3);
+    expect(together.project.terrain!.z[0]).toBe(9);
+    expect(()=>importFiles([{name:"dem.asc",text:asc}])).toThrow(/before adding a terrain grid/);
+  });
+
+  it("round-trips terrain cells without data through project JSON",()=>{
+    const t={...valleyProject.terrain!,z:valleyProject.terrain!.z.map((v,i)=>i===5?NaN:v)};
+    const json=toProjectJson({...valleyProject,terrain:t});
+    expect(json).toMatch(/"z":\[[^\]]*null/);
+    const back=importFiles([{name:"p.json",text:json}]).project.terrain!;
+    expect(back.z[5]).toBeNaN();
+    expect(back.z.slice(0,5)).toEqual(t.z.slice(0,5));
+    expect(back.ncols*back.nrows).toBe(t.z.length);
+  });
+});
+
 describe("unit order inference",()=>{
   const hole=(id:string,...units:string[]):Borehole=>({id,x:0,y:0,z:0,intervals:units.map((unit,i)=>({from:i,to:i+1,unit}))});
   it("assembles the column from partial logs",()=>{

@@ -57,7 +57,8 @@ export function computeSection(model:GeoModel,spec:SectionSpec,buffer=Infinity):
     const p=model.nodes[i];
     samples.push({s:along(p),x:p.x,y:p.y,z:H.map(h=>h.z[i]),observed:H.map(h=>!!h.observed[i])});
   };
-  for(const [i,j] of uniqueEdges(model.triangles)){
+  model.edges??=uniqueEdges(model.triangles);
+  for(const [i,j] of model.edges){
     const fi=across(model.nodes[i]),fj=across(model.nodes[j]);
     if(Math.abs(fi)<=eps)vertex(i);
     if(Math.abs(fj)<=eps)vertex(j);

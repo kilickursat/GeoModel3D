@@ -1,4 +1,5 @@
 import {Borehole,GeoProject,Interval,UnitDef,boreholeDepth} from "./geology";
+import {TerrainGrid,isTerrainFile,readTerrain} from "./terrain";
 
 export interface TextFile { name:string; text:string }
 export interface ImportResult { project:GeoProject; warnings:string[] }
@@ -41,6 +42,7 @@ function csvField(v:string|number|undefined){
 export function toCsv(rows:Array<Array<string|number|undefined>>){return rows.map(r=>r.map(csvField).join(",")).join("\n")+"\n"}
 
 const norm=(h:string)=>h.toLowerCase().replace(/[^a-z0-9]/g,"");
+const round=(v:number)=>Math.round(v*100)/100;
 const ALIASES={
   id:["holeid","boreholeid","bhid","hole","borehole","bh","boreholename","boreholeno","holeno","locaid","locationid","location","pointid","name","id"],
   x:["x","easting","east","e","xcoord","xcoordinate","collarx","locanate","locx"],
@@ -51,7 +53,11 @@ const ALIASES={
   to:["to","depthto","todepth","bottom","base","basedepth","bottomdepth","depthbase","depthbottom","geolbase"],
   unit:["unit","unitid","unitcode","stratigraphicunit","geologicalunit","formation","stratum","geology","lithology","litho","lith","lithcode","geolgeol","geolleg","layer","soil","material","code"],
   name:["name","unitname","description","desc"],
-  color:["color","colour","hex","rgb"]
+  color:["color","colour","hex","rgb"],
+  erosive:["erosive","erosion","erosivebase","unconformity"],
+  gamma:["gamma","unitweight","bulkunitweight","gammabulk","gammaknm3"],
+  gammaSat:["gammasat","saturatedunitweight","gammasaturated","satunitweight"],
+  source:["source","reference","ref","provenance"]
 };
 type Field=keyof typeof ALIASES;
 function columns(header:string[]){
@@ -91,10 +97,10 @@ function readCsvTable(file:TextFile,t:Tables){
       if(t.collars.has(id))t.warnings.push(`${file.name}: duplicate collar ${id}; first row kept`);
       else t.collars.set(id,{x:num(cell(r,"x")),y:num(cell(r,"y")),z:num(cell(r,"z")),depth:num(cell(r,"depth"))});
     }
-  }else if(c.unit!==undefined&&(c.color!==undefined||c.name!==undefined)){
+  }else if(c.unit!==undefined&&(["color","name","erosive","gamma","gammaSat"] as Field[]).some(f=>c[f]!==undefined)){
     for(const r of data){
       const id=cell(r,"unit");
-      if(id)t.units.push({id,name:cell(r,"name")||id,color:normaliseColor(cell(r,"color"))??""});
+      if(id)t.units.push(unitDef({id,name:cell(r,"name"),color:cell(r,"color"),erosive:cell(r,"erosive"),gamma:cell(r,"gamma"),gammaSat:cell(r,"gammaSat"),source:cell(r,"source")}));
     }
   }else{
     throw new Error(`${file.name}: unrecognised columns (${rows[0].join(", ")}). Expected a borehole table with hole id, x, y, z, from, to and unit columns, or separate collar (hole id, x, y, z) and interval (hole id, from, to, unit) tables.`);
@@ -163,11 +169,29 @@ function readGeoreport3D(doc:any,file:string):ImportResult{
   result.project.description=`Imported from a Georeport3D extraction (${file}).`;
   return result;
 }
+// A unit definition from loosely typed input: booleans as yes/no/true/1, numbers as text or numbers.
+function unitDef(u:{id:string;name?:unknown;color?:unknown;erosive?:unknown;gamma?:unknown;gammaSat?:unknown;source?:unknown}):UnitDef{
+  const out:UnitDef={id:u.id,name:typeof u.name==="string"&&u.name.trim()?u.name.trim():u.id,color:normaliseColor(u.color)??""};
+  if(u.erosive===true||typeof u.erosive==="string"&&/^(y|yes|true|1|x)$/i.test(u.erosive.trim()))out.erosive=true;
+  const gamma=typeof u.gamma==="number"?u.gamma:num(u.gamma as string|undefined);
+  const gammaSat=typeof u.gammaSat==="number"?u.gammaSat:num(u.gammaSat as string|undefined);
+  if(Number.isFinite(gamma))out.gamma=gamma;
+  if(Number.isFinite(gammaSat))out.gammaSat=gammaSat;
+  if(typeof u.source==="string"&&u.source.trim())out.source=u.source.trim();
+  return out;
+}
+function checkProperties(units:UnitDef[],warnings:string[]){
+  for(const u of units){
+    for(const [key,v] of [["unit weight",u.gamma],["saturated unit weight",u.gammaSat]] as Array<[string,number|undefined]>)
+      if(v!==undefined&&(v<10||v>30))warnings.push(`${u.name}: ${key} ${v} kN/m³ is outside 10–30 kN/m³; check the units`);
+    if(u.gamma!==undefined&&u.gammaSat!==undefined&&u.gammaSat<u.gamma)warnings.push(`${u.name}: saturated unit weight is below the bulk unit weight`);
+  }
+}
 function readProjectJson(doc:any,file:string):ImportResult{
   const t:Tables={collars:new Map(),intervals:new Map(),units:[],warnings:[]};
   for(const u of doc.units??[]){
     const id=String(u.id??u.name??"").trim();
-    if(id)t.units.push({id,name:String(u.name??id),color:normaliseColor(u.color)??""});
+    if(id)t.units.push(unitDef({...u,id}));
   }
   for(const b of doc.boreholes??[]){
     const id=String(b.id??"").trim();
@@ -178,10 +202,18 @@ function readProjectJson(doc:any,file:string):ImportResult{
   const result=assemble(t,doc.name||file,doc.crs,!t.units.length);
   if(doc.description)result.project.description=String(doc.description);
   if(Number.isFinite(doc.base))result.project.base=Number(doc.base);
+  const g=doc.terrain;
+  if(g){
+    const ok=["x0","y0","dx","dy","ncols","nrows"].every(k=>Number.isFinite(g[k]))&&Array.isArray(g.z)&&g.z.length===g.ncols*g.nrows;
+    if(ok)result.project.terrain={x0:g.x0,y0:g.y0,dx:g.dx,dy:g.dy,ncols:g.ncols,nrows:g.nrows,z:g.z.map((v:unknown)=>typeof v==="number"?v:NaN),source:g.source};
+    else result.warnings.push(`${file}: terrain grid is incomplete and was ignored`);
+  }
   return result;
 }
+// JSON has no NaN, so terrain cells without data are written as null.
 export function toProjectJson(p:GeoProject){
-  return JSON.stringify({format:"geomodel3d-project",version:1,name:p.name,description:p.description,crs:p.crs,base:p.base,units:p.units,boreholes:p.boreholes},null,1)+"\n";
+  const doc={format:"geomodel3d-project",version:1,name:p.name,description:p.description,crs:p.crs,base:p.base,units:p.units,boreholes:p.boreholes,terrain:p.terrain};
+  return JSON.stringify(doc,null,1).replace(/"z": \[[^\]]*\]/,m=>m.replace(/\s+/g,""))+"\n";
 }
 export function toBoreholeCsv(p:GeoProject){
   const rows:Array<Array<string|number|undefined>>=[["hole_id","x","y","z","depth","from","to","unit"]];
@@ -228,6 +260,7 @@ function assemble(t:Tables,name:string,crs:string|undefined,inferUnits:boolean):
     }
   }
   assignColors(units);
+  checkProperties(units,warnings);
   return {project:{name,crs,units,boreholes},warnings};
 }
 
@@ -302,8 +335,19 @@ function hslHex(h:number,s:number,l:number){
 
 // ---------- entry point ----------
 
-export function importFiles(files:TextFile[]):ImportResult{
+// Terrain grids (.asc, gridded .xyz) attach to the boreholes imported with them, or to `current` when they come alone.
+export function importFiles(files:TextFile[],current?:GeoProject):ImportResult{
   if(!files.length)throw new Error("No files to import");
+  const grids=files.filter(f=>isTerrainFile(f.name,f.text)),rest=files.filter(f=>!grids.includes(f));
+  if(grids.length){
+    const terrain:TerrainGrid=readTerrain(grids[0].name,grids[0].text);
+    const note=`Terrain from ${grids[0].name}: ${terrain.ncols} × ${terrain.nrows} cells of ${round(terrain.dx)} × ${round(terrain.dy)} m`;
+    const result=rest.length?importFiles(rest):current?{project:{...current},warnings:[]}:null;
+    if(!result)throw new Error("Load or import boreholes before adding a terrain grid");
+    result.project.terrain=terrain;
+    result.warnings.unshift(note,...grids.slice(1).map(f=>`Only one terrain grid is used; ${f.name} was ignored`));
+    return result;
+  }
   const structured=files.filter(f=>/\.(json|ags)$/i.test(f.name)||/^\s*[{[]/.test(f.text)||/^\s*"GROUP"/.test(f.text));
   if(structured.length){
     const f=structured[0];
