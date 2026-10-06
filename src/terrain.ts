@@ -102,15 +102,100 @@ export function isTerrainFile(name:string,text:string){
   return /\.txt$/i.test(name)&&/^\s*-?[\d.]+[\s,;]+-?[\d.]+[\s,;]+-?[\d.]+\s*$/m.test(text.slice(0,200))&&!/[a-z]/i.test(text.slice(0,200));
 }
 
-// Inverse-distance weighted residual between surveyed collars and the terrain, for points outside the model.
-export function residualField(points:Array<XY&{r:number}>){
+// Convex hull, counter-clockwise, of points that may carry extra fields. Points on a hull edge are kept, as they
+// are vertices of the triangulation's boundary.
+export function convexHull<P extends XY>(points:P[]):P[]{
+  const p=[...points].sort((a,b)=>a.x-b.x||a.y-b.y);
+  const cross=(o:XY,a:XY,b:XY)=>(a.x-o.x)*(b.y-o.y)-(a.y-o.y)*(b.x-o.x);
+  const lower:P[]=[],upper:P[]=[];
+  for(const q of p){while(lower.length>=2&&cross(lower[lower.length-2],lower[lower.length-1],q)<0)lower.pop();lower.push(q)}
+  for(const q of [...p].reverse()){while(upper.length>=2&&cross(upper[upper.length-2],upper[upper.length-1],q)<0)upper.pop();upper.push(q)}
+  return [...lower.slice(0,-1),...upper.slice(0,-1)];
+}
+const side=(a:XY,b:XY,p:XY)=>(b.x-a.x)*(p.y-a.y)-(b.y-a.y)*(p.x-a.x);
+
+// Collar residual for terrain beyond the model: the residual at the nearest point of the footprint boundary,
+// interpolated along the boundary edge exactly as inside the model, so the two surfaces meet without a step.
+export function boundaryResidual(hull:Array<XY&{r:number}>){
   return (x:number,y:number)=>{
-    let num=0,den=0;
-    for(const p of points){
-      const d2=(p.x-x)**2+(p.y-y)**2;
-      if(d2<1e-12)return p.r;
-      num+=p.r/d2;den+=1/d2;
+    if(hull.length===1)return hull[0].r;
+    let best=Infinity,value=0;
+    for(let i=0;i<hull.length;i++){
+      const a=hull[i],b=hull[(i+1)%hull.length],dx=b.x-a.x,dy=b.y-a.y,len2=dx*dx+dy*dy;
+      const t=len2?Math.min(Math.max(((x-a.x)*dx+(y-a.y)*dy)/len2,0),1):0;
+      const d2=(a.x+t*dx-x)**2+(a.y+t*dy-y)**2;
+      if(d2<best){best=d2;value=a.r+t*(b.r-a.r)}
     }
-    return den?num/den:0;
+    return value;
   };
+}
+
+interface Vertex extends XY { z:number; id:number }
+function clipHalf(poly:Vertex[],a:XY,b:XY,outside:boolean){
+  const out:Vertex[]=[];
+  for(let i=0;i<poly.length;i++){
+    const p=poly[i],q=poly[(i+1)%poly.length],sp=side(a,b,p),sq=side(a,b,q);
+    if(outside?sp<0:sp>=0)out.push(p);
+    if((sp<0)!==(sq<0)){
+      const t=sp/(sp-sq);
+      out.push({x:p.x+t*(q.x-p.x),y:p.y+t*(q.y-p.y),z:p.z+t*(q.z-p.z),id:-1});
+    }
+  }
+  return out;
+}
+// The parts of a triangle outside a convex counter-clockwise polygon, as disjoint convex pieces: each piece is
+// outside one edge and inside all the edges before it.
+function outsideConvex(tri:Vertex[],hull:XY[]){
+  const pieces:Vertex[][]=[];
+  let rest=tri;
+  for(let i=0;i<hull.length&&rest.length>=3;i++){
+    const a=hull[i],b=hull[(i+1)%hull.length],out=clipHalf(rest,a,b,true);
+    if(out.length>=3)pieces.push(out);
+    rest=clipHalf(rest,a,b,false);
+  }
+  return pieces;
+}
+
+// Terrain around a model footprint (a convex counter-clockwise polygon), within `margin` of its bounding box:
+// triangles crossing the footprint edge are clipped exactly, so the context meets the model without gaps or overlap.
+// Positions are in the grid's coordinates; at most maxSide grid lines are used along each side.
+export function terrainOutside(t:TerrainGrid,at:(x:number,y:number)=>number,hull:XY[],margin:number,maxSide=256){
+  const positions:number[]=[],index:number[]=[];
+  if(hull.length<3)return {positions,index};
+  const xs=hull.map(p=>p.x),ys=hull.map(p=>p.y);
+  const box={minX:Math.min(...xs),maxX:Math.max(...xs),minY:Math.min(...ys),maxY:Math.max(...ys)};
+  const c0=Math.max(0,Math.floor((box.minX-margin-t.x0)/t.dx)),c1=Math.min(t.ncols-1,Math.ceil((box.maxX+margin-t.x0)/t.dx));
+  const r0=Math.max(0,Math.floor((box.minY-margin-t.y0)/t.dy)),r1=Math.min(t.nrows-1,Math.ceil((box.maxY+margin-t.y0)/t.dy));
+  if(c1<=c0||r1<=r0)return {positions,index};
+  const step=Math.max(1,Math.ceil(Math.max(c1-c0,r1-r0)/maxSide));
+  const cols=Math.floor((c1-c0)/step)+1,rows=Math.floor((r1-r0)/step)+1;
+  const grid:Vertex[]=[];
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    const x=t.x0+(c0+c*step)*t.dx,y=t.y0+(r0+r*step)*t.dy;
+    grid.push({x,y,z:at(x,y),id:-1});
+  }
+  const emitted=new Map<number,number>();
+  const vertex=(v:Vertex,g:number)=>{
+    if(g>=0&&emitted.has(g))return emitted.get(g)!;
+    positions.push(v.x,v.y,v.z);
+    const k=positions.length/3-1;
+    if(g>=0)emitted.set(g,k);
+    return k;
+  };
+  for(let r=0;r<rows-1;r++)for(let c=0;c<cols-1;c++){
+    const ids=[r*cols+c,r*cols+c+1,(r+1)*cols+c+1,(r+1)*cols+c];
+    if(ids.some(i=>!Number.isFinite(grid[i].z)))continue;
+    for(const tri of [[ids[0],ids[1],ids[2]],[ids[0],ids[2],ids[3]]]){
+      const v=tri.map(i=>({...grid[i],id:i}));
+      const clear=Math.max(...v.map(p=>p.x))<=box.minX||Math.min(...v.map(p=>p.x))>=box.maxX||Math.max(...v.map(p=>p.y))<=box.minY||Math.min(...v.map(p=>p.y))>=box.maxY;
+      for(const piece of clear?[v]:outsideConvex(v,hull)){
+        const k=piece.map(p=>vertex(p,p.id));
+        for(let j=1;j<piece.length-1;j++){
+          const area=side(piece[0],piece[j],piece[j+1]);
+          if(area>1e-9)index.push(k[0],k[j],k[j+1]);
+        }
+      }
+    }
+  }
+  return {positions,index};
 }

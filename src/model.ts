@@ -1,7 +1,7 @@
 import {Borehole,GeoProject,UnitDef,boreholeDepth} from "./geology";
 import {delaunay,Triangle,XY,triangleArea,uniqueEdges} from "./tin";
 import {TINSurface,GeologicalVolume} from "./volume";
-import {TerrainGrid,terrainZ,residualField} from "./terrain";
+import {TerrainGrid,terrainZ,convexHull,boundaryResidual} from "./terrain";
 
 // horizons[0] is the ground surface, horizons[k] the base of units[k-1]; the last one is the model base.
 export interface Horizon { id:string; name:string; z:Float64Array; observed:Uint8Array }
@@ -226,7 +226,7 @@ export function buildGeologicalModel(project:GeoProject):GeoModel{
     const off=residuals.filter(q=>Math.abs(q.residual)>1);
     for(const q of off)warnings.push(`${q.id}: collar ${fmt(q.collar)} m, terrain ${fmt(q.terrain)} m (${q.residual>0?"+":""}${fmt(q.residual)} m); terrain adjusted to the collar`);
     if(missing)warnings.push(`Terrain has no data under ${Math.round(missing/(M-N)*100)} % of the model; the surface between boreholes is used there`);
-    const field=residualField(boreholes.map((b,i)=>({x:b.x,y:b.y,r:r[i]})));
+    const field=boundaryResidual(convexHull(boreholes.map((b,i)=>({x:b.x,y:b.y,r:r[i]}))));
     terrainAt=(x,y)=>terrainZ(t,x,y)+field(x,y);
   }
 
