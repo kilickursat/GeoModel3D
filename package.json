@@ -1,9 +1,22 @@
 {
-  "name":"geomodel3d",
-  "private":true,
-  "version":"0.3.0",
-  "type":"module",
-  "scripts":{"dev":"vite","build":"tsc -b && vite build && node scripts/build-single.mjs","preview":"vite preview"},
-  "dependencies":{"three":"^0.180.0"},
-  "devDependencies":{"@types/three":"^0.180.0","@vitejs/plugin-basic-ssl":"^2.1.0","typescript":"^5.8.3","vite":"^7.1.7"}
+  "name": "geomodel3d",
+  "private": true,
+  "version": "0.3.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build && node scripts/build-single.mjs",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.180.0",
+    "@vitejs/plugin-basic-ssl": "^2.1.0",
+    "typescript": "^5.8.3",
+    "vite": "^7.1.7",
+    "vitest": "^4.1.11"
+  }
 }
