@@ -11,6 +11,7 @@ const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x071018);
 
 const camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,.1,1000);
+camera.up.set(0,0,1);
 camera.position.set(150,150,130);
 
 const renderer=new THREE.WebGLRenderer({antialias:true});
@@ -28,6 +29,7 @@ sun.position.set(50,80,160);
 scene.add(sun);
 
 const grid=new THREE.GridHelper(150,15,0x31505d,0x193039);
+grid.rotation.x=Math.PI/2;
 grid.position.set(52,38,0);
 scene.add(grid);
 
@@ -74,7 +76,7 @@ for(const [id,surface] of horizons){
 for(const b of sampleBoreholes){
   const total=Math.max(...b.intervals.map(i=>i.to));
   const stem=new THREE.Mesh(
-    new THREE.CylinderGeometry(.24,.24,total,8),
+    new THREE.CylinderGeometry(.24,.24,total,8).rotateX(Math.PI/2),
     new THREE.MeshBasicMaterial({color:0xdce8ef,transparent:true,opacity:.95})
   );
   stem.position.set(b.x,b.y,b.z-total/2);
@@ -82,7 +84,7 @@ for(const b of sampleBoreholes){
 
   for(const i of b.intervals){
     const marker=new THREE.Mesh(
-      new THREE.CylinderGeometry(.50,.50,Math.max(.4,i.to-i.from),8),
+      new THREE.CylinderGeometry(.50,.50,Math.max(.4,i.to-i.from),8).rotateX(Math.PI/2),
       new THREE.MeshBasicMaterial({color:COLORS[i.lithology]})
     );
     marker.position.set(b.x,b.y,b.z-(i.from+i.to)/2);
@@ -103,6 +105,7 @@ scene.add(sectionPlaneMesh);
 
 const sectionAngle=THREE.MathUtils.degToRad(28);
 const sectionNormal=new THREE.Vector3(Math.cos(sectionAngle),Math.sin(sectionAngle),0).normalize();
+const sectionAlong=new THREE.Vector3(-Math.sin(sectionAngle),Math.cos(sectionAngle),0);
 const sectionPlane=new THREE.Plane();
 let sectionOffset=0;
 
@@ -111,7 +114,7 @@ function updateSection(){
   const point=center.clone().addScaledVector(sectionNormal,sectionOffset);
   sectionPlane.setFromNormalAndCoplanarPoint(sectionNormal,point);
   sectionPlaneMesh.position.copy(point);
-  sectionPlaneMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),sectionNormal);
+  sectionPlaneMesh.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(sectionAlong,new THREE.Vector3(0,0,1),sectionNormal));
 
   sectionGroup.clear();
   for(const [id,surface] of horizons){
