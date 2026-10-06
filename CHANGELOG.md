@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.5.0 — 2026-10-06
+
+### Added
+- **Terrain grids** (ESRI ASCII `.asc`, gridded `.xyz`), imported with boreholes or onto the loaded project.
+  - The ground follows the grid, corrected so that surveyed collars keep their elevations.
+  - Horizons are cut where the topography lies below them.
+  - Collars more than 1 m from the grid, and boreholes outside it, are reported.
+- **Erosional units.** Where an erosive unit removed older units from a log, those units are cut at its base instead of thinning towards it. On a synthetic buried channel with known geometry, this lowers the error of the truncated surfaces 2–5×.
+- **Subdivided triangulation** where terrain or erosion needs it. Without either, models are unchanged.
+- **Unit properties:** unit weight, saturated unit weight and their source, in unit tables and project JSON, with range checks.
+- **Viewer:**
+  - terrain beyond the model, drawn translucent and cut with it;
+  - an erosive tag in the legend;
+  - unit properties in the legend and on hover;
+  - an "Exact colours" mode;
+  - the active rendering backend shown in the toolbar.
+- **Synthetic buried-channel dataset**, with its true geometry as a test fixture. The valley dataset gains a 5 m terrain grid with an incised stream. Both carry illustrative unit weights labelled as not measured.
+
+### Changed
+- The viewer runs on three.js r186's `WebGPURenderer` with TSL node materials.
+  - WebGL 2 remains the default backend; WebGPU is opt-in with `?backend=webgpu` until it has been checked on real hardware.
+  - The cut-away is a shader mask, identical on both backends.
+- Frames are drawn only after something changes. On a software renderer, the idle loop went from 4 to 60 frames per second.
+- The offline single-file build grows from 547 kB to about 1.1 MB.
+
 ## 0.4.0 — 2026-10-06
 
 ### Added

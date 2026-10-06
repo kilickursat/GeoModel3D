@@ -1,9 +1,10 @@
-import * as THREE from "three";
+import * as THREE from "three/webgpu";
+import {uniform,positionWorld,dot} from "three/tsl";
 import {OrbitControls} from "three/addons/controls/OrbitControls.js";
 import {CSS2DRenderer,CSS2DObject} from "three/addons/renderers/CSS2DRenderer.js";
 import pkg from "../package.json";
-import {GeoProject,sampleProjects,boreholeDepth} from "./geology";
-import {buildGeologicalModel,GeoModel,unitVolume,unitCubicMetres,horizonSurface,modelBounds,footprintArea} from "./model";
+import {GeoProject,UnitDef,sampleProjects,boreholeDepth} from "./geology";
+import {buildGeologicalModel,GeoModel,unitVolume,unitCubicMetres,modelBounds,footprintArea} from "./model";
 import {volumeGeometry} from "./volume";
 import {computeSection,offsetRange,principalAzimuth,Section} from "./section";
 import {sectionSvg,sectionCsv} from "./sectionSvg";
@@ -22,10 +23,13 @@ const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x071018);
 const camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,0.1,1e5);
 camera.up.set(0,0,1);
-const renderer=new THREE.WebGLRenderer({antialias:true});
+// WebGL 2 is the default backend until the WebGPU backend has been checked on real hardware; ?backend=webgpu opts in.
+const wantWebGPU=new URLSearchParams(location.search).get("backend")==="webgpu";
+const renderer=new THREE.WebGPURenderer({antialias:true,forceWebGL:!wantWebGPU});
+await renderer.init();
+const backendName=(renderer.backend as {isWebGPUBackend?:boolean}).isWebGPUBackend?"WebGPU":"WebGL 2";
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.setSize(innerWidth,innerHeight);
-renderer.localClippingEnabled=true;
 app.appendChild(renderer.domElement);
 const labelRenderer=new CSS2DRenderer();
 labelRenderer.setSize(innerWidth,innerHeight);
@@ -45,18 +49,27 @@ let content=new THREE.Group();
 world.add(content);
 const sectionGroup=new THREE.Group();
 world.add(sectionGroup);
+// The cut-away is a fragment mask shared by every clipped material, so it behaves the same on both backends.
+// clipPlane mirrors it on the CPU for picking and label visibility.
 const clipPlane=new THREE.Plane();
+const cutOn=uniform(0),cutNormal=uniform(new THREE.Vector2(1,0)),cutConstant=uniform(0);
+const keepFragment=cutOn.lessThan(0.5).or(dot(positionWorld.xy,cutNormal).add(cutConstant).greaterThanEqual(0));
+// Frames are drawn only after something changes.
+let dirty=2;
+const invalidate=()=>{dirty=2};
 
 let project:GeoProject=sampleProjects[0];
 let imported:GeoProject|null=null;
 let model:GeoModel;
 let section:Section;
 let origin={x:0,y:0,z:0},extent=1,sectionBuffer=1;
-const view={azimuth:0,offset:0,ve:1,cut:false,flip:false,volumes:true,horizons:true,boreholes:true,labels:true,panel:innerWidth>760,hidden:new Set<string>()};
+const view={azimuth:0,offset:0,ve:1,cut:false,flip:false,exact:false,volumes:true,horizons:true,boreholes:true,labels:true,terrain:true,panel:innerWidth>760,hidden:new Set<string>()};
 
-const volumeMeshes:THREE.Mesh[]=[];
+interface UnitMaterials { lit:THREE.MeshStandardNodeMaterial; flat:THREE.MeshBasicNodeMaterial }
+const volumeMeshes:Array<THREE.Mesh<THREE.BufferGeometry,THREE.Material>>=[];
 const horizonLines:THREE.LineSegments[]=[];
 let holeMesh:THREE.InstancedMesh|null=null;
+let terrainMesh:THREE.Mesh|null=null;
 let holeInfo:Array<{hole:number;interval:number}>=[];
 let labels:CSS2DObject[]=[];
 
@@ -70,6 +83,8 @@ function disposeContent(){
     m.geometry?.dispose();
     const mat=m.material as THREE.Material|THREE.Material[]|undefined;
     if(mat)(Array.isArray(mat)?mat:[mat]).forEach(x=>x.dispose());
+    const unit=o.userData.materials as UnitMaterials|undefined;
+    if(unit){unit.lit.dispose();unit.flat.dispose()}
   });
   world.remove(content);
   content=new THREE.Group();
@@ -94,22 +109,36 @@ function buildContent(){
     geo.setAttribute("position",new THREE.BufferAttribute(g.positions,3));
     geo.setIndex(new THREE.BufferAttribute(g.indices,1));
     geo.computeVertexNormals();
-    const mesh=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:u.color,roughness:.95,metalness:0,transparent:true,depthWrite:false,side:THREE.FrontSide}));
+    const materials:UnitMaterials={
+      lit:new THREE.MeshStandardNodeMaterial({color:u.color,roughness:.95,metalness:0,transparent:true,depthWrite:false,side:THREE.FrontSide}),
+      flat:new THREE.MeshBasicNodeMaterial({color:u.color,transparent:true,depthWrite:false,side:THREE.FrontSide})
+    };
+    materials.lit.maskNode=keepFragment;
+    materials.flat.maskNode=keepFragment;
+    const mesh=new THREE.Mesh<THREE.BufferGeometry,THREE.Material>(geo,materials.lit);
     mesh.userData.unit=k;
+    mesh.userData.materials=materials;
     volumeMeshes.push(mesh);
     content.add(mesh);
   });
 
-  model.horizons.forEach((_,k)=>{
+  // Horizons are drawn along the edges of the borehole triangulation; a subdivided mesh would only add noise.
+  model.horizons.forEach((h,k)=>{
     if(!model.triangles.length)return;
-    const s=horizonSurface(model,k),geo=new THREE.BufferGeometry();
-    geo.setAttribute("position",new THREE.BufferAttribute(new Float32Array(s.points.flatMap(p=>[p.x-origin.x,p.y-origin.y,p.z-origin.z])),3));
-    geo.setIndex(s.triangles.flatMap(t=>[t.a,t.b,t.c]));
-    const line=new THREE.LineSegments(new THREE.WireframeGeometry(geo),new THREE.LineBasicMaterial({color:k===0?0xdfeaf0:0xffffff,transparent:true,opacity:k===0?.22:.07,depthWrite:false}));
-    geo.dispose();
+    const pos:number[]=[];
+    for(const chain of model.edgeChains)for(let j=0;j<chain.length-1;j++){
+      const a=chain[j],b=chain[j+1];
+      pos.push(model.nodes[a].x-origin.x,model.nodes[a].y-origin.y,h.z[a]-origin.z,model.nodes[b].x-origin.x,model.nodes[b].y-origin.y,h.z[b]-origin.z);
+    }
+    const geo=new THREE.BufferGeometry();
+    geo.setAttribute("position",new THREE.Float32BufferAttribute(pos,3));
+    const material=new THREE.LineBasicNodeMaterial({color:k===0?0xdfeaf0:0xffffff,transparent:true,opacity:k===0?.22:.07,depthWrite:false});
+    material.maskNode=keepFragment;
+    const line=new THREE.LineSegments(geo,material);
     horizonLines.push(line);
     content.add(line);
   });
+  buildTerrain();
 
   const radius=extent*0.0045,segments:Array<{hole:number;interval:number;top:number;bottom:number;color:string}>=[];
   model.boreholes.forEach((bh,hole)=>{
@@ -127,7 +156,9 @@ function buildContent(){
     content.add(label);
   });
   if(segments.length){
-    holeMesh=new THREE.InstancedMesh(new THREE.CylinderGeometry(1,1,1,10).rotateX(Math.PI/2),new THREE.MeshBasicMaterial(),segments.length);
+    const material=new THREE.MeshBasicNodeMaterial();
+    material.maskNode=keepFragment;
+    holeMesh=new THREE.InstancedMesh(new THREE.CylinderGeometry(1,1,1,10).rotateX(Math.PI/2),material,segments.length);
     const m=new THREE.Matrix4(),q=new THREE.Quaternion(),c=new THREE.Color();
     segments.forEach((s,i)=>{
       const bh=model.boreholes[s.hole];
@@ -145,6 +176,55 @@ function buildContent(){
   content.add(grid);
 }
 function niceCeil(v:number){const p=10**Math.floor(Math.log10(v));return Math.ceil(v/p)*p}
+
+// The terrain grid beyond the model footprint: real data around the model, cut with it, never covering it.
+function buildTerrain(){
+  terrainMesh=null;
+  const t=model.project.terrain,at=model.terrainAt;
+  if(!t||!at||!model.triangles.length)return;
+  const hull=convexHull(model.boreholes);
+  const step=Math.max(1,Math.ceil(Math.max(t.ncols,t.nrows)/256));
+  const cols=Math.floor((t.ncols-1)/step)+1,rows=Math.floor((t.nrows-1)/step)+1;
+  const pos=new Float32Array(cols*rows*3),ok=new Uint8Array(cols*rows);
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    const x=t.x0+c*step*t.dx,y=t.y0+r*step*t.dy,z=at(x,y),i=r*cols+c;
+    pos.set([x-origin.x,y-origin.y,(Number.isFinite(z)?z:0)-origin.z],i*3);
+    ok[i]=Number.isFinite(z)?1:0;
+  }
+  const index:number[]=[];
+  for(let r=0;r<rows-1;r++)for(let c=0;c<cols-1;c++){
+    const a=r*cols+c,b=a+1,d=a+cols,e=d+1;
+    if(!(ok[a]&&ok[b]&&ok[d]&&ok[e]))continue;
+    // Drop only cells entirely inside the footprint: a slight overlap at the edge beats a jagged gap.
+    const xs=[c,c+1].map(k=>t.x0+k*step*t.dx),ys=[r,r+1].map(k=>t.y0+k*step*t.dy);
+    if(xs.every(x=>ys.every(y=>insideHull(hull,x,y))))continue;
+    index.push(a,b,e,a,e,d);
+  }
+  if(!index.length)return;
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute("position",new THREE.BufferAttribute(pos,3));
+  geo.setIndex(index);
+  geo.computeVertexNormals();
+  const material=new THREE.MeshStandardNodeMaterial({color:0x5f6f66,roughness:1,metalness:0,transparent:true,opacity:.42,depthWrite:false,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1});
+  material.maskNode=keepFragment;
+  terrainMesh=new THREE.Mesh(geo,material);
+  content.add(terrainMesh);
+}
+function convexHull(points:Array<{x:number;y:number}>){
+  const p=[...points].sort((a,b)=>a.x-b.x||a.y-b.y);
+  const cross=(o:{x:number;y:number},a:{x:number;y:number},b:{x:number;y:number})=>(a.x-o.x)*(b.y-o.y)-(a.y-o.y)*(b.x-o.x);
+  const lower:typeof p=[],upper:typeof p=[];
+  for(const q of p){while(lower.length>=2&&cross(lower[lower.length-2],lower[lower.length-1],q)<=0)lower.pop();lower.push(q)}
+  for(const q of [...p].reverse()){while(upper.length>=2&&cross(upper[upper.length-2],upper[upper.length-1],q)<=0)upper.pop();upper.push(q)}
+  return [...lower.slice(0,-1),...upper.slice(0,-1)];
+}
+function insideHull(hull:Array<{x:number;y:number}>,x:number,y:number){
+  for(let i=0;i<hull.length;i++){
+    const a=hull[i],b=hull[(i+1)%hull.length];
+    if((b.x-a.x)*(y-a.y)-(b.y-a.y)*(x-a.x)<0)return false;
+  }
+  return hull.length>2;
+}
 // Shift the projection centre away from the open section view so the model sits in the free part of the screen.
 function updateViewOffset(){
   const open=view.panel&&innerWidth>760;
@@ -163,13 +243,14 @@ function fitCamera(){
   updateViewOffset();
   sun.position.copy(sphere.center).add(new THREE.Vector3(0.45,-0.7,1).multiplyScalar(dist));
   controls.update();
+  invalidate();
 }
 
 // ---------- section ----------
 
-const fence=new THREE.Mesh(new THREE.BufferGeometry(),new THREE.MeshBasicMaterial({vertexColors:true,side:THREE.DoubleSide,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1}));
-const fenceLines=new THREE.LineSegments(new THREE.BufferGeometry(),new THREE.LineBasicMaterial({color:0x0b1620,transparent:true,opacity:.75}));
-const outline=new THREE.LineLoop(new THREE.BufferGeometry(),new THREE.LineBasicMaterial({color:0x78c9df,transparent:true,opacity:.55}));
+const fence=new THREE.Mesh(new THREE.BufferGeometry(),new THREE.MeshBasicNodeMaterial({vertexColors:true,side:THREE.DoubleSide,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1}));
+const fenceLines=new THREE.LineSegments(new THREE.BufferGeometry(),new THREE.LineBasicNodeMaterial({color:0x0b1620,transparent:true,opacity:.75}));
+const outline=new THREE.Line(new THREE.BufferGeometry(),new THREE.LineBasicNodeMaterial({color:0x78c9df,transparent:true,opacity:.55}));
 const endLabels=["A","A′"].map(t=>{const el=document.createElement("div");el.className="end-label";el.textContent=t;const l=new CSS2DObject(el);l.center.set(0.5,1.2);return l});
 sectionGroup.add(fence,fenceLines,outline,...endLabels);
 
@@ -197,7 +278,7 @@ function updateSection(){
   outline.geometry=new THREE.BufferGeometry();
   if(n>1){
     const top=Math.max(...s.z[0])+(Math.max(...s.z[0])-model.base)*0.04;
-    outline.geometry.setAttribute("position",new THREE.Float32BufferAttribute([...p(0,model.base),...p(n-1,model.base),...p(n-1,top),...p(0,top)],3));
+    outline.geometry.setAttribute("position",new THREE.Float32BufferAttribute([...p(0,model.base),...p(n-1,model.base),...p(n-1,top),...p(0,top),...p(0,model.base)],3));
     endLabels[0].position.set(...(p(0,top) as [number,number,number]));
     endLabels[1].position.set(...(p(n-1,top) as [number,number,number]));
   }
@@ -216,6 +297,8 @@ function updateCutSide(){
   if(side===cutSide)return false;
   cutSide=side;
   clipPlane.setFromNormalAndCoplanarPoint(n.multiplyScalar(side),p);
+  cutNormal.value.set(clipPlane.normal.x,clipPlane.normal.y);
+  cutConstant.value=clipPlane.constant;
   return true;
 }
 
@@ -223,22 +306,26 @@ function updateCutSide(){
 
 function applyDisplay(){
   world.scale.set(1,1,view.ve);
-  const planes=view.cut?[clipPlane]:[];
+  cutOn.value=view.cut?1:0;
   for(const m of volumeMeshes){
-    const mat=m.material as THREE.MeshStandardMaterial;
+    const {lit,flat}=m.userData.materials as UnitMaterials;
+    m.material=view.exact?flat:lit;
     m.visible=view.volumes&&!view.hidden.has(model.units[m.userData.unit].id);
-    if(mat.transparent===view.cut){
-      mat.transparent=!view.cut;
-      mat.depthWrite=view.cut;
-      mat.side=view.cut?THREE.DoubleSide:THREE.FrontSide;
-      mat.needsUpdate=true;
+    for(const mat of [lit,flat]){
+      if(mat.transparent===view.cut){
+        mat.transparent=!view.cut;
+        mat.depthWrite=view.cut;
+        mat.side=view.cut?THREE.DoubleSide:THREE.FrontSide;
+        mat.needsUpdate=true;
+      }
+      mat.opacity=view.cut?1:.24;
     }
-    mat.opacity=view.cut?1:.24;
-    mat.clippingPlanes=planes;
   }
-  for(const l of horizonLines){l.visible=view.horizons;(l.material as THREE.Material).clippingPlanes=planes}
-  if(holeMesh){holeMesh.visible=view.boreholes;(holeMesh.material as THREE.Material).clippingPlanes=planes}
+  for(const l of horizonLines)l.visible=view.horizons;
+  if(holeMesh)holeMesh.visible=view.boreholes;
+  if(terrainMesh)terrainMesh.visible=view.terrain;
   for(const l of labels)l.visible=view.boreholes&&view.labels&&(!view.cut||clipPlane.distanceToPoint(l.position)>=0);
+  invalidate();
 }
 
 // ---------- UI ----------
@@ -260,7 +347,7 @@ const datasetSelect=ui.querySelector<HTMLSelectElement>(".dataset")!;
 const toolbar=document.createElement("div");
 toolbar.className="toolbar";
 toolbar.innerHTML=`<button class="import">Import data…</button>
-<input class="file" type="file" multiple hidden accept=".csv,.tsv,.txt,.ags,.json">
+<input class="file" type="file" multiple hidden accept=".csv,.tsv,.txt,.ags,.json,.asc,.xyz">
 <details class="menu"><summary>Export</summary><div>
   <button data-export="project">Project (JSON)</button>
   <button data-export="boreholes">Boreholes (CSV)</button>
@@ -272,9 +359,12 @@ toolbar.innerHTML=`<button class="import">Import data…</button>
   <label><input type="checkbox" data-view="horizons" checked>Horizons</label>
   <label><input type="checkbox" data-view="boreholes" checked>Boreholes</label>
   <label><input type="checkbox" data-view="labels" checked>Labels</label>
+  <label><input type="checkbox" data-view="terrain" checked>Terrain</label>
   <label><input type="checkbox" data-view="cut">Cut at section</label>
   <label><input type="checkbox" data-view="flip">Keep other side</label>
-</div>`;
+  <label title="Unlit legend colours: what you see is the legend colour, independent of lighting"><input type="checkbox" data-view="exact">Exact colours</label>
+</div>
+<div class="backend">Renderer: ${backendName}${wantWebGPU&&backendName!=="WebGPU"?" (WebGPU unavailable)":""} · <a href="?backend=${backendName==="WebGPU"?"webgl":"webgpu"}">use ${backendName==="WebGPU"?"WebGL 2":"WebGPU"}</a></div>`;
 app.appendChild(toolbar);
 const fileInput=toolbar.querySelector<HTMLInputElement>(".file")!;
 
@@ -308,7 +398,7 @@ app.appendChild(tooltip);
 const dropZone=document.createElement("div");
 dropZone.className="drop";
 dropZone.hidden=true;
-dropZone.innerHTML="<div>Drop borehole files<br><span>CSV tables · AGS4 · GeoModel3D or Georeport3D JSON</span></div>";
+dropZone.innerHTML="<div>Drop borehole or terrain files<br><span>CSV tables · AGS4 · GeoModel3D or Georeport3D JSON · terrain grid (.asc, .xyz)</span></div>";
 app.appendChild(dropZone);
 
 function renderPanel(){
@@ -318,9 +408,17 @@ function renderPanel(){
   const count=(n:number,what:string)=>`${n} ${what}${n===1?"":"s"}`;
   const stats=[count(model.boreholes.length,"borehole"),count(model.units.length,"unit"),count(model.horizons.length,"horizon")];
   if(model.triangles.length)stats.push(`footprint ${fmtArea(footprintArea(model))}`);
+  if(project.terrain)stats.push(`terrain ${fmt(project.terrain.dx,1)} m grid`);
   if(project.crs)stats.push(esc(project.crs));
   ui.querySelector(".stats")!.innerHTML=stats.join(" · ");
-  ui.querySelector(".legend")!.innerHTML=model.units.map((u,k)=>`<label title="${esc(u.name)}"><input type="checkbox" data-unit="${esc(u.id)}"${view.hidden.has(u.id)?"":" checked"}><i style="background:${u.color}"></i><span class="name">${esc(u.name)}</span><span class="vol">${model.triangles.length?fmtVolume(unitCubicMetres(model,k)):""}</span></label>`).join("");
+  ui.querySelector(".legend")!.innerHTML=model.units.map((u,k)=>{
+    const title=[u.name,u.erosive?"Erosive base: cuts down into older units":"",unitProperties(u)].filter(Boolean).join("\n");
+    return `<label title="${esc(title)}"><input type="checkbox" data-unit="${esc(u.id)}"${view.hidden.has(u.id)?"":" checked"}><i style="background:${u.color}"></i><span class="name">${esc(u.name)}</span>${u.erosive?'<span class="tag">erosive</span>':""}<span class="vol">${model.triangles.length?fmtVolume(unitCubicMetres(model,k)):""}</span></label>`;
+  }).join("");
+}
+function unitProperties(u:UnitDef){
+  const p=[u.gamma!==undefined?`γ ${fmt(u.gamma,1)} kN/m³`:"",u.gammaSat!==undefined?`γsat ${fmt(u.gammaSat,1)} kN/m³`:""].filter(Boolean).join(" · ");
+  return p&&u.source?`${p} (${u.source})`:p;
 }
 
 function syncControls(){
@@ -338,6 +436,7 @@ function syncControls(){
   sectionView.hidden=!view.panel;
   updateViewOffset();
   toolbar.querySelector<HTMLInputElement>('[data-view="flip"]')!.disabled=!view.cut;
+  invalidate();
 }
 
 function renderSectionPanel(){
@@ -378,7 +477,7 @@ function loadProject(p:GeoProject,importWarnings:string[]=[]){
 async function importFileList(list:FileList|File[]){
   try{
     const files=await Promise.all([...list].map(async f=>({name:f.name,text:await f.text()})));
-    const result=importFiles(files);
+    const result=importFiles(files,project);
     imported=result.project;
     loadProject(result.project,result.warnings);
   }catch(err){
@@ -413,7 +512,7 @@ app.addEventListener("click",e=>{
 });
 toolbar.querySelectorAll<HTMLInputElement>("[data-view]").forEach(input=>{
   input.onchange=()=>{
-    const key=input.dataset.view as "volumes"|"horizons"|"boreholes"|"labels"|"cut"|"flip";
+    const key=input.dataset.view as "volumes"|"horizons"|"boreholes"|"labels"|"terrain"|"cut"|"flip"|"exact";
     view[key]=input.checked;
     if(key==="cut"||key==="flip")updateSection();else applyDisplay();
     syncControls();
@@ -461,7 +560,14 @@ function updateTooltip(){
   }
   if(!html&&view.volumes){
     const hit=raycaster.intersectObjects(volumeMeshes.filter(m=>m.visible)).find(kept);
-    if(hit){const k=hit.object.userData.unit;html=`<b>${esc(model.units[k].name)}</b><span>${fmtVolume(unitCubicMetres(model,k))} in the model</span>`}
+    if(hit){
+      const u=model.units[hit.object.userData.unit],props=unitProperties(u);
+      html=`<b>${esc(u.name)}</b>${u.erosive?" · erosive base":""}<span>${fmtVolume(unitCubicMetres(model,hit.object.userData.unit))} in the model · elevation ${fmt(hit.point.z/view.ve+origin.z,1)} m</span>${props?`<span>${esc(props)}</span>`:""}`;
+    }
+  }
+  if(!html&&terrainMesh?.visible){
+    const hit=raycaster.intersectObject(terrainMesh).find(kept);
+    if(hit)html=`<b>Terrain</b> · ${fmt(hit.point.z/view.ve+origin.z,2)} m<span>${esc(project.terrain?.source??"terrain grid")}, outside the model</span>`;
   }
   tooltip.hidden=!html;
   if(html){
@@ -477,13 +583,17 @@ addEventListener("resize",()=>{
   renderer.setSize(innerWidth,innerHeight);
   labelRenderer.setSize(innerWidth,innerHeight);
   renderSectionPanel();
+  invalidate();
 });
 
+controls.addEventListener("change",invalidate);
 loadProject(project);
 renderer.setAnimationLoop(()=>{
   controls.update();
-  if(view.cut&&updateCutSide())applyDisplay();
   updateTooltip();
+  if(!dirty)return;
+  dirty--;
+  if(view.cut&&updateCutSide())applyDisplay();
   renderer.render(scene,camera);
   labelRenderer.render(scene,camera);
 });

@@ -1,7 +1,9 @@
 import {defineConfig} from "vite";
 
 // Relative asset URLs: the same build works on GitHub Pages (/GeoModel3D/), any static host or sub-path.
+// Bare "three" resolves to the WebGPU build so the viewer and the three.js add-ons share one module.
 export default defineConfig({
   base:"./",
-  build:{chunkSizeWarningLimit:900}
+  resolve:{alias:[{find:/^three$/,replacement:"three/webgpu"}]},
+  build:{target:"es2022",chunkSizeWarningLimit:1500}
 });

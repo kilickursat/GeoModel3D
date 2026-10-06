@@ -35,6 +35,8 @@ button,select,input{font:inherit}
 .toggles label{display:flex;align-items:center;gap:7px;cursor:pointer}
 .toggles input{margin:0;accent-color:#78c9df}
 .toggles input:disabled+*,.toggles label:has(input:disabled){opacity:.45}
+.backend{color:#708792;padding:0 2px}
+.backend a{color:#78c9df}
 
 .section-control{position:fixed;left:24px;right:24px;bottom:22px;padding:9px 14px;display:flex;align-items:center;gap:18px;color:#9bb1bd;font-size:10px;letter-spacing:.06em}
 .section-control .tag{letter-spacing:.12em}
@@ -75,3 +77,4 @@ button,select,input{font:inherit}
   .section-view{left:12px;right:12px;width:auto;bottom:auto;top:calc(30vh + 70px);height:34vh}
   .notice{right:12px;top:auto;bottom:220px}
 }
+.legend .tag{font-size:9px;color:#d08a4c;border:1px solid rgba(208,138,76,.5);border-radius:3px;padding:0 3px;flex:none}
