@@ -1,4 +1,5 @@
-import * as THREE from "three";
+import * as THREE from "three/webgpu";
+import {uniform,positionWorld,dot} from "three/tsl";
 import {OrbitControls} from "three/addons/controls/OrbitControls.js";
 import {CSS2DRenderer,CSS2DObject} from "three/addons/renderers/CSS2DRenderer.js";
 import pkg from "../package.json";
@@ -22,10 +23,13 @@ const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x071018);
 const camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,0.1,1e5);
 camera.up.set(0,0,1);
-const renderer=new THREE.WebGLRenderer({antialias:true});
+// WebGL 2 is the default backend until the WebGPU backend has been checked on real hardware; ?backend=webgpu opts in.
+const wantWebGPU=new URLSearchParams(location.search).get("backend")==="webgpu";
+const renderer=new THREE.WebGPURenderer({antialias:true,forceWebGL:!wantWebGPU});
+await renderer.init();
+const backendName=(renderer.backend as {isWebGPUBackend?:boolean}).isWebGPUBackend?"WebGPU":"WebGL 2";
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.setSize(innerWidth,innerHeight);
-renderer.localClippingEnabled=true;
 app.appendChild(renderer.domElement);
 const labelRenderer=new CSS2DRenderer();
 labelRenderer.setSize(innerWidth,innerHeight);
@@ -45,16 +49,24 @@ let content=new THREE.Group();
 world.add(content);
 const sectionGroup=new THREE.Group();
 world.add(sectionGroup);
+// The cut-away is a fragment mask shared by every clipped material, so it behaves the same on both backends.
+// clipPlane mirrors it on the CPU for picking and label visibility.
 const clipPlane=new THREE.Plane();
+const cutOn=uniform(0),cutNormal=uniform(new THREE.Vector2(1,0)),cutConstant=uniform(0);
+const keepFragment=cutOn.lessThan(0.5).or(dot(positionWorld.xy,cutNormal).add(cutConstant).greaterThanEqual(0));
+// Frames are drawn only after something changes.
+let dirty=2;
+const invalidate=()=>{dirty=2};
 
 let project:GeoProject=sampleProjects[0];
 let imported:GeoProject|null=null;
 let model:GeoModel;
 let section:Section;
 let origin={x:0,y:0,z:0},extent=1,sectionBuffer=1;
-const view={azimuth:0,offset:0,ve:1,cut:false,flip:false,volumes:true,horizons:true,boreholes:true,labels:true,panel:innerWidth>760,hidden:new Set<string>()};
+const view={azimuth:0,offset:0,ve:1,cut:false,flip:false,exact:false,volumes:true,horizons:true,boreholes:true,labels:true,panel:innerWidth>760,hidden:new Set<string>()};
 
-const volumeMeshes:THREE.Mesh[]=[];
+interface UnitMaterials { lit:THREE.MeshStandardNodeMaterial; flat:THREE.MeshBasicNodeMaterial }
+const volumeMeshes:Array<THREE.Mesh<THREE.BufferGeometry,THREE.Material>>=[];
 const horizonLines:THREE.LineSegments[]=[];
 let holeMesh:THREE.InstancedMesh|null=null;
 let holeInfo:Array<{hole:number;interval:number}>=[];
@@ -70,6 +82,8 @@ function disposeContent(){
     m.geometry?.dispose();
     const mat=m.material as THREE.Material|THREE.Material[]|undefined;
     if(mat)(Array.isArray(mat)?mat:[mat]).forEach(x=>x.dispose());
+    const unit=o.userData.materials as UnitMaterials|undefined;
+    if(unit){unit.lit.dispose();unit.flat.dispose()}
   });
   world.remove(content);
   content=new THREE.Group();
@@ -94,8 +108,15 @@ function buildContent(){
     geo.setAttribute("position",new THREE.BufferAttribute(g.positions,3));
     geo.setIndex(new THREE.BufferAttribute(g.indices,1));
     geo.computeVertexNormals();
-    const mesh=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:u.color,roughness:.95,metalness:0,transparent:true,depthWrite:false,side:THREE.FrontSide}));
+    const materials:UnitMaterials={
+      lit:new THREE.MeshStandardNodeMaterial({color:u.color,roughness:.95,metalness:0,transparent:true,depthWrite:false,side:THREE.FrontSide}),
+      flat:new THREE.MeshBasicNodeMaterial({color:u.color,transparent:true,depthWrite:false,side:THREE.FrontSide})
+    };
+    materials.lit.maskNode=keepFragment;
+    materials.flat.maskNode=keepFragment;
+    const mesh=new THREE.Mesh<THREE.BufferGeometry,THREE.Material>(geo,materials.lit);
     mesh.userData.unit=k;
+    mesh.userData.materials=materials;
     volumeMeshes.push(mesh);
     content.add(mesh);
   });
@@ -105,7 +126,9 @@ function buildContent(){
     const s=horizonSurface(model,k),geo=new THREE.BufferGeometry();
     geo.setAttribute("position",new THREE.BufferAttribute(new Float32Array(s.points.flatMap(p=>[p.x-origin.x,p.y-origin.y,p.z-origin.z])),3));
     geo.setIndex(s.triangles.flatMap(t=>[t.a,t.b,t.c]));
-    const line=new THREE.LineSegments(new THREE.WireframeGeometry(geo),new THREE.LineBasicMaterial({color:k===0?0xdfeaf0:0xffffff,transparent:true,opacity:k===0?.22:.07,depthWrite:false}));
+    const material=new THREE.LineBasicNodeMaterial({color:k===0?0xdfeaf0:0xffffff,transparent:true,opacity:k===0?.22:.07,depthWrite:false});
+    material.maskNode=keepFragment;
+    const line=new THREE.LineSegments(new THREE.WireframeGeometry(geo),material);
     geo.dispose();
     horizonLines.push(line);
     content.add(line);
@@ -127,7 +150,9 @@ function buildContent(){
     content.add(label);
   });
   if(segments.length){
-    holeMesh=new THREE.InstancedMesh(new THREE.CylinderGeometry(1,1,1,10).rotateX(Math.PI/2),new THREE.MeshBasicMaterial(),segments.length);
+    const material=new THREE.MeshBasicNodeMaterial();
+    material.maskNode=keepFragment;
+    holeMesh=new THREE.InstancedMesh(new THREE.CylinderGeometry(1,1,1,10).rotateX(Math.PI/2),material,segments.length);
     const m=new THREE.Matrix4(),q=new THREE.Quaternion(),c=new THREE.Color();
     segments.forEach((s,i)=>{
       const bh=model.boreholes[s.hole];
@@ -163,13 +188,14 @@ function fitCamera(){
   updateViewOffset();
   sun.position.copy(sphere.center).add(new THREE.Vector3(0.45,-0.7,1).multiplyScalar(dist));
   controls.update();
+  invalidate();
 }
 
 // ---------- section ----------
 
-const fence=new THREE.Mesh(new THREE.BufferGeometry(),new THREE.MeshBasicMaterial({vertexColors:true,side:THREE.DoubleSide,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1}));
-const fenceLines=new THREE.LineSegments(new THREE.BufferGeometry(),new THREE.LineBasicMaterial({color:0x0b1620,transparent:true,opacity:.75}));
-const outline=new THREE.LineLoop(new THREE.BufferGeometry(),new THREE.LineBasicMaterial({color:0x78c9df,transparent:true,opacity:.55}));
+const fence=new THREE.Mesh(new THREE.BufferGeometry(),new THREE.MeshBasicNodeMaterial({vertexColors:true,side:THREE.DoubleSide,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1}));
+const fenceLines=new THREE.LineSegments(new THREE.BufferGeometry(),new THREE.LineBasicNodeMaterial({color:0x0b1620,transparent:true,opacity:.75}));
+const outline=new THREE.Line(new THREE.BufferGeometry(),new THREE.LineBasicNodeMaterial({color:0x78c9df,transparent:true,opacity:.55}));
 const endLabels=["A","A′"].map(t=>{const el=document.createElement("div");el.className="end-label";el.textContent=t;const l=new CSS2DObject(el);l.center.set(0.5,1.2);return l});
 sectionGroup.add(fence,fenceLines,outline,...endLabels);
 
@@ -197,7 +223,7 @@ function updateSection(){
   outline.geometry=new THREE.BufferGeometry();
   if(n>1){
     const top=Math.max(...s.z[0])+(Math.max(...s.z[0])-model.base)*0.04;
-    outline.geometry.setAttribute("position",new THREE.Float32BufferAttribute([...p(0,model.base),...p(n-1,model.base),...p(n-1,top),...p(0,top)],3));
+    outline.geometry.setAttribute("position",new THREE.Float32BufferAttribute([...p(0,model.base),...p(n-1,model.base),...p(n-1,top),...p(0,top),...p(0,model.base)],3));
     endLabels[0].position.set(...(p(0,top) as [number,number,number]));
     endLabels[1].position.set(...(p(n-1,top) as [number,number,number]));
   }
@@ -216,6 +242,8 @@ function updateCutSide(){
   if(side===cutSide)return false;
   cutSide=side;
   clipPlane.setFromNormalAndCoplanarPoint(n.multiplyScalar(side),p);
+  cutNormal.value.set(clipPlane.normal.x,clipPlane.normal.y);
+  cutConstant.value=clipPlane.constant;
   return true;
 }
 
@@ -223,22 +251,25 @@ function updateCutSide(){
 
 function applyDisplay(){
   world.scale.set(1,1,view.ve);
-  const planes=view.cut?[clipPlane]:[];
+  cutOn.value=view.cut?1:0;
   for(const m of volumeMeshes){
-    const mat=m.material as THREE.MeshStandardMaterial;
+    const {lit,flat}=m.userData.materials as UnitMaterials;
+    m.material=view.exact?flat:lit;
     m.visible=view.volumes&&!view.hidden.has(model.units[m.userData.unit].id);
-    if(mat.transparent===view.cut){
-      mat.transparent=!view.cut;
-      mat.depthWrite=view.cut;
-      mat.side=view.cut?THREE.DoubleSide:THREE.FrontSide;
-      mat.needsUpdate=true;
+    for(const mat of [lit,flat]){
+      if(mat.transparent===view.cut){
+        mat.transparent=!view.cut;
+        mat.depthWrite=view.cut;
+        mat.side=view.cut?THREE.DoubleSide:THREE.FrontSide;
+        mat.needsUpdate=true;
+      }
+      mat.opacity=view.cut?1:.24;
     }
-    mat.opacity=view.cut?1:.24;
-    mat.clippingPlanes=planes;
   }
-  for(const l of horizonLines){l.visible=view.horizons;(l.material as THREE.Material).clippingPlanes=planes}
-  if(holeMesh){holeMesh.visible=view.boreholes;(holeMesh.material as THREE.Material).clippingPlanes=planes}
+  for(const l of horizonLines)l.visible=view.horizons;
+  if(holeMesh)holeMesh.visible=view.boreholes;
   for(const l of labels)l.visible=view.boreholes&&view.labels&&(!view.cut||clipPlane.distanceToPoint(l.position)>=0);
+  invalidate();
 }
 
 // ---------- UI ----------
@@ -274,7 +305,9 @@ toolbar.innerHTML=`<button class="import">Import data…</button>
   <label><input type="checkbox" data-view="labels" checked>Labels</label>
   <label><input type="checkbox" data-view="cut">Cut at section</label>
   <label><input type="checkbox" data-view="flip">Keep other side</label>
-</div>`;
+  <label title="Unlit legend colours: what you see is the legend colour, independent of lighting"><input type="checkbox" data-view="exact">Exact colours</label>
+</div>
+<div class="backend">Renderer: ${backendName}${wantWebGPU&&backendName!=="WebGPU"?" (WebGPU unavailable)":""} · <a href="?backend=${backendName==="WebGPU"?"webgl":"webgpu"}">use ${backendName==="WebGPU"?"WebGL 2":"WebGPU"}</a></div>`;
 app.appendChild(toolbar);
 const fileInput=toolbar.querySelector<HTMLInputElement>(".file")!;
 
@@ -338,6 +371,7 @@ function syncControls(){
   sectionView.hidden=!view.panel;
   updateViewOffset();
   toolbar.querySelector<HTMLInputElement>('[data-view="flip"]')!.disabled=!view.cut;
+  invalidate();
 }
 
 function renderSectionPanel(){
@@ -413,7 +447,7 @@ app.addEventListener("click",e=>{
 });
 toolbar.querySelectorAll<HTMLInputElement>("[data-view]").forEach(input=>{
   input.onchange=()=>{
-    const key=input.dataset.view as "volumes"|"horizons"|"boreholes"|"labels"|"cut"|"flip";
+    const key=input.dataset.view as "volumes"|"horizons"|"boreholes"|"labels"|"cut"|"flip"|"exact";
     view[key]=input.checked;
     if(key==="cut"||key==="flip")updateSection();else applyDisplay();
     syncControls();
@@ -477,13 +511,17 @@ addEventListener("resize",()=>{
   renderer.setSize(innerWidth,innerHeight);
   labelRenderer.setSize(innerWidth,innerHeight);
   renderSectionPanel();
+  invalidate();
 });
 
+controls.addEventListener("change",invalidate);
 loadProject(project);
 renderer.setAnimationLoop(()=>{
   controls.update();
-  if(view.cut&&updateCutSide())applyDisplay();
   updateTooltip();
+  if(!dirty)return;
+  dirty--;
+  if(view.cut&&updateCutSide())applyDisplay();
   renderer.render(scene,camera);
   labelRenderer.render(scene,camera);
 });
