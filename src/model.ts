@@ -9,7 +9,8 @@ export interface CollarResidual { id:string; collar:number; terrain:number; resi
 export interface GeoModel {
   project:GeoProject;
   units:UnitDef[];
-  // boreholes[i] sits on nodes[i]; nodes added by subdividing the borehole triangulation follow them.
+  // boreholes[i] sits on nodes[i]; nodes added by subdividing the borehole triangulation follow them, then the nodes
+  // on the lines where units pinch out or are cut.
   boreholes:Borehole[];
   nodes:XY[];
   triangles:Triangle[];
@@ -118,6 +119,58 @@ export function subdivide(nodes:XY[],triangles:Triangle[],level:number):Subdivis
   return {nodes:out,triangles:tris,parents,edgeChains:[...chains.values()]};
 }
 
+// A mesh whose node fields can be split along the zero line of a function that is linear on every triangle. Each new
+// node lies on the edge it splits, with every field interpolated along that edge, so all fields stay linear on every
+// triangle and the mesh stays conforming; edge chains gain the nodes inserted on their edges.
+function splittableMesh(nodes:XY[],triangles:Triangle[],chains:number[][],fields:number[][],flags:number[][]){
+  const mesh={nodes:[...nodes],triangles,chains};
+  function split(f:(n:number)=>number,eps=1e-9){
+    const pts=mesh.nodes,P=pts.length,value=pts.map((_,n)=>f(n)),made=new Map<number,number>();
+    const side=(n:number)=>value[n]>eps?1:value[n]<-eps?-1:0;
+    if(!value.some(v=>v>eps)||!value.some(v=>v<-eps))return;
+    const between=(a:number,b:number)=>{
+      if(side(a)*side(b)>=0)return -1;
+      const lo=Math.min(a,b),hi=Math.max(a,b),key=lo*P+hi;
+      let m=made.get(key);
+      if(m===undefined){
+        const t=value[lo]/(value[lo]-value[hi]);
+        m=pts.length;
+        pts.push({x:pts[lo].x+t*(pts[hi].x-pts[lo].x),y:pts[lo].y+t*(pts[hi].y-pts[lo].y)});
+        for(const g of fields)g.push(g[lo]+t*(g[hi]-g[lo]));
+        for(const g of flags)g.push(g[lo]&g[hi]);
+        value.push(0);
+        made.set(key,m);
+      }
+      return m;
+    };
+    const out:Triangle[]=[];
+    for(const t of mesh.triangles){
+      const ab=between(t.a,t.b),bc=between(t.b,t.c),ca=between(t.c,t.a);
+      if(ab<0&&bc<0&&ca<0){out.push(t);continue}
+      const ring=[t.a];
+      if(ab>=0)ring.push(ab);
+      ring.push(t.b);
+      if(bc>=0)ring.push(bc);
+      ring.push(t.c);
+      if(ca>=0)ring.push(ca);
+      // The zero line cuts the triangle into two convex pieces; nodes on the line belong to both.
+      for(const s of [1,-1]){
+        const piece=ring.filter(n=>side(n)!==-s);
+        if(!piece.some(n=>side(n)===s))continue;
+        for(let j=1;j+1<piece.length;j++)out.push({a:piece[0],b:piece[j],c:piece[j+1]});
+      }
+    }
+    if(!made.size)return;
+    mesh.triangles=out;
+    mesh.chains=mesh.chains.map(c=>{
+      const o=[c[0]];
+      for(let j=1;j<c.length;j++){const m=made.get(Math.min(c[j-1],c[j])*P+Math.max(c[j-1],c[j]));if(m!==undefined)o.push(m);o.push(c[j])}
+      return o;
+    });
+  }
+  return {mesh,split};
+}
+
 // Subdivide finely enough to follow the terrain grid, or to cut cleanly along erosion surfaces.
 function subdivisionLevel(nodes:XY[],triangles:Triangle[],terrain?:TerrainGrid){
   const lengths=uniqueEdges(triangles).map(([a,b])=>Math.hypot(nodes[a].x-nodes[b].x,nodes[a].y-nodes[b].y)).sort((p,q)=>p-q);
@@ -215,11 +268,22 @@ export function buildGeologicalModel(project:GeoProject):GeoModel{
     residuals=boreholes.map(b=>{const tz=terrainZ(t,b.x,b.y);return {id:b.id,collar:b.z,terrain:tz,residual:b.z-tz}});
     const r=residuals.map(q=>Number.isFinite(q.residual)?q.residual:0);
     const correction=spread(r);
+    // Where the terrain rises above the surface through the collars, the extra height belongs to the units that form
+    // the ground at the surrounding boreholes, shared by their barycentric weights: a unit absent from the surface of
+    // all of them stays absent. Where the terrain is lower, the ordering below cuts the units from the top.
+    const surfaceUnit=boreholes.map((_,i)=>{
+      let above=raw[0][i];
+      for(let u=0;u<K-1;u++){const below=Math.min(Math.max(raw[u+1][i],base),above);if(above-below>1e-9)return u;above=below}
+      return K-1;
+    });
+    const shares=units.map((_,u)=>spread(surfaceUnit.map(s=>s===u?1:0)));
     let missing=0;
     for(let n=N;n<M;n++){
       const tz=terrainZ(t,mesh.nodes[n].x,mesh.nodes[n].y);
-      if(Number.isFinite(tz))z[0][n]=tz+correction[n];
-      else{missing++;known[0][n]=0}
+      if(!Number.isFinite(tz)){missing++;known[0][n]=0;continue}
+      const ground=tz+correction[n],rise=ground-z[0][n];
+      z[0][n]=ground;
+      if(rise>0){let below=1;for(let k=1;k<=K;k++){below-=shares[k-1][n];z[k][n]+=rise*below}}
     }
     const outside=residuals.filter(q=>!Number.isFinite(q.terrain));
     if(outside.length)warnings.push(`Terrain grid does not cover ${outside.map(q=>q.id).join(", ")}`);
@@ -231,16 +295,26 @@ export function buildGeologicalModel(project:GeoProject):GeoModel{
   }
 
   // Stratigraphic ordering: each horizon lies at or below the one above and at or above the model base. This
-  // cuts older units at the ground (erosion by the present topography) and at erosive unit bases.
-  for(let k=1;k<K;k++)for(let n=0;n<M;n++)z[k][n]=Math.min(Math.max(z[k][n],base),z[k-1][n]);
-  if(K)for(let n=0;n<M;n++)z[K][n]=Math.min(base,z[K-1][n]);
+  // cuts older units at the ground (erosion by the present topography) and at erosive unit bases. The lines where a
+  // horizon meets the one above or the base are first added to the mesh, so pinch-outs and outcrops run straight
+  // across the triangles instead of stepping along their edges.
+  const Z=z.map(a=>Array.from(a)),known01=known.map(a=>Array.from(a));
+  const cut=splittableMesh(mesh.nodes,mesh.triangles,mesh.edgeChains,Z,known01);
+  for(let k=1;k<=K;k++){
+    const zk=Z[k],above=Z[k-1];
+    if(k===K)zk.fill(base);
+    cut.split(n=>zk[n]-base);
+    for(let n=0;n<zk.length;n++)zk[n]=Math.max(zk[n],base);
+    cut.split(n=>zk[n]-above[n]);
+    for(let n=0;n<zk.length;n++)zk[n]=Math.min(zk[n],above[n]);
+  }
 
-  const horizons:Horizon[]=z.map((zk,k)=>({
+  const horizons:Horizon[]=Z.map((zk,k)=>({
     id:k===0?"ground":k===K?"base":"base:"+units[k-1].id,
     name:k===0?"Ground surface":k===K?"Model base":"Base of "+units[k-1].name,
-    z:zk,observed:known[k]
+    z:Float64Array.from(zk),observed:Uint8Array.from(known01[k])
   }));
-  return {project,units,boreholes,nodes:mesh.nodes,triangles:mesh.triangles,horizons,base,warnings,edgeChains:mesh.edgeChains,level,residuals,terrainAt};
+  return {project,units,boreholes,nodes:cut.mesh.nodes,triangles:cut.mesh.triangles,horizons,base,warnings,edgeChains:cut.mesh.chains,level,residuals,terrainAt};
 }
 
 export function horizonSurface(model:GeoModel,k:number):TINSurface{
