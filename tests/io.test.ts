@@ -72,7 +72,8 @@ describe("AGS4 import",()=>{
     expect(parseAgs4(ags).get("GEOL")!.length).toBe(8);
     const {project,warnings}=importFiles([{name:"site.ags",text:ags}]);
     expect(project.name).toBe("Riverside test");
-    expect(project.crs).toBe("OSGB");
+    // LOCA_GREF "OSGB" is recognised as the British National Grid, which georeferences the model.
+    expect([project.crs,project.crsCode]).toEqual(["OSGB36 / British National Grid","EPSG:27700"]);
     expect(project.units.map(u=>[u.id,u.name])).toEqual([["MG","Made Ground"],["LC","London Clay"],["LMB","Lambeth Group"]]);
     expect(project.boreholes.map(b=>b.id)).toEqual(["BH1","BH2","BH4"]);
     expect(warnings).toEqual([expect.stringMatching(/^BH3: no collar position and elevation/)]);

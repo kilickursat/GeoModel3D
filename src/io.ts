@@ -1,8 +1,24 @@
-import {Borehole,GeoProject,Interval,UnitDef,boreholeDepth} from "./geology";
+import proj4 from "proj4";
+import {Borehole,GeoProject,Interval,UnitDef,UnitRule,SptTest,WaterLevel,boreholeDepth} from "./geology";
 import {TerrainGrid,isTerrainFile,readTerrain} from "./terrain";
+import {Crs,findCrs,projectCrs,suggestCrs,toProjected,searchCrs} from "./crs";
+import {isBoringXml,readBoringXml} from "./boringXml";
+import {applyUnitRules,japaneseLithologyRules} from "./rules";
 
 export interface TextFile { name:string; text:string }
 export interface ImportResult { project:GeoProject; warnings:string[] }
+
+// ---------- decoding ----------
+
+// Text from file bytes: UTF-8 (or UTF-16 with a byte-order mark) when valid, else the encoding an XML declaration
+// names, else Shift_JIS, which Japanese spreadsheets and borehole logs commonly use, else Windows-1252.
+export function decodeText(bytes:Uint8Array):string{
+  if(bytes[0]===0xff&&bytes[1]===0xfe)return new TextDecoder("utf-16le").decode(bytes);
+  if(bytes[0]===0xfe&&bytes[1]===0xff)return new TextDecoder("utf-16be").decode(bytes);
+  const declared=new TextDecoder("latin1").decode(bytes.subarray(0,200)).match(/^<\?xml[^>]*encoding=["']([\w.:-]+)["']/i)?.[1];
+  const attempt=(label:string)=>{try{return new TextDecoder(label,{fatal:true}).decode(bytes)}catch{return null}};
+  return (declared&&!/^utf-?8$/i.test(declared)?attempt(declared):null)??attempt("utf-8")??attempt("shift_jis")??new TextDecoder("windows-1252").decode(bytes);
+}
 
 // ---------- CSV ----------
 
@@ -49,6 +65,8 @@ const ALIASES={
   y:["y","northing","north","n","ycoord","ycoordinate","collary","locanatn","locy"],
   z:["z","elevation","elev","collarz","collarelevation","groundlevel","groundelevation","gl","rl","collarrl","locagl","zcoord","level","height"],
   depth:["depth","totaldepth","finaldepth","eoh","holedepth","enddepth","locafdep","maxdepth"],
+  lat:["lat","latitude","localat","latdeg","ylat"],
+  lon:["lon","long","lng","longitude","localon","londeg","xlon"],
   from:["from","depthfrom","fromdepth","top","topdepth","depthtop","geoltop"],
   to:["to","depthto","todepth","bottom","base","basedepth","bottomdepth","depthbase","depthbottom","geolbase"],
   unit:["unit","unitid","unitcode","stratigraphicunit","geologicalunit","formation","stratum","geology","lithology","litho","lith","lithcode","geolgeol","geolleg","layer","soil","material","code"],
@@ -72,7 +90,8 @@ function num(v:string|undefined){
   return Number(/^-?\d+,\d+$/.test(s)?s.replace(",","."):s);
 }
 
-interface Tables { collars:Map<string,{x:number;y:number;z:number;depth?:number}>; intervals:Map<string,Interval[]>; units:UnitDef[]; warnings:string[] }
+interface Collar { x:number; y:number; z:number; depth?:number; lon?:number; lat?:number; spt?:SptTest[]; water?:WaterLevel[] }
+interface Tables { collars:Map<string,Collar>; intervals:Map<string,Interval[]>; units:UnitDef[]; warnings:string[] }
 
 function readCsvTable(file:TextFile,t:Tables){
   const rows=parseCsv(file.text);
@@ -80,22 +99,23 @@ function readCsvTable(file:TextFile,t:Tables){
   const c=columns(rows[0]),has=(...f:Field[])=>f.every(k=>c[k]!==undefined);
   const data=rows.slice(1);
   const cell=(r:string[],f:Field)=>c[f]===undefined?undefined:r[c[f]!]?.trim();
+  const collar=(r:string[]):Collar=>({x:num(cell(r,"x")),y:num(cell(r,"y")),z:num(cell(r,"z")),depth:num(cell(r,"depth")),lon:num(cell(r,"lon")),lat:num(cell(r,"lat"))});
   if(has("id","from","to","unit")){
-    const combined=has("x","y","z");
+    const combined=has("x","y","z")||has("lat","lon","z");
     for(const r of data){
       const id=cell(r,"id");
       if(!id){t.warnings.push(`${file.name}: row without a borehole id skipped`);continue}
       const from=num(cell(r,"from")),to=num(cell(r,"to")),unit=cell(r,"unit")??"";
       if(!t.intervals.has(id))t.intervals.set(id,[]);
       t.intervals.get(id)!.push({from,to,unit});
-      if(combined&&!t.collars.has(id))t.collars.set(id,{x:num(cell(r,"x")),y:num(cell(r,"y")),z:num(cell(r,"z")),depth:num(cell(r,"depth"))});
+      if(combined&&!t.collars.has(id))t.collars.set(id,collar(r));
     }
-  }else if(has("id","x","y")){
+  }else if(has("id","x","y")||has("id","lat","lon")){
     for(const r of data){
       const id=cell(r,"id");
       if(!id)continue;
       if(t.collars.has(id))t.warnings.push(`${file.name}: duplicate collar ${id}; first row kept`);
-      else t.collars.set(id,{x:num(cell(r,"x")),y:num(cell(r,"y")),z:num(cell(r,"z")),depth:num(cell(r,"depth"))});
+      else t.collars.set(id,collar(r));
     }
   }else if(c.unit!==undefined&&(["color","name","erosive","gamma","gammaSat"] as Field[]).some(f=>c[f]!==undefined)){
     for(const r of data){
@@ -131,8 +151,9 @@ function readAgs4(file:TextFile):ImportResult{
   let local=false;
   for(const r of loca){
     let x=num(r.LOCA_NATE),y=num(r.LOCA_NATN),z=num(r.LOCA_GL);
-    if(!Number.isFinite(x)||!Number.isFinite(y)){x=num(r.LOCA_LOCX);y=num(r.LOCA_LOCY);z=Number.isFinite(z)?z:num(r.LOCA_LOCZ);local=local||Number.isFinite(x)}
-    t.collars.set(r.LOCA_ID,{x,y,z,depth:num(r.LOCA_FDEP)});
+    const lon=num(r.LOCA_LON),lat=num(r.LOCA_LAT);
+    if((!Number.isFinite(x)||!Number.isFinite(y))&&!(Number.isFinite(lon)&&Number.isFinite(lat))){x=num(r.LOCA_LOCX);y=num(r.LOCA_LOCY);z=Number.isFinite(z)?z:num(r.LOCA_LOCZ);local=local||Number.isFinite(x)}
+    t.collars.set(r.LOCA_ID,{x,y,z,depth:num(r.LOCA_FDEP),lon,lat});
   }
   if(local)warnings.push("Some locations have no national grid coordinates; local LOCA_LOCX/LOCA_LOCY were used for them");
   for(const r of geol){
@@ -144,7 +165,8 @@ function readAgs4(file:TextFile):ImportResult{
   t.units=[...new Set(geol.map(r=>r[key]?.trim()).filter(Boolean))].filter(c=>names.has(c)).map(c=>({id:c,name:names.get(c)!,color:""}));
   const proj=g.get("PROJ")?.[0];
   const grefs=[...new Set(loca.map(r=>r.LOCA_GREF).filter(Boolean))];
-  const result=assemble(t,proj?.PROJ_NAME||file.name.replace(/\.[^.]+$/,""),grefs.length===1?grefs[0]:undefined,true);
+  const named=grefs.length===1?crsFromName(grefs[0]):undefined;
+  const result=assemble(t,proj?.PROJ_NAME||file.name.replace(/\.[^.]+$/,""),named?named.name:grefs.length===1?grefs[0]:undefined,true,named);
   result.project.description=`Imported from AGS4 (${file.name}); units from ${key}.`;
   return result;
 }
@@ -196,11 +218,18 @@ function readProjectJson(doc:any,file:string):ImportResult{
   for(const b of doc.boreholes??[]){
     const id=String(b.id??"").trim();
     if(!id)continue;
-    t.collars.set(id,{x:Number(b.x),y:Number(b.y),z:Number(b.z),depth:b.depth===undefined?undefined:Number(b.depth)});
-    t.intervals.set(id,(b.intervals??[]).map((i:any)=>({from:Number(i.from),to:Number(i.to),unit:String(i.unit??"").trim()})));
+    const list=(v:unknown,keys:string[])=>Array.isArray(v)?v.filter(o=>o&&keys.every(k=>Number.isFinite(Number(o[k])))):undefined;
+    t.collars.set(id,{x:Number(b.x),y:Number(b.y),z:Number(b.z),depth:b.depth===undefined?undefined:Number(b.depth),
+      lon:b.lon===undefined?undefined:Number(b.lon),lat:b.lat===undefined?undefined:Number(b.lat),
+      spt:list(b.spt,["depth","blows","penetration"]),water:list(b.water,["depth"])});
+    t.intervals.set(id,(b.intervals??[]).map((i:any)=>({from:Number(i.from),to:Number(i.to),unit:String(i.unit??"").trim(),...(typeof i.name==="string"?{name:i.name}:{})})));
   }
-  const result=assemble(t,doc.name||file,doc.crs,!t.units.length);
+  const rules:UnitRule[]|undefined=Array.isArray(doc.rules)?doc.rules.filter((r:any)=>r&&typeof r.match==="string"&&typeof r.unit==="string"):undefined;
+  const crs=doc.crsProj4?{name:doc.crs||doc.crsCode||"Custom",code:doc.crsCode,proj4:String(doc.crsProj4)}:doc.crsCode?findCrs(String(doc.crsCode)):undefined;
+  if(doc.crsCode&&!crs)t.warnings.push(`${file}: coordinate system ${doc.crsCode} is not known here; the model is shown without a map`);
+  const result=assemble(t,doc.name||file,doc.crs,!t.units.length,crs??undefined,rules);
   if(doc.description)result.project.description=String(doc.description);
+  if(doc.source)result.project.source=String(doc.source);
   if(Number.isFinite(doc.base))result.project.base=Number(doc.base);
   const g=doc.terrain;
   if(g){
@@ -212,7 +241,8 @@ function readProjectJson(doc:any,file:string):ImportResult{
 }
 // JSON has no NaN, so terrain cells without data are written as null.
 export function toProjectJson(p:GeoProject){
-  const doc={format:"geomodel3d-project",version:1,name:p.name,description:p.description,crs:p.crs,base:p.base,units:p.units,boreholes:p.boreholes,terrain:p.terrain};
+  const doc={format:"geomodel3d-project",version:1,name:p.name,description:p.description,source:p.source,crs:p.crs,crsCode:p.crsCode,crsProj4:p.crsProj4,
+    base:p.base,units:p.units,rules:p.rules,boreholes:p.boreholes,terrain:p.terrain};
   return JSON.stringify(doc,null,1).replace(/"z": \[[^\]]*\]/,m=>m.replace(/\s+/g,""))+"\n";
 }
 export function toBoreholeCsv(p:GeoProject){
@@ -223,15 +253,30 @@ export function toBoreholeCsv(p:GeoProject){
 
 // ---------- assembling a project ----------
 
-function assemble(t:Tables,name:string,crs:string|undefined,inferUnits:boolean):ImportResult{
+// Collars given only by latitude and longitude are placed in the declared coordinate system, or in the one suggested
+// for their location.
+function georeference(t:Tables,declared?:Crs):Crs|undefined{
+  const geo=[...t.collars.values()].filter(c=>!(Number.isFinite(c.x)&&Number.isFinite(c.y))&&Number.isFinite(c.lon)&&Number.isFinite(c.lat));
+  if(!geo.length)return declared;
+  const mean=(k:"lon"|"lat")=>geo.reduce((a,c)=>a+c[k]!,0)/geo.length;
+  const crs=declared??suggestCrs(mean("lon"),mean("lat"))[0];
+  for(const c of geo)Object.assign(c,toProjected(crs,c.lon!,c.lat!));
+  t.warnings.push(`${geo.length} collar position${geo.length>1?"s":""} converted from latitude and longitude to ${crs.name}${crs.code?` (${crs.code})`:""}${declared?"":", suggested for their location"}${crs.note?`. ${crs.note}`:""}`);
+  return crs;
+}
+
+function assemble(t:Tables,name:string,crsName:string|undefined,inferUnits:boolean,declared?:Crs,rules?:UnitRule[]):ImportResult{
   const warnings=t.warnings,boreholes:Borehole[]=[];
+  const crs=georeference(t,declared);
   for(const [id,raw] of t.intervals){
     const collar=t.collars.get(id);
     if(!collar||![collar.x,collar.y,collar.z].every(Number.isFinite)){warnings.push(`${id}: no collar position and elevation; not placed`);continue}
     const intervals:Interval[]=[];
     for(const i of raw){
-      if(!i.unit||!Number.isFinite(i.from)||!Number.isFinite(i.to)||i.from<0||i.to<=i.from){
-        warnings.push(`${id}: interval ${i.from}–${i.to} m${i.unit?" ("+i.unit+")":""} is incomplete or inverted; skipped`);continue;
+      // A description without a unit is given one by the rules below.
+      const label=i.unit||(rules?.length?i.name:undefined);
+      if(!label||!Number.isFinite(i.from)||!Number.isFinite(i.to)||i.from<0||i.to<=i.from){
+        warnings.push(`${id}: interval ${i.from}–${i.to} m${label?" ("+label+")":""} is incomplete or inverted; skipped`);continue;
       }
       intervals.push(i);
     }
@@ -239,7 +284,15 @@ function assemble(t:Tables,name:string,crs:string|undefined,inferUnits:boolean):
     if(!intervals.length){warnings.push(`${id}: no usable intervals; not placed`);continue}
     const b:Borehole={id,x:collar.x,y:collar.y,z:collar.z,intervals};
     if(collar.depth!==undefined&&Number.isFinite(collar.depth)&&collar.depth>boreholeDepth(b))b.depth=collar.depth;
+    if(Number.isFinite(collar.lon)&&Number.isFinite(collar.lat)){b.lon=collar.lon;b.lat=collar.lat}
+    if(collar.spt?.length)b.spt=collar.spt;
+    if(collar.water?.length)b.water=collar.water;
     boreholes.push(b);
+  }
+  if(rules?.length){
+    const mapped=applyUnitRules(boreholes,rules);
+    boreholes.splice(0,boreholes.length,...mapped.boreholes);
+    if(mapped.unmatched.size)warnings.push(`Descriptions that no rule assigns to a unit are modelled as units of their own: ${[...mapped.unmatched].map(([n,c])=>`${n} (${c})`).join(", ")}`);
   }
   for(const id of t.collars.keys())if(!t.intervals.has(id))warnings.push(`${id}: collar without intervals; ignored`);
   const logged=new Set(boreholes.flatMap(b=>b.intervals.map(i=>i.unit)));
@@ -261,7 +314,11 @@ function assemble(t:Tables,name:string,crs:string|undefined,inferUnits:boolean):
   }
   assignColors(units);
   checkProperties(units,warnings);
-  return {project:{name,crs,units,boreholes},warnings};
+  const project:GeoProject={name,crs:crs?.name??crsName,units,boreholes};
+  if(crs?.code&&findCrs(crs.code))project.crsCode=crs.code;
+  else if(crs)project.crsProj4=crs.proj4;
+  if(rules?.length)project.rules=rules;
+  return {project,warnings};
 }
 
 // Stratigraphic order from the logs: "A directly above B" in any hole means A is younger. Ties and conflicting
@@ -333,6 +390,49 @@ function hslHex(h:number,s:number,l:number){
   return "#"+f(0)+f(8)+f(4);
 }
 
+// ---------- Japanese borehole logs ----------
+
+const TOKYO="+proj=longlat +ellps=bessel +towgs84=-146.414,507.337,680.507,0,0,0,0 +no_defs";
+// Units come from the descriptions through the current project's rules or, for a new project, a first grouping of
+// the soil names by principal material.
+function readBoringLogs(files:TextFile[],current?:GeoProject):ImportResult{
+  const t:Tables={collars:new Map(),intervals:new Map(),units:[],warnings:[]};
+  let tokyo=0,jgd2000=0;
+  for(const f of files){
+    let log;
+    try{log=readBoringXml(f.text,f.name)}catch(e){t.warnings.push((e as Error).message);continue}
+    let id=log.id;
+    if(t.collars.has(id))id=`${log.id} (${f.name.replace(/\.[^.]+$/,"")})`;
+    for(const n of log.notes)t.warnings.push(`${id}: ${n}`);
+    let {lon,lat}=log;
+    if(log.datum==="Tokyo"){[lon,lat]=proj4(TOKYO,"WGS84").forward([lon,lat]);tokyo++}
+    if(log.datum==="JGD2000")jgd2000++;
+    t.collars.set(id,{x:NaN,y:NaN,z:log.z,depth:log.depth,lon,lat,spt:log.spt,water:log.water});
+    t.intervals.set(id,log.intervals.map(i=>({...i,unit:""})));
+  }
+  if(tokyo)t.warnings.push(`${tokyo} log${tokyo>1?"s use":" uses"} the Tokyo datum; shifted to JGD2011 to about 9 m (the TKY2JGD grid is not applied)`);
+  if(jgd2000)t.warnings.push(`${jgd2000} log${jgd2000>1?"s use":" uses"} JGD2000, taken as JGD2011 (they differ by up to a few metres in eastern Japan since 2011)`);
+  const rules=current?.rules??japaneseLithologyRules;
+  const result=assemble(t,files.length===1?files[0].name.replace(/\.[^.]+$/,""):"Imported borehole logs",undefined,!current?.rules,projectCrs(current??{})??undefined,rules);
+  if(!current?.rules)result.warnings.push("Units are a first grouping of the soil names by principal material (lithology, not formations); edit the unit rules to model the stratigraphy");
+  result.warnings.push("Collar elevations are as logged (孔口標高), normally T.P.; river and port surveys may use a local datum such as A.P. or O.P.");
+  result.project.description=`Imported from ${files.length} Japanese borehole log${files.length>1?"s":""} (電子納品 XML).`;
+  if(current?.rules)result.project.units=[...current.units.filter(u=>result.project.boreholes.some(b=>b.intervals.some(i=>i.unit===u.id))),...result.project.units.filter(u=>!current.units.some(c=>c.id===u.id))];
+  return result;
+}
+
+// The coordinate system an AGS4 LOCA_GREF or similar label names, if it can be recognised.
+export function crsFromName(label:string):Crs|undefined{
+  const code=label.match(/epsg\D{0,3}(\d{4,5})/i);
+  if(code)return findCrs(code[1]);
+  const aliases:Array<[RegExp,string]>=[[/osgb|british national grid|\bbng\b|ostn/i,"27700"],[/\bitm\b|irish transverse/i,"2157"],[/irish grid|tm75|tm65/i,"29903"],
+    [/hk ?1980|hk80/i,"2326"],[/svy21/i,"3414"],[/nztm/i,"2193"],[/rd new|amersfoort/i,"28992"],[/lv95|ch1903\+/i,"2056"],[/lambert.?93/i,"2154"]];
+  const hit=aliases.find(([re])=>re.test(label));
+  if(hit)return findCrs(hit[1]);
+  const found=searchCrs(label,2);
+  return found.length===1?found[0]:undefined;
+}
+
 // ---------- entry point ----------
 
 // Terrain grids (.asc, gridded .xyz) attach to the boreholes imported with them, or to `current` when they come alone.
@@ -346,6 +446,12 @@ export function importFiles(files:TextFile[],current?:GeoProject):ImportResult{
     if(!result)throw new Error("Load or import boreholes before adding a terrain grid");
     result.project.terrain=terrain;
     result.warnings.unshift(note,...grids.slice(1).map(f=>`Only one terrain grid is used; ${f.name} was ignored`));
+    return result;
+  }
+  const logs=files.filter(f=>isBoringXml(f.text));
+  if(logs.length){
+    const result=readBoringLogs(logs,current);
+    if(logs.length<files.length)result.warnings.unshift(`Only the borehole logs were read; ${files.length-logs.length} other file${files.length-logs.length>1?"s were":" was"} ignored`);
     return result;
   }
   const structured=files.filter(f=>/\.(json|ags)$/i.test(f.name)||/^\s*[{[]/.test(f.text)||/^\s*"GROUP"/.test(f.text));
