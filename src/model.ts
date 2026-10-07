@@ -17,9 +17,11 @@ export interface GeoModel {
   horizons:Horizon[];
   base:number;
   warnings:string[];
-  // Node chains along the edges of the borehole triangulation, and its subdivision level (1 = not subdivided).
+  // Node chains along the edges of the borehole triangulation; the spacing it was refined to (0 = not refined); and
+  // the number of nodes of the refined triangulation, before the nodes on pinch-out lines.
   edgeChains:number[][];
-  level:number;
+  spacing:number;
+  meshNodes:number;
   // Surveyed collar elevation minus terrain, and the collar-corrected terrain for display beyond the model.
   residuals:CollarResidual[];
   terrainAt?:(x:number,y:number)=>number;
@@ -77,46 +79,82 @@ function idw(samples:Array<{x:number;y:number;v:number}>,p:XY){
 
 interface Subdivision { nodes:XY[]; triangles:Triangle[]; parents:Array<{i:number[];w:number[]}>; edgeChains:number[][] }
 
-// Splits every triangle into level² similar triangles; nodes on shared edges are shared, so the mesh stays
-// conforming. parents[k] gives the barycentric weights of node N+k on the original nodes.
-export function subdivide(nodes:XY[],triangles:Triangle[],level:number):Subdivision{
-  const out=[...nodes],parents:Array<{i:number[];w:number[]}>=[];
-  const add=(i:number[],w:number[])=>{
-    out.push({x:i.reduce((s,n,k)=>s+nodes[n].x*w[k],0),y:i.reduce((s,n,k)=>s+nodes[n].y*w[k],0)});
-    parents.push({i,w});
-    return out.length-1;
+// Refines a triangulation by longest-edge bisection until no edge is longer than `spacing`. Each step halves the
+// longest edge of a triangle and of the neighbour across it; when that edge is not the neighbour's own longest, the
+// neighbour is refined first (Rivara's LEPP), so the mesh stays conforming and the triangles keep their shape. Long
+// thin triangles between distant boreholes are refined as finely as short ones, so the ground can follow the
+// terrain everywhere. New nodes are edge midpoints: parents[k] gives node N+k's barycentric weights on the original
+// nodes, and the edge chains follow the original edges.
+export function refine(nodes:XY[],triangles:Triangle[],spacing:number,maxTriangles=200_000):Subdivision{
+  const pts=[...nodes],weights:Array<Map<number,number>>=nodes.map((_,i)=>new Map([[i,1]]));
+  const tris:Array<[number,number,number]|null>=[];
+  const SHIFT=2**22,key=(a:number,b:number)=>a<b?a*SHIFT+b:b*SHIFT+a;
+  const byEdge=new Map<number,number[]>();
+  let alive=0;
+  const add=(a:number,b:number,c:number)=>{
+    alive++;
+    const t=tris.push([a,b,c])-1;
+    for(const k of [key(a,b),key(b,c),key(c,a)]){const l=byEdge.get(k);if(l)l.push(t);else byEdge.set(k,[t])}
+    return t;
   };
-  const chains=new Map<string,number[]>();
-  const chain=(a:number,b:number)=>{
-    const lo=Math.min(a,b),hi=Math.max(a,b),key=lo+":"+hi;
-    let c=chains.get(key);
-    if(!c){
-      c=[lo];
-      for(let s=1;s<level;s++)c.push(add([lo,hi],[1-s/level,s/level]));
-      c.push(hi);
-      chains.set(key,c);
-    }
-    return a===lo?c:[...c].reverse();
+  const remove=(t:number)=>{
+    const [a,b,c]=tris[t]!;
+    for(const k of [key(a,b),key(b,c),key(c,a)]){const l=byEdge.get(k)!;l.splice(l.indexOf(t),1);if(!l.length)byEdge.delete(k)}
+    tris[t]=null;
+    alive--;
   };
-  const tris:Triangle[]=[];
-  for(const t of triangles){
-    const ab=chain(t.a,t.b),ac=chain(t.a,t.c),cb=chain(t.c,t.b),inner=new Map<number,number>();
-    // Lattice point (i, j) = a + i/level·(b−a) + j/level·(c−a).
-    const id=(i:number,j:number)=>{
-      if(j===0)return ab[i];
-      if(i===0)return ac[j];
-      if(i+j===level)return cb[i];
-      const key=i*(level+1)+j;
-      let v=inner.get(key);
-      if(v===undefined){v=add([t.a,t.b,t.c],[(level-i-j)/level,i/level,j/level]);inner.set(key,v)}
-      return v;
-    };
-    for(let i=0;i<level;i++)for(let j=0;j<level-i;j++){
-      tris.push({a:id(i,j),b:id(i+1,j),c:id(i,j+1)});
-      if(i+j<level-1)tris.push({a:id(i+1,j),b:id(i+1,j+1),c:id(i,j+1)});
+  for(const t of triangles)add(t.a,t.b,t.c);
+  const chains:number[][]=[],chainOf=new Map<number,number>();
+  for(const [a,b] of uniqueEdges(triangles)){chainOf.set(key(a,b),chains.length);chains.push([Math.min(a,b),Math.max(a,b)])}
+  const len2=(a:number,b:number)=>(pts[a].x-pts[b].x)**2+(pts[a].y-pts[b].y)**2;
+  // The longest edge, ties broken the same way in every triangle so that neighbours agree.
+  const longest=(t:number):[number,number]=>{
+    const [a,b,c]=tris[t]!;
+    let best:[number,number]=[a,b],bl=len2(a,b);
+    for(const [p,q] of [[b,c],[c,a]] as Array<[number,number]>){
+      const l=len2(p,q);
+      if(l>bl*(1+1e-12)||(l>=bl*(1-1e-12)&&key(p,q)<key(best[0],best[1]))){best=[p,q];bl=l}
     }
+    return best;
+  };
+  const split=(p:number,q:number)=>{
+    const m=pts.push({x:(pts[p].x+pts[q].x)/2,y:(pts[p].y+pts[q].y)/2})-1;
+    const w=new Map<number,number>();
+    for(const src of [weights[p],weights[q]])for(const [i,v] of src)w.set(i,(w.get(i)??0)+v/2);
+    weights.push(w);
+    const o=chainOf.get(key(p,q));
+    if(o!==undefined){
+      const c=chains[o],i=c.indexOf(p),j=c.indexOf(q);
+      c.splice(Math.max(i,j),0,m);
+      chainOf.delete(key(p,q));chainOf.set(key(p,m),o);chainOf.set(key(m,q),o);
+    }
+    for(const t of [...byEdge.get(key(p,q))!]){
+      const tri=tris[t]!,k=tri.findIndex((v,i)=>(v===p||v===q)&&(tri[(i+1)%3]===p||tri[(i+1)%3]===q));
+      const u=tri[k],v=tri[(k+1)%3],x=tri[(k+2)%3];
+      remove(t);add(u,m,x);add(m,v,x);
+    }
+  };
+  const bisect=(t0:number)=>{
+    const stack=[t0];
+    while(stack.length){
+      const t=stack[stack.length-1];
+      if(!tris[t]){stack.pop();continue}
+      const [p,q]=longest(t),n=byEdge.get(key(p,q))!.find(x=>x!==t);
+      if(n===undefined||key(...longest(n))===key(p,q)){split(p,q);stack.pop()}
+      else stack.push(n);
+    }
+  };
+  const limit=spacing*spacing;
+  const queue=tris.map((_,i)=>i);
+  while(queue.length&&alive<maxTriangles){
+    const t=queue.pop()!;
+    if(!tris[t]||len2(...longest(t))<=limit)continue;
+    const before=tris.length;
+    bisect(t);
+    for(let i=before;i<tris.length;i++)if(tris[i])queue.push(i);
   }
-  return {nodes:out,triangles:tris,parents,edgeChains:[...chains.values()]};
+  const parents=weights.slice(nodes.length).map(w=>({i:[...w.keys()],w:[...w.values()]}));
+  return {nodes:pts,triangles:tris.filter(Boolean).map(t=>({a:t![0],b:t![1],c:t![2]})),parents,edgeChains:chains};
 }
 
 // A mesh whose node fields can be split along the zero line of a function that is linear on every triangle. Each new
@@ -171,15 +209,13 @@ function splittableMesh(nodes:XY[],triangles:Triangle[],chains:number[][],fields
   return {mesh,split};
 }
 
-// Subdivide finely enough to follow the terrain grid, or to cut cleanly along erosion surfaces.
-function subdivisionLevel(nodes:XY[],triangles:Triangle[],terrain?:TerrainGrid){
-  const lengths=uniqueEdges(triangles).map(([a,b])=>Math.hypot(nodes[a].x-nodes[b].x,nodes[a].y-nodes[b].y)).sort((p,q)=>p-q);
+// Refine finely enough to follow the terrain grid, or to cut cleanly along erosion surfaces, within a budget of about
+// 80,000 triangles (refined triangles cover about 0.14 × spacing² each).
+function refinementSpacing(nodes:XY[],triangles:Triangle[],terrain?:TerrainGrid){
   const xs=nodes.map(p=>p.x),ys=nodes.map(p=>p.y);
   const extent=Math.max(Math.max(...xs)-Math.min(...xs),Math.max(...ys)-Math.min(...ys));
-  const target=Math.max(terrain?Math.min(terrain.dx,terrain.dy):0,extent/(terrain?300:150));
-  let level=Math.min(64,Math.max(2,Math.ceil(lengths[Math.floor(lengths.length/2)]/target)));
-  while(level>1&&triangles.length*level*level>200_000)level--;
-  return level;
+  const area=triangles.reduce((s,t)=>s+triangleArea(nodes,t),0);
+  return Math.max(terrain?Math.min(terrain.dx,terrain.dy):0,extent/(terrain?300:150),Math.sqrt(area/(0.14*80_000)));
 }
 
 export function buildGeologicalModel(project:GeoProject):GeoModel{
@@ -243,8 +279,8 @@ export function buildGeologicalModel(project:GeoProject):GeoModel{
   }
 
   const erosive=units.some(u=>u.erosive);
-  const level=coarse.length&&(project.terrain||erosive)?subdivisionLevel(nodes,coarse,project.terrain):1;
-  const mesh=subdivide(nodes,coarse,level);
+  const spacing=coarse.length&&(project.terrain||erosive)?refinementSpacing(nodes,coarse,project.terrain):0;
+  const mesh=spacing?refine(nodes,coarse,spacing):{nodes,triangles:coarse,parents:[],edgeChains:uniqueEdges(coarse).map(([a,b])=>[Math.min(a,b),Math.max(a,b)])};
   const M=mesh.nodes.length;
   const spread=(values:ArrayLike<number>)=>{
     const out=new Float64Array(M);
@@ -268,15 +304,22 @@ export function buildGeologicalModel(project:GeoProject):GeoModel{
     residuals=boreholes.map(b=>{const tz=terrainZ(t,b.x,b.y);return {id:b.id,collar:b.z,terrain:tz,residual:b.z-tz}});
     const r=residuals.map(q=>Number.isFinite(q.residual)?q.residual:0);
     const correction=spread(r);
-    // Where the terrain rises above the surface through the collars, the extra height belongs to the units that form
-    // the ground at the surrounding boreholes, shared by their barycentric weights: a unit absent from the surface of
-    // all of them stays absent. Where the terrain is lower, the ordering below cuts the units from the top.
-    const surfaceUnit=boreholes.map((_,i)=>{
-      let above=raw[0][i];
-      for(let u=0;u<K-1;u++){const below=Math.min(Math.max(raw[u+1][i],base),above);if(above-below>1e-9)return u;above=below}
-      return K-1;
-    });
-    const shares=units.map((_,u)=>spread(surfaceUnit.map(s=>s===u?1:0)));
+    // Where the terrain rises above the surface through the collars, the extra height is made of what the top of the
+    // surrounding boreholes is made of: each unit's share is its part of the top 5 m of the log, interpolated with the
+    // boreholes' barycentric weights. A thin topsoil therefore takes little of it, and a unit absent from the top of
+    // all of them takes none. Where the terrain is lower, the ordering below cuts the units from the top.
+    const TOP=5;
+    const near=units.map(()=>new Float64Array(N));
+    for(let i=0;i<N;i++){
+      let above=raw[0][i],sum=0;
+      for(let u=0;u<K;u++){
+        const below=u+1===K?Math.min(base,above):Math.min(Math.max(raw[u+1][i],base),above);
+        const part=Math.max(0,Math.min(above,raw[0][i])-Math.max(below,raw[0][i]-TOP));
+        near[u][i]=part;sum+=part;above=below;
+      }
+      for(let u=0;u<K;u++)near[u][i]=sum>0?near[u][i]/sum:u===K-1?1:0;
+    }
+    const shares=near.map(spread);
     let missing=0;
     for(let n=N;n<M;n++){
       const tz=terrainZ(t,mesh.nodes[n].x,mesh.nodes[n].y);
@@ -314,7 +357,7 @@ export function buildGeologicalModel(project:GeoProject):GeoModel{
     name:k===0?"Ground surface":k===K?"Model base":"Base of "+units[k-1].name,
     z:Float64Array.from(zk),observed:Uint8Array.from(known01[k])
   }));
-  return {project,units,boreholes,nodes:cut.mesh.nodes,triangles:cut.mesh.triangles,horizons,base,warnings,edgeChains:cut.mesh.chains,level,residuals,terrainAt};
+  return {project,units,boreholes,nodes:cut.mesh.nodes,triangles:cut.mesh.triangles,horizons,base,warnings,edgeChains:cut.mesh.chains,spacing,meshNodes:M,residuals,terrainAt};
 }
 
 export function horizonSurface(model:GeoModel,k:number):TINSurface{
@@ -340,10 +383,32 @@ export function modelBounds(model:GeoModel){
   for(let i=0;i<ground.length;i++)maxZ=Math.max(maxZ,ground[i]);
   return {minX:Math.min(...xs),maxX:Math.max(...xs),minY:Math.min(...ys),maxY:Math.max(...ys),minZ:Math.min(model.base,...model.boreholes.map(b=>b.z-boreholeDepth(b))),maxZ};
 }
+// A grid of cells listing the triangles whose bounding box overlaps them, built once per model.
+const triangleIndex=new WeakMap<GeoModel,{x0:number;y0:number;size:number;nx:number;ny:number;cells:Triangle[][]}>();
+function cellsOf(model:GeoModel){
+  let index=triangleIndex.get(model);
+  if(index)return index;
+  const p=model.nodes,xs=p.map(q=>q.x),ys=p.map(q=>q.y);
+  const x0=Math.min(...xs),y0=Math.min(...ys),w=Math.max(...xs)-x0||1,h=Math.max(...ys)-y0||1;
+  const size=Math.sqrt(w*h/Math.max(1,model.triangles.length)),nx=Math.ceil(w/size)+1,ny=Math.ceil(h/size)+1;
+  const cells:Triangle[][]=Array.from({length:nx*ny},()=>[]);
+  for(const t of model.triangles){
+    const tx=[p[t.a].x,p[t.b].x,p[t.c].x],ty=[p[t.a].y,p[t.b].y,p[t.c].y];
+    const c0=Math.floor((Math.min(...tx)-x0)/size),c1=Math.floor((Math.max(...tx)-x0)/size);
+    const r0=Math.floor((Math.min(...ty)-y0)/size),r1=Math.floor((Math.max(...ty)-y0)/size);
+    for(let r=r0;r<=r1;r++)for(let c=c0;c<=c1;c++)cells[r*nx+c].push(t);
+  }
+  index={x0,y0,size,nx,ny,cells};
+  triangleIndex.set(model,index);
+  return index;
+}
 // Horizon elevations at (x, y), or null outside the model footprint.
 export function sampleModel(model:GeoModel,x:number,y:number):number[]|null{
   const p=model.nodes;
-  for(const t of model.triangles){
+  if(!model.triangles.length)return null;
+  const g=cellsOf(model),c=Math.floor((x-g.x0)/g.size),r=Math.floor((y-g.y0)/g.size);
+  if(c<0||r<0||c>=g.nx||r>=g.ny)return null;
+  for(const t of g.cells[r*g.nx+c]){
     const d=(p[t.b].x-p[t.a].x)*(p[t.c].y-p[t.a].y)-(p[t.b].y-p[t.a].y)*(p[t.c].x-p[t.a].x);
     const wb=((x-p[t.a].x)*(p[t.c].y-p[t.a].y)-(y-p[t.a].y)*(p[t.c].x-p[t.a].x))/d;
     const wc=((p[t.b].x-p[t.a].x)*(y-p[t.a].y)-(p[t.b].y-p[t.a].y)*(x-p[t.a].x))/d;

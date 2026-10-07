@@ -38,13 +38,15 @@ describe("vertical sections",()=>{
 
   it("never gives a unit negative thickness on the valley model",()=>{
     const v=buildGeologicalModel(valleyProject);
+    let worst=-Infinity;
     for(let azimuth=0;azimuth<180;azimuth+=15){
       const [lo,hi]=offsetRange(v,azimuth);
       for(const offset of [lo*0.9,(lo+hi)/2,hi*0.9]){
         const s=computeSection(v,{azimuth,offset});
-        for(let k=1;k<s.z.length;k++)s.z[k].forEach((z,j)=>expect(z).toBeLessThanOrEqual(s.z[k-1][j]+1e-9));
+        for(let k=1;k<s.z.length;k++)s.z[k].forEach((z,j)=>{worst=Math.max(worst,z-s.z[k-1][j])});
       }
     }
+    expect(worst).toBeLessThanOrEqual(1e-9);
   });
 
   it("projects only the boreholes within the buffer",()=>{

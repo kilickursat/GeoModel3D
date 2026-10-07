@@ -1,44 +1,63 @@
 import {describe,it,expect} from "vitest";
-import {buildGeologicalModel,boreholeContacts,subdivide,sampleModel,unitCubicMetres,unitVolume,modelBounds,GeoModel} from "../src/model";
+import {buildGeologicalModel,boreholeContacts,refine,sampleModel,unitCubicMetres,unitVolume,modelBounds,GeoModel} from "../src/model";
 import {volumeGeometry} from "../src/volume";
 import {computeSection,offsetRange} from "../src/section";
 import {valleyProject,channelProject,GeoProject,UnitDef,boreholeDepth} from "../src/geology";
 import {terrainZ,TerrainGrid} from "../src/terrain";
 import {delaunay,triangleArea,boundaryEdges,uniqueEdges} from "../src/tin";
-import {randomPoints,meshVolume,openEdges,latticeNodeCount} from "./helpers";
+import {randomPoints,meshVolume,openEdges} from "./helpers";
 import truth from "./fixtures/channel-truth.json";
 
 const ordered=(m:GeoModel)=>m.horizons.every((h,k)=>k===0||h.z.every((z,i)=>z<=m.horizons[k-1].z[i]+1e-9));
 
-describe("subdividing the borehole triangulation",()=>{
-  const pts=randomPoints(25,3),tris=delaunay(pts);
-  it("keeps the original triangles at level 1",()=>{
-    const s=subdivide(pts,tris,1);
-    expect(s.triangles).toEqual(tris);
-    expect(s.nodes.length).toBe(pts.length);
+describe("refining the borehole triangulation",()=>{
+  // Clustered boreholes, as along a road: short edges within the clusters, long thin triangles between them.
+  const pts=[...randomPoints(12,3,60,40),...randomPoints(12,4,60,40).map(p=>({x:p.x+900,y:p.y+300})),{x:450,y:-200}];
+  const tris=delaunay(pts);
+  const edges=(nodes:typeof pts,t:{a:number;b:number;c:number})=>[[t.a,t.b],[t.b,t.c],[t.c,t.a]].map(([a,b])=>Math.hypot(nodes[a].x-nodes[b].x,nodes[a].y-nodes[b].y));
+  const minAngle=(nodes:typeof pts,ts:typeof tris)=>Math.min(...ts.map(t=>{const [a,b,c]=edges(nodes,t);
+    return Math.min(...[[a,b,c],[b,c,a],[c,a,b]].map(([x,y,z])=>Math.acos(Math.min(1,Math.max(-1,(y*y+z*z-x*x)/(2*y*z))))))}));
+  it("keeps the triangulation when no edge is longer than the spacing",()=>{
+    const r=refine(pts,tris,1e6);
+    expect(r.triangles).toEqual(tris);
+    expect(r.nodes.length).toBe(pts.length);
   });
-  it("splits each triangle into level² counter-clockwise triangles that still tile the hull without gaps",()=>{
-    const L=4,s=subdivide(pts,tris,L);
-    expect(s.triangles.length).toBe(tris.length*L*L);
-    for(const t of s.triangles)expect(triangleArea(s.nodes,t)).toBeGreaterThan(0);
-    expect(s.triangles.reduce((a,t)=>a+triangleArea(s.nodes,t),0)).toBeCloseTo(tris.reduce((a,t)=>a+triangleArea(pts,t),0),6);
-    expect(boundaryEdges(s.triangles).length).toBe(boundaryEdges(tris).length*L);
-    expect(s.edgeChains.length).toBe(uniqueEdges(tris).length);
-    expect(s.edgeChains.every(c=>c.length===L+1)).toBe(true);
+  it("refines until no edge exceeds the spacing, conforming, counter-clockwise and without losing area or shape",()=>{
+    const s=20,r=refine(pts,tris,s);
+    expect(Math.max(...r.triangles.flatMap(t=>edges(r.nodes,t)))).toBeLessThanOrEqual(s+1e-9);
+    for(const t of r.triangles)expect(triangleArea(r.nodes,t)).toBeGreaterThan(0);
+    expect(r.triangles.reduce((a,t)=>a+triangleArea(r.nodes,t),0)).toBeCloseTo(tris.reduce((a,t)=>a+triangleArea(pts,t),0),6);
+    // Conforming: every edge is used by one triangle (the hull) or two, and the hull is the original one.
+    const use=new Map<string,number>();
+    for(const t of r.triangles)for(const [a,b] of [[t.a,t.b],[t.b,t.c],[t.c,t.a]]){const k=Math.min(a,b)+":"+Math.max(a,b);use.set(k,(use.get(k)??0)+1)}
+    expect([...use.values()].every(n=>n===1||n===2)).toBe(true);
+    expect(boundaryEdges(r.triangles).reduce((a,[p,q])=>a+Math.hypot(r.nodes[p].x-r.nodes[q].x,r.nodes[p].y-r.nodes[q].y),0))
+      .toBeCloseTo(boundaryEdges(tris).reduce((a,[p,q])=>a+Math.hypot(pts[p].x-pts[q].x,pts[p].y-pts[q].y),0),6);
+    // Longest-edge bisection never makes an angle smaller than half the smallest original one.
+    expect(minAngle(r.nodes,r.triangles)).toBeGreaterThanOrEqual(minAngle(pts,tris)/2-1e-9);
+    // Parents reproduce the new nodes, and the chains follow the original edges through mesh edges.
+    r.parents.forEach((p,k)=>{
+      const n=r.nodes[pts.length+k];
+      expect(p.w.reduce((a,b)=>a+b,0)).toBeCloseTo(1,12);
+      expect(p.i.reduce((a,i,m)=>a+pts[i].x*p.w[m],0)).toBeCloseTo(n.x,9);
+      expect(p.i.reduce((a,i,m)=>a+pts[i].y*p.w[m],0)).toBeCloseTo(n.y,9);
+    });
+    expect(r.edgeChains.length).toBe(uniqueEdges(tris).length);
+    for(const c of r.edgeChains)for(let j=1;j<c.length;j++)expect(use.has(Math.min(c[j-1],c[j])+":"+Math.max(c[j-1],c[j]))).toBe(true);
   });
 });
 
 describe("terrain",()=>{
   const m=buildGeologicalModel(valleyProject),t=valleyProject.terrain!;
   it("subdivides the model and keeps every collar at its surveyed elevation",()=>{
-    expect(m.level).toBeGreaterThan(1);
+    expect(m.spacing).toBeGreaterThan(0);
     expect(m.warnings).toEqual([]);
     m.boreholes.forEach((b,i)=>expect(m.horizons[0].z[i]).toBe(b.z));
     expect(Math.max(...m.residuals.map(r=>Math.abs(r.residual)))).toBeLessThan(0.6);
   });
   it("follows the terrain between boreholes, corrected only by the collar residuals",()=>{
     const worst=Math.max(...m.residuals.map(r=>Math.abs(r.residual)));
-    for(let n=m.boreholes.length;n<latticeNodeCount(m);n+=37)
+    for(let n=m.boreholes.length;n<m.meshNodes;n+=37)
       expect(Math.abs(m.horizons[0].z[n]-terrainZ(t,m.nodes[n].x,m.nodes[n].y))).toBeLessThanOrEqual(worst+1e-9);
   });
   it("keeps every horizon at or below the ground and the volumes closed",()=>{
@@ -100,6 +119,21 @@ describe("terrain",()=>{
     expect(s[2]).toBeCloseTo(45,9);
     for(let x=2;x<100;x+=7)for(let y=2;y<100;y+=7){const v=sampleModel(m,x,y)!;expect(v[0]-v[1]).toBeLessThan(1e-9)}
     expect(ordered(m)).toBe(true);
+  });
+
+  it("makes extra terrain height of what the top 5 m of the boreholes is made of",()=>{
+    const units:UnitDef[]=["Topsoil","Clay","Rock"].map(id=>({id,name:id,color:"#888888"}));
+    const log=[{from:0,to:1,unit:"Topsoil"},{from:1,to:9,unit:"Clay"},{from:9,to:20,unit:"Rock"}];
+    const holes=[[0,0],[100,0],[0,100],[100,100]].map(([x,y],i)=>({id:"H"+i,x,y,z:50,intervals:log}));
+    const z:number[]=[];
+    for(let r=0;r<21;r++)for(let c=0;c<21;c++){const x=c*5,y=r*5;z.push(50+3*Math.exp(-((x-50)**2+(y-50)**2)/20**2))}
+    const m=buildGeologicalModel({name:"hump",units,boreholes:holes,terrain:{x0:0,y0:0,dx:5,dy:5,ncols:21,nrows:21,z}});
+    const s=sampleModel(m,50,50)!,rise=s[0]-50;
+    expect(rise).toBeGreaterThan(2.5);
+    // The top 5 m of every log is 1 m of topsoil and 4 m of clay.
+    expect(s[0]-s[1]).toBeCloseTo(1+rise/5,6);
+    expect(s[1]-s[2]).toBeCloseTo(8+rise*4/5,6);
+    expect(s[2]).toBeCloseTo(41,9);
   });
 
   it("reports collars that disagree with the terrain and still honours them",()=>{
