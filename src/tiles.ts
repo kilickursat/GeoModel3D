@@ -17,7 +17,7 @@ export const mapSources:TileSource[]=[
 export const elevationSources:ElevationSource[]=[
   {id:"gsi-dem5a",name:"GSI 5 m DEM (laser survey)",url:"https://cyberjapandata.gsi.go.jp/xyz/dem5a/{z}/{x}/{y}.txt",zoom:15,cell:5,format:"gsi",
     attribution:"地理院タイル 標高 DEM5A (GSI)",link:"https://maps.gsi.go.jp/development/ichiran.html",region:JAPAN},
-  {id:"gsi-dem10b",name:"GSI 10 m DEM",url:"https://cyberjapandata.gsi.go.jp/xyz/dem10b/{z}/{x}/{y}.txt",zoom:14,cell:10,format:"gsi",
+  {id:"gsi-dem10b",name:"GSI 10 m DEM",url:"https://cyberjapandata.gsi.go.jp/xyz/dem/{z}/{x}/{y}.txt",zoom:14,cell:10,format:"gsi",
     attribution:"地理院タイル 標高 DEM10B (GSI)",link:"https://maps.gsi.go.jp/development/ichiran.html",region:JAPAN},
   {id:"terrarium",name:"Terrain Tiles (global; about 30 m, finer where national surveys exist)",url:"https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png",zoom:14,cell:10,format:"terrarium",
     attribution:"Terrain Tiles (Mapzen, AWS Open Data; SRTM, GMTED2010, ETOPO1 and national sources)",link:"https://github.com/tilezen/joerd/blob/master/docs/attribution.md"}
