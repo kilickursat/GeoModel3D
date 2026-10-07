@@ -60,5 +60,9 @@ describe("vertical sections",()=>{
     const layout=(w:number,h:number)=>buildGeologicalModel({name:"l",units,boreholes:randomPoints(30,9,w,h).map((p,i)=>({id:"L"+i,...p,z:0,intervals:[{from:0,to:1,unit:"U1"}]}))});
     expect(principalAzimuth(layout(1000,60))).toBeCloseTo(90,-1);
     expect([0,180]).toContain(Math.round(principalAzimuth(layout(60,1000))/10)*10);
+    // Subdividing the mesh for the terrain must not turn the default section.
+    const withTerrain=buildGeologicalModel(valleyProject),without=buildGeologicalModel({...valleyProject,terrain:undefined});
+    expect(withTerrain.nodes.length).toBeGreaterThan(without.nodes.length);
+    expect(principalAzimuth(withTerrain)).toBe(principalAzimuth(without));
   });
 });
