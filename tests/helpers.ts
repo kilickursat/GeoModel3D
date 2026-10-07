@@ -1,5 +1,4 @@
-import {XY,delaunay} from "../src/tin";
-import {GeoModel,subdivide} from "../src/model";
+import {XY} from "../src/tin";
 
 // Deterministic PRNG (mulberry32) so geometric tests are reproducible.
 export function rng(seed:number){
@@ -33,17 +32,11 @@ export function meshVolume(positions:ArrayLike<number>,indices:ArrayLike<number>
 // Directed edges used more often than their reverse; empty for a closed, consistently oriented surface
 // (shells that touch along a pinch line share an edge between four faces, which is still closed).
 export function openEdges(indices:ArrayLike<number>){
-  const count=new Map<string,number>();
-  for(let f=0;f<indices.length;f+=3)for(const [a,b] of [[0,1],[1,2],[2,0]]){
-    const k=indices[f+a]+">"+indices[f+b];count.set(k,(count.get(k)??0)+1);
+  const S=2**24,count=new Map<number,number>();
+  for(let f=0;f<indices.length;f+=3)for(let e=0;e<3;e++){
+    const k=indices[f+e]*S+indices[f+(e+1)%3];count.set(k,(count.get(k)??0)+1);
   }
   const open:string[]=[];
-  for(const [k,n] of count){const [a,b]=k.split(">");if(count.get(b+">"+a)!==n)open.push(k)}
+  for(const [k,n] of count){const a=Math.floor(k/S),b=k%S;if(count.get(b*S+a)!==n)open.push(a+">"+b)}
   return open;
-}
-// Number of nodes of the subdivided borehole triangulation. The nodes added on the lines where units pinch out follow
-// them; they lie on its edges, so their values are interpolated along an edge rather than read from the terrain.
-export function latticeNodeCount(m:GeoModel){
-  const holes=m.nodes.slice(0,m.boreholes.length);
-  return subdivide(holes,delaunay(holes),m.level).nodes.length;
 }

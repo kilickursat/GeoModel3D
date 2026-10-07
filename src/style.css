@@ -1,5 +1,5 @@
 *{box-sizing:border-box}
-html,body,#app{margin:0;width:100%;height:100%;overflow:hidden;font-family:Inter,system-ui,sans-serif}
+html,body,#app{margin:0;width:100%;height:100%;overflow:hidden;font-family:Inter,system-ui,"Segoe UI","Hiragino Sans","Noto Sans JP","Noto Sans CJK JP","Yu Gothic UI",Meiryo,sans-serif}
 body{background:#071018;color:#e8f2f7}
 button,select,input{font:inherit}
 .labels{position:fixed;inset:0;pointer-events:none}
@@ -22,6 +22,23 @@ button,select,input{font:inherit}
 .legend .name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .legend .vol{color:#8aa2ae;font-variant-numeric:tabular-nums}
 .hint{margin-top:10px;font-size:11px;color:#708792}
+.crs{display:flex;align-items:center;gap:7px;margin-top:8px;color:#9bb1bd}
+.crs input,.rule input,.geo select{min-width:0;background:#0d1d29;color:#e8f2f7;border:1px solid rgba(160,190,200,.25);border-radius:6px;padding:4px 6px;font-size:11px}
+.crs input{flex:1}
+.rules{margin-top:10px;color:#c4d2d9}
+.rules summary{cursor:pointer;color:#d9edf5}
+.rule{margin-top:6px;padding-top:6px;border-top:1px solid rgba(160,190,200,.1)}
+.rule-main{display:flex;align-items:center;gap:5px}
+.rule-main .r-match{flex:1.4}
+.rule-main .r-unit{flex:1}
+.rule-main span{color:#8aa2ae}
+.rule-if{display:flex;gap:8px;margin-top:4px;color:#8aa2ae;font-size:10px}
+.rule-if label{display:flex;align-items:center;gap:3px}
+.rule-if input{width:46px;padding:2px 4px;font-size:10px}
+.r-del{border:0;background:none;color:#9bb1bd;cursor:pointer;font-size:15px;line-height:1;padding:0 2px}
+.rule-actions{display:flex;gap:6px;margin-top:8px}
+.rule-actions button{border:1px solid rgba(160,190,200,.22);background:#0d1d29;color:#d9edf5;border-radius:6px;padding:4px 9px;font-size:11px;cursor:pointer}
+.rule-note{margin-top:6px;color:#8aa2ae}
 
 .toolbar{position:fixed;right:24px;top:22px;padding:10px;display:flex;flex-direction:column;gap:8px;width:190px;font-size:11px}
 .toolbar button,.menu summary,.section-control button,.section-head button{border:1px solid rgba(160,190,200,.22);background:#0d1d29;color:#d9edf5;border-radius:7px;padding:7px 10px;font-size:11px;cursor:pointer;text-align:left}
@@ -35,6 +52,14 @@ button,select,input{font:inherit}
 .toggles label{display:flex;align-items:center;gap:7px;cursor:pointer}
 .toggles input{margin:0;accent-color:#78c9df}
 .toggles input:disabled+*,.toggles label:has(input:disabled){opacity:.45}
+.geo{display:grid;gap:5px}
+.toolbar button:disabled,.geo select:disabled{opacity:.45;cursor:default}
+.geo-status{color:#9bb1bd;padding:0 2px}
+.geo-status:empty{display:none}
+.credits{position:fixed;left:24px;bottom:72px;max-width:min(58vw,760px);font-size:10px;color:#8aa2ae;background:rgba(7,16,24,.62);padding:3px 8px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.credits a{color:#9bd3e3}
+.notice details{margin-top:4px}
+.notice summary{cursor:pointer;color:#9bd3e3}
 .backend{color:#708792;padding:0 2px}
 .backend a{color:#78c9df;white-space:nowrap}
 
@@ -76,5 +101,6 @@ button,select,input{font:inherit}
   .section-control .tag{display:none}
   .section-view{left:12px;right:12px;width:auto;bottom:auto;top:calc(30vh + 70px);height:34vh}
   .notice{right:12px;top:auto;bottom:220px}
+  .credits{left:12px;right:12px;top:4px;bottom:auto;max-width:none;font-size:9px}
 }
 .legend .tag{font-size:9px;color:#d08a4c;border:1px solid rgba(208,138,76,.5);border-radius:3px;padding:0 3px;flex:none}

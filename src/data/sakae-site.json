@@ -1,0 +1,11571 @@
+{
+ "format": "geomodel3d-project",
+ "version": 1,
+ "name": "Sakae, Yokohama (KuniJiban)",
+ "description": "75 borehole logs from MLIT road surveys around Sakae-ku, Yokohama, 2001–2025, from KuniJiban. The units are an interpretation of the logged soil names, SPT N-values and elevations: see the unit rules. Terrain: GSI 5 m DEM, fetched when the project opens. Five rock-core logs that contradict their neighbours are left out.",
+ "source": "国土地盤情報検索サイト「KuniJiban」の地盤情報 (KuniJiban ground information: MLIT, PWRI, PARI). Individual logs carry no copyright.",
+ "crs": "JGD2011 / Japan Plane Rectangular CS IX",
+ "crsCode": "EPSG:6677",
+ "units": [
+  {
+   "id": "Fill",
+   "name": "Fill (盛土・埋土)",
+   "color": "#a59a8f"
+  },
+  {
+   "id": "Alluvium",
+   "name": "Alluvium (沖積層)",
+   "color": "#c7b07a",
+   "erosive": true
+  },
+  {
+   "id": "Kanto Loam",
+   "name": "Kanto Loam (関東ローム)",
+   "color": "#b8683f"
+  },
+  {
+   "id": "Pleistocene",
+   "name": "Pleistocene sediments (洪積層)",
+   "color": "#e0c36a"
+  },
+  {
+   "id": "Kazusa",
+   "name": "Kazusa Group (上総層群)",
+   "color": "#5f7186"
+  }
+ ],
+ "rules": [
+  {
+   "match": "盛土|埋土|表土|客土|コンクリート|アスファルト|舗装|砕石|改良土",
+   "unit": "Fill"
+  },
+  {
+   "match": "岩|固結|凝固|硬質",
+   "unit": "Kazusa"
+  },
+  {
+   "match": ".",
+   "minN": 50,
+   "unit": "Kazusa"
+  },
+  {
+   "match": "凝灰質|火山灰",
+   "minN": 30,
+   "unit": "Kazusa"
+  },
+  {
+   "match": "ローム|黒ボク|軽石|浮石|火山灰|凝灰質",
+   "unit": "Kanto Loam"
+  },
+  {
+   "match": "腐植|泥炭|有機質",
+   "maxZ": 25,
+   "unit": "Alluvium"
+  },
+  {
+   "match": "シルト|粘土|粘性土",
+   "maxN": 5,
+   "maxZ": 25,
+   "unit": "Alluvium"
+  },
+  {
+   "match": "砂|礫",
+   "maxN": 20,
+   "maxZ": 25,
+   "unit": "Alluvium"
+  },
+  {
+   "match": ".",
+   "unit": "Pleistocene"
+  }
+ ],
+ "boreholes": [
+  {
+   "id": "148301107",
+   "x": -29525.99627146574,
+   "y": -70549.22502691587,
+   "z": 65.26,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.6,
+     "name": "埋土",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.6,
+     "to": 8.5,
+     "name": "火山灰質粘性土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 8.5,
+     "to": 13.85,
+     "name": "火山灰質粘性土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 13.85,
+     "to": 14.2,
+     "name": "砂利・礫混り砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 14.2,
+     "to": 17.9,
+     "name": "砂質粘性土",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 17.9,
+     "to": 18.5,
+     "name": "砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 18.5,
+     "to": 19.2,
+     "name": "砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 19.2,
+     "to": 20.95,
+     "name": "砂質粘性土",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 20.95,
+     "to": 22.4,
+     "name": "シルト混り砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 22.4,
+     "to": 23.9,
+     "name": "砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 23.9,
+     "to": 24.5,
+     "name": "砂質粘性土",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 24.5,
+     "to": 31.8,
+     "name": "シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 31.8,
+     "to": 33,
+     "name": "砂質シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 33,
+     "to": 35.25,
+     "name": "粘土質砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 35.25,
+     "to": 37,
+     "name": "礫質土",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 37,
+     "to": 37.6,
+     "name": "砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 37.6,
+     "to": 48.29,
+     "name": "軟岩・風化岩",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.5084202777778,
+   "lat": 35.3636525,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 11,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 10,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 9,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 21,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 23,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 24,
+     "penetration": 300
+    },
+    {
+     "depth": 17.15,
+     "blows": 24,
+     "penetration": 300
+    },
+    {
+     "depth": 18.15,
+     "blows": 25,
+     "penetration": 300
+    },
+    {
+     "depth": 19.15,
+     "blows": 50,
+     "penetration": 250
+    },
+    {
+     "depth": 20.15,
+     "blows": 26,
+     "penetration": 300
+    },
+    {
+     "depth": 21.15,
+     "blows": 50,
+     "penetration": 300
+    },
+    {
+     "depth": 22.15,
+     "blows": 50,
+     "penetration": 120
+    },
+    {
+     "depth": 23.15,
+     "blows": 50,
+     "penetration": 180
+    },
+    {
+     "depth": 24.15,
+     "blows": 26,
+     "penetration": 300
+    },
+    {
+     "depth": 25.15,
+     "blows": 25,
+     "penetration": 300
+    },
+    {
+     "depth": 26.15,
+     "blows": 24,
+     "penetration": 300
+    },
+    {
+     "depth": 27.15,
+     "blows": 25,
+     "penetration": 300
+    },
+    {
+     "depth": 28.15,
+     "blows": 16,
+     "penetration": 300
+    },
+    {
+     "depth": 29.15,
+     "blows": 16,
+     "penetration": 300
+    },
+    {
+     "depth": 30.15,
+     "blows": 15,
+     "penetration": 300
+    },
+    {
+     "depth": 31.15,
+     "blows": 20,
+     "penetration": 300
+    },
+    {
+     "depth": 32.15,
+     "blows": 38,
+     "penetration": 300
+    },
+    {
+     "depth": 33.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 34.15,
+     "blows": 35,
+     "penetration": 300
+    },
+    {
+     "depth": 35.15,
+     "blows": 50,
+     "penetration": 90
+    },
+    {
+     "depth": 36,
+     "blows": 50,
+     "penetration": 30
+    },
+    {
+     "depth": 37.15,
+     "blows": 50,
+     "penetration": 250
+    },
+    {
+     "depth": 38.15,
+     "blows": 50,
+     "penetration": 90
+    },
+    {
+     "depth": 39.15,
+     "blows": 50,
+     "penetration": 210
+    },
+    {
+     "depth": 40.15,
+     "blows": 50,
+     "penetration": 220
+    },
+    {
+     "depth": 42.15,
+     "blows": 50,
+     "penetration": 190
+    },
+    {
+     "depth": 43.15,
+     "blows": 50,
+     "penetration": 180
+    },
+    {
+     "depth": 44.15,
+     "blows": 50,
+     "penetration": 160
+    },
+    {
+     "depth": 45.15,
+     "blows": 50,
+     "penetration": 170
+    },
+    {
+     "depth": 46.15,
+     "blows": 50,
+     "penetration": 150
+    },
+    {
+     "depth": 47.15,
+     "blows": 50,
+     "penetration": 130
+    },
+    {
+     "depth": 48.15,
+     "blows": 50,
+     "penetration": 140
+    }
+   ],
+   "water": [
+    {
+     "depth": 9.8
+    }
+   ]
+  },
+  {
+   "id": "148307968",
+   "x": -28566.49576829093,
+   "y": -70441.35437148277,
+   "z": 13.93,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "name": "埋土",
+     "unit": "Fill"
+    },
+    {
+     "from": 2,
+     "to": 2.9,
+     "name": "シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 2.9,
+     "to": 7.9,
+     "name": "粘土質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 7.9,
+     "to": 14.9,
+     "name": "シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 14.9,
+     "to": 15.2,
+     "name": "砂質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 15.2,
+     "to": 16,
+     "name": "シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 16,
+     "to": 16.45,
+     "name": "砂質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 16.45,
+     "to": 16.65,
+     "name": "砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 16.65,
+     "to": 17.2,
+     "name": "礫質土",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 17.2,
+     "to": 22.35,
+     "name": "軟岩・風化岩",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.518975,
+   "lat": 35.36465277777778,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 1,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 1,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 1,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 2,
+     "penetration": 400
+    },
+    {
+     "depth": 11.15,
+     "blows": 2,
+     "penetration": 400
+    },
+    {
+     "depth": 12.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 17.15,
+     "blows": 50,
+     "penetration": 100
+    },
+    {
+     "depth": 18.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 19.15,
+     "blows": 50,
+     "penetration": 250
+    },
+    {
+     "depth": 20.15,
+     "blows": 50,
+     "penetration": 210
+    },
+    {
+     "depth": 21.15,
+     "blows": 50,
+     "penetration": 220
+    },
+    {
+     "depth": 22.15,
+     "blows": 50,
+     "penetration": 200
+    }
+   ],
+   "water": [
+    {
+     "depth": 1.8
+    }
+   ]
+  },
+  {
+   "id": "148308424",
+   "x": -28763.58369151365,
+   "y": -70502.35849740461,
+   "z": 16.16,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.7,
+     "name": "埋土",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.7,
+     "to": 4.5,
+     "name": "粘性土",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 4.5,
+     "to": 11.8,
+     "name": "粘性土",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 11.8,
+     "to": 17.34,
+     "name": "軟岩・風化岩",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51680833333336,
+   "lat": 35.36409722222222,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 3,
+     "penetration": 310
+    },
+    {
+     "depth": 2.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 15,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 21,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 12,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 50,
+     "penetration": 190
+    },
+    {
+     "depth": 13.15,
+     "blows": 50,
+     "penetration": 140
+    },
+    {
+     "depth": 14.15,
+     "blows": 50,
+     "penetration": 220
+    },
+    {
+     "depth": 15.15,
+     "blows": 50,
+     "penetration": 230
+    },
+    {
+     "depth": 16.15,
+     "blows": 50,
+     "penetration": 170
+    },
+    {
+     "depth": 17.15,
+     "blows": 50,
+     "penetration": 190
+    }
+   ],
+   "water": [
+    {
+     "depth": 1.35
+    }
+   ]
+  },
+  {
+   "id": "148309627",
+   "x": -28839.207292918705,
+   "y": -70477.49433693774,
+   "z": 22.47,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1.9,
+     "name": "埋土",
+     "unit": "Fill"
+    },
+    {
+     "from": 1.9,
+     "to": 5.5,
+     "name": "粘土質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 5.5,
+     "to": 7.8,
+     "name": "シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 7.8,
+     "to": 13.36,
+     "name": "軟岩・風化岩",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51597527777778,
+   "lat": 35.36431916666667,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 25,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 33,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 50,
+     "penetration": 270
+    },
+    {
+     "depth": 9.15,
+     "blows": 50,
+     "penetration": 250
+    },
+    {
+     "depth": 10.15,
+     "blows": 50,
+     "penetration": 220
+    },
+    {
+     "depth": 11.15,
+     "blows": 50,
+     "penetration": 260
+    },
+    {
+     "depth": 12.15,
+     "blows": 50,
+     "penetration": 190
+    },
+    {
+     "depth": 13.15,
+     "blows": 50,
+     "penetration": 210
+    }
+   ],
+   "water": [
+    {
+     "depth": 1.8
+    }
+   ]
+  },
+  {
+   "id": "148310342",
+   "x": -28935.079324744398,
+   "y": -70461.77843727876,
+   "z": 40.26,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1.95,
+     "name": "埋土",
+     "unit": "Fill"
+    },
+    {
+     "from": 1.95,
+     "to": 3.5,
+     "name": "軟岩・風化岩",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 3.5,
+     "to": 15.34,
+     "name": "軟岩・風化岩",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51491972222223,
+   "lat": 35.36445805555556,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 15,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 33,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 45,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 48,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 50,
+     "penetration": 280
+    },
+    {
+     "depth": 6.15,
+     "blows": 47,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 50,
+     "penetration": 270
+    },
+    {
+     "depth": 8.15,
+     "blows": 50,
+     "penetration": 230
+    },
+    {
+     "depth": 9.15,
+     "blows": 50,
+     "penetration": 220
+    },
+    {
+     "depth": 10.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 11.15,
+     "blows": 50,
+     "penetration": 180
+    },
+    {
+     "depth": 12.15,
+     "blows": 50,
+     "penetration": 150
+    },
+    {
+     "depth": 13.15,
+     "blows": 50,
+     "penetration": 220
+    },
+    {
+     "depth": 14.15,
+     "blows": 50,
+     "penetration": 180
+    },
+    {
+     "depth": 15.15,
+     "blows": 50,
+     "penetration": 190
+    }
+   ]
+  },
+  {
+   "id": "148311676",
+   "x": -29000.739579697034,
+   "y": -70470.81182594762,
+   "z": 29.68,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 10.75,
+     "name": "埋土",
+     "unit": "Fill"
+    },
+    {
+     "from": 10.75,
+     "to": 11.7,
+     "name": "有機質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 11.7,
+     "to": 13.6,
+     "name": "砂質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 13.6,
+     "to": 19.4,
+     "name": "軟岩・風化岩",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.5141975,
+   "lat": 35.36437472222222,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 2,
+     "penetration": 350
+    },
+    {
+     "depth": 7.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 1,
+     "penetration": 350
+    },
+    {
+     "depth": 10.15,
+     "blows": 3,
+     "penetration": 350
+    },
+    {
+     "depth": 11.15,
+     "blows": 1,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 27,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 50,
+     "penetration": 210
+    },
+    {
+     "depth": 15.15,
+     "blows": 50,
+     "penetration": 250
+    },
+    {
+     "depth": 16.15,
+     "blows": 50,
+     "penetration": 230
+    },
+    {
+     "depth": 17.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 18.15,
+     "blows": 50,
+     "penetration": 240
+    },
+    {
+     "depth": 19.15,
+     "blows": 50,
+     "penetration": 250
+    }
+   ],
+   "water": [
+    {
+     "depth": 6.25
+    }
+   ]
+  },
+  {
+   "id": "148312744",
+   "x": -29157.247853275578,
+   "y": -70479.5507407158,
+   "z": 44.31,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "name": "埋土",
+     "unit": "Fill"
+    },
+    {
+     "from": 1,
+     "to": 3,
+     "name": "火山灰質粘性土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 3,
+     "to": 3.5,
+     "name": "シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 3.5,
+     "to": 5.8,
+     "name": "砂質シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 5.8,
+     "to": 7.9,
+     "name": "砂質シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 7.9,
+     "to": 14.35,
+     "name": "玉石混り砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 14.35,
+     "to": 20.32,
+     "name": "軟岩・風化岩",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51247555555557,
+   "lat": 35.36429138888889,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 28,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 17,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 13,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 13,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 50,
+     "penetration": 270
+    },
+    {
+     "depth": 9.15,
+     "blows": 50,
+     "penetration": 230
+    },
+    {
+     "depth": 10.15,
+     "blows": 50,
+     "penetration": 260
+    },
+    {
+     "depth": 11.15,
+     "blows": 50,
+     "penetration": 290
+    },
+    {
+     "depth": 12.15,
+     "blows": 50,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 50,
+     "penetration": 280
+    },
+    {
+     "depth": 14.15,
+     "blows": 50,
+     "penetration": 220
+    },
+    {
+     "depth": 16.15,
+     "blows": 50,
+     "penetration": 140
+    },
+    {
+     "depth": 17.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 18.15,
+     "blows": 50,
+     "penetration": 210
+    },
+    {
+     "depth": 19.15,
+     "blows": 50,
+     "penetration": 210
+    },
+    {
+     "depth": 20.15,
+     "blows": 50,
+     "penetration": 170
+    }
+   ],
+   "water": [
+    {
+     "depth": 6.7
+    }
+   ]
+  },
+  {
+   "id": "148313237",
+   "x": -29243.082491184257,
+   "y": -70482.3537348195,
+   "z": 62.42,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4.7,
+     "name": "埋土",
+     "unit": "Fill"
+    },
+    {
+     "from": 4.7,
+     "to": 6.65,
+     "name": "埋土",
+     "unit": "Fill"
+    },
+    {
+     "from": 6.65,
+     "to": 8.4,
+     "name": "火山灰質粘性土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 8.4,
+     "to": 12.35,
+     "name": "火山灰質粘性土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 12.35,
+     "to": 12.8,
+     "name": "シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 12.8,
+     "to": 13.5,
+     "name": "シルト混り砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 13.5,
+     "to": 13.85,
+     "name": "シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 13.85,
+     "to": 15.8,
+     "name": "シルト混り砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 15.8,
+     "to": 17.3,
+     "name": "砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 17.3,
+     "to": 17.6,
+     "name": "礫質土",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 17.6,
+     "to": 24.5,
+     "name": "砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 24.5,
+     "to": 31.6,
+     "name": "砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 31.6,
+     "to": 37.41,
+     "name": "軟岩・風化岩",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.5115311111111,
+   "lat": 35.36426361111111,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 5,
+     "penetration": 320
+    },
+    {
+     "depth": 2.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 4,
+     "penetration": 310
+    },
+    {
+     "depth": 4.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 4,
+     "penetration": 340
+    },
+    {
+     "depth": 6.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 2,
+     "penetration": 370
+    },
+    {
+     "depth": 11.15,
+     "blows": 2,
+     "penetration": 400
+    },
+    {
+     "depth": 12.15,
+     "blows": 6,
+     "penetration": 320
+    },
+    {
+     "depth": 13.15,
+     "blows": 9,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 16,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 18,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 24,
+     "penetration": 300
+    },
+    {
+     "depth": 17.15,
+     "blows": 50,
+     "penetration": 250
+    },
+    {
+     "depth": 18.15,
+     "blows": 50,
+     "penetration": 260
+    },
+    {
+     "depth": 19.15,
+     "blows": 50,
+     "penetration": 260
+    },
+    {
+     "depth": 20.15,
+     "blows": 40,
+     "penetration": 300
+    },
+    {
+     "depth": 21.15,
+     "blows": 42,
+     "penetration": 300
+    },
+    {
+     "depth": 22.15,
+     "blows": 50,
+     "penetration": 220
+    },
+    {
+     "depth": 23.15,
+     "blows": 40,
+     "penetration": 300
+    },
+    {
+     "depth": 24.15,
+     "blows": 50,
+     "penetration": 260
+    },
+    {
+     "depth": 25.15,
+     "blows": 50,
+     "penetration": 250
+    },
+    {
+     "depth": 26.15,
+     "blows": 50,
+     "penetration": 290
+    },
+    {
+     "depth": 27.15,
+     "blows": 50,
+     "penetration": 210
+    },
+    {
+     "depth": 28.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 29.15,
+     "blows": 50,
+     "penetration": 210
+    },
+    {
+     "depth": 30.15,
+     "blows": 50,
+     "penetration": 230
+    },
+    {
+     "depth": 31.15,
+     "blows": 50,
+     "penetration": 210
+    },
+    {
+     "depth": 32.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 33.15,
+     "blows": 50,
+     "penetration": 210
+    },
+    {
+     "depth": 34.15,
+     "blows": 50,
+     "penetration": 230
+    },
+    {
+     "depth": 35.15,
+     "blows": 50,
+     "penetration": 220
+    },
+    {
+     "depth": 36.15,
+     "blows": 50,
+     "penetration": 220
+    },
+    {
+     "depth": 37.15,
+     "blows": 50,
+     "penetration": 260
+    }
+   ],
+   "water": [
+    {
+     "depth": 1.95
+    }
+   ]
+  },
+  {
+   "id": "148314501",
+   "x": -29078.991354727634,
+   "y": -70470.55921836062,
+   "z": 30.45,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 8.5,
+     "name": "埋土",
+     "unit": "Fill"
+    },
+    {
+     "from": 8.5,
+     "to": 11,
+     "name": "有機質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 11,
+     "to": 12.5,
+     "name": "軟岩・風化岩",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 12.5,
+     "to": 17.39,
+     "name": "軟岩・風化岩",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.5133363888889,
+   "lat": 35.36437472222222,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 10,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 48,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 50,
+     "penetration": 280
+    },
+    {
+     "depth": 13.15,
+     "blows": 50,
+     "penetration": 250
+    },
+    {
+     "depth": 14.15,
+     "blows": 50,
+     "penetration": 240
+    },
+    {
+     "depth": 15.15,
+     "blows": 50,
+     "penetration": 280
+    },
+    {
+     "depth": 16.15,
+     "blows": 50,
+     "penetration": 220
+    },
+    {
+     "depth": 17.15,
+     "blows": 50,
+     "penetration": 240
+    }
+   ],
+   "water": [
+    {
+     "depth": 5.6
+    }
+   ]
+  },
+  {
+   "id": "148315610",
+   "x": -29078.861859086974,
+   "y": -70430.49872640983,
+   "z": 44.71,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 17.6,
+     "name": "埋土",
+     "unit": "Fill"
+    },
+    {
+     "from": 17.6,
+     "to": 18.9,
+     "name": "シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 18.9,
+     "to": 19.4,
+     "name": "砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 19.4,
+     "to": 24.29,
+     "name": "軟岩・風化岩",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.5133363888889,
+   "lat": 35.364735833333334,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 10,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 9,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 17.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 18.15,
+     "blows": 9,
+     "penetration": 300
+    },
+    {
+     "depth": 19.15,
+     "blows": 50,
+     "penetration": 150
+    },
+    {
+     "depth": 20.15,
+     "blows": 50,
+     "penetration": 220
+    },
+    {
+     "depth": 21.15,
+     "blows": 50,
+     "penetration": 230
+    },
+    {
+     "depth": 22.15,
+     "blows": 50,
+     "penetration": 260
+    },
+    {
+     "depth": 23.15,
+     "blows": 50,
+     "penetration": 220
+    },
+    {
+     "depth": 24.15,
+     "blows": 50,
+     "penetration": 140
+    }
+   ],
+   "water": [
+    {
+     "depth": 6.2
+    }
+   ]
+  },
+  {
+   "id": "R2-No.1",
+   "x": -28467.730117053106,
+   "y": -69463.2566684052,
+   "z": 25.1,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.8,
+     "name": "盛土（ローム）",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.8,
+     "to": 1.6,
+     "name": "シルト質細砂",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 1.6,
+     "to": 3.7,
+     "name": "細砂",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 3.7,
+     "to": 4.8,
+     "name": "砂質シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 4.8,
+     "to": 9.37,
+     "name": "細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.52002777777778,
+   "lat": 35.373472222222226,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 10,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 50,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 50,
+     "penetration": 220
+    },
+    {
+     "depth": 6.15,
+     "blows": 50,
+     "penetration": 230
+    },
+    {
+     "depth": 7.15,
+     "blows": 50,
+     "penetration": 260
+    },
+    {
+     "depth": 8.15,
+     "blows": 50,
+     "penetration": 240
+    },
+    {
+     "depth": 9.15,
+     "blows": 50,
+     "penetration": 220
+    }
+   ],
+   "water": [
+    {
+     "depth": 3.15
+    }
+   ]
+  },
+  {
+   "id": "R2-No.2",
+   "x": -28490.46534638568,
+   "y": -69469.34789125324,
+   "z": 23.6,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1.7,
+     "name": "埋土（細砂）",
+     "unit": "Fill"
+    },
+    {
+     "from": 1.7,
+     "to": 2.8,
+     "name": "砂質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 2.8,
+     "to": 3.7,
+     "name": "粘土混り細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 3.7,
+     "to": 7,
+     "name": "細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 7,
+     "to": 8.9,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 8.9,
+     "to": 10.8,
+     "name": "シルト質細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 10.8,
+     "to": 11.7,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 11.7,
+     "to": 12.39,
+     "name": "シルト混り細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.5197777777778,
+   "lat": 35.373416666666664,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 2,
+     "penetration": 340
+    },
+    {
+     "depth": 2.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 23,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 21,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 20,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 38,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 50,
+     "penetration": 290
+    },
+    {
+     "depth": 8.15,
+     "blows": 50,
+     "penetration": 190
+    },
+    {
+     "depth": 9.15,
+     "blows": 50,
+     "penetration": 170
+    },
+    {
+     "depth": 10.15,
+     "blows": 50,
+     "penetration": 190
+    },
+    {
+     "depth": 11.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 12.15,
+     "blows": 50,
+     "penetration": 240
+    }
+   ],
+   "water": [
+    {
+     "depth": 1.9
+    }
+   ]
+  },
+  {
+   "id": "R2-No.3",
+   "x": -28518.082417654543,
+   "y": -69423.03618497381,
+   "z": 19.41,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1.7,
+     "name": "盛土（砂質シルト）",
+     "unit": "Fill"
+    },
+    {
+     "from": 1.7,
+     "to": 2.8,
+     "name": "砂質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 2.8,
+     "to": 3.8,
+     "name": "砂質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 3.8,
+     "to": 5.6,
+     "name": "細砂",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 5.6,
+     "to": 7,
+     "name": "細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 7,
+     "to": 8.6,
+     "name": "細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 8.6,
+     "to": 10,
+     "name": "シルト質細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 10,
+     "to": 10.7,
+     "name": "シルト質細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 10.7,
+     "to": 11.8,
+     "name": "シルト混り細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 11.8,
+     "to": 12.7,
+     "name": "礫混り細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 12.7,
+     "to": 16.33,
+     "name": "細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51947222222225,
+   "lat": 35.37383333333334,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 2,
+     "penetration": 350
+    },
+    {
+     "depth": 2.15,
+     "blows": 1,
+     "penetration": 310
+    },
+    {
+     "depth": 3.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 12,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 13,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 21,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 45,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 50,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 10.15,
+     "blows": 27,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 50,
+     "penetration": 160
+    },
+    {
+     "depth": 12.15,
+     "blows": 50,
+     "penetration": 250
+    },
+    {
+     "depth": 13.15,
+     "blows": 50,
+     "penetration": 170
+    },
+    {
+     "depth": 14.15,
+     "blows": 50,
+     "penetration": 190
+    },
+    {
+     "depth": 15.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 16.15,
+     "blows": 50,
+     "penetration": 180
+    }
+   ],
+   "water": [
+    {
+     "depth": 1.9
+    }
+   ]
+  },
+  {
+   "id": "R2-No.3-1",
+   "x": -28500.46355849055,
+   "y": -69438.50009799152,
+   "z": 19.87,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "name": "盛土（シルト質細砂）",
+     "unit": "Fill"
+    },
+    {
+     "from": 1,
+     "to": 1.6,
+     "name": "シルト混り細砂",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 1.6,
+     "to": 3,
+     "name": "細砂",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 3,
+     "to": 6,
+     "name": "細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 6,
+     "to": 9.7,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 9.7,
+     "to": 11.31,
+     "name": "シルト混り細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51966666666667,
+   "lat": 35.373694444444446,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 11,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 21,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 27,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 28,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 50,
+     "penetration": 210
+    },
+    {
+     "depth": 7.15,
+     "blows": 50,
+     "penetration": 160
+    },
+    {
+     "depth": 8.15,
+     "blows": 50,
+     "penetration": 230
+    },
+    {
+     "depth": 9.15,
+     "blows": 50,
+     "penetration": 220
+    },
+    {
+     "depth": 10.15,
+     "blows": 50,
+     "penetration": 180
+    },
+    {
+     "depth": 11.15,
+     "blows": 50,
+     "penetration": 160
+    }
+   ],
+   "water": [
+    {
+     "depth": 1.8
+    }
+   ]
+  },
+  {
+   "id": "R2-No.4",
+   "x": -28540.72955880923,
+   "y": -69401.39305612177,
+   "z": 17.99,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "name": "盛土（砂混りシルト）",
+     "unit": "Fill"
+    },
+    {
+     "from": 1,
+     "to": 1.6,
+     "name": "盛土（粘土混り細砂）",
+     "unit": "Fill"
+    },
+    {
+     "from": 1.6,
+     "to": 2.55,
+     "name": "有機質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 2.55,
+     "to": 5.35,
+     "name": "有機質粘土",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 5.35,
+     "to": 7.7,
+     "name": "シルト質細砂",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 7.7,
+     "to": 10,
+     "name": "シルト混り細砂",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 10,
+     "to": 10.8,
+     "name": "シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 10.8,
+     "to": 11.65,
+     "name": "粗砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 11.65,
+     "to": 14.9,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 14.9,
+     "to": 16.29,
+     "name": "シルト質細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51922222222223,
+   "lat": 35.374027777777776,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 1,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 1,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 11,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 12,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 36,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 50,
+     "penetration": 100
+    },
+    {
+     "depth": 12.15,
+     "blows": 50,
+     "penetration": 110
+    },
+    {
+     "depth": 13.15,
+     "blows": 50,
+     "penetration": 150
+    },
+    {
+     "depth": 14.15,
+     "blows": 50,
+     "penetration": 80
+    },
+    {
+     "depth": 15.15,
+     "blows": 50,
+     "penetration": 130
+    },
+    {
+     "depth": 16.15,
+     "blows": 50,
+     "penetration": 140
+    }
+   ],
+   "water": [
+    {
+     "depth": 1.2
+    }
+   ]
+  },
+  {
+   "id": "R2-No.5",
+   "x": -28548.23292809306,
+   "y": -69379.79795729296,
+   "z": 19.42,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1.5,
+     "name": "盛土（粘土）",
+     "unit": "Fill"
+    },
+    {
+     "from": 1.5,
+     "to": 2.4,
+     "name": "有機質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 2.4,
+     "to": 3,
+     "name": "シルト質細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 3,
+     "to": 3.65,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 3.65,
+     "to": 8,
+     "name": "細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 8,
+     "to": 11.6,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 11.6,
+     "to": 13.3,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.5191388888889,
+   "lat": 35.37422222222222,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 11,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 50,
+     "penetration": 290
+    },
+    {
+     "depth": 4.15,
+     "blows": 38,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 42,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 39,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 41,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 50,
+     "penetration": 290
+    },
+    {
+     "depth": 9.15,
+     "blows": 50,
+     "penetration": 220
+    },
+    {
+     "depth": 10.15,
+     "blows": 50,
+     "penetration": 160
+    },
+    {
+     "depth": 11.15,
+     "blows": 50,
+     "penetration": 100
+    },
+    {
+     "depth": 12.15,
+     "blows": 50,
+     "penetration": 80
+    },
+    {
+     "depth": 13.15,
+     "blows": 50,
+     "penetration": 150
+    }
+   ],
+   "water": [
+    {
+     "depth": 2.8
+    }
+   ]
+  },
+  {
+   "id": "R2-No.6",
+   "x": -28565.832011701383,
+   "y": -69358.17078657614,
+   "z": 21.57,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2.75,
+     "name": "盛土（砂質粘土）",
+     "unit": "Fill"
+    },
+    {
+     "from": 2.75,
+     "to": 3.8,
+     "name": "有機質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 3.8,
+     "to": 5.95,
+     "name": "シルト質細砂",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 5.95,
+     "to": 6.8,
+     "name": "細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 6.8,
+     "to": 7.65,
+     "name": "砂質シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 7.65,
+     "to": 12.23,
+     "name": "細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51894444444446,
+   "lat": 35.37441666666667,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 2,
+     "penetration": 350
+    },
+    {
+     "depth": 2.15,
+     "blows": 2,
+     "penetration": 450
+    },
+    {
+     "depth": 3.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 20,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 50,
+     "penetration": 180
+    },
+    {
+     "depth": 8.15,
+     "blows": 50,
+     "penetration": 100
+    },
+    {
+     "depth": 9.15,
+     "blows": 50,
+     "penetration": 150
+    },
+    {
+     "depth": 10.15,
+     "blows": 50,
+     "penetration": 80
+    },
+    {
+     "depth": 11.15,
+     "blows": 50,
+     "penetration": 110
+    },
+    {
+     "depth": 12.15,
+     "blows": 50,
+     "penetration": 80
+    }
+   ],
+   "water": [
+    {
+     "depth": 3.3
+    }
+   ]
+  },
+  {
+   "id": "R2-No.7",
+   "x": -28467.94472659726,
+   "y": -69531.05142903661,
+   "z": 24.48,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.4,
+     "name": "埋土（礫混り粘土）",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.4,
+     "to": 2.6,
+     "name": "シルト質細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 2.6,
+     "to": 5,
+     "name": "細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 5,
+     "to": 10.34,
+     "name": "細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.52002777777778,
+   "lat": 35.37286111111111,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 14,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 27,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 21,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 40,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 50,
+     "penetration": 280
+    },
+    {
+     "depth": 6.15,
+     "blows": 50,
+     "penetration": 240
+    },
+    {
+     "depth": 7.15,
+     "blows": 50,
+     "penetration": 230
+    },
+    {
+     "depth": 8.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 9.15,
+     "blows": 50,
+     "penetration": 180
+    },
+    {
+     "depth": 10.15,
+     "blows": 50,
+     "penetration": 190
+    }
+   ],
+   "water": [
+    {
+     "depth": 1.9
+    }
+   ]
+  },
+  {
+   "id": "R2-No.8",
+   "x": -28435.064701783696,
+   "y": -69509.58417753084,
+   "z": 24.27,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.6,
+     "name": "埋土（礫混り粘土）",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.6,
+     "to": 1.6,
+     "name": "砂質シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 1.6,
+     "to": 5,
+     "name": "細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 5,
+     "to": 9.8,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 9.8,
+     "to": 11.7,
+     "name": "シルト質細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 11.7,
+     "to": 12.8,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 12.8,
+     "to": 13.6,
+     "name": "火山灰質シルト",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 13.6,
+     "to": 14.7,
+     "name": "シルト質細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 14.7,
+     "to": 17,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 17,
+     "to": 19.31,
+     "name": "シルト質微細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.5203888888889,
+   "lat": 35.37305555555555,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 25,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 38,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 42,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 49,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 50,
+     "penetration": 230
+    },
+    {
+     "depth": 6.15,
+     "blows": 50,
+     "penetration": 210
+    },
+    {
+     "depth": 7.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 8.15,
+     "blows": 50,
+     "penetration": 180
+    },
+    {
+     "depth": 9.15,
+     "blows": 50,
+     "penetration": 190
+    },
+    {
+     "depth": 10.15,
+     "blows": 44,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 50,
+     "penetration": 140
+    },
+    {
+     "depth": 12.15,
+     "blows": 50,
+     "penetration": 260
+    },
+    {
+     "depth": 13.15,
+     "blows": 16,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 50,
+     "penetration": 280
+    },
+    {
+     "depth": 15.15,
+     "blows": 50,
+     "penetration": 180
+    },
+    {
+     "depth": 16.15,
+     "blows": 50,
+     "penetration": 130
+    },
+    {
+     "depth": 17.15,
+     "blows": 50,
+     "penetration": 170
+    },
+    {
+     "depth": 18.15,
+     "blows": 50,
+     "penetration": 150
+    },
+    {
+     "depth": 19.15,
+     "blows": 50,
+     "penetration": 160
+    }
+   ],
+   "water": [
+    {
+     "depth": 4.4
+    }
+   ]
+  },
+  {
+   "id": "R2-No.9",
+   "x": -29135.959782281596,
+   "y": -68490.4076097382,
+   "z": 67.07,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.65,
+     "name": "埋土（砂混り粘土）",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.65,
+     "to": 4.8,
+     "name": "ローム",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 4.8,
+     "to": 5.7,
+     "name": "火山灰質粘土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 5.7,
+     "to": 8.8,
+     "name": "火山灰質シルト",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 8.8,
+     "to": 10.65,
+     "name": "粘土質シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 10.65,
+     "to": 16.8,
+     "name": "火山灰質粘土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 16.8,
+     "to": 18.7,
+     "name": "火山灰質シルト",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 18.7,
+     "to": 21.55,
+     "name": "シルト混り細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 21.55,
+     "to": 23.9,
+     "name": "シルト質細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 23.9,
+     "to": 25.8,
+     "name": "砂質シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 25.8,
+     "to": 30,
+     "name": "砂質シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 30,
+     "to": 30.85,
+     "name": "砂混りシルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 30.85,
+     "to": 33.65,
+     "name": "細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 33.65,
+     "to": 36.7,
+     "name": "シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 36.7,
+     "to": 38.35,
+     "name": "砂混りシルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 38.35,
+     "to": 41.6,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 41.6,
+     "to": 42.8,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 42.8,
+     "to": 44.27,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.5126388888889,
+   "lat": 35.382222222222225,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 20,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 15,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 17,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 16,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 9,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 12,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 11,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 15,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 15,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 19,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 26,
+     "penetration": 300
+    },
+    {
+     "depth": 17.15,
+     "blows": 14,
+     "penetration": 300
+    },
+    {
+     "depth": 18.15,
+     "blows": 20,
+     "penetration": 300
+    },
+    {
+     "depth": 19.15,
+     "blows": 47,
+     "penetration": 300
+    },
+    {
+     "depth": 20.15,
+     "blows": 50,
+     "penetration": 300
+    },
+    {
+     "depth": 21.15,
+     "blows": 50,
+     "penetration": 190
+    },
+    {
+     "depth": 22.15,
+     "blows": 50,
+     "penetration": 280
+    },
+    {
+     "depth": 23.15,
+     "blows": 32,
+     "penetration": 300
+    },
+    {
+     "depth": 24.15,
+     "blows": 24,
+     "penetration": 300
+    },
+    {
+     "depth": 25.15,
+     "blows": 17,
+     "penetration": 300
+    },
+    {
+     "depth": 26.15,
+     "blows": 15,
+     "penetration": 300
+    },
+    {
+     "depth": 27.15,
+     "blows": 16,
+     "penetration": 300
+    },
+    {
+     "depth": 28.15,
+     "blows": 17,
+     "penetration": 300
+    },
+    {
+     "depth": 29.15,
+     "blows": 15,
+     "penetration": 300
+    },
+    {
+     "depth": 30.15,
+     "blows": 12,
+     "penetration": 300
+    },
+    {
+     "depth": 31.15,
+     "blows": 50,
+     "penetration": 70
+    },
+    {
+     "depth": 32.15,
+     "blows": 35,
+     "penetration": 300
+    },
+    {
+     "depth": 33.15,
+     "blows": 40,
+     "penetration": 300
+    },
+    {
+     "depth": 34.15,
+     "blows": 9,
+     "penetration": 300
+    },
+    {
+     "depth": 35.15,
+     "blows": 10,
+     "penetration": 300
+    },
+    {
+     "depth": 36.15,
+     "blows": 10,
+     "penetration": 300
+    },
+    {
+     "depth": 37.15,
+     "blows": 24,
+     "penetration": 300
+    },
+    {
+     "depth": 38.15,
+     "blows": 32,
+     "penetration": 300
+    },
+    {
+     "depth": 39.15,
+     "blows": 50,
+     "penetration": 280
+    },
+    {
+     "depth": 40.15,
+     "blows": 50,
+     "penetration": 150
+    },
+    {
+     "depth": 41.15,
+     "blows": 50,
+     "penetration": 130
+    },
+    {
+     "depth": 42.15,
+     "blows": 50,
+     "penetration": 70
+    },
+    {
+     "depth": 43.15,
+     "blows": 50,
+     "penetration": 160
+    },
+    {
+     "depth": 44.15,
+     "blows": 50,
+     "penetration": 120
+    }
+   ],
+   "water": [
+    {
+     "depth": 7.9
+    }
+   ]
+  },
+  {
+   "id": "R2-No.10",
+   "x": -29115.83010290926,
+   "y": -68508.96253239753,
+   "z": 67.87,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.7,
+     "name": "埋土（黒ボク）",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.7,
+     "to": 4.9,
+     "name": "ローム",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 4.9,
+     "to": 6.5,
+     "name": "火山灰質粘土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 6.5,
+     "to": 18,
+     "name": "火山灰質シルト",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 18,
+     "to": 19.8,
+     "name": "火山灰質粘土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 19.8,
+     "to": 22.7,
+     "name": "シルト混り細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 22.7,
+     "to": 23.9,
+     "name": "シルト質細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 23.9,
+     "to": 30,
+     "name": "砂質シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 30,
+     "to": 32,
+     "name": "シルト混り細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 32,
+     "to": 34.6,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 34.6,
+     "to": 38.8,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 38.8,
+     "to": 41,
+     "name": "シルト混り細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 41,
+     "to": 44.25,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.5128611111111,
+   "lat": 35.38205555555555,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 16,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 13,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 12,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 11,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 9,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 9,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 12,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 16,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 15,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 13,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 14,
+     "penetration": 300
+    },
+    {
+     "depth": 17.15,
+     "blows": 16,
+     "penetration": 300
+    },
+    {
+     "depth": 18.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 19.15,
+     "blows": 13,
+     "penetration": 300
+    },
+    {
+     "depth": 20.15,
+     "blows": 29,
+     "penetration": 300
+    },
+    {
+     "depth": 21.15,
+     "blows": 19,
+     "penetration": 300
+    },
+    {
+     "depth": 22.15,
+     "blows": 22,
+     "penetration": 300
+    },
+    {
+     "depth": 23.15,
+     "blows": 37,
+     "penetration": 300
+    },
+    {
+     "depth": 24.15,
+     "blows": 13,
+     "penetration": 300
+    },
+    {
+     "depth": 25.15,
+     "blows": 15,
+     "penetration": 300
+    },
+    {
+     "depth": 26.15,
+     "blows": 13,
+     "penetration": 300
+    },
+    {
+     "depth": 27.15,
+     "blows": 14,
+     "penetration": 300
+    },
+    {
+     "depth": 28.15,
+     "blows": 12,
+     "penetration": 300
+    },
+    {
+     "depth": 29.15,
+     "blows": 16,
+     "penetration": 300
+    },
+    {
+     "depth": 30.15,
+     "blows": 37,
+     "penetration": 300
+    },
+    {
+     "depth": 31.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 32.15,
+     "blows": 50,
+     "penetration": 290
+    },
+    {
+     "depth": 33.15,
+     "blows": 50,
+     "penetration": 230
+    },
+    {
+     "depth": 34.15,
+     "blows": 50,
+     "penetration": 100
+    },
+    {
+     "depth": 35.15,
+     "blows": 46,
+     "penetration": 300
+    },
+    {
+     "depth": 36.15,
+     "blows": 30,
+     "penetration": 300
+    },
+    {
+     "depth": 37.15,
+     "blows": 40,
+     "penetration": 300
+    },
+    {
+     "depth": 38.15,
+     "blows": 42,
+     "penetration": 300
+    },
+    {
+     "depth": 39.15,
+     "blows": 50,
+     "penetration": 250
+    },
+    {
+     "depth": 40.15,
+     "blows": 50,
+     "penetration": 150
+    },
+    {
+     "depth": 41.15,
+     "blows": 50,
+     "penetration": 230
+    },
+    {
+     "depth": 42.15,
+     "blows": 50,
+     "penetration": 100
+    },
+    {
+     "depth": 43.15,
+     "blows": 50,
+     "penetration": 120
+    },
+    {
+     "depth": 44.15,
+     "blows": 50,
+     "penetration": 100
+    }
+   ],
+   "water": [
+    {
+     "depth": 8.7
+    }
+   ]
+  },
+  {
+   "id": "R2-No.11",
+   "x": -29078.154008861387,
+   "y": -68564.55358694878,
+   "z": 67.15,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5.8,
+     "name": "ローム",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 5.8,
+     "to": 11.65,
+     "name": "火山灰質粘土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 11.65,
+     "to": 21.8,
+     "name": "シルト質細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 21.8,
+     "to": 26,
+     "name": "砂質シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 26,
+     "to": 27.7,
+     "name": "砂混りシルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 27.7,
+     "to": 30.7,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 30.7,
+     "to": 33,
+     "name": "シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 33,
+     "to": 33.9,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 33.9,
+     "to": 38.32,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51327777777777,
+   "lat": 35.38155555555556,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 9,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 11,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 15,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 17,
+     "penetration": 300
+    },
+    {
+     "depth": 13.65,
+     "blows": 19,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 20,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 19,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 20,
+     "penetration": 300
+    },
+    {
+     "depth": 17.15,
+     "blows": 18,
+     "penetration": 300
+    },
+    {
+     "depth": 18.15,
+     "blows": 18,
+     "penetration": 300
+    },
+    {
+     "depth": 19.15,
+     "blows": 23,
+     "penetration": 300
+    },
+    {
+     "depth": 20.15,
+     "blows": 37,
+     "penetration": 300
+    },
+    {
+     "depth": 21.15,
+     "blows": 50,
+     "penetration": 240
+    },
+    {
+     "depth": 22.15,
+     "blows": 14,
+     "penetration": 300
+    },
+    {
+     "depth": 23.65,
+     "blows": 12,
+     "penetration": 300
+    },
+    {
+     "depth": 24.15,
+     "blows": 11,
+     "penetration": 300
+    },
+    {
+     "depth": 25.15,
+     "blows": 10,
+     "penetration": 300
+    },
+    {
+     "depth": 26.15,
+     "blows": 11,
+     "penetration": 300
+    },
+    {
+     "depth": 27.15,
+     "blows": 11,
+     "penetration": 300
+    },
+    {
+     "depth": 28.15,
+     "blows": 50,
+     "penetration": 90
+    },
+    {
+     "depth": 29.15,
+     "blows": 50,
+     "penetration": 100
+    },
+    {
+     "depth": 30.15,
+     "blows": 50,
+     "penetration": 70
+    },
+    {
+     "depth": 31.15,
+     "blows": 23,
+     "penetration": 300
+    },
+    {
+     "depth": 32.65,
+     "blows": 22,
+     "penetration": 300
+    },
+    {
+     "depth": 33.15,
+     "blows": 50,
+     "penetration": 130
+    },
+    {
+     "depth": 34.15,
+     "blows": 50,
+     "penetration": 280
+    },
+    {
+     "depth": 35.15,
+     "blows": 50,
+     "penetration": 160
+    },
+    {
+     "depth": 36.15,
+     "blows": 50,
+     "penetration": 230
+    },
+    {
+     "depth": 37.15,
+     "blows": 50,
+     "penetration": 140
+    },
+    {
+     "depth": 38.15,
+     "blows": 50,
+     "penetration": 170
+    }
+   ],
+   "water": [
+    {
+     "depth": 12.2,
+     "date": "2021-02-04"
+    }
+   ]
+  },
+  {
+   "id": "Br-1",
+   "x": -28877.44262165558,
+   "y": -70506.61613645633,
+   "z": 34.63,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1.5,
+     "name": "強風化泥岩",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 1.5,
+     "to": 5,
+     "name": "風化泥岩",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 5,
+     "to": 14.42,
+     "name": "泥岩",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51555555555555,
+   "lat": 35.36405555555556,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 26,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 50,
+     "penetration": 270
+    },
+    {
+     "depth": 3.15,
+     "blows": 41,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 37,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 50,
+     "penetration": 280
+    },
+    {
+     "depth": 6.15,
+     "blows": 50,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 41,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 36,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 40,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 29,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 27,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 39,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 50,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 50,
+     "penetration": 270
+    }
+   ],
+   "water": [
+    {
+     "depth": 0.6,
+     "date": "2021-07-28"
+    }
+   ]
+  },
+  {
+   "id": "Br-2",
+   "x": -28879.996560811924,
+   "y": -70515.85276054109,
+   "z": 41.46,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.5,
+     "name": "表土",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.5,
+     "to": 5,
+     "name": "強風化泥岩",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 5,
+     "to": 8.46,
+     "name": "風化泥岩",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 8.46,
+     "to": 13.43,
+     "name": "泥岩",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51552777777778,
+   "lat": 35.36397222222222,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 17,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 19,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 25,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 36,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 31,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 19,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 26,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 50,
+     "penetration": 250
+    },
+    {
+     "depth": 9.15,
+     "blows": 50,
+     "penetration": 270
+    },
+    {
+     "depth": 10.15,
+     "blows": 50,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 50,
+     "penetration": 280
+    },
+    {
+     "depth": 12.15,
+     "blows": 50,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 50,
+     "penetration": 280
+    }
+   ]
+  },
+  {
+   "id": "Br-5",
+   "x": -28902.536717296483,
+   "y": -70460.31143170246,
+   "z": 36.07,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "name": "強風化泥岩",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 1,
+     "to": 11.35,
+     "name": "泥岩",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51527777777778,
+   "lat": 35.364472222222226,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 26,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 50,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 42,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 5.15,
+     "blows": 50,
+     "penetration": 290
+    },
+    {
+     "depth": 6.15,
+     "blows": 50,
+     "penetration": 240
+    },
+    {
+     "depth": 7.15,
+     "blows": 50,
+     "penetration": 190
+    },
+    {
+     "depth": 8.15,
+     "blows": 27,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 50,
+     "penetration": 290
+    },
+    {
+     "depth": 10.15,
+     "blows": 50,
+     "penetration": 290
+    },
+    {
+     "depth": 11.15,
+     "blows": 50,
+     "penetration": 200
+    }
+   ]
+  },
+  {
+   "id": "R3-No.1",
+   "x": -28609.62473698748,
+   "y": -69312.77501154038,
+   "z": 21.84,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "name": "埋土（砂質土）",
+     "unit": "Fill"
+    },
+    {
+     "from": 1,
+     "to": 3.9,
+     "name": "シルト質細砂",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 3.9,
+     "to": 7,
+     "name": "細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 7,
+     "to": 9.1,
+     "name": "細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 9.1,
+     "to": 9.85,
+     "name": "砂質固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 9.85,
+     "to": 11,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 11,
+     "to": 11.7,
+     "name": "シルト質細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 11.7,
+     "to": 13.8,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 13.8,
+     "to": 14.29,
+     "name": "細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.5184608888889,
+   "lat": 35.37482461111111,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 15,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 19,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 25,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 26,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 29,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 46,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 34,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 34,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 50,
+     "penetration": 140
+    },
+    {
+     "depth": 10.15,
+     "blows": 50,
+     "penetration": 110
+    },
+    {
+     "depth": 11.15,
+     "blows": 50,
+     "penetration": 180
+    },
+    {
+     "depth": 12.15,
+     "blows": 50,
+     "penetration": 150
+    },
+    {
+     "depth": 13.15,
+     "blows": 50,
+     "penetration": 170
+    },
+    {
+     "depth": 14.15,
+     "blows": 50,
+     "penetration": 140
+    }
+   ],
+   "water": [
+    {
+     "depth": 3.4
+    }
+   ]
+  },
+  {
+   "id": "R3-No.2",
+   "x": -28644.76919446,
+   "y": -69293.2705427127,
+   "z": 20.61,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3.7,
+     "name": "埋土（粘性土）",
+     "unit": "Fill"
+    },
+    {
+     "from": 3.7,
+     "to": 4.5,
+     "name": "シルト質細砂",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 4.5,
+     "to": 8.7,
+     "name": "細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 8.7,
+     "to": 9.95,
+     "name": "シルト質細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 9.95,
+     "to": 10.8,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 10.8,
+     "to": 12.8,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 12.8,
+     "to": 15.26,
+     "name": "細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51807341666668,
+   "lat": 35.37499941666667,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 10,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 27,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 25,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 35,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 43,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 46,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 50,
+     "penetration": 150
+    },
+    {
+     "depth": 11.15,
+     "blows": 50,
+     "penetration": 250
+    },
+    {
+     "depth": 12.15,
+     "blows": 50,
+     "penetration": 60
+    },
+    {
+     "depth": 13.15,
+     "blows": 50,
+     "penetration": 90
+    },
+    {
+     "depth": 14.15,
+     "blows": 50,
+     "penetration": 160
+    },
+    {
+     "depth": 15.15,
+     "blows": 50,
+     "penetration": 110
+    }
+   ],
+   "water": [
+    {
+     "depth": 1.8
+    }
+   ]
+  },
+  {
+   "id": "R3-No.3",
+   "x": -28663.49576059877,
+   "y": -69271.5440526101,
+   "z": 20.68,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4.7,
+     "name": "埋土（粘性土）",
+     "unit": "Fill"
+    },
+    {
+     "from": 4.7,
+     "to": 6,
+     "name": "有機質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 6,
+     "to": 7.25,
+     "name": "砂混りシルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 7.25,
+     "to": 8.8,
+     "name": "砂質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 8.8,
+     "to": 10.7,
+     "name": "シルト質細砂",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 10.7,
+     "to": 12.6,
+     "name": "砂質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 12.6,
+     "to": 13.9,
+     "name": "砂混りシルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 13.9,
+     "to": 14.7,
+     "name": "シルト質細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 14.7,
+     "to": 18.7,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 18.7,
+     "to": 19.1,
+     "name": "砂礫",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 19.1,
+     "to": 20.21,
+     "name": "細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51786655555557,
+   "lat": 35.375194722222226,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 2,
+     "penetration": 350
+    },
+    {
+     "depth": 4.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 2,
+     "penetration": 350
+    },
+    {
+     "depth": 6.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 12,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 13,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 17,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 18,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 28,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 50,
+     "penetration": 240
+    },
+    {
+     "depth": 16.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 17.15,
+     "blows": 50,
+     "penetration": 110
+    },
+    {
+     "depth": 18.15,
+     "blows": 50,
+     "penetration": 70
+    },
+    {
+     "depth": 19.15,
+     "blows": 50,
+     "penetration": 80
+    },
+    {
+     "depth": 20.15,
+     "blows": 50,
+     "penetration": 60
+    }
+   ],
+   "water": [
+    {
+     "depth": 1.8
+    }
+   ]
+  },
+  {
+   "id": "R3-No.4",
+   "x": -28689.2321665251,
+   "y": -69249.32983655101,
+   "z": 22.39,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2.85,
+     "name": "埋土（砂質シルト）",
+     "unit": "Fill"
+    },
+    {
+     "from": 2.85,
+     "to": 4.55,
+     "name": "シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 4.55,
+     "to": 6.3,
+     "name": "有機質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 6.3,
+     "to": 7.85,
+     "name": "砂混りシルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 7.85,
+     "to": 8.95,
+     "name": "砂質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 8.95,
+     "to": 12.6,
+     "name": "シルト混り細砂",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 12.6,
+     "to": 13.2,
+     "name": "砂質シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 13.2,
+     "to": 14.7,
+     "name": "細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 14.7,
+     "to": 15.75,
+     "name": "シルト混り細砂",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 15.75,
+     "to": 16.9,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 16.9,
+     "to": 21.65,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 21.65,
+     "to": 22.25,
+     "name": "砂礫",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.5175825277778,
+   "lat": 35.37539422222222,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 1,
+     "penetration": 350
+    },
+    {
+     "depth": 3.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 3,
+     "penetration": 350
+    },
+    {
+     "depth": 5.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 24,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 15,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 11,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 19,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 50,
+     "penetration": 280
+    },
+    {
+     "depth": 14.15,
+     "blows": 24,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 9,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 40,
+     "penetration": 300
+    },
+    {
+     "depth": 17.15,
+     "blows": 50,
+     "penetration": 100
+    },
+    {
+     "depth": 18.15,
+     "blows": 50,
+     "penetration": 120
+    },
+    {
+     "depth": 19.15,
+     "blows": 50,
+     "penetration": 80
+    },
+    {
+     "depth": 20.15,
+     "blows": 50,
+     "penetration": 100
+    },
+    {
+     "depth": 21.15,
+     "blows": 50,
+     "penetration": 60
+    },
+    {
+     "depth": 22.15,
+     "blows": 50,
+     "penetration": 100
+    }
+   ],
+   "water": [
+    {
+     "depth": 3
+    }
+   ]
+  },
+  {
+   "id": "R3-No.5",
+   "x": -28703.88845991624,
+   "y": -69227.1324309949,
+   "z": 24.85,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5.75,
+     "name": "埋土（粘性土）",
+     "unit": "Fill"
+    },
+    {
+     "from": 5.75,
+     "to": 6.9,
+     "name": "砂質粘土",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 6.9,
+     "to": 9.35,
+     "name": "シルト質細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 9.35,
+     "to": 9.8,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 9.8,
+     "to": 10.7,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 10.7,
+     "to": 12.9,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 12.9,
+     "to": 16.7,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 16.7,
+     "to": 17.29,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51742044444447,
+   "lat": 35.375593888888886,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 14,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 16,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 22,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 42,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 40,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 42,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 50,
+     "penetration": 100
+    },
+    {
+     "depth": 11.15,
+     "blows": 43,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 50,
+     "penetration": 180
+    },
+    {
+     "depth": 13.15,
+     "blows": 50,
+     "penetration": 160
+    },
+    {
+     "depth": 14.15,
+     "blows": 50,
+     "penetration": 80
+    },
+    {
+     "depth": 15.15,
+     "blows": 50,
+     "penetration": 100
+    },
+    {
+     "depth": 16.15,
+     "blows": 50,
+     "penetration": 90
+    },
+    {
+     "depth": 17.15,
+     "blows": 50,
+     "penetration": 140
+    }
+   ],
+   "water": [
+    {
+     "depth": 3.4
+    }
+   ]
+  },
+  {
+   "id": "R3-No.6",
+   "x": -28896.22683230922,
+   "y": -68265.19712318896,
+   "z": 57.78,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.6,
+     "name": "コンクリート",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.6,
+     "to": 11.8,
+     "name": "盛土（ローム）",
+     "unit": "Fill"
+    },
+    {
+     "from": 11.8,
+     "to": 15.7,
+     "name": "砂質シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 15.7,
+     "to": 21.34,
+     "name": "細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51526958333332,
+   "lat": 35.38425925,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 2,
+     "penetration": 330
+    },
+    {
+     "depth": 2.65,
+     "blows": 3,
+     "penetration": 350
+    },
+    {
+     "depth": 3.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 7.65,
+     "blows": 2,
+     "penetration": 320
+    },
+    {
+     "depth": 8.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 3,
+     "penetration": 320
+    },
+    {
+     "depth": 11.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 17,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 13,
+     "penetration": 300
+    },
+    {
+     "depth": 14.65,
+     "blows": 24,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 16,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 50,
+     "penetration": 250
+    },
+    {
+     "depth": 17.15,
+     "blows": 50,
+     "penetration": 230
+    },
+    {
+     "depth": 18.15,
+     "blows": 50,
+     "penetration": 260
+    },
+    {
+     "depth": 19.15,
+     "blows": 50,
+     "penetration": 220
+    },
+    {
+     "depth": 20.15,
+     "blows": 50,
+     "penetration": 180
+    },
+    {
+     "depth": 21.15,
+     "blows": 50,
+     "penetration": 190
+    }
+   ],
+   "water": [
+    {
+     "depth": 10.4,
+     "date": "2022-02-21"
+    }
+   ]
+  },
+  {
+   "id": "R3-No.7",
+   "x": -28885.536058266367,
+   "y": -68250.10073830762,
+   "z": 57.44,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.5,
+     "name": "コンクリート",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.5,
+     "to": 0.7,
+     "name": "砕石",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.7,
+     "to": 11.6,
+     "name": "盛土（ローム）",
+     "unit": "Fill"
+    },
+    {
+     "from": 11.6,
+     "to": 13.9,
+     "name": "砂質シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 13.9,
+     "to": 19.36,
+     "name": "細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51538672222222,
+   "lat": 35.38439563888889,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 3,
+     "penetration": 320
+    },
+    {
+     "depth": 2.15,
+     "blows": 2,
+     "penetration": 310
+    },
+    {
+     "depth": 3.15,
+     "blows": 2,
+     "penetration": 330
+    },
+    {
+     "depth": 4.15,
+     "blows": 2,
+     "penetration": 390
+    },
+    {
+     "depth": 5.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 2,
+     "penetration": 350
+    },
+    {
+     "depth": 7.15,
+     "blows": 2,
+     "penetration": 400
+    },
+    {
+     "depth": 8.15,
+     "blows": 2,
+     "penetration": 380
+    },
+    {
+     "depth": 9.15,
+     "blows": 2,
+     "penetration": 350
+    },
+    {
+     "depth": 10.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 14,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 13,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 50,
+     "penetration": 230
+    },
+    {
+     "depth": 15.15,
+     "blows": 50,
+     "penetration": 220
+    },
+    {
+     "depth": 16.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 17.15,
+     "blows": 50,
+     "penetration": 240
+    },
+    {
+     "depth": 18.15,
+     "blows": 50,
+     "penetration": 230
+    },
+    {
+     "depth": 19.15,
+     "blows": 50,
+     "penetration": 210
+    }
+   ],
+   "water": [
+    {
+     "depth": 11.1
+    }
+   ]
+  },
+  {
+   "id": "R3-No.8",
+   "x": -28883.682922159864,
+   "y": -68273.42221444093,
+   "z": 48.13,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.7,
+     "name": "コンクリート",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.7,
+     "to": 1.6,
+     "name": "盛土（有機質火山灰土）",
+     "unit": "Fill"
+    },
+    {
+     "from": 1.6,
+     "to": 1.85,
+     "name": "コンクリート",
+     "unit": "Fill"
+    },
+    {
+     "from": 1.85,
+     "to": 4,
+     "name": "盛土（有機質火山灰土）",
+     "unit": "Fill"
+    },
+    {
+     "from": 4,
+     "to": 5.9,
+     "name": "盛土（ローム）",
+     "unit": "Fill"
+    },
+    {
+     "from": 5.9,
+     "to": 11.3,
+     "name": "細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51540794444443,
+   "lat": 35.38418547222222,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 2,
+     "penetration": 400
+    },
+    {
+     "depth": 3.15,
+     "blows": 2,
+     "penetration": 450
+    },
+    {
+     "depth": 4.15,
+     "blows": 2,
+     "penetration": 400
+    },
+    {
+     "depth": 5.15,
+     "blows": 2,
+     "penetration": 350
+    },
+    {
+     "depth": 6.15,
+     "blows": 50,
+     "penetration": 290
+    },
+    {
+     "depth": 7.15,
+     "blows": 50,
+     "penetration": 150
+    },
+    {
+     "depth": 8.15,
+     "blows": 50,
+     "penetration": 90
+    },
+    {
+     "depth": 9.15,
+     "blows": 50,
+     "penetration": 180
+    },
+    {
+     "depth": 10.15,
+     "blows": 50,
+     "penetration": 170
+    },
+    {
+     "depth": 11.15,
+     "blows": 50,
+     "penetration": 150
+    }
+   ],
+   "water": [
+    {
+     "depth": 4.8
+    }
+   ]
+  },
+  {
+   "id": "R3-No.9",
+   "x": -28873.61326992954,
+   "y": -68259.20208101768,
+   "z": 47.6,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.55,
+     "name": "コンクリート",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.55,
+     "to": 3.9,
+     "name": "盛土（ローム）",
+     "unit": "Fill"
+    },
+    {
+     "from": 3.9,
+     "to": 5.7,
+     "name": "盛土（有機質火山灰土）",
+     "unit": "Fill"
+    },
+    {
+     "from": 5.7,
+     "to": 6.8,
+     "name": "盛土（ローム）",
+     "unit": "Fill"
+    },
+    {
+     "from": 6.8,
+     "to": 11.9,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 11.9,
+     "to": 12.8,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 12.8,
+     "to": 14.31,
+     "name": "細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51551827777777,
+   "lat": 35.38431394444444,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 2,
+     "penetration": 330
+    },
+    {
+     "depth": 3.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 2,
+     "penetration": 450
+    },
+    {
+     "depth": 6.15,
+     "blows": 2,
+     "penetration": 400
+    },
+    {
+     "depth": 7.15,
+     "blows": 18,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 33,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 50,
+     "penetration": 290
+    },
+    {
+     "depth": 10.15,
+     "blows": 50,
+     "penetration": 240
+    },
+    {
+     "depth": 11.15,
+     "blows": 50,
+     "penetration": 180
+    },
+    {
+     "depth": 12.15,
+     "blows": 50,
+     "penetration": 230
+    },
+    {
+     "depth": 13.15,
+     "blows": 50,
+     "penetration": 220
+    },
+    {
+     "depth": 14.15,
+     "blows": 50,
+     "penetration": 160
+    }
+   ],
+   "water": [
+    {
+     "depth": 4.6
+    }
+   ]
+  },
+  {
+   "id": "No.1",
+   "x": -27980.35189890774,
+   "y": -70357.21981969899,
+   "z": 9.17,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1.1,
+     "name": "表土（有機質シルト）",
+     "unit": "Fill"
+    },
+    {
+     "from": 1.1,
+     "to": 3.5,
+     "name": "腐植土",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 3.5,
+     "to": 13.7,
+     "name": "シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 13.7,
+     "to": 14.85,
+     "name": "砂質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 14.85,
+     "to": 23.3,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.52542222222223,
+   "lat": 35.36542777777778,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 2,
+     "penetration": 350
+    },
+    {
+     "depth": 2,
+     "blows": 1,
+     "penetration": 600
+    },
+    {
+     "depth": 3,
+     "blows": 2,
+     "penetration": 450
+    },
+    {
+     "depth": 4,
+     "blows": 1,
+     "penetration": 600
+    },
+    {
+     "depth": 5,
+     "blows": 1,
+     "penetration": 650
+    },
+    {
+     "depth": 6,
+     "blows": 0,
+     "penetration": 550
+    },
+    {
+     "depth": 7,
+     "blows": 0,
+     "penetration": 550
+    },
+    {
+     "depth": 8,
+     "blows": 0,
+     "penetration": 550
+    },
+    {
+     "depth": 9,
+     "blows": 0,
+     "penetration": 550
+    },
+    {
+     "depth": 10,
+     "blows": 2,
+     "penetration": 550
+    },
+    {
+     "depth": 11.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 2,
+     "penetration": 400
+    },
+    {
+     "depth": 13.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 9,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 50,
+     "penetration": 190
+    },
+    {
+     "depth": 16.15,
+     "blows": 50,
+     "penetration": 170
+    },
+    {
+     "depth": 17.15,
+     "blows": 50,
+     "penetration": 170
+    },
+    {
+     "depth": 18.15,
+     "blows": 50,
+     "penetration": 160
+    },
+    {
+     "depth": 19.15,
+     "blows": 50,
+     "penetration": 160
+    },
+    {
+     "depth": 20.15,
+     "blows": 50,
+     "penetration": 180
+    },
+    {
+     "depth": 21.15,
+     "blows": 50,
+     "penetration": 160
+    },
+    {
+     "depth": 22.15,
+     "blows": 50,
+     "penetration": 190
+    },
+    {
+     "depth": 23.15,
+     "blows": 50,
+     "penetration": 150
+    }
+   ],
+   "water": [
+    {
+     "depth": 1.04,
+     "date": "2017-01-16"
+    },
+    {
+     "depth": 0.75,
+     "date": "2017-01-17"
+    }
+   ]
+  },
+  {
+   "id": "No.2",
+   "x": -27985.624952488077,
+   "y": -70348.26676072512,
+   "z": 8.76,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.3,
+     "name": "表土",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.3,
+     "to": 0.6,
+     "name": "有機質粘土",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 0.6,
+     "to": 3.55,
+     "name": "腐植土",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 3.55,
+     "to": 9.8,
+     "name": "シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 9.8,
+     "to": 10.65,
+     "name": "シルト質細砂",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 10.65,
+     "to": 13.8,
+     "name": "シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 13.8,
+     "to": 14.8,
+     "name": "細砂",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 14.8,
+     "to": 15.75,
+     "name": "礫混じり粘土",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 15.75,
+     "to": 23.35,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.5253638888889,
+   "lat": 35.36550833333334,
+   "spt": [
+    {
+     "depth": 1,
+     "blows": 1,
+     "penetration": 600
+    },
+    {
+     "depth": 2,
+     "blows": 1,
+     "penetration": 600
+    },
+    {
+     "depth": 3,
+     "blows": 1,
+     "penetration": 600
+    },
+    {
+     "depth": 4,
+     "blows": 1,
+     "penetration": 500
+    },
+    {
+     "depth": 5.15,
+     "blows": 1,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 1,
+     "penetration": 300
+    },
+    {
+     "depth": 7,
+     "blows": 1,
+     "penetration": 600
+    },
+    {
+     "depth": 8,
+     "blows": 0,
+     "penetration": 600
+    },
+    {
+     "depth": 9,
+     "blows": 1,
+     "penetration": 600
+    },
+    {
+     "depth": 10.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 3,
+     "penetration": 350
+    },
+    {
+     "depth": 13.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 12,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 50,
+     "penetration": 160
+    },
+    {
+     "depth": 17.15,
+     "blows": 50,
+     "penetration": 180
+    },
+    {
+     "depth": 18.15,
+     "blows": 50,
+     "penetration": 190
+    },
+    {
+     "depth": 19.15,
+     "blows": 50,
+     "penetration": 180
+    },
+    {
+     "depth": 20.15,
+     "blows": 50,
+     "penetration": 150
+    },
+    {
+     "depth": 21.15,
+     "blows": 50,
+     "penetration": 130
+    },
+    {
+     "depth": 22.15,
+     "blows": 50,
+     "penetration": 140
+    },
+    {
+     "depth": 23.15,
+     "blows": 50,
+     "penetration": 200
+    }
+   ],
+   "water": [
+    {
+     "depth": 0.3,
+     "date": "2017-01-12"
+    },
+    {
+     "depth": 0.5,
+     "date": "2017-01-14"
+    }
+   ]
+  },
+  {
+   "id": "No.3",
+   "x": -27979.790503843695,
+   "y": -70339.04009392904,
+   "z": 8.76,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.3,
+     "name": "表土",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.3,
+     "to": 1.4,
+     "name": "有機質粘土",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 1.4,
+     "to": 3.7,
+     "name": "腐植土",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 3.7,
+     "to": 9.7,
+     "name": "シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 9.7,
+     "to": 10.7,
+     "name": "シルト質細砂",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 10.7,
+     "to": 12.8,
+     "name": "砂混じりシルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 12.8,
+     "to": 13.65,
+     "name": "シルト質細砂",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 13.65,
+     "to": 14.2,
+     "name": "砂礫",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 14.2,
+     "to": 14.6,
+     "name": "粘土混じり砂礫",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 14.6,
+     "to": 18.7,
+     "name": "凝固シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 18.7,
+     "to": 24.34,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.5254277777778,
+   "lat": 35.36559166666667,
+   "spt": [
+    {
+     "depth": 1,
+     "blows": 0,
+     "penetration": 600
+    },
+    {
+     "depth": 2,
+     "blows": 0,
+     "penetration": 600
+    },
+    {
+     "depth": 3,
+     "blows": 0,
+     "penetration": 600
+    },
+    {
+     "depth": 4,
+     "blows": 0,
+     "penetration": 600
+    },
+    {
+     "depth": 5,
+     "blows": 0,
+     "penetration": 600
+    },
+    {
+     "depth": 6,
+     "blows": 0,
+     "penetration": 600
+    },
+    {
+     "depth": 7,
+     "blows": 0,
+     "penetration": 600
+    },
+    {
+     "depth": 8,
+     "blows": 0,
+     "penetration": 600
+    },
+    {
+     "depth": 9,
+     "blows": 0,
+     "penetration": 600
+    },
+    {
+     "depth": 10.15,
+     "blows": 2,
+     "penetration": 330
+    },
+    {
+     "depth": 11.15,
+     "blows": 3,
+     "penetration": 350
+    },
+    {
+     "depth": 12.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 21,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 29,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 48,
+     "penetration": 300
+    },
+    {
+     "depth": 17.15,
+     "blows": 30,
+     "penetration": 300
+    },
+    {
+     "depth": 18.15,
+     "blows": 12,
+     "penetration": 300
+    },
+    {
+     "depth": 19.15,
+     "blows": 50,
+     "penetration": 150
+    },
+    {
+     "depth": 20.15,
+     "blows": 50,
+     "penetration": 140
+    },
+    {
+     "depth": 21.15,
+     "blows": 50,
+     "penetration": 140
+    },
+    {
+     "depth": 22.15,
+     "blows": 50,
+     "penetration": 110
+    },
+    {
+     "depth": 23.15,
+     "blows": 50,
+     "penetration": 110
+    },
+    {
+     "depth": 24.15,
+     "blows": 50,
+     "penetration": 190
+    }
+   ],
+   "water": [
+    {
+     "depth": 0.35,
+     "date": "2017-01-10"
+    }
+   ]
+  },
+  {
+   "id": "No.4",
+   "x": -27973.001004777343,
+   "y": -70347.38154429948,
+   "z": 8.74,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.3,
+     "name": "表土",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.3,
+     "to": 0.6,
+     "name": "有機質粘土",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 0.6,
+     "to": 3.7,
+     "name": "腐植土",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 3.7,
+     "to": 4.9,
+     "name": "シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 4.9,
+     "to": 5.6,
+     "name": "砂質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 5.6,
+     "to": 12.85,
+     "name": "シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 12.85,
+     "to": 14.7,
+     "name": "シルト質細砂",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 14.7,
+     "to": 15.1,
+     "name": "砂礫",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 15.1,
+     "to": 23.24,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.5255027777778,
+   "lat": 35.36551666666667,
+   "spt": [
+    {
+     "depth": 1,
+     "blows": 0,
+     "penetration": 500
+    },
+    {
+     "depth": 2,
+     "blows": 0,
+     "penetration": 500
+    },
+    {
+     "depth": 3,
+     "blows": 0,
+     "penetration": 500
+    },
+    {
+     "depth": 4,
+     "blows": 0,
+     "penetration": 500
+    },
+    {
+     "depth": 5,
+     "blows": 0,
+     "penetration": 500
+    },
+    {
+     "depth": 6,
+     "blows": 0,
+     "penetration": 500
+    },
+    {
+     "depth": 7,
+     "blows": 0,
+     "penetration": 500
+    },
+    {
+     "depth": 8,
+     "blows": 0,
+     "penetration": 500
+    },
+    {
+     "depth": 9.15,
+     "blows": 1,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 2,
+     "penetration": 350
+    },
+    {
+     "depth": 11.15,
+     "blows": 1,
+     "penetration": 350
+    },
+    {
+     "depth": 12.15,
+     "blows": 3,
+     "penetration": 350
+    },
+    {
+     "depth": 13.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 14,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 50,
+     "penetration": 130
+    },
+    {
+     "depth": 16.15,
+     "blows": 47,
+     "penetration": 300
+    },
+    {
+     "depth": 17.15,
+     "blows": 50,
+     "penetration": 130
+    },
+    {
+     "depth": 18.15,
+     "blows": 50,
+     "penetration": 120
+    },
+    {
+     "depth": 19.15,
+     "blows": 50,
+     "penetration": 120
+    },
+    {
+     "depth": 20.15,
+     "blows": 50,
+     "penetration": 140
+    },
+    {
+     "depth": 21.15,
+     "blows": 50,
+     "penetration": 140
+    },
+    {
+     "depth": 22.15,
+     "blows": 50,
+     "penetration": 110
+    },
+    {
+     "depth": 23.15,
+     "blows": 50,
+     "penetration": 90
+    }
+   ],
+   "water": [
+    {
+     "depth": 0.35,
+     "date": "2017-01-06"
+    }
+   ]
+  },
+  {
+   "id": "No.13+10",
+   "x": -29013.966852551166,
+   "y": -70470.83080644565,
+   "z": 45.54,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3.8,
+     "name": "盛土",
+     "unit": "Fill"
+    },
+    {
+     "from": 3.8,
+     "to": 7,
+     "name": "シルト質細砂",
+     "unit": "Pleistocene"
+    }
+   ],
+   "lon": 139.51405194444445,
+   "lat": 35.36437416666667
+  },
+  {
+   "id": "No.13+25",
+   "x": -29047.76156403257,
+   "y": -70461.35365692443,
+   "z": 45.72,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 8.9,
+     "name": "盛土",
+     "unit": "Fill"
+    },
+    {
+     "from": 8.9,
+     "to": 10,
+     "name": "シルト質細砂",
+     "unit": "Pleistocene"
+    }
+   ],
+   "lon": 139.51367972222224,
+   "lat": 35.36445861111111
+  },
+  {
+   "id": "No.13+40",
+   "x": -29083.062782674784,
+   "y": -70449.40622246708,
+   "z": 45.66,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 8.75,
+     "name": "盛土",
+     "unit": "Fill"
+    },
+    {
+     "from": 8.75,
+     "to": 8.95,
+     "name": "砂質粘土",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 8.95,
+     "to": 10,
+     "name": "シルト質細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 10,
+     "to": 11.9,
+     "name": "微細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 11.9,
+     "to": 14.5,
+     "name": "シルト混じり微細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 14.5,
+     "to": 15.05,
+     "name": "砂質固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 15.05,
+     "to": 16.7,
+     "name": "シルト混じり微細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 16.7,
+     "to": 17.33,
+     "name": "砂混じり固結シルト",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51329083333334,
+   "lat": 35.36456527777778,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 1,
+     "penetration": 370
+    },
+    {
+     "depth": 3.15,
+     "blows": 10,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 1,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 15,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 32,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 36,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 39,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 40,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 36,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 37,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 39,
+     "penetration": 300
+    },
+    {
+     "depth": 17.15,
+     "blows": 50,
+     "penetration": 180
+    }
+   ]
+  },
+  {
+   "id": "No.13+55",
+   "x": -29107.298724656164,
+   "y": -70450.31395065488,
+   "z": 45.81,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 6,
+     "name": "盛土",
+     "unit": "Fill"
+    }
+   ],
+   "lon": 139.51302416666667,
+   "lat": 35.36455638888889
+  },
+  {
+   "id": "No.13+70",
+   "x": -29131.534672157344,
+   "y": -70451.22161357994,
+   "z": 46.12,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 7,
+     "name": "盛土",
+     "unit": "Fill"
+    }
+   ],
+   "lon": 139.5127575,
+   "lat": 35.3645475
+  },
+  {
+   "id": "No.CP3-1",
+   "x": -28018.579862708648,
+   "y": -70312.10938936315,
+   "z": 9.62,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3.9,
+     "name": "盛土",
+     "unit": "Fill"
+    },
+    {
+     "from": 3.9,
+     "to": 7.8,
+     "name": "砂質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 7.8,
+     "to": 10.7,
+     "name": "粘土質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 10.7,
+     "to": 13.7,
+     "name": "砂質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 13.7,
+     "to": 17.85,
+     "name": "砂混じりシルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 17.85,
+     "to": 23.35,
+     "name": "泥岩",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.525,
+   "lat": 35.365833333333335,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 1,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 3,
+     "penetration": 350
+    },
+    {
+     "depth": 4,
+     "blows": 0,
+     "penetration": 450
+    },
+    {
+     "depth": 5,
+     "blows": 0,
+     "penetration": 450
+    },
+    {
+     "depth": 6.15,
+     "blows": 1,
+     "penetration": 350
+    },
+    {
+     "depth": 7,
+     "blows": 0,
+     "penetration": 450
+    },
+    {
+     "depth": 8,
+     "blows": 0,
+     "penetration": 450
+    },
+    {
+     "depth": 9,
+     "blows": 0,
+     "penetration": 450
+    },
+    {
+     "depth": 10,
+     "blows": 0,
+     "penetration": 450
+    },
+    {
+     "depth": 11.15,
+     "blows": 3,
+     "penetration": 350
+    },
+    {
+     "depth": 12.15,
+     "blows": 3,
+     "penetration": 320
+    },
+    {
+     "depth": 13.15,
+     "blows": 3,
+     "penetration": 320
+    },
+    {
+     "depth": 14.15,
+     "blows": 3,
+     "penetration": 340
+    },
+    {
+     "depth": 15.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 17.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 18.15,
+     "blows": 50,
+     "penetration": 130
+    },
+    {
+     "depth": 19.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 20.15,
+     "blows": 50,
+     "penetration": 190
+    },
+    {
+     "depth": 21.15,
+     "blows": 50,
+     "penetration": 240
+    },
+    {
+     "depth": 22.15,
+     "blows": 50,
+     "penetration": 190
+    },
+    {
+     "depth": 23.15,
+     "blows": 50,
+     "penetration": 200
+    }
+   ],
+   "water": [
+    {
+     "depth": 1.5,
+     "date": "2018-02-19"
+    }
+   ]
+  },
+  {
+   "id": "No.CP3-2",
+   "x": -28018.483878190385,
+   "y": -70281.29363055844,
+   "z": 10.66,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2.5,
+     "name": "盛土",
+     "unit": "Fill"
+    },
+    {
+     "from": 2.5,
+     "to": 3.9,
+     "name": "腐植土",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 3.9,
+     "to": 4.9,
+     "name": "泥炭",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 4.9,
+     "to": 8.7,
+     "name": "砂質粘土",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 8.7,
+     "to": 11.8,
+     "name": "粘土質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 11.8,
+     "to": 13.7,
+     "name": "砂混じりシルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 13.7,
+     "to": 17.9,
+     "name": "シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 17.9,
+     "to": 18.8,
+     "name": "礫混じり細砂",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 18.8,
+     "to": 24.4,
+     "name": "泥岩",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.525,
+   "lat": 35.36611111111111,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 1,
+     "penetration": 350
+    },
+    {
+     "depth": 4.15,
+     "blows": 1,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 1,
+     "penetration": 350
+    },
+    {
+     "depth": 7,
+     "blows": 0,
+     "penetration": 450
+    },
+    {
+     "depth": 8,
+     "blows": 0,
+     "penetration": 450
+    },
+    {
+     "depth": 9.15,
+     "blows": 1,
+     "penetration": 350
+    },
+    {
+     "depth": 10.15,
+     "blows": 1,
+     "penetration": 350
+    },
+    {
+     "depth": 11,
+     "blows": 0,
+     "penetration": 450
+    },
+    {
+     "depth": 12.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 14,
+     "blows": 0,
+     "penetration": 450
+    },
+    {
+     "depth": 15.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 17,
+     "blows": 0,
+     "penetration": 450
+    },
+    {
+     "depth": 18.15,
+     "blows": 15,
+     "penetration": 300
+    },
+    {
+     "depth": 19.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 20.15,
+     "blows": 50,
+     "penetration": 230
+    },
+    {
+     "depth": 21.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 22.15,
+     "blows": 50,
+     "penetration": 250
+    },
+    {
+     "depth": 23.15,
+     "blows": 50,
+     "penetration": 220
+    },
+    {
+     "depth": 24.15,
+     "blows": 50,
+     "penetration": 250
+    }
+   ],
+   "water": [
+    {
+     "depth": 2,
+     "date": "2018-02-22"
+    }
+   ]
+  },
+  {
+   "id": "No.1 (509162656)",
+   "x": -27917.42040666942,
+   "y": -70250.79179908436,
+   "z": 9.97,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "name": "埋土(砂混じり粘土)",
+     "unit": "Fill"
+    },
+    {
+     "from": 3,
+     "to": 4.4,
+     "name": "腐植土",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 4.4,
+     "to": 5.8,
+     "name": "シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 5.8,
+     "to": 6.9,
+     "name": "砂混じりシルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 6.9,
+     "to": 10.2,
+     "name": "砂質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 10.2,
+     "to": 10.6,
+     "name": "硬質シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 10.6,
+     "to": 13.9,
+     "name": "泥岩",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 13.9,
+     "to": 15.4,
+     "name": "砂質泥岩",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 15.4,
+     "to": 16.4,
+     "name": "泥岩",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.52611111111113,
+   "lat": 35.36638888888889,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 2,
+     "penetration": 330
+    },
+    {
+     "depth": 2.15,
+     "blows": 4,
+     "penetration": 350
+    },
+    {
+     "depth": 3.15,
+     "blows": 2,
+     "penetration": 400
+    },
+    {
+     "depth": 4,
+     "blows": 0,
+     "penetration": 600
+    },
+    {
+     "depth": 5,
+     "blows": 0,
+     "penetration": 600
+    },
+    {
+     "depth": 6.15,
+     "blows": 0,
+     "penetration": 600
+    },
+    {
+     "depth": 7.15,
+     "blows": 2,
+     "penetration": 310
+    },
+    {
+     "depth": 8.15,
+     "blows": 4,
+     "penetration": 330
+    },
+    {
+     "depth": 9.15,
+     "blows": 3,
+     "penetration": 330
+    },
+    {
+     "depth": 10.15,
+     "blows": 18,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 50,
+     "penetration": 160
+    },
+    {
+     "depth": 12.15,
+     "blows": 50,
+     "penetration": 160
+    },
+    {
+     "depth": 13.15,
+     "blows": 50,
+     "penetration": 210
+    },
+    {
+     "depth": 14.15,
+     "blows": 50,
+     "penetration": 260
+    },
+    {
+     "depth": 15.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 16.15,
+     "blows": 50,
+     "penetration": 250
+    }
+   ],
+   "water": [
+    {
+     "depth": 2.04,
+     "date": "2018-04-04"
+    }
+   ]
+  },
+  {
+   "id": "R4-No.1",
+   "x": -28422.489931997974,
+   "y": -69620.53725242794,
+   "z": 34.66,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.8,
+     "name": "盛土（シルト混り細砂）",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.8,
+     "to": 13.5,
+     "name": "シルト質細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 13.5,
+     "to": 18.6,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 18.6,
+     "to": 19.5,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 19.5,
+     "to": 22,
+     "name": "砂質固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 22,
+     "to": 23.24,
+     "name": "細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.5205311388889,
+   "lat": 35.37205577777778,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 11,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 16,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 22,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 24,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 24,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 26,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 22,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 25,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 24,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 27,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 30,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 42,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 40,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 48,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 50,
+     "penetration": 230
+    },
+    {
+     "depth": 16.15,
+     "blows": 50,
+     "penetration": 140
+    },
+    {
+     "depth": 17.15,
+     "blows": 50,
+     "penetration": 160
+    },
+    {
+     "depth": 18.15,
+     "blows": 50,
+     "penetration": 130
+    },
+    {
+     "depth": 19.15,
+     "blows": 50,
+     "penetration": 110
+    },
+    {
+     "depth": 20.15,
+     "blows": 50,
+     "penetration": 100
+    },
+    {
+     "depth": 21.15,
+     "blows": 50,
+     "penetration": 170
+    },
+    {
+     "depth": 22.15,
+     "blows": 50,
+     "penetration": 150
+    },
+    {
+     "depth": 23.15,
+     "blows": 50,
+     "penetration": 90
+    }
+   ],
+   "water": [
+    {
+     "depth": 9.5,
+     "date": "2022-10-20"
+    }
+   ]
+  },
+  {
+   "id": "R4-No.2",
+   "x": -28439.62432553805,
+   "y": -69585.0106679724,
+   "z": 35.35,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "name": "盛土（シルト混り細砂）",
+     "unit": "Fill"
+    },
+    {
+     "from": 2,
+     "to": 12,
+     "name": "シルト混り細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 12,
+     "to": 19.85,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 19.85,
+     "to": 21.7,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 21.7,
+     "to": 24.29,
+     "name": "細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.52034133333333,
+   "lat": 35.37237552777778,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 16,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 27,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 28,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 26,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 30,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 37,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 44,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 38,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 40,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 32,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 45,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 14.15,
+     "blows": 50,
+     "penetration": 180
+    },
+    {
+     "depth": 15.15,
+     "blows": 50,
+     "penetration": 190
+    },
+    {
+     "depth": 16.15,
+     "blows": 50,
+     "penetration": 160
+    },
+    {
+     "depth": 17.15,
+     "blows": 50,
+     "penetration": 150
+    },
+    {
+     "depth": 18.15,
+     "blows": 50,
+     "penetration": 140
+    },
+    {
+     "depth": 19.15,
+     "blows": 50,
+     "penetration": 130
+    },
+    {
+     "depth": 20.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 21.15,
+     "blows": 50,
+     "penetration": 300
+    },
+    {
+     "depth": 22.15,
+     "blows": 50,
+     "penetration": 120
+    },
+    {
+     "depth": 23.15,
+     "blows": 50,
+     "penetration": 100
+    },
+    {
+     "depth": 24.15,
+     "blows": 50,
+     "penetration": 140
+    }
+   ],
+   "water": [
+    {
+     "depth": 10.4,
+     "date": "2022-10-14"
+    }
+   ]
+  },
+  {
+   "id": "R4-No.3",
+   "x": -28461.986224676544,
+   "y": -69552.80180755712,
+   "z": 27.43,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1.8,
+     "name": "盛土（砂質粘土）",
+     "unit": "Fill"
+    },
+    {
+     "from": 1.8,
+     "to": 9,
+     "name": "シルト質細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 9,
+     "to": 13.6,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 13.6,
+     "to": 14.8,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 14.8,
+     "to": 15.7,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 15.7,
+     "to": 16.45,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.52009411111112,
+   "lat": 35.372665222222224,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 42,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 39,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 50,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 47,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 50,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 50,
+     "penetration": 170
+    },
+    {
+     "depth": 8.15,
+     "blows": 50,
+     "penetration": 230
+    },
+    {
+     "depth": 9.15,
+     "blows": 50,
+     "penetration": 190
+    },
+    {
+     "depth": 10.15,
+     "blows": 50,
+     "penetration": 150
+    },
+    {
+     "depth": 11.15,
+     "blows": 50,
+     "penetration": 170
+    },
+    {
+     "depth": 12.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 13.15,
+     "blows": 50,
+     "penetration": 140
+    },
+    {
+     "depth": 14.15,
+     "blows": 50,
+     "penetration": 170
+    },
+    {
+     "depth": 15.15,
+     "blows": 50,
+     "penetration": 180
+    },
+    {
+     "depth": 16.15,
+     "blows": 45,
+     "penetration": 300
+    }
+   ],
+   "water": [
+    {
+     "depth": 3.1,
+     "date": "2022-10-11"
+    }
+   ]
+  },
+  {
+   "id": "R4-No.4",
+   "x": -29260.487784946654,
+   "y": -68744.74507378771,
+   "z": 58,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.8,
+     "name": "ローム",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 0.8,
+     "to": 4.9,
+     "name": "凝灰質シルト",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 4.9,
+     "to": 7.5,
+     "name": "凝灰質シルト",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 7.5,
+     "to": 10.85,
+     "name": "シルト質細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 10.85,
+     "to": 12.45,
+     "name": "細砂",
+     "unit": "Pleistocene"
+    }
+   ],
+   "lon": 139.5112773611111,
+   "lat": 35.379925972222225,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 10,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 11,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 16,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 13,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 18,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 44,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 29,
+     "penetration": 300
+    }
+   ],
+   "water": [
+    {
+     "depth": 2.95,
+     "date": "2022-10-12"
+    }
+   ]
+  },
+  {
+   "id": "R4-No.5",
+   "x": -29301.019111540852,
+   "y": -68772.37844155484,
+   "z": 58.87,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.3,
+     "name": "埋土（黒ボク）",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.3,
+     "to": 1.9,
+     "name": "黒ボク",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 1.9,
+     "to": 3.6,
+     "name": "ローム",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 3.6,
+     "to": 6.7,
+     "name": "凝灰質シルト",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 6.7,
+     "to": 9.85,
+     "name": "凝灰質シルト",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 9.85,
+     "to": 12.6,
+     "name": "シルト質粘土",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 12.6,
+     "to": 15.7,
+     "name": "砂混りシルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 15.7,
+     "to": 20.6,
+     "name": "シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 20.6,
+     "to": 21.75,
+     "name": "砂混りシルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 21.75,
+     "to": 24.15,
+     "name": "シルト質細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 24.15,
+     "to": 27.23,
+     "name": "細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51083225,
+   "lat": 35.379675694444444,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 14,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 20,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 40,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 19,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 22,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 30,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 11,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 15,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 16,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 13,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 16,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 10,
+     "penetration": 300
+    },
+    {
+     "depth": 17.15,
+     "blows": 11,
+     "penetration": 300
+    },
+    {
+     "depth": 18.15,
+     "blows": 12,
+     "penetration": 300
+    },
+    {
+     "depth": 19.15,
+     "blows": 12,
+     "penetration": 300
+    },
+    {
+     "depth": 20.15,
+     "blows": 17,
+     "penetration": 300
+    },
+    {
+     "depth": 21.15,
+     "blows": 19,
+     "penetration": 300
+    },
+    {
+     "depth": 22.15,
+     "blows": 50,
+     "penetration": 40
+    },
+    {
+     "depth": 23.15,
+     "blows": 50,
+     "penetration": 70
+    },
+    {
+     "depth": 24.15,
+     "blows": 50,
+     "penetration": 90
+    },
+    {
+     "depth": 25.15,
+     "blows": 50,
+     "penetration": 30
+    },
+    {
+     "depth": 26.15,
+     "blows": 50,
+     "penetration": 60
+    },
+    {
+     "depth": 27.15,
+     "blows": 50,
+     "penetration": 80
+    }
+   ],
+   "water": [
+    {
+     "depth": 2.9,
+     "date": "2022-10-18"
+    }
+   ]
+  },
+  {
+   "id": "R4-No.6",
+   "x": -29071.9981930316,
+   "y": -68708.03200503459,
+   "z": 61.88,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.6,
+     "name": "埋土（黒ボク）",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.6,
+     "to": 5.6,
+     "name": "ローム",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 5.6,
+     "to": 6.8,
+     "name": "凝灰質粘土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 6.8,
+     "to": 8.5,
+     "name": "凝灰質シルト",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 8.5,
+     "to": 10.6,
+     "name": "凝灰質粘土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 10.6,
+     "to": 11.7,
+     "name": "凝灰質シルト",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 11.7,
+     "to": 14.5,
+     "name": "シルト質細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 14.5,
+     "to": 16.5,
+     "name": "シルト混り細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 16.5,
+     "to": 20,
+     "name": "シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 20,
+     "to": 20.7,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 20.7,
+     "to": 23.9,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 23.9,
+     "to": 30.9,
+     "name": "凝灰質シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 30.9,
+     "to": 36.31,
+     "name": "細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51335063888888,
+   "lat": 35.38026241666667,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 17,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 11,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 9,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 21,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 20,
+     "penetration": 300
+    },
+    {
+     "depth": 17.15,
+     "blows": 19,
+     "penetration": 300
+    },
+    {
+     "depth": 19.15,
+     "blows": 22,
+     "penetration": 300
+    },
+    {
+     "depth": 20.15,
+     "blows": 50,
+     "penetration": 270
+    },
+    {
+     "depth": 21.15,
+     "blows": 50,
+     "penetration": 180
+    },
+    {
+     "depth": 22.15,
+     "blows": 50,
+     "penetration": 160
+    },
+    {
+     "depth": 23.15,
+     "blows": 41,
+     "penetration": 300
+    },
+    {
+     "depth": 24.15,
+     "blows": 31,
+     "penetration": 300
+    },
+    {
+     "depth": 25.15,
+     "blows": 50,
+     "penetration": 300
+    },
+    {
+     "depth": 26.15,
+     "blows": 50,
+     "penetration": 270
+    },
+    {
+     "depth": 27.15,
+     "blows": 45,
+     "penetration": 300
+    },
+    {
+     "depth": 28.15,
+     "blows": 36,
+     "penetration": 300
+    },
+    {
+     "depth": 29.15,
+     "blows": 27,
+     "penetration": 300
+    },
+    {
+     "depth": 30.15,
+     "blows": 34,
+     "penetration": 300
+    },
+    {
+     "depth": 31.15,
+     "blows": 50,
+     "penetration": 170
+    },
+    {
+     "depth": 32.15,
+     "blows": 50,
+     "penetration": 150
+    },
+    {
+     "depth": 33.15,
+     "blows": 50,
+     "penetration": 140
+    },
+    {
+     "depth": 34.15,
+     "blows": 50,
+     "penetration": 140
+    },
+    {
+     "depth": 35.15,
+     "blows": 50,
+     "penetration": 130
+    },
+    {
+     "depth": 36.15,
+     "blows": 50,
+     "penetration": 160
+    }
+   ],
+   "water": [
+    {
+     "depth": 6.5,
+     "date": "2022-11-07"
+    }
+   ]
+  },
+  {
+   "id": "R4-No.7",
+   "x": -29083.397501481297,
+   "y": -68594.71798405328,
+   "z": 69.05,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4.85,
+     "name": "ローム",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 4.85,
+     "to": 5.55,
+     "name": "浮石",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 5.55,
+     "to": 7,
+     "name": "ローム",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 7,
+     "to": 13,
+     "name": "凝灰質粘土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 13,
+     "to": 13.7,
+     "name": "砂混りシルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 13.7,
+     "to": 23.85,
+     "name": "シルト質細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 23.85,
+     "to": 27,
+     "name": "シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 27,
+     "to": 29,
+     "name": "シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 29,
+     "to": 33.6,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 33.6,
+     "to": 35.9,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 35.9,
+     "to": 36.7,
+     "name": "シルト混り細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 36.7,
+     "to": 42.8,
+     "name": "凝灰質シルト",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 42.8,
+     "to": 48.25,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.5132211388889,
+   "lat": 35.3812835,
+   "spt": [
+    {
+     "depth": 1.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 2.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 9,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 2,
+     "penetration": 400
+    },
+    {
+     "depth": 6.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 20,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 20,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 23,
+     "penetration": 300
+    },
+    {
+     "depth": 17.15,
+     "blows": 17,
+     "penetration": 300
+    },
+    {
+     "depth": 18.15,
+     "blows": 18,
+     "penetration": 300
+    },
+    {
+     "depth": 19.15,
+     "blows": 21,
+     "penetration": 300
+    },
+    {
+     "depth": 20.15,
+     "blows": 27,
+     "penetration": 300
+    },
+    {
+     "depth": 21.15,
+     "blows": 28,
+     "penetration": 300
+    },
+    {
+     "depth": 22.15,
+     "blows": 36,
+     "penetration": 300
+    },
+    {
+     "depth": 23.15,
+     "blows": 50,
+     "penetration": 240
+    },
+    {
+     "depth": 24.15,
+     "blows": 11,
+     "penetration": 300
+    },
+    {
+     "depth": 25.15,
+     "blows": 10,
+     "penetration": 300
+    },
+    {
+     "depth": 26.15,
+     "blows": 9,
+     "penetration": 300
+    },
+    {
+     "depth": 27.15,
+     "blows": 9,
+     "penetration": 300
+    },
+    {
+     "depth": 28.15,
+     "blows": 10,
+     "penetration": 300
+    },
+    {
+     "depth": 29.15,
+     "blows": 50,
+     "penetration": 160
+    },
+    {
+     "depth": 30.15,
+     "blows": 50,
+     "penetration": 120
+    },
+    {
+     "depth": 31.15,
+     "blows": 50,
+     "penetration": 100
+    },
+    {
+     "depth": 32.15,
+     "blows": 50,
+     "penetration": 170
+    },
+    {
+     "depth": 33.15,
+     "blows": 50,
+     "penetration": 140
+    },
+    {
+     "depth": 34.15,
+     "blows": 36,
+     "penetration": 300
+    },
+    {
+     "depth": 35.15,
+     "blows": 38,
+     "penetration": 300
+    },
+    {
+     "depth": 36.15,
+     "blows": 50,
+     "penetration": 280
+    },
+    {
+     "depth": 37.15,
+     "blows": 35,
+     "penetration": 300
+    },
+    {
+     "depth": 38.15,
+     "blows": 22,
+     "penetration": 300
+    },
+    {
+     "depth": 39.15,
+     "blows": 33,
+     "penetration": 300
+    },
+    {
+     "depth": 40.15,
+     "blows": 21,
+     "penetration": 300
+    },
+    {
+     "depth": 41.15,
+     "blows": 27,
+     "penetration": 300
+    },
+    {
+     "depth": 42.15,
+     "blows": 32,
+     "penetration": 300
+    },
+    {
+     "depth": 43.15,
+     "blows": 50,
+     "penetration": 160
+    },
+    {
+     "depth": 44.15,
+     "blows": 50,
+     "penetration": 130
+    },
+    {
+     "depth": 45.15,
+     "blows": 50,
+     "penetration": 170
+    },
+    {
+     "depth": 46.15,
+     "blows": 50,
+     "penetration": 150
+    },
+    {
+     "depth": 47.15,
+     "blows": 50,
+     "penetration": 140
+    },
+    {
+     "depth": 48.15,
+     "blows": 50,
+     "penetration": 100
+    }
+   ],
+   "water": [
+    {
+     "depth": 14.6,
+     "date": "2023-01-06"
+    }
+   ]
+  },
+  {
+   "id": "R6-No.2",
+   "x": -27949.057280429402,
+   "y": -70401.39022375792,
+   "z": 9.84,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1.6,
+     "name": "盛土(粘性土)",
+     "unit": "Fill"
+    },
+    {
+     "from": 1.6,
+     "to": 4.1,
+     "name": "腐植土",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 4.1,
+     "to": 10.75,
+     "name": "シルト質粘土",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 10.75,
+     "to": 12.1,
+     "name": "砂混じりシルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 12.1,
+     "to": 15.35,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.52576811111112,
+   "lat": 35.3650305,
+   "spt": [
+    {
+     "depth": 2.15,
+     "blows": 2,
+     "penetration": 380
+    },
+    {
+     "depth": 3.15,
+     "blows": 1,
+     "penetration": 350
+    },
+    {
+     "depth": 3.5,
+     "blows": 1,
+     "penetration": 490
+    },
+    {
+     "depth": 4,
+     "blows": 1,
+     "penetration": 520
+    },
+    {
+     "depth": 5,
+     "blows": 0,
+     "penetration": 520
+    },
+    {
+     "depth": 7,
+     "blows": 0,
+     "penetration": 520
+    },
+    {
+     "depth": 8,
+     "blows": 0,
+     "penetration": 520
+    },
+    {
+     "depth": 9,
+     "blows": 0,
+     "penetration": 520
+    },
+    {
+     "depth": 10,
+     "blows": 0,
+     "penetration": 520
+    },
+    {
+     "depth": 11,
+     "blows": 1,
+     "penetration": 480
+    },
+    {
+     "depth": 12.15,
+     "blows": 50,
+     "penetration": 290
+    },
+    {
+     "depth": 13.15,
+     "blows": 50,
+     "penetration": 140
+    },
+    {
+     "depth": 14.15,
+     "blows": 50,
+     "penetration": 230
+    },
+    {
+     "depth": 15.15,
+     "blows": 50,
+     "penetration": 200
+    }
+   ],
+   "water": [
+    {
+     "depth": 1.22,
+     "date": "2025-12-11"
+    },
+    {
+     "depth": 1.1,
+     "date": "2025-12-12"
+    },
+    {
+     "depth": 0.84,
+     "date": "2025-12-17"
+    }
+   ]
+  },
+  {
+   "id": "R6-No.3",
+   "x": -28328.60324849876,
+   "y": -69692.61958078497,
+   "z": 22.41,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.4,
+     "name": "表土(粘性土)",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.4,
+     "to": 1.1,
+     "name": "表土(砂)",
+     "unit": "Fill"
+    },
+    {
+     "from": 1.1,
+     "to": 1.9,
+     "name": "砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 1.9,
+     "to": 3.8,
+     "name": "砂質固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 3.8,
+     "to": 5.85,
+     "name": "礫混じり中砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 5.85,
+     "to": 10.8,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 10.8,
+     "to": 15.31,
+     "name": "シルト質細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.5215668888889,
+   "lat": 35.37140869444445,
+   "spt": [
+    {
+     "depth": 2.15,
+     "blows": 50,
+     "penetration": 270
+    },
+    {
+     "depth": 3.15,
+     "blows": 50,
+     "penetration": 240
+    },
+    {
+     "depth": 4.15,
+     "blows": 50,
+     "penetration": 160
+    },
+    {
+     "depth": 5.15,
+     "blows": 50,
+     "penetration": 190
+    },
+    {
+     "depth": 6.15,
+     "blows": 50,
+     "penetration": 150
+    },
+    {
+     "depth": 7.15,
+     "blows": 50,
+     "penetration": 180
+    },
+    {
+     "depth": 8.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 9.15,
+     "blows": 50,
+     "penetration": 180
+    },
+    {
+     "depth": 10.15,
+     "blows": 50,
+     "penetration": 170
+    },
+    {
+     "depth": 11.15,
+     "blows": 36,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 50,
+     "penetration": 280
+    },
+    {
+     "depth": 13.15,
+     "blows": 50,
+     "penetration": 170
+    },
+    {
+     "depth": 14.15,
+     "blows": 50,
+     "penetration": 180
+    },
+    {
+     "depth": 15.15,
+     "blows": 50,
+     "penetration": 160
+    }
+   ],
+   "water": [
+    {
+     "depth": 1.65,
+     "date": "2025-12-16"
+    }
+   ]
+  },
+  {
+   "id": "R6-No.4",
+   "x": -28589.524107444333,
+   "y": -69381.08431927577,
+   "z": 22.62,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.4,
+     "name": "表土(粘性土)",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.4,
+     "to": 1.6,
+     "name": "ローム",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 1.6,
+     "to": 6.65,
+     "name": "細砂",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 6.65,
+     "to": 7.6,
+     "name": "シルト質細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 7.6,
+     "to": 9.15,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 9.15,
+     "to": 11.45,
+     "name": "凝灰質シルト",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.5186845,
+   "lat": 35.374209444444446,
+   "spt": [
+    {
+     "depth": 2.15,
+     "blows": 10,
+     "penetration": 330
+    },
+    {
+     "depth": 3.15,
+     "blows": 14,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 17,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 13,
+     "penetration": 310
+    },
+    {
+     "depth": 6.15,
+     "blows": 30,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 50,
+     "penetration": 250
+    },
+    {
+     "depth": 8.15,
+     "blows": 50,
+     "penetration": 260
+    },
+    {
+     "depth": 9.15,
+     "blows": 35,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 25,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 40,
+     "penetration": 300
+    }
+   ],
+   "water": [
+    {
+     "depth": 4.6,
+     "date": "2025-11-07"
+    },
+    {
+     "depth": 4,
+     "date": "2025-11-10"
+    }
+   ]
+  },
+  {
+   "id": "R6-No.5",
+   "x": -28613.37295085473,
+   "y": -69352.48198454385,
+   "z": 30.15,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1.4,
+     "name": "凝灰質粘土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 1.4,
+     "to": 1.8,
+     "name": "粘土混じり細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 1.8,
+     "to": 5.8,
+     "name": "礫混じりシルト質砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 5.8,
+     "to": 15.45,
+     "name": "細砂",
+     "unit": "Pleistocene"
+    }
+   ],
+   "lon": 139.5184210277778,
+   "lat": 35.37446658333334,
+   "spt": [
+    {
+     "depth": 2.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 12,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 7,
+     "penetration": 320
+    },
+    {
+     "depth": 5.15,
+     "blows": 11,
+     "penetration": 320
+    },
+    {
+     "depth": 6.15,
+     "blows": 36,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 32,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 39,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 24,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 34,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 27,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 30,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 34,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 46,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 41,
+     "penetration": 300
+    }
+   ],
+   "water": [
+    {
+     "depth": 5,
+     "date": "2025-11-14"
+    }
+   ]
+  },
+  {
+   "id": "R6-No.6",
+   "x": -28569.203380216102,
+   "y": -69323.80626627636,
+   "z": 22.88,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 9.15,
+     "name": "細砂",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 9.15,
+     "to": 9.95,
+     "name": "砂混じり凝灰質シルト",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 9.95,
+     "to": 17.15,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 17.15,
+     "to": 20.7,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 20.7,
+     "to": 21.28,
+     "name": "礫混じり細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 21.28,
+     "to": 24.31,
+     "name": "細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.5189061388889,
+   "lat": 35.374726333333335,
+   "spt": [
+    {
+     "depth": 2.15,
+     "blows": 14,
+     "penetration": 310
+    },
+    {
+     "depth": 3.15,
+     "blows": 15,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 20,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 17,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 17,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 21,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 21,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 26,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 50,
+     "penetration": 150
+    },
+    {
+     "depth": 11.15,
+     "blows": 50,
+     "penetration": 140
+    },
+    {
+     "depth": 12.15,
+     "blows": 50,
+     "penetration": 160
+    },
+    {
+     "depth": 13.15,
+     "blows": 50,
+     "penetration": 130
+    },
+    {
+     "depth": 14.15,
+     "blows": 50,
+     "penetration": 120
+    },
+    {
+     "depth": 15.15,
+     "blows": 50,
+     "penetration": 130
+    },
+    {
+     "depth": 16.15,
+     "blows": 50,
+     "penetration": 90
+    },
+    {
+     "depth": 17.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 18.15,
+     "blows": 50,
+     "penetration": 180
+    },
+    {
+     "depth": 19.15,
+     "blows": 50,
+     "penetration": 230
+    },
+    {
+     "depth": 20.15,
+     "blows": 50,
+     "penetration": 300
+    },
+    {
+     "depth": 21.15,
+     "blows": 50,
+     "penetration": 130
+    },
+    {
+     "depth": 22.15,
+     "blows": 50,
+     "penetration": 90
+    },
+    {
+     "depth": 23.15,
+     "blows": 50,
+     "penetration": 120
+    },
+    {
+     "depth": 24.15,
+     "blows": 50,
+     "penetration": 160
+    }
+   ],
+   "water": [
+    {
+     "depth": 3,
+     "date": "2025-11-27"
+    },
+    {
+     "depth": 4.7,
+     "date": "2025-12-01"
+    },
+    {
+     "depth": 4.5,
+     "date": "2025-12-02"
+    }
+   ]
+  },
+  {
+   "id": "R6-No.7",
+   "x": -28582.01145181364,
+   "y": -69315.5530692599,
+   "z": 23.53,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.2,
+     "name": "砕石",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.2,
+     "to": 1.2,
+     "name": "砂混じりシルト質粘土",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 1.2,
+     "to": 6.7,
+     "name": "シルト質細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 6.7,
+     "to": 10.15,
+     "name": "細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 10.15,
+     "to": 11.7,
+     "name": "シルト質細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 11.7,
+     "to": 22.24,
+     "name": "細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.5187648888889,
+   "lat": 35.37480036111111,
+   "spt": [
+    {
+     "depth": 2.15,
+     "blows": 18,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 21,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 35,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 34,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 25,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 39,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 27,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 34,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 30,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 50,
+     "penetration": 140
+    },
+    {
+     "depth": 12.15,
+     "blows": 50,
+     "penetration": 120
+    },
+    {
+     "depth": 13.15,
+     "blows": 50,
+     "penetration": 80
+    },
+    {
+     "depth": 14.15,
+     "blows": 50,
+     "penetration": 60
+    },
+    {
+     "depth": 15.15,
+     "blows": 50,
+     "penetration": 90
+    },
+    {
+     "depth": 16.15,
+     "blows": 50,
+     "penetration": 120
+    },
+    {
+     "depth": 17.15,
+     "blows": 50,
+     "penetration": 110
+    },
+    {
+     "depth": 18.15,
+     "blows": 50,
+     "penetration": 100
+    },
+    {
+     "depth": 19.15,
+     "blows": 50,
+     "penetration": 80
+    },
+    {
+     "depth": 20.15,
+     "blows": 50,
+     "penetration": 110
+    },
+    {
+     "depth": 21.15,
+     "blows": 50,
+     "penetration": 70
+    },
+    {
+     "depth": 22.15,
+     "blows": 50,
+     "penetration": 90
+    }
+   ],
+   "water": [
+    {
+     "depth": 1.17,
+     "date": "2025-11-26"
+    }
+   ]
+  },
+  {
+   "id": "R6-No.8",
+   "x": -28695.188344329705,
+   "y": -69212.8522697146,
+   "z": 26.03,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1.2,
+     "name": "盛土(礫混じり粘土)",
+     "unit": "Fill"
+    },
+    {
+     "from": 1.2,
+     "to": 2.7,
+     "name": "細砂",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 2.7,
+     "to": 3.6,
+     "name": "火山灰質粘土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 3.6,
+     "to": 4.35,
+     "name": "粘土混じり火山灰質細砂",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 4.35,
+     "to": 4.8,
+     "name": "火山灰質粘土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 4.8,
+     "to": 8.9,
+     "name": "粘土質シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 8.9,
+     "to": 9.9,
+     "name": "細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 9.9,
+     "to": 11.3,
+     "name": "砂混じり粘土質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 11.3,
+     "to": 13.05,
+     "name": "粘土混じり細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 13.05,
+     "to": 16.15,
+     "name": "シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 16.15,
+     "to": 18.8,
+     "name": "礫混じり砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 18.8,
+     "to": 19.9,
+     "name": "シルト質細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 19.9,
+     "to": 20.9,
+     "name": "礫混じり砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 20.9,
+     "to": 22.1,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 22.1,
+     "to": 25.24,
+     "name": "シルト混じり細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51751569444446,
+   "lat": 35.375722861111115,
+   "spt": [
+    {
+     "depth": 2.15,
+     "blows": 10,
+     "penetration": 320
+    },
+    {
+     "depth": 3.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 15,
+     "penetration": 320
+    },
+    {
+     "depth": 6.15,
+     "blows": 12,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 8,
+     "penetration": 350
+    },
+    {
+     "depth": 8.15,
+     "blows": 6,
+     "penetration": 360
+    },
+    {
+     "depth": 9.15,
+     "blows": 32,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 14,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 17,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 31,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 30,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 50,
+     "penetration": 170
+    },
+    {
+     "depth": 15.15,
+     "blows": 50,
+     "penetration": 150
+    },
+    {
+     "depth": 16.15,
+     "blows": 50,
+     "penetration": 130
+    },
+    {
+     "depth": 17.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 18.15,
+     "blows": 50,
+     "penetration": 220
+    },
+    {
+     "depth": 19.15,
+     "blows": 50,
+     "penetration": 200
+    },
+    {
+     "depth": 20.15,
+     "blows": 50,
+     "penetration": 120
+    },
+    {
+     "depth": 21.15,
+     "blows": 50,
+     "penetration": 110
+    },
+    {
+     "depth": 22.15,
+     "blows": 50,
+     "penetration": 90
+    },
+    {
+     "depth": 23.15,
+     "blows": 50,
+     "penetration": 190
+    },
+    {
+     "depth": 24.15,
+     "blows": 50,
+     "penetration": 160
+    },
+    {
+     "depth": 25.15,
+     "blows": 50,
+     "penetration": 90
+    }
+   ],
+   "water": [
+    {
+     "depth": 2.5,
+     "date": "2025-12-09"
+    }
+   ]
+  },
+  {
+   "id": "R6-No.9",
+   "x": -28725.19813270082,
+   "y": -69186.09741851604,
+   "z": 26.88,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3.9,
+     "name": "砂混じり火山灰質粘性土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 3.9,
+     "to": 4.75,
+     "name": "砂質シルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 4.75,
+     "to": 5.7,
+     "name": "砂混じり火山灰質シルト",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 5.7,
+     "to": 7.85,
+     "name": "火山灰質シルト",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 7.85,
+     "to": 8.65,
+     "name": "シルト質細砂",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 8.65,
+     "to": 11.4,
+     "name": "シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 11.4,
+     "to": 12.1,
+     "name": "細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 12.1,
+     "to": 12.6,
+     "name": "砂混じりシルト",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 12.6,
+     "to": 13.75,
+     "name": "シルト混じり細砂",
+     "unit": "Alluvium"
+    },
+    {
+     "from": 13.75,
+     "to": 14.9,
+     "name": "砂混じりシルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 14.9,
+     "to": 17.05,
+     "name": "砂質シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 17.05,
+     "to": 19.3,
+     "name": "中砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 19.3,
+     "to": 20.9,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 20.9,
+     "to": 22.6,
+     "name": "砂混じり固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 22.6,
+     "to": 24.1,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 24.1,
+     "to": 24.7,
+     "name": "砂混じり固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 24.7,
+     "to": 25.6,
+     "name": "シルト質細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 25.6,
+     "to": 26.8,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 26.8,
+     "to": 28.24,
+     "name": "砂質固結シルト",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51718447222223,
+   "lat": 35.375963166666665,
+   "spt": [
+    {
+     "depth": 2.15,
+     "blows": 13,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 8,
+     "penetration": 320
+    },
+    {
+     "depth": 4.15,
+     "blows": 19,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 8,
+     "penetration": 310
+    },
+    {
+     "depth": 6.15,
+     "blows": 8,
+     "penetration": 320
+    },
+    {
+     "depth": 7.15,
+     "blows": 11,
+     "penetration": 310
+    },
+    {
+     "depth": 8.15,
+     "blows": 13,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 15,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 11,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 19,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 25,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 40,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 50,
+     "penetration": 230
+    },
+    {
+     "depth": 17.15,
+     "blows": 50,
+     "penetration": 170
+    },
+    {
+     "depth": 18.15,
+     "blows": 50,
+     "penetration": 90
+    },
+    {
+     "depth": 19.15,
+     "blows": 50,
+     "penetration": 140
+    },
+    {
+     "depth": 20.15,
+     "blows": 50,
+     "penetration": 190
+    },
+    {
+     "depth": 21.15,
+     "blows": 50,
+     "penetration": 170
+    },
+    {
+     "depth": 22.15,
+     "blows": 50,
+     "penetration": 110
+    },
+    {
+     "depth": 23.15,
+     "blows": 50,
+     "penetration": 140
+    },
+    {
+     "depth": 24.15,
+     "blows": 50,
+     "penetration": 170
+    },
+    {
+     "depth": 25.15,
+     "blows": 50,
+     "penetration": 150
+    },
+    {
+     "depth": 26.15,
+     "blows": 50,
+     "penetration": 90
+    },
+    {
+     "depth": 27.15,
+     "blows": 50,
+     "penetration": 160
+    },
+    {
+     "depth": 28.15,
+     "blows": 50,
+     "penetration": 90
+    }
+   ],
+   "water": [
+    {
+     "depth": 2,
+     "date": "2025-12-04"
+    },
+    {
+     "depth": 1.95,
+     "date": "2025-12-05"
+    },
+    {
+     "depth": 5.82,
+     "date": "2025-12-08"
+    },
+    {
+     "depth": 5.15,
+     "date": "2025-12-09"
+    }
+   ]
+  },
+  {
+   "id": "R6-No.10",
+   "x": -28896.613991484952,
+   "y": -68957.27145196171,
+   "z": 42.17,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "name": "凝灰質シルト",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 3,
+     "to": 8.41,
+     "name": "細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51528980555557,
+   "lat": 35.37802086111111,
+   "spt": [
+    {
+     "depth": 2.15,
+     "blows": 15,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 21,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 50,
+     "penetration": 270
+    },
+    {
+     "depth": 6.15,
+     "blows": 50,
+     "penetration": 230
+    },
+    {
+     "depth": 7.15,
+     "blows": 50,
+     "penetration": 290
+    },
+    {
+     "depth": 8.15,
+     "blows": 50,
+     "penetration": 260
+    }
+   ],
+   "water": [
+    {
+     "depth": 4,
+     "date": "2025-11-28"
+    }
+   ]
+  },
+  {
+   "id": "R6-No.11",
+   "x": -28884.124730534022,
+   "y": -68949.8140129432,
+   "z": 54.92,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.9,
+     "name": "表土(粘性土)",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.9,
+     "to": 5.45,
+     "name": "砂質シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 5.45,
+     "to": 15.7,
+     "name": "砂混じり凝灰質シルト",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 15.7,
+     "to": 19.45,
+     "name": "細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.515427,
+   "lat": 35.378088444444444,
+   "spt": [
+    {
+     "depth": 2.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 25,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 26,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 35,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 31,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 20,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 16,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 12,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 16,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 27,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 41,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 50,
+     "penetration": 100
+    },
+    {
+     "depth": 17.15,
+     "blows": 50,
+     "penetration": 270
+    },
+    {
+     "depth": 18.15,
+     "blows": 50,
+     "penetration": 240
+    },
+    {
+     "depth": 19.15,
+     "blows": 50,
+     "penetration": 300
+    }
+   ],
+   "water": [
+    {
+     "depth": 3.6,
+     "date": "2025-11-20"
+    }
+   ]
+  },
+  {
+   "id": "R6-No.12",
+   "x": -28913.291409846915,
+   "y": -68931.31070148488,
+   "z": 44.49,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "name": "盛土(火山灰質シルト)",
+     "unit": "Fill"
+    },
+    {
+     "from": 2,
+     "to": 3.6,
+     "name": "盛土(シルト質粘土)",
+     "unit": "Fill"
+    },
+    {
+     "from": 3.6,
+     "to": 6.35,
+     "name": "凝灰質シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 6.35,
+     "to": 9.31,
+     "name": "砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51510533333334,
+   "lat": 35.37825438888889,
+   "spt": [
+    {
+     "depth": 2.15,
+     "blows": 3,
+     "penetration": 350
+    },
+    {
+     "depth": 3.15,
+     "blows": 4,
+     "penetration": 330
+    },
+    {
+     "depth": 4.15,
+     "blows": 19,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 50,
+     "penetration": 280
+    },
+    {
+     "depth": 7.15,
+     "blows": 50,
+     "penetration": 290
+    },
+    {
+     "depth": 8.05,
+     "blows": 50,
+     "penetration": 250
+    },
+    {
+     "depth": 9.05,
+     "blows": 50,
+     "penetration": 260
+    }
+   ],
+   "water": [
+    {
+     "depth": 3.6,
+     "date": "2025-11-19"
+    }
+   ]
+  },
+  {
+   "id": "R6-No.13",
+   "x": -29040.922580883464,
+   "y": -68990.02015876159,
+   "z": 60.63,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2.55,
+     "name": "黒ボク",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 2.55,
+     "to": 5.35,
+     "name": "ローム",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 5.35,
+     "to": 12.3,
+     "name": "砂混じり火山灰質粘土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 12.3,
+     "to": 14.05,
+     "name": "シルト質細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 14.05,
+     "to": 14.7,
+     "name": "砂質固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 14.7,
+     "to": 16.46,
+     "name": "砂混じりシルト",
+     "unit": "Pleistocene"
+    }
+   ],
+   "lon": 139.51370269444445,
+   "lat": 35.37772147222222,
+   "spt": [
+    {
+     "depth": 2.15,
+     "blows": 6,
+     "penetration": 330
+    },
+    {
+     "depth": 3.15,
+     "blows": 8,
+     "penetration": 320
+    },
+    {
+     "depth": 4.15,
+     "blows": 4,
+     "penetration": 340
+    },
+    {
+     "depth": 5.15,
+     "blows": 3,
+     "penetration": 310
+    },
+    {
+     "depth": 6.15,
+     "blows": 5,
+     "penetration": 340
+    },
+    {
+     "depth": 7.15,
+     "blows": 4,
+     "penetration": 330
+    },
+    {
+     "depth": 8.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 5,
+     "penetration": 310
+    },
+    {
+     "depth": 10.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 3,
+     "penetration": 340
+    },
+    {
+     "depth": 12.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 19,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 49,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 7,
+     "penetration": 310
+    }
+   ],
+   "water": [
+    {
+     "depth": 5.25,
+     "date": "2025-10-31"
+    }
+   ]
+  },
+  {
+   "id": "R6-No.14",
+   "x": -29210.175181405866,
+   "y": -68671.4860707783,
+   "z": 63.79,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.15,
+     "name": "表土",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.15,
+     "to": 4.6,
+     "name": "ローム",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 4.6,
+     "to": 5.25,
+     "name": "軽石",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 5.25,
+     "to": 6.8,
+     "name": "ローム",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 6.8,
+     "to": 9.35,
+     "name": "シルト質粘土",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 9.35,
+     "to": 9.9,
+     "name": "細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 9.9,
+     "to": 10.3,
+     "name": "シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 10.3,
+     "to": 16.8,
+     "name": "シルト混じり細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 16.8,
+     "to": 19.15,
+     "name": "シルト質細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 19.15,
+     "to": 20.6,
+     "name": "砂混じりシルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 20.6,
+     "to": 25.25,
+     "name": "シルト質粘土",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 25.25,
+     "to": 26.95,
+     "name": "砂混じり固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 26.95,
+     "to": 28,
+     "name": "砂質固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 28,
+     "to": 28.7,
+     "name": "シルト混じり砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 28.7,
+     "to": 31.15,
+     "name": "砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.5118285,
+   "lat": 35.38058780555556,
+   "spt": [
+    {
+     "depth": 2.15,
+     "blows": 12,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 11,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 11,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 3,
+     "penetration": 320
+    },
+    {
+     "depth": 8.15,
+     "blows": 3,
+     "penetration": 350
+    },
+    {
+     "depth": 9.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 12,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 16,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 20,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 19,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 18,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 28,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 50,
+     "penetration": 290
+    },
+    {
+     "depth": 17.15,
+     "blows": 26,
+     "penetration": 300
+    },
+    {
+     "depth": 18.15,
+     "blows": 20,
+     "penetration": 300
+    },
+    {
+     "depth": 19.15,
+     "blows": 11,
+     "penetration": 300
+    },
+    {
+     "depth": 20.15,
+     "blows": 11,
+     "penetration": 300
+    },
+    {
+     "depth": 21.15,
+     "blows": 9,
+     "penetration": 300
+    },
+    {
+     "depth": 22.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 23.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 24.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 25.15,
+     "blows": 25,
+     "penetration": 300
+    },
+    {
+     "depth": 26.15,
+     "blows": 50,
+     "penetration": 170
+    },
+    {
+     "depth": 27.05,
+     "blows": 50,
+     "penetration": 220
+    },
+    {
+     "depth": 28.05,
+     "blows": 50,
+     "penetration": 170
+    },
+    {
+     "depth": 29.05,
+     "blows": 50,
+     "penetration": 100
+    },
+    {
+     "depth": 30.05,
+     "blows": 50,
+     "penetration": 80
+    },
+    {
+     "depth": 31.05,
+     "blows": 50,
+     "penetration": 100
+    }
+   ],
+   "water": [
+    {
+     "depth": 4.27,
+     "date": "2025-10-22"
+    },
+    {
+     "depth": 4.58,
+     "date": "2025-10-23"
+    },
+    {
+     "depth": -2,
+     "date": "2025-10-23"
+    },
+    {
+     "depth": 4.64,
+     "date": "2025-10-24"
+    }
+   ]
+  },
+  {
+   "id": "R6-No.15",
+   "x": -29060.62936386876,
+   "y": -68582.57916174963,
+   "z": 72,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 7.35,
+     "name": "ローム",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 7.35,
+     "to": 17.1,
+     "name": "凝灰質粘土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 17.1,
+     "to": 21.5,
+     "name": "細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 21.5,
+     "to": 26.85,
+     "name": "シルト質細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 26.85,
+     "to": 31.75,
+     "name": "砂混じりシルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 31.75,
+     "to": 35.27,
+     "name": "細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51347130555556,
+   "lat": 35.381393583333335,
+   "spt": [
+    {
+     "depth": 2.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 7,
+     "penetration": 320
+    },
+    {
+     "depth": 4.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 9,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 3,
+     "penetration": 350
+    },
+    {
+     "depth": 9.15,
+     "blows": 3,
+     "penetration": 340
+    },
+    {
+     "depth": 10.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 3,
+     "penetration": 340
+    },
+    {
+     "depth": 12.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 3,
+     "penetration": 340
+    },
+    {
+     "depth": 14.15,
+     "blows": 3,
+     "penetration": 330
+    },
+    {
+     "depth": 15.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 4,
+     "penetration": 320
+    },
+    {
+     "depth": 17.15,
+     "blows": 20,
+     "penetration": 300
+    },
+    {
+     "depth": 18.15,
+     "blows": 18,
+     "penetration": 300
+    },
+    {
+     "depth": 19.15,
+     "blows": 18,
+     "penetration": 300
+    },
+    {
+     "depth": 20.15,
+     "blows": 19,
+     "penetration": 300
+    },
+    {
+     "depth": 21.15,
+     "blows": 16,
+     "penetration": 300
+    },
+    {
+     "depth": 22.15,
+     "blows": 17,
+     "penetration": 300
+    },
+    {
+     "depth": 23.15,
+     "blows": 18,
+     "penetration": 300
+    },
+    {
+     "depth": 24.15,
+     "blows": 25,
+     "penetration": 300
+    },
+    {
+     "depth": 25.15,
+     "blows": 21,
+     "penetration": 300
+    },
+    {
+     "depth": 26.15,
+     "blows": 29,
+     "penetration": 300
+    },
+    {
+     "depth": 27.15,
+     "blows": 17,
+     "penetration": 300
+    },
+    {
+     "depth": 28.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 29.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 30.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 31.15,
+     "blows": 9,
+     "penetration": 300
+    },
+    {
+     "depth": 32.15,
+     "blows": 50,
+     "penetration": 100
+    },
+    {
+     "depth": 33.15,
+     "blows": 50,
+     "penetration": 80
+    },
+    {
+     "depth": 34.15,
+     "blows": 50,
+     "penetration": 80
+    },
+    {
+     "depth": 35.15,
+     "blows": 58,
+     "penetration": 120
+    }
+   ],
+   "water": [
+    {
+     "depth": 2.9,
+     "date": "2025-12-03"
+    },
+    {
+     "depth": 6.22,
+     "date": "2025-12-04"
+    },
+    {
+     "depth": 3.96,
+     "date": "2025-12-04"
+    },
+    {
+     "depth": 11.62,
+     "date": "2025-12-05"
+    },
+    {
+     "depth": 4.6,
+     "date": "2025-12-05"
+    },
+    {
+     "depth": 13.46,
+     "date": "2025-12-08"
+    },
+    {
+     "depth": 6.43,
+     "date": "2025-12-08"
+    }
+   ]
+  },
+  {
+   "id": "R6-No.16",
+   "x": -29099.2880524743,
+   "y": -68399.33206993647,
+   "z": 60.9,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.4,
+     "name": "表土",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.4,
+     "to": 1.6,
+     "name": "盛土(粘性土)",
+     "unit": "Fill"
+    },
+    {
+     "from": 1.6,
+     "to": 6.8,
+     "name": "ローム",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 6.8,
+     "to": 7.6,
+     "name": "凝灰質粘土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 7.6,
+     "to": 9.75,
+     "name": "砂混じり火山灰質粘土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 9.75,
+     "to": 13.75,
+     "name": "粘土質細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 13.75,
+     "to": 16.65,
+     "name": "シルト質細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 16.65,
+     "to": 21,
+     "name": "砂混じりシルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 21,
+     "to": 23.85,
+     "name": "粘土混じりシルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 23.85,
+     "to": 24.9,
+     "name": "細砂",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 24.9,
+     "to": 26.25,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 26.25,
+     "to": 27.26,
+     "name": "細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.51303927777778,
+   "lat": 35.38304425,
+   "spt": [
+    {
+     "depth": 2.15,
+     "blows": 5,
+     "penetration": 310
+    },
+    {
+     "depth": 4.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 5,
+     "penetration": 310
+    },
+    {
+     "depth": 7,
+     "blows": 1,
+     "penetration": 400
+    },
+    {
+     "depth": 8.15,
+     "blows": 10,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 10,
+     "penetration": 310
+    },
+    {
+     "depth": 10.15,
+     "blows": 12,
+     "penetration": 320
+    },
+    {
+     "depth": 11.15,
+     "blows": 10,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 11,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 10,
+     "penetration": 320
+    },
+    {
+     "depth": 14.15,
+     "blows": 17,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 42,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 50,
+     "penetration": 260
+    },
+    {
+     "depth": 17.15,
+     "blows": 17,
+     "penetration": 300
+    },
+    {
+     "depth": 18.15,
+     "blows": 11,
+     "penetration": 320
+    },
+    {
+     "depth": 19.15,
+     "blows": 12,
+     "penetration": 300
+    },
+    {
+     "depth": 20.15,
+     "blows": 9,
+     "penetration": 300
+    },
+    {
+     "depth": 21.15,
+     "blows": 9,
+     "penetration": 300
+    },
+    {
+     "depth": 22.15,
+     "blows": 9,
+     "penetration": 300
+    },
+    {
+     "depth": 23.15,
+     "blows": 11,
+     "penetration": 320
+    },
+    {
+     "depth": 24.15,
+     "blows": 50,
+     "penetration": 90
+    },
+    {
+     "depth": 25.15,
+     "blows": 34,
+     "penetration": 300
+    },
+    {
+     "depth": 26.15,
+     "blows": 50,
+     "penetration": 140
+    },
+    {
+     "depth": 27.15,
+     "blows": 50,
+     "penetration": 110
+    }
+   ],
+   "water": [
+    {
+     "depth": 6.63,
+     "date": "2025-10-16"
+    }
+   ]
+  },
+  {
+   "id": "R6-No.17",
+   "x": -29073.718090865084,
+   "y": -68393.12830223031,
+   "z": 58.58,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "name": "盛土(砂礫)",
+     "unit": "Fill"
+    },
+    {
+     "from": 1,
+     "to": 1.95,
+     "name": "盛土(砂混じりシルト質粘土)",
+     "unit": "Fill"
+    },
+    {
+     "from": 1.95,
+     "to": 3.6,
+     "name": "有機質シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 3.6,
+     "to": 7,
+     "name": "ローム",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 7,
+     "to": 8.8,
+     "name": "火山灰質粘土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 8.8,
+     "to": 15.65,
+     "name": "シルト質細砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 15.65,
+     "to": 21,
+     "name": "シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 21,
+     "to": 22.3,
+     "name": "固結シルト",
+     "unit": "Kazusa"
+    },
+    {
+     "from": 22.3,
+     "to": 24.2,
+     "name": "細砂",
+     "unit": "Kazusa"
+    }
+   ],
+   "lon": 139.5133205,
+   "lat": 35.38310091666667,
+   "spt": [
+    {
+     "depth": 2.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 20,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 13,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 10,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 9,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 17,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 39,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 23,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 9,
+     "penetration": 300
+    },
+    {
+     "depth": 17.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 18.15,
+     "blows": 10,
+     "penetration": 300
+    },
+    {
+     "depth": 19.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 20.15,
+     "blows": 12,
+     "penetration": 300
+    },
+    {
+     "depth": 21.15,
+     "blows": 50,
+     "penetration": 220
+    },
+    {
+     "depth": 22.15,
+     "blows": 50,
+     "penetration": 270
+    },
+    {
+     "depth": 23.05,
+     "blows": 50,
+     "penetration": 150
+    },
+    {
+     "depth": 24.05,
+     "blows": 50,
+     "penetration": 150
+    }
+   ],
+   "water": [
+    {
+     "depth": 4.05,
+     "date": "2025-10-15"
+    },
+    {
+     "depth": 4.33,
+     "date": "2025-10-16"
+    }
+   ]
+  },
+  {
+   "id": "R6-No.18",
+   "x": -29038.959158475,
+   "y": -68388.4117549648,
+   "z": 65.86,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1.7,
+     "name": "盛土(礫混じり砂質シルト)",
+     "unit": "Fill"
+    },
+    {
+     "from": 1.7,
+     "to": 1.8,
+     "name": "アスファルト",
+     "unit": "Fill"
+    },
+    {
+     "from": 1.8,
+     "to": 13.35,
+     "name": "盛土(シルト質砂)",
+     "unit": "Fill"
+    },
+    {
+     "from": 13.35,
+     "to": 14.1,
+     "name": "シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 14.1,
+     "to": 16.15,
+     "name": "砂質シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 16.15,
+     "to": 17.4,
+     "name": "砂混じりシルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 17.4,
+     "to": 17.8,
+     "name": "砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 17.8,
+     "to": 20.8,
+     "name": "有機質シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 20.8,
+     "to": 23.3,
+     "name": "砂質シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 23.3,
+     "to": 28.15,
+     "name": "シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 28.15,
+     "to": 29.1,
+     "name": "礫混じり砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 29.1,
+     "to": 32.45,
+     "name": "砂",
+     "unit": "Pleistocene"
+    }
+   ],
+   "lon": 139.51370291666666,
+   "lat": 35.38314444444445,
+   "spt": [
+    {
+     "depth": 2.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 3.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 6.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 8.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 12.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 13.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 14.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 17.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 18.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 19.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 20.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 21.15,
+     "blows": 2,
+     "penetration": 300
+    },
+    {
+     "depth": 22.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 23.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 24.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 25.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 26.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 27.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 28.15,
+     "blows": 26,
+     "penetration": 300
+    },
+    {
+     "depth": 29.15,
+     "blows": 50,
+     "penetration": 240
+    },
+    {
+     "depth": 30.15,
+     "blows": 50,
+     "penetration": 300
+    },
+    {
+     "depth": 31.15,
+     "blows": 34,
+     "penetration": 300
+    },
+    {
+     "depth": 32.15,
+     "blows": 23,
+     "penetration": 300
+    }
+   ],
+   "water": [
+    {
+     "depth": 5.66,
+     "date": "2025-10-16"
+    },
+    {
+     "depth": 9.53,
+     "date": "2025-10-17"
+    },
+    {
+     "depth": 1.69,
+     "date": "2025-10-14"
+    },
+    {
+     "depth": 9.61,
+     "date": "2025-10-20"
+    }
+   ]
+  },
+  {
+   "id": "R6-No.19",
+   "x": -28397.742325264826,
+   "y": -69614.3227829538,
+   "z": 28.15,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "name": "盛土(粘土混じり砂)",
+     "unit": "Fill"
+    },
+    {
+     "from": 1,
+     "to": 1.8,
+     "name": "盛土(粘土質砂)",
+     "unit": "Fill"
+    },
+    {
+     "from": 1.8,
+     "to": 2,
+     "name": "粘土質砂",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 2,
+     "to": 4.8,
+     "name": "砂質シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 4.8,
+     "to": 11,
+     "name": "細砂",
+     "unit": "Pleistocene"
+    }
+   ],
+   "lon": 139.5208032777778,
+   "lat": 35.3721125,
+   "water": [
+    {
+     "depth": 3.25,
+     "date": "2025-11-19"
+    },
+    {
+     "depth": 3.2,
+     "date": "2025-11-20"
+    },
+    {
+     "depth": 3.2,
+     "date": "2025-11-21"
+    },
+    {
+     "depth": 5.05,
+     "date": "2025-11-25"
+    }
+   ]
+  },
+  {
+   "id": "R6-No.20",
+   "x": -28974.968105403757,
+   "y": -68906.71500743057,
+   "z": 68.72,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.1,
+     "name": "表土(礫)",
+     "unit": "Fill"
+    },
+    {
+     "from": 0.1,
+     "to": 0.7,
+     "name": "黒ボク",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 0.7,
+     "to": 8.9,
+     "name": "ローム",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 8.9,
+     "to": 10.05,
+     "name": "砂混じり火山灰質粘土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 10.05,
+     "to": 10.65,
+     "name": "砂混じり凝灰質粘土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 10.65,
+     "to": 15.7,
+     "name": "砂混じり火山灰質粘土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 15.7,
+     "to": 18,
+     "name": "シルト質細砂",
+     "unit": "Pleistocene"
+    }
+   ],
+   "lon": 139.5144256388889,
+   "lat": 35.37847430555556,
+   "water": [
+    {
+     "depth": 6,
+     "date": "2025-11-11"
+    }
+   ]
+  },
+  {
+   "id": "R6-No.21A",
+   "x": -29076.0624804667,
+   "y": -68700.53669680878,
+   "z": 60.38,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3.9,
+     "name": "盛土(粘性土)",
+     "unit": "Fill"
+    },
+    {
+     "from": 3.9,
+     "to": 6,
+     "name": "改良土",
+     "unit": "Fill"
+    }
+   ],
+   "lon": 139.51330563888888,
+   "lat": 35.380329861111115,
+   "water": [
+    {
+     "depth": -99.99,
+     "date": "2025-11-26"
+    }
+   ]
+  },
+  {
+   "id": "R6-No.21B",
+   "x": -29091.23718473784,
+   "y": -68715.89260931629,
+   "z": 60.08,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 6,
+     "name": "ローム",
+     "unit": "Kanto Loam"
+    }
+   ],
+   "lon": 139.51313916666666,
+   "lat": 35.380191,
+   "water": [
+    {
+     "depth": -99.99,
+     "date": "2025-11-26"
+    }
+   ]
+  },
+  {
+   "id": "R6-No.22",
+   "x": -29175.059196530805,
+   "y": -68631.75786674001,
+   "z": 65.11,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2.05,
+     "name": "盛土(ローム)",
+     "unit": "Fill"
+    },
+    {
+     "from": 2.05,
+     "to": 6.8,
+     "name": "ローム",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 6.8,
+     "to": 11,
+     "name": "凝灰質粘土",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 11,
+     "to": 14.8,
+     "name": "シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 14.8,
+     "to": 15.55,
+     "name": "軽石",
+     "unit": "Kanto Loam"
+    },
+    {
+     "from": 15.55,
+     "to": 17.5,
+     "name": "シルト",
+     "unit": "Pleistocene"
+    },
+    {
+     "from": 17.5,
+     "to": 18.45,
+     "name": "細砂",
+     "unit": "Pleistocene"
+    }
+   ],
+   "lon": 139.51221358333333,
+   "lat": 35.380946944444446,
+   "spt": [
+    {
+     "depth": 2.15,
+     "blows": 5,
+     "penetration": 330
+    },
+    {
+     "depth": 3.15,
+     "blows": 3,
+     "penetration": 300
+    },
+    {
+     "depth": 4.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 5.15,
+     "blows": 5,
+     "penetration": 320
+    },
+    {
+     "depth": 6.15,
+     "blows": 7,
+     "penetration": 300
+    },
+    {
+     "depth": 7.15,
+     "blows": 3,
+     "penetration": 320
+    },
+    {
+     "depth": 8.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 9.15,
+     "blows": 6,
+     "penetration": 300
+    },
+    {
+     "depth": 10.15,
+     "blows": 10,
+     "penetration": 300
+    },
+    {
+     "depth": 11.15,
+     "blows": 4,
+     "penetration": 330
+    },
+    {
+     "depth": 12.15,
+     "blows": 5,
+     "penetration": 330
+    },
+    {
+     "depth": 13.15,
+     "blows": 5,
+     "penetration": 330
+    },
+    {
+     "depth": 14.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 15.15,
+     "blows": 8,
+     "penetration": 300
+    },
+    {
+     "depth": 16.15,
+     "blows": 4,
+     "penetration": 300
+    },
+    {
+     "depth": 17.15,
+     "blows": 5,
+     "penetration": 300
+    },
+    {
+     "depth": 18.15,
+     "blows": 31,
+     "penetration": 300
+    }
+   ],
+   "water": [
+    {
+     "depth": 6.43,
+     "date": "2025-11-19"
+    },
+    {
+     "depth": 6.94,
+     "date": "2025-11-20"
+    }
+   ]
+  }
+ ]
+}

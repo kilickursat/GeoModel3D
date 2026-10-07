@@ -3,13 +3,16 @@ import {uniform,positionWorld,dot} from "three/tsl";
 import {OrbitControls} from "three/addons/controls/OrbitControls.js";
 import {CSS2DRenderer,CSS2DObject} from "three/addons/renderers/CSS2DRenderer.js";
 import pkg from "../package.json";
-import {GeoProject,UnitDef,sampleProjects,boreholeDepth} from "./geology";
+import {GeoProject,UnitDef,UnitRule,sampleProjects,sakaeProject,boreholeDepth} from "./geology";
 import {buildGeologicalModel,GeoModel,unitVolume,unitCubicMetres,modelBounds,footprintArea} from "./model";
 import {volumeGeometry} from "./volume";
 import {terrainOutside,convexHull} from "./terrain";
 import {computeSection,offsetRange,principalAzimuth,Section} from "./section";
 import {sectionSvg,sectionCsv} from "./sectionSvg";
-import {importFiles,toProjectJson,toBoreholeCsv} from "./io";
+import {importFiles,toProjectJson,toBoreholeCsv,decodeText,assignColors} from "./io";
+import {Crs,crsRegistry,projectCrs,findCrs,customCrs,searchCrs,suggestCrs,toProjected,toGeographic} from "./crs";
+import {fetchTerrain,elevationSources,mapSources,covers,tileUrl,parseGsiTile,decodeTerrarium,mapTiles,tileXY,ElevationSource,TileSource} from "./tiles";
+import {applyUnitRules} from "./rules";
 import "./style.css";
 
 const app=document.querySelector<HTMLDivElement>("#app")!;
@@ -65,7 +68,7 @@ let imported:GeoProject|null=null;
 let model:GeoModel;
 let section:Section;
 let origin={x:0,y:0,z:0},extent=1,sectionBuffer=1;
-const view={azimuth:0,offset:0,ve:1,cut:true,flip:false,exact:false,volumes:true,horizons:true,boreholes:true,labels:true,terrain:true,panel:innerWidth>760,hidden:new Set<string>()};
+const view={azimuth:0,offset:0,ve:1,cut:true,flip:false,exact:false,volumes:true,horizons:true,boreholes:true,labels:true,terrain:true,map:false,mapSource:"osm",panel:innerWidth>760,hidden:new Set<string>()};
 
 interface UnitMaterials { lit:THREE.MeshStandardNodeMaterial; flat:THREE.MeshBasicNodeMaterial }
 const volumeMeshes:Array<THREE.Mesh<THREE.BufferGeometry,THREE.Material>>=[];
@@ -196,8 +199,128 @@ function buildTerrain(){
   const material=new THREE.MeshStandardNodeMaterial({color:0x5f6f66,roughness:1,metalness:0,transparent:true,opacity:.42,depthWrite:false});
   material.maskNode=keepFragment;
   terrainMesh=new THREE.Mesh(geo,material);
+  terrainMesh.userData.plain=material;
   terrainMesh.renderOrder=-1;
   content.add(terrainMesh);
+}
+
+// ---------- real-world placement: coordinate system, terrain and map ----------
+
+// Bundled public datasets fetch their terrain and map when opened. Imported data may be confidential, so nothing is
+// requested from tile servers for them until the user asks.
+const publicSites=new Set<GeoProject>([sakaeProject]);
+let geoStatus="";
+interface MapLayer { key:string; texture:THREE.CanvasTexture; z:number; x0:number; y0:number; nx:number; ny:number; source:TileSource; failed:number }
+let mapLayer:MapLayer|null=null;
+const mapMaterials:THREE.Material[]=[];
+
+function siteBox(){const b=modelBounds(model),m=extent*0.25;return {minX:b.minX-m,minY:b.minY-m,maxX:b.maxX+m,maxY:b.maxY+m}}
+function siteCentre(crs:Crs){const b=modelBounds(model);return toGeographic(crs,(b.minX+b.maxX)/2,(b.minY+b.maxY)/2)}
+function setGeoStatus(text:string){geoStatus=text;const el=toolbar.querySelector(".geo-status");if(el)el.textContent=text}
+
+async function loadElevationTile(s:ElevationSource,z:number,x:number,y:number){
+  const r=await fetch(tileUrl(s,z,x,y));
+  if(!r.ok)return null;
+  if(s.format==="gsi")return parseGsiTile(await r.text());
+  const bitmap=await createImageBitmap(await r.blob(),{colorSpaceConversion:"none",premultiplyAlpha:"none"});
+  const canvas=document.createElement("canvas");
+  canvas.width=canvas.height=256;
+  const ctx=canvas.getContext("2d",{willReadFrequently:true})!;
+  ctx.drawImage(bitmap,0,0);
+  return decodeTerrarium(ctx.getImageData(0,0,256,256).data);
+}
+
+async function fetchSiteTerrain(){
+  const crs=projectCrs(project);
+  if(!crs){showNotice("Terrain",["Choose the coordinate system of the data first: terrain is fetched by geographic position."],true);return}
+  const target=project,c=siteCentre(crs);
+  const sources=elevationSources.filter(s=>covers(s,c.lon,c.lat));
+  setGeoStatus("Fetching terrain…");
+  try{
+    const terrain=await fetchTerrain(crs,siteBox(),sources,loadElevationTile);
+    if(project!==target)return;
+    target.terrain=terrain;
+    setGeoStatus("");
+    loadProject(target,[`Terrain: ${terrain.source}; ${terrain.ncols} × ${terrain.nrows} cells of ${fmt(terrain.dx,1)} m`],true);
+  }catch(e){
+    if(project!==target)return;
+    setGeoStatus("");
+    showNotice("Terrain could not be fetched",[(e as Error).message,"The model uses the surface through the collars."],true);
+  }
+}
+
+// The basemap is drawn on the terrain around the model: tiles composed into one texture, and each terrain vertex
+// mapped to it through its geographic position.
+async function updateMap(){
+  const crs=projectCrs(project),mesh=terrainMesh;
+  if(!view.map||!crs||!mesh){applyMap(null);renderCredits();return}
+  const source=mapSources.find(s=>s.id===view.mapSource)??mapSources[0];
+  const t=mapTiles(crs,siteBox(),source);
+  const key=`${project.name}|${source.id}|${t.z}/${t.x0}/${t.y0}/${t.x1}/${t.y1}`;
+  if(mapLayer?.key!==key){
+    const nx=t.x1-t.x0+1,ny=t.y1-t.y0+1,canvas=document.createElement("canvas");
+    canvas.width=nx*256;canvas.height=ny*256;
+    const ctx=canvas.getContext("2d")!;
+    setGeoStatus(`Loading map: ${nx*ny} tiles…`);
+    let failed=0;
+    const jobs:Promise<void>[]=[];
+    for(let y=t.y0;y<=t.y1;y++)for(let x=t.x0;x<=t.x1;x++)jobs.push((async()=>{
+      const img=new Image();
+      img.crossOrigin="anonymous";
+      img.src=tileUrl(source,t.z,x,y);
+      try{await img.decode();ctx.drawImage(img,(x-t.x0)*256,(y-t.y0)*256)}catch{failed++}
+    })());
+    await Promise.all(jobs);
+    if(mesh!==terrainMesh||!view.map)return;
+    mapLayer?.texture.dispose();
+    const texture=new THREE.CanvasTexture(canvas);
+    texture.colorSpace=THREE.SRGBColorSpace;
+    texture.anisotropy=8;
+    mapLayer={key,texture,z:t.z,x0:t.x0,y0:t.y0,nx,ny,source,failed};
+    setGeoStatus(failed===nx*ny?"Map tiles could not be loaded":failed?`${failed} of ${nx*ny} map tiles missing`:"");
+  }
+  applyMap(mapLayer);
+  renderCredits();
+}
+function applyMap(layer:MapLayer|null){
+  const mesh=terrainMesh,crs=projectCrs(project);
+  if(!mesh)return;
+  if(!layer||!crs){mesh.material=mesh.userData.plain;invalidate();return}
+  const pos=mesh.geometry.getAttribute("position"),uv=new Float32Array(pos.count*2);
+  for(let i=0;i<pos.count;i++){
+    const g=toGeographic(crs,pos.getX(i)+origin.x,pos.getY(i)+origin.y),t=tileXY(g.lon,g.lat,layer.z);
+    uv[i*2]=(t.x-layer.x0)/layer.nx;uv[i*2+1]=1-(t.y-layer.y0)/layer.ny;
+  }
+  mesh.geometry.setAttribute("uv",new THREE.BufferAttribute(uv,2));
+  const material=new THREE.MeshStandardNodeMaterial({map:layer.texture,roughness:1,metalness:0,transparent:true,opacity:.9,depthWrite:false});
+  material.maskNode=keepFragment;
+  mapMaterials.splice(0).forEach(m=>m.dispose());
+  mapMaterials.push(material);
+  mesh.material=material;
+  invalidate();
+}
+
+// Changing the coordinate system places boreholes that carry latitude and longitude again; for data given only in
+// project coordinates it declares what those coordinates are.
+function setProjectCrs(crs:Crs){
+  const known=crs.code&&findCrs(crs.code);
+  const placed=project.boreholes.some(b=>b.lon!==undefined&&b.lat!==undefined);
+  const next:GeoProject={...project,crs:crs.name,crsCode:known?crs.code:undefined,crsProj4:known?undefined:crs.proj4,
+    boreholes:project.boreholes.map(b=>b.lon!==undefined&&b.lat!==undefined?{...b,...toProjected(crs,b.lon,b.lat)}:b)};
+  const notes=[`Coordinate system: ${crs.name}${crs.code?` (${crs.code})`:""}${crs.note?`. ${crs.note}`:""}`];
+  if(placed&&next.terrain){delete next.terrain;notes.push("The terrain grid was in the previous system and was removed; fetch it again")}
+  if(!placed)notes.push("No borehole carries latitude and longitude, so coordinates are unchanged: this declares the system they are in");
+  imported=next;
+  loadProject(next,notes);
+}
+
+function renderCredits(){
+  const parts:string[]=[];
+  if(view.map&&mapLayer&&projectCrs(project))parts.push(`Map <a href="${mapLayer.source.link}" target="_blank" rel="noopener">${esc(mapLayer.source.attribution)}</a>`);
+  if(project.terrain?.source&&view.terrain)parts.push(`Terrain ${esc(project.terrain.source)}`);
+  if(project.source)parts.push(`Data ${esc(project.source)}`);
+  credits.innerHTML=parts.join(" · ");
+  credits.hidden=!parts.length;
 }
 // Shift the projection centre away from the open section view so the model sits in the free part of the screen.
 function updateViewOffset(){
@@ -299,6 +422,7 @@ function applyDisplay(){
   if(holeMesh)holeMesh.visible=view.boreholes;
   if(terrainMesh)terrainMesh.visible=view.terrain;
   for(const l of labels)l.visible=view.boreholes&&view.labels&&(!view.cut||clipPlane.distanceToPoint(l.position)>=0);
+  renderCredits();
   invalidate();
 }
 
@@ -312,16 +436,20 @@ ui.innerHTML=`<div class="title">GeoModel3D <span>${pkg.version.split(".").slice
   <select class="dataset" aria-label="Dataset"></select>
   <div class="desc"></div>
   <div class="stats"></div>
+  <label class="crs">Coordinates <input class="crs-input" list="crs-options" placeholder="EPSG code, system or country" spellcheck="false" autocomplete="off"></label>
+  <datalist id="crs-options"></datalist>
   <div class="legend"></div>
+  <details class="rules"><summary>Unit rules</summary><div class="rule-list"></div>
+    <div class="rule-actions"><button class="add-rule">Add rule</button><button class="apply-rules">Apply</button></div><div class="rule-note"></div></details>
 </div>
-<div class="hint">Drag to orbit · wheel to zoom · right-drag to pan · drop CSV, AGS4 or JSON files to import</div>`;
+<div class="hint">Drag to orbit · wheel to zoom · right-drag to pan · drop CSV, AGS4, borehole XML or JSON files to import</div>`;
 app.appendChild(ui);
 const datasetSelect=ui.querySelector<HTMLSelectElement>(".dataset")!;
 
 const toolbar=document.createElement("div");
 toolbar.className="toolbar";
 toolbar.innerHTML=`<button class="import">Import data…</button>
-<input class="file" type="file" multiple hidden accept=".csv,.tsv,.txt,.ags,.json,.asc,.xyz">
+<input class="file" type="file" multiple hidden accept=".csv,.tsv,.txt,.ags,.json,.xml,.asc,.xyz">
 <details class="menu"><summary>Export</summary><div>
   <button data-export="project">Project (JSON)</button>
   <button data-export="boreholes">Boreholes (CSV)</button>
@@ -334,10 +462,12 @@ toolbar.innerHTML=`<button class="import">Import data…</button>
   <label><input type="checkbox" data-view="boreholes" checked>Boreholes</label>
   <label><input type="checkbox" data-view="labels" checked>Labels</label>
   <label><input type="checkbox" data-view="terrain" checked>Terrain</label>
+  <label title="Needs the coordinate system of the data; map tiles are requested from the map's server"><input type="checkbox" data-view="map">Map</label>
   <label><input type="checkbox" data-view="cut" checked>Cut at section</label>
   <label><input type="checkbox" data-view="flip">Keep other side</label>
   <label title="Unlit legend colours: what you see is the legend colour, independent of lighting"><input type="checkbox" data-view="exact">Exact colours</label>
 </div>
+<div class="geo"><select class="map-source" aria-label="Map"></select><button class="fetch-terrain" title="Elevation tiles are requested for the area around the model">Fetch terrain</button><div class="geo-status" aria-live="polite"></div></div>
 <div class="backend">Renderer: ${backendName}${wantWebGPU&&backendName!=="WebGPU"?" (WebGPU unavailable here)":` · <a href="?backend=${backendName==="WebGPU"?"webgl":"webgpu"}">use ${backendName==="WebGPU"?webgl:"WebGPU"}</a>`}</div>`;
 app.appendChild(toolbar);
 const fileInput=toolbar.querySelector<HTMLInputElement>(".file")!;
@@ -365,6 +495,10 @@ const notice=document.createElement("div");
 notice.className="notice";
 notice.hidden=true;
 app.appendChild(notice);
+const credits=document.createElement("div");
+credits.className="credits";
+credits.hidden=true;
+app.appendChild(credits);
 const tooltip=document.createElement("div");
 tooltip.className="tooltip";
 tooltip.hidden=true;
@@ -372,7 +506,7 @@ app.appendChild(tooltip);
 const dropZone=document.createElement("div");
 dropZone.className="drop";
 dropZone.hidden=true;
-dropZone.innerHTML="<div>Drop borehole or terrain files<br><span>CSV tables · AGS4 · GeoModel3D or Georeport3D JSON · terrain grid (.asc, .xyz)</span></div>";
+dropZone.innerHTML="<div>Drop borehole or terrain files<br><span>CSV tables · AGS4 · Japanese borehole XML (電子納品, KuniJiban) · GeoModel3D or Georeport3D JSON · terrain grid (.asc, .xyz)</span></div>";
 app.appendChild(dropZone);
 
 function renderPanel(){
@@ -383,8 +517,23 @@ function renderPanel(){
   const stats=[count(model.boreholes.length,"borehole"),count(model.units.length,"unit"),count(model.horizons.length,"horizon")];
   if(model.triangles.length)stats.push(`footprint ${fmtArea(footprintArea(model))}`);
   if(project.terrain)stats.push(`terrain ${fmt(project.terrain.dx,1)} m grid`);
-  if(project.crs)stats.push(esc(project.crs));
   ui.querySelector(".stats")!.innerHTML=stats.join(" · ");
+  const crs=projectCrs(project),input=ui.querySelector<HTMLInputElement>(".crs-input")!;
+  input.value=crs?`${crs.code?crs.code+" · ":""}${crs.name}`:project.crs??"";
+  input.title=crs?.note??(crs?"":"Not georeferenced: choose the coordinate system the data are in to fetch terrain and show a map");
+  // Systems suggested for the site come first when its geographic position is known.
+  const placed=project.boreholes.find(b=>b.lon!==undefined&&b.lat!==undefined);
+  const first=placed?suggestCrs(placed.lon!,placed.lat!):crs?.code&&findCrs(crs.code)?[findCrs(crs.code)!]:[];
+  ui.querySelector("#crs-options")!.innerHTML=[...first,...crsRegistry.filter(e=>!first.includes(e))].map(e=>`<option value="${esc(e.code+" · "+e.name)}">${esc(e.region)}</option>`).join("");
+  const sources=crs?mapSources.filter(m=>{const c=siteCentre(crs);return covers(m,c.lon,c.lat)}):mapSources.slice(0,1);
+  if(!sources.some(m=>m.id===view.mapSource))view.mapSource=sources[0].id;
+  const mapSelect=toolbar.querySelector<HTMLSelectElement>(".map-source")!;
+  mapSelect.innerHTML=sources.map(m=>`<option value="${m.id}"${m.id===view.mapSource?" selected":""}>${esc(m.name)}</option>`).join("");
+  mapSelect.disabled=!crs;
+  toolbar.querySelector<HTMLInputElement>('[data-view="map"]')!.disabled=!crs;
+  toolbar.querySelector<HTMLInputElement>('[data-view="map"]')!.checked=view.map;
+  toolbar.querySelector<HTMLButtonElement>(".fetch-terrain")!.disabled=!crs;
+  renderRules();
   ui.querySelector(".legend")!.innerHTML=model.units.map((u,k)=>{
     const title=[u.name,u.erosive?"Erosive base: cuts down into older units":"",unitProperties(u)].filter(Boolean).join("\n");
     return `<label title="${esc(title)}"><input type="checkbox" data-unit="${esc(u.id)}"${view.hidden.has(u.id)?"":" checked"}><i style="background:${u.color}"></i><span class="name">${esc(u.name)}</span>${u.erosive?'<span class="tag">erosive</span>':""}<span class="vol">${model.triangles.length?fmtVolume(unitCubicMetres(model,k)):""}</span></label>`;
@@ -393,6 +542,46 @@ function renderPanel(){
 function unitProperties(u:UnitDef){
   const p=[u.gamma!==undefined?`γ ${fmt(u.gamma,1)} kN/m³`:"",u.gammaSat!==undefined?`γsat ${fmt(u.gammaSat,1)} kN/m³`:""].filter(Boolean).join(" · ");
   return p&&u.source?`${p} (${u.source})`:p;
+}
+
+// ---------- unit rules ----------
+
+const ruleList=ui.querySelector<HTMLDivElement>(".rule-list")!;
+const ruleRow=(r:Partial<UnitRule>)=>`<div class="rule"><div class="rule-main"><input class="r-match" value="${esc(r.match??"")}" placeholder="description matches" title="A regular expression tested against the logged description" spellcheck="false" aria-label="Description matches">
+<span>→</span><input class="r-unit" list="unit-options" value="${esc(r.unit??"")}" placeholder="unit" aria-label="Unit"><button class="r-del" aria-label="Remove rule">×</button></div>
+<div class="rule-if"><label>N ≥<input class="r-minN" type="number" step="any" value="${r.minN??""}"></label><label>N &lt;<input class="r-maxN" type="number" step="any" value="${r.maxN??""}"></label>
+<label title="Elevation of the top of the interval, m">top ≥<input class="r-minZ" type="number" step="any" value="${r.minZ??""}"></label><label>&lt;<input class="r-maxZ" type="number" step="any" value="${r.maxZ??""}"></label></div></div>`;
+function renderRules(){
+  const box=ui.querySelector<HTMLDetailsElement>(".rules")!;
+  box.hidden=!project.rules;
+  if(!project.rules)return;
+  box.querySelector("summary")!.textContent=`Unit rules (${project.rules.length})`;
+  ruleList.innerHTML=project.rules.map(ruleRow).join("")+`<datalist id="unit-options">${project.units.map(u=>`<option value="${esc(u.id)}">${esc(u.name)}</option>`).join("")}</datalist>`;
+  const {unmatched}=applyUnitRules(project.boreholes,project.rules);
+  const names=new Set(project.boreholes.flatMap(b=>b.intervals.map(i=>i.name).filter(Boolean)));
+  box.querySelector(".rule-note")!.textContent=`${names.size} logged descriptions. The first rule that matches a description, its median N-value and the elevation of its top gives the unit.`+
+    (unmatched.size?` No rule matches: ${[...unmatched].slice(0,12).map(([n,c])=>`${n} (${c})`).join(", ")}${unmatched.size>12?"…":""}`:"");
+}
+function readRules():UnitRule[]{
+  const num=(row:Element,c:string)=>{const v=(row.querySelector(c) as HTMLInputElement).value.trim();return v===""?undefined:Number(v)};
+  return [...ruleList.querySelectorAll(".rule")].map(row=>{
+    const r:UnitRule={match:(row.querySelector(".r-match") as HTMLInputElement).value.trim(),unit:(row.querySelector(".r-unit") as HTMLInputElement).value.trim()};
+    for(const k of ["minN","maxN","minZ","maxZ"] as const){const v=num(row,".r-"+k);if(v!==undefined&&Number.isFinite(v))r[k]=v}
+    return r;
+  }).filter(r=>r.match&&r.unit);
+}
+// New units go to the bottom of the column; units no interval uses any more are dropped.
+function applyRules(){
+  const rules=readRules();
+  const {boreholes,unmatched}=applyUnitRules(project.boreholes,rules);
+  const used=new Set(boreholes.flatMap(b=>b.intervals.map(i=>i.unit)));
+  const kept=project.units.filter(u=>used.has(u.id)),added=[...used].filter(id=>!kept.some(u=>u.id===id));
+  const notes=[`${rules.length} unit rules applied`];
+  if(added.length)notes.push(`New units added at the bottom of the column: ${added.join(", ")}`);
+  if(unmatched.size)notes.push(`Descriptions that no rule assigns to a unit are modelled as units of their own: ${[...unmatched].map(([n,c])=>`${n} (${c})`).join(", ")}`);
+  const next:GeoProject={...project,rules,boreholes,units:assignColors([...kept.map(u=>({...u})),...added.map(id=>({id,name:id,color:""}))])};
+  imported=next;
+  loadProject(next,notes,true);
 }
 
 function syncControls(){
@@ -421,36 +610,48 @@ function renderSectionPanel(){
 
 function showNotice(title:string,lines:string[],error=false){
   if(!lines.length&&!error){notice.hidden=true;return}
-  const shown=lines.slice(0,12);
+  const shown=lines.length>12?lines.slice(0,10):lines,rest=lines.slice(shown.length);
+  const list=(l:string[])=>`<ul>${l.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
   notice.className="notice"+(error?" error":"");
-  notice.innerHTML=`<div class="notice-head"><b>${esc(title)}</b><button aria-label="Dismiss">×</button></div><ul>${shown.map(l=>`<li>${esc(l)}</li>`).join("")}${lines.length>shown.length?`<li>…and ${lines.length-shown.length} more</li>`:""}</ul>`;
+  notice.innerHTML=`<div class="notice-head"><b>${esc(title)}</b><button aria-label="Dismiss">×</button></div>${list(shown)}${rest.length?`<details><summary>${rest.length} more</summary>${list(rest)}</details>`:""}`;
   notice.hidden=false;
   notice.querySelector("button")!.onclick=()=>{notice.hidden=true};
 }
 
-function loadProject(p:GeoProject,importWarnings:string[]=[]){
+// keepView rebuilds the same site (new terrain or rules) without moving the camera or resetting the controls.
+function loadProject(p:GeoProject,importWarnings:string[]=[],keepView=false){
+  const before={...origin};
   project=p;
   model=buildGeologicalModel(p);
-  view.hidden.clear();
+  if(!keepView)view.hidden.clear();
   buildContent();
-  const b=modelBounds(model),height=Math.max(b.maxZ-b.minZ,1);
-  view.ve=Math.min(10,Math.max(1,Math.round(extent/(height*3)*2)/2));
-  view.azimuth=model.nodes.length>1?principalAzimuth(model):0;
-  view.offset=0;
-  view.labels=model.boreholes.length<=80;
-  toolbar.querySelector<HTMLInputElement>('[data-view="labels"]')!.checked=view.labels;
+  if(keepView){
+    const shift=new THREE.Vector3(before.x-origin.x,before.y-origin.y,(before.z-origin.z)*view.ve);
+    camera.position.add(shift);controls.target.add(shift);controls.update();
+  }else{
+    const b=modelBounds(model),height=Math.max(b.maxZ-b.minZ,1);
+    // Enough exaggeration to read the layers, but not so much that real terrain turns into spikes.
+    view.ve=Math.min(5,Math.max(1,Math.round(extent/(height*3)*2)/2));
+    view.azimuth=model.nodes.length>1?principalAzimuth(model):0;
+    view.offset=0;
+    view.labels=model.boreholes.length<=40;
+    toolbar.querySelector<HTMLInputElement>('[data-view="labels"]')!.checked=view.labels;
+    view.map=publicSites.has(p)&&!!projectCrs(p);
+  }
   sectionBuffer=Math.max(extent*0.12,1);
   renderPanel();
   syncControls();
   updateSection();
-  fitCamera();
+  if(!keepView)fitCamera();
   const warnings=[...importWarnings,...model.warnings];
   showNotice(`${p.name}: ${warnings.length} note${warnings.length===1?"":"s"}`,warnings);
+  if(publicSites.has(p)&&!p.terrain&&projectCrs(p)&&!keepView)void fetchSiteTerrain();
+  void updateMap();
 }
 
 async function importFileList(list:FileList|File[]){
   try{
-    const files=await Promise.all([...list].map(async f=>({name:f.name,text:await f.text()})));
+    const files=await Promise.all([...list].map(async f=>({name:f.name,text:decodeText(new Uint8Array(await f.arrayBuffer()))})));
     const result=importFiles(files,project);
     imported=result.project;
     loadProject(result.project,result.warnings);
@@ -486,9 +687,10 @@ app.addEventListener("click",e=>{
 });
 toolbar.querySelectorAll<HTMLInputElement>("[data-view]").forEach(input=>{
   input.onchange=()=>{
-    const key=input.dataset.view as "volumes"|"horizons"|"boreholes"|"labels"|"terrain"|"cut"|"flip"|"exact";
+    const key=input.dataset.view as "volumes"|"horizons"|"boreholes"|"labels"|"terrain"|"map"|"cut"|"flip"|"exact";
     view[key]=input.checked;
     if(key==="cut"||key==="flip")updateSection();else applyDisplay();
+    if(key==="map")void updateMap();
     syncControls();
   };
 });
@@ -497,6 +699,20 @@ ui.querySelector(".legend")!.addEventListener("change",e=>{
   if(input.checked)view.hidden.delete(id);else view.hidden.add(id);
   applyDisplay();
 });
+toolbar.querySelector<HTMLSelectElement>(".map-source")!.onchange=e=>{view.mapSource=(e.target as HTMLSelectElement).value;void updateMap()};
+toolbar.querySelector<HTMLButtonElement>(".fetch-terrain")!.onclick=()=>void fetchSiteTerrain();
+ui.querySelector<HTMLInputElement>(".crs-input")!.onchange=e=>{
+  const value=(e.target as HTMLInputElement).value.trim();
+  try{
+    const code=value.match(/EPSG:\d+/i)?.[0];
+    const found=value.startsWith("+")?customCrs(value):code?findCrs(code):searchCrs(value,2).length===1?searchCrs(value,2)[0]:undefined;
+    if(!found)throw new Error(`No coordinate system matches “${value}”. Type an EPSG code or part of a name, or paste a PROJ definition.`);
+    setProjectCrs(found);
+  }catch(err){showNotice("Coordinate system",[(err as Error).message],true);renderPanel()}
+};
+ui.querySelector(".add-rule")!.addEventListener("click",()=>ruleList.insertAdjacentHTML("beforeend",ruleRow({})));
+ui.querySelector(".apply-rules")!.addEventListener("click",applyRules);
+ruleList.addEventListener("click",e=>{const b=(e.target as HTMLElement).closest(".r-del");if(b)b.closest(".rule")!.remove()});
 let sectionQueued=false;
 const queueSection=()=>{if(!sectionQueued){sectionQueued=true;requestAnimationFrame(()=>{sectionQueued=false;updateSection()})}};
 azimuthInput.oninput=()=>{view.azimuth=Number(azimuthInput.value);syncControls();queueSection()};
@@ -528,8 +744,12 @@ function updateTooltip(){
     const hit=raycaster.intersectObject(holeMesh).find(kept);
     if(hit&&hit.instanceId!==undefined){
       const info=holeInfo[hit.instanceId],bh=model.boreholes[info.hole],iv=bh.intervals[info.interval];
-      const what=iv?`${esc(model.units.find(u=>u.id===iv.unit)?.name??iv.unit)} ${fmt(iv.from,1)}–${fmt(iv.to,1)} m`:"not logged";
-      html=`<b>${esc(bh.id)}</b> · ${what}<span>collar ${fmt(bh.x,1)}, ${fmt(bh.y,1)} · ${fmt(bh.z,2)} m · final depth ${fmt(boreholeDepth(bh),1)} m</span>`;
+      const what=iv?`${esc(model.units.find(u=>u.id===iv.unit)?.name??iv.unit)} ${fmt(iv.from,2)}–${fmt(iv.to,2)} m`:"not logged";
+      const spt=iv?(bh.spt??[]).filter(t=>t.depth>=iv.from&&t.depth<iv.to).map(t=>t.penetration>=300?String(t.blows):`${t.blows}/${fmt(t.penetration/10)} cm`):[];
+      const logged=[iv?.name&&iv.name!==iv.unit?esc(iv.name):"",spt.length?`N ${spt.join(", ")}`:""].filter(Boolean).join(" · ");
+      const water=bh.water?.length?` · water ${fmt(Math.min(...bh.water.map(w=>w.depth)),2)} m deep`:"";
+      const where=bh.lat!==undefined&&bh.lon!==undefined?` (${fmt(bh.lat,5)}°, ${fmt(bh.lon,5)}°)`:"";
+      html=`<b>${esc(bh.id)}</b> · ${what}${logged?`<span>${logged}</span>`:""}<span>collar E ${fmt(bh.x,1)} N ${fmt(bh.y,1)}${where} · ${fmt(bh.z,2)} m · final depth ${fmt(boreholeDepth(bh),1)} m${water}</span>`;
     }
   }
   if(!html&&view.volumes){
