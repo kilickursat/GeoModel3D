@@ -2,7 +2,8 @@ import {GeoModel} from "./model";
 import {Section} from "./section";
 import {toCsv} from "./io";
 
-export interface SectionSvgOptions { width:number; height:number; theme?:"dark"|"light"; title?:boolean; legend?:boolean; buffer?:number }
+// roundVe draws at a round vertical exaggeration (1, 2, 2.5, 5, 10…), as drawings state it, instead of filling the height.
+export interface SectionSvgOptions { width:number; height:number; theme?:"dark"|"light"; title?:boolean; legend?:boolean; buffer?:number; roundVe?:boolean }
 
 const THEMES={
   dark:{bg:"#0b1620",text:"#d9edf5",muted:"#8aa2ae",grid:"rgba(160,190,200,.14)",line:"#e8f5ff",hole:"#0b1620"},
@@ -31,7 +32,7 @@ export function sectionSvg(model:GeoModel,s:Section,o:SectionSvgOptions){
   const m={l:58,r:18,t:title?42:26,b:44+legendRows*18};
   let pw=W-m.l-m.r;
   const ph=H-m.t-m.b;
-  const out:string[]=[`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Inter, system-ui, sans-serif">`,`<rect width="${W}" height="${H}" fill="${t.bg}"/>`];
+  const out:string[]=[`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Inter, system-ui, 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic UI', Meiryo, sans-serif">`,`<rect width="${W}" height="${H}" fill="${t.bg}"/>`];
   if(title)out.push(`<text x="${m.l}" y="18" font-size="13" font-weight="600" fill="${t.text}">${esc(model.project.name)} — ${esc(sectionTitle(s))}</text>`);
   if(s.s.length<2){
     out.push(`<text x="${W/2}" y="${H/2}" text-anchor="middle" font-size="13" fill="${t.muted}">The section line does not cross the model footprint</text></svg>`);
@@ -44,6 +45,11 @@ export function sectionSvg(model:GeoModel,s:Section,o:SectionSvgOptions){
   s0-=padS;s1+=padS;z0-=padZ;z1+=padZ;
   // Never draw a section with the vertical scale compressed below 1:1; narrow the plot instead.
   if((ph/(z1-z0))/(pw/(s1-s0))<1){const w=ph/(z1-z0)*(s1-s0);m.l+=(pw-w)/2;pw=w}
+  if(o.roundVe){
+    const fill=(ph/(z1-z0))/(pw/(s1-s0)),nice=[1,2,2.5,5,10,20,25,50,100,200].filter(v=>v<=fill+1e-9).pop()??1;
+    const extra=ph/(nice*pw/(s1-s0))-(z1-z0);
+    z0-=extra/2;z1+=extra/2;
+  }
   const X=(v:number)=>m.l+(v-s0)/(s1-s0)*pw,Y=(v:number)=>m.t+(z1-v)/(z1-z0)*ph;
   const ve=(ph/(z1-z0))/(pw/(s1-s0));
 

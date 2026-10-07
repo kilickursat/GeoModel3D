@@ -37,6 +37,14 @@ describe("section drawing",()=>{
     expect(svg).toContain(`>${m.boreholes[nearest.index].id}</text>`);
   });
 
+  it("can draw at a round vertical exaggeration",()=>{
+    const m=buildGeologicalModel(sakaeProject),s=computeSection(m,{azimuth:170,offset:0},300);
+    const fill=sectionSvg(m,s,{width:1600,height:900}).match(/V\.E\. ×([\d.]+)/)![1];
+    const round=sectionSvg(m,s,{width:1600,height:900,roundVe:true}).match(/V\.E\. ×([\d.]+)/)![1];
+    expect([1,2,2.5,5,10,20,25,50,100,200]).toContain(Number(round));
+    expect(Number(round)).toBeLessThanOrEqual(Number(fill));
+  });
+
   it("explains an empty section",()=>{
     const off=computeSection(m,{azimuth:90,offset:10000});
     expect(sectionSvg(m,off,{width:400,height:200})).toContain("does not cross the model footprint");
