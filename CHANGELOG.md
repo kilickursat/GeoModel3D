@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.5.2 — 2026-10-07
+
+### Fixed
+- With terrain, where the ground lies above the surface between the collars, all the extra height went to the youngest unit. Thin units such as made ground thickened between boreholes, or appeared between boreholes that did not log them. The extra height now goes to the units at the surface of the surrounding boreholes. In the valley dataset, made ground falls from 29,540 to 20,738 m³.
+- Since 0.5 the default section followed the subdivided mesh instead of the borehole layout, so it could turn when the mesh changed. It follows the borehole layout again; the valley opens at 077° instead of 080°.
+- Pinch-outs and outcrops stepped along the triangle edges, which made them look jagged from above. The line where a horizon meets the one above it is now added to the mesh, so they run straight. Unit volumes are now exact for the cut surfaces, not just for their values at the mesh nodes.
+
+### Changed
+- WebGPU is the default backend wherever the browser offers it; elsewhere the viewer runs on WebGL 2 as before. `?backend=webgl` forces WebGL 2.
+- The renderer link in the toolbar no longer breaks across two lines.
+
 ## 0.5.1 — 2026-10-06
 
 ### Fixed

@@ -32,12 +32,12 @@ Since 0.4:
 Boreholes → contacts → TIN horizons → closed unit volumes → sections
 
 1. **Stratigraphic column.** Units are ordered youngest (top) to oldest (bottom). A project can declare the order. Otherwise it is inferred from the logs: if unit A lies directly above unit B in any hole, A comes first. Logs that disagree are reported.
-2. **Reading a log.** Each borehole gives the elevation of every contact it shows. A unit missing between two logged units has zero thickness at that hole (it pinches out). A unit logged out of order below a younger one is modelled as the younger unit and reported. A contact inside an unlogged gap is placed at the middle of the gap and reported.
+2. **Reading a log.** Each borehole gives the elevation of every contact it shows. A unit missing between two logged units has zero thickness at that hole, so it thins to zero towards it from the holes that logged it (it pinches out). A unit logged out of order below a younger one is modelled as the younger unit and reported. A contact inside an unlogged gap is placed at the middle of the gap and reported.
 3. **Erosion.** If the unit directly above a contact is marked erosive, the units missing below it were eroded, not thinned. Their original surfaces at that hole are estimated from the holes that logged them, never below the erosion surface, and then cut by it.
 4. **End of hole.** The base of the last unit a hole enters is not observed. Below it, horizons are inferred by stacking unit thicknesses, interpolated by inverse-distance weighting from holes that logged those units completely. The base of that last unit is kept below the end of the hole.
 5. **Model base.** The lowest unit closes at a flat base at the deepest end of hole, or at the project's `base` elevation if one is given.
-6. **Horizons.** All horizons share one Delaunay triangulation of the borehole collars, and the model covers the convex hull of the boreholes without extrapolating beyond it. Between holes, horizons are linear. With terrain or erosive units, the triangulation is subdivided so the ground can follow the terrain grid and erosion surfaces can cut sharply.
-7. **Terrain.** The ground follows the terrain grid. The grid is corrected by the difference between each surveyed collar and the grid, interpolated between boreholes, so collars keep their surveyed elevations; collars more than 1 m off are reported. Every horizon is then kept at or below the ground, which removes units where the topography cuts below them.
+6. **Horizons.** All horizons share one Delaunay triangulation of the borehole collars, and the model covers the convex hull of the boreholes without extrapolating beyond it. Between holes, horizons are linear. With terrain or erosive units, the triangulation is subdivided so the ground can follow the terrain grid and erosion surfaces can cut sharply. Where a horizon meets the one above it or the model base, that line is added to the triangulation, so pinch-outs and outcrops run straight across triangles instead of stepping along their edges.
+7. **Terrain.** The ground follows the terrain grid. The grid is corrected by the difference between each surveyed collar and the grid, interpolated between boreholes, so collars keep their surveyed elevations; collars more than 1 m off are reported. Where the ground lies above the surface through the collars, the extra height belongs to the units at the surface of the surrounding boreholes, shared by their interpolation weights: a unit that none of them shows at the surface does not appear. Where it lies below, every horizon is kept at or below the ground, which removes units from the top where the topography cuts below them.
 8. **Volumes.** Each unit is a closed, outward-facing shell between its top and base horizons. Its volume is exact for this piecewise-linear model: triangle area × mean vertex thickness.
 9. **Sections.** A vertical plane cuts every horizon along the same triangulation edges, so the unit polygons line up. Boreholes within a buffer are projected onto the section. A horizon segment is dashed unless it was logged at the boreholes around it.
 
@@ -98,7 +98,7 @@ Unit weights are in kN/m³ and optional; record where they come from in `source`
 
 The viewer uses three.js's `WebGPURenderer` with TSL node materials, so one shader description serves both the WebGPU and the WebGL 2 backends.
 
-- **WebGL 2 is the default backend.** The WebGPU backend has not yet been checked on real hardware, so it is opt-in: add `?backend=webgpu` to the address, or use the link under the display options. The toolbar shows which backend is running, and falls back to WebGL 2 where WebGPU is unavailable.
+- **WebGPU is the default backend** wherever the browser offers it; elsewhere the viewer runs on WebGL 2. Add `?backend=webgl` to the address, or use the link under the display options, to force WebGL 2. The toolbar shows which backend is running.
 - **The cut-away is a shader mask**, so it behaves identically on both backends.
 - **Frames are drawn only when something changes**, so an idle model costs nothing. This matters on machines without a graphics card.
 - **Exact colours** shows units unlit in their legend colours, for reading colours rather than shapes.
@@ -139,7 +139,7 @@ Every push to `main` runs the tests, builds the site and publishes `dist/` to Gi
 
 Done:
 - **0.4:** import adapters (CSV, AGS4, Georeport3D), missing units and pinch-outs, sections at any orientation with export.
-- **0.5:** terrain, erosional units, unit properties, WebGPU-ready rendering.
+- **0.5:** terrain, erosional units, unit properties, WebGPU rendering (the default since 0.5.2).
 
 Next:
 
@@ -152,13 +152,12 @@ Next:
    - vertical stress, pore pressure and effective stress on volumes and sections;
    - a groundwater surface from water-level records;
    - horizontal stress only where K0 is given.
-3. WebGPU as the default backend once checked on real hardware.
-4. Reference models from real public site-investigation data (e.g. published AGS4 files).
-5. Faults; constrained TIN boundaries, pinch-out lines and geological map contacts.
-6. Fence diagrams for boreholes along an alignment (tunnels, roads).
-7. GeoJSON, DXF and LAS import; GeoTIFF terrain.
-8. Streaming and level of detail for large models.
-9. Provenance display for Georeport3D extractions.
+3. Reference models from real public site-investigation data (e.g. published AGS4 files).
+4. Faults; constrained TIN boundaries, pinch-out lines and geological map contacts.
+5. Fence diagrams for boreholes along an alignment (tunnels, roads).
+6. GeoJSON, DXF and LAS import; GeoTIFF terrain.
+7. Streaming and level of detail for large models.
+8. Provenance display for Georeport3D extractions.
 
 ## License
 
