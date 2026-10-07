@@ -396,7 +396,8 @@ const TOKYO="+proj=longlat +ellps=bessel +towgs84=-146.414,507.337,680.507,0,0,0
 // Units come from the descriptions through the current project's rules or, for a new project, a first grouping of
 // the soil names by principal material.
 function readBoringLogs(files:TextFile[],current?:GeoProject):ImportResult{
-  const t:Tables={collars:new Map(),intervals:new Map(),units:[],warnings:[]};
+  // A project with rules declares its units and their order; a new one infers the order from the logs.
+  const t:Tables={collars:new Map(),intervals:new Map(),units:current?.rules?current.units.map(u=>({...u})):[],warnings:[]};
   let tokyo=0,jgd2000=0;
   for(const f of files){
     let log;
@@ -417,7 +418,6 @@ function readBoringLogs(files:TextFile[],current?:GeoProject):ImportResult{
   if(!current?.rules)result.warnings.push("Units are a first grouping of the soil names by principal material (lithology, not formations); edit the unit rules to model the stratigraphy");
   result.warnings.push("Collar elevations are as logged (孔口標高), normally T.P.; river and port surveys may use a local datum such as A.P. or O.P.");
   result.project.description=`Imported from ${files.length} Japanese borehole log${files.length>1?"s":""} (電子納品 XML).`;
-  if(current?.rules)result.project.units=[...current.units.filter(u=>result.project.boreholes.some(b=>b.intervals.some(i=>i.unit===u.id))),...result.project.units.filter(u=>!current.units.some(c=>c.id===u.id))];
   return result;
 }
 

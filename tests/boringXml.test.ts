@@ -78,6 +78,11 @@ describe("units from logged descriptions",()=>{
     expect(boreholes[0].intervals.map(i=>i.unit)).toEqual(["Fill","Alluvium","Bedrock","謎の土"]);
     expect([...unmatched]).toEqual([["謎の土",1]]);
   });
+  it("can restrict a rule to elevations",()=>{
+    const {boreholes}=applyUnitRules([hole],[{match:"砂",maxZ:8,unit:"Low"},{match:".",unit:"Other"}]);
+    // Tops at 10, 9, 6 and 2 m.
+    expect(boreholes[0].intervals.map(i=>i.unit)).toEqual(["Other","Other","Low","Other"]);
+  });
   it("groups Japanese soil names by their principal material",()=>{
     const names=["盛土（ローム）","有機質シルト","火山灰質粘土","固結シルト","砂礫","シルト混じり細砂","砂質シルト","礫混じり砂","泥岩"];
     const holes:Borehole[]=[{id:"H",x:0,y:0,z:0,intervals:names.map((name,k)=>({from:k,to:k+1,unit:"",name}))}];

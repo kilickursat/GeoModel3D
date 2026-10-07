@@ -1,5 +1,6 @@
 import valleyDemo from "./data/valley-demo.json";
 import channelDemo from "./data/channel-demo.json";
+import sakaeSite from "./data/sakae-site.json";
 import {TerrainGrid} from "./terrain";
 
 // Geological units are listed in stratigraphic order, youngest (top) to oldest (bottom). An erosive unit's base
@@ -16,9 +17,10 @@ export interface WaterLevel { depth:number; date?:string }
 // exceeds the logged intervals. `lon`, `lat` keep the surveyed geographic position, so the collar can be placed again
 // in another coordinate system.
 export interface Borehole { id:string; x:number; y:number; z:number; depth?:number; intervals:Interval[]; lon?:number; lat?:number; spt?:SptTest[]; water?:WaterLevel[] }
-// Assigns a unit to every logged description that matches the regular expression `match` (case-insensitive), and,
-// when given, whose median SPT N-value in the interval lies in [minN, maxN). The first matching rule wins.
-export interface UnitRule { match:string; unit:string; minN?:number; maxN?:number }
+// Assigns a unit to every logged description that matches the regular expression `match` (case-insensitive) and,
+// when given, whose median SPT N-value in the interval lies in [minN, maxN) and whose top elevation lies in
+// [minZ, maxZ). The first matching rule wins.
+export interface UnitRule { match:string; unit:string; minN?:number; maxN?:number; minZ?:number; maxZ?:number }
 // x, y are in the system named by `crs`; `crsCode` (e.g. EPSG:6677) or the PROJ definition `crsProj4` georeferences it.
 // `source` credits where the data come from.
 export interface GeoProject {
@@ -52,9 +54,10 @@ function fromJson(p:unknown):GeoProject{
   if(project.terrain)project.terrain={...project.terrain,z:project.terrain.z.map(v=>v===null?NaN:v)};
   return project;
 }
+export const sakaeProject=fromJson(sakaeSite);
 export const valleyProject=fromJson(valleyDemo);
 export const channelProject=fromJson(channelDemo);
-export const sampleProjects:GeoProject[]=[valleyProject,channelProject,referenceProject];
+export const sampleProjects:GeoProject[]=[sakaeProject,valleyProject,channelProject,referenceProject];
 
 export function boreholeDepth(b:Borehole){return Math.max(b.depth??0,...b.intervals.map(i=>i.to))}
 // SPT N-value; a test stopped short of 300 mm is scaled to 300 mm (a converted N-value).

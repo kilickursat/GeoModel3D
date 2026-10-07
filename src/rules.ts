@@ -1,6 +1,7 @@
-// Units from logged descriptions: the first rule whose pattern matches an interval's description, and whose
-// N-value range (if any) contains the median SPT N-value inside the interval, gives its unit. An interval that no
-// rule matches keeps its description as its unit, so nothing is dropped silently; such descriptions are counted.
+// Units from logged descriptions: the first rule whose pattern matches an interval's description, and whose ranges
+// (if any) contain the median SPT N-value inside the interval and the elevation of its top, gives its unit. An
+// interval that no rule matches keeps its description as its unit, so nothing is dropped silently; such
+// descriptions are counted.
 import {Borehole,UnitRule,sptN} from "./geology";
 
 const median=(v:number[])=>{const s=[...v].sort((a,b)=>a-b),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2};
@@ -18,8 +19,9 @@ export function applyUnitRules(boreholes:Borehole[],rules:UnitRule[]){
   const unmatched=new Map<string,number>();
   const out=boreholes.map(b=>({...b,intervals:b.intervals.map(i=>{
     if(i.name===undefined)return i;
-    const n=intervalN(b,i.from,i.to);
-    const rule=compiled.find(r=>r.re.test(i.name!)&&(r.minN===undefined||n>=r.minN)&&(r.maxN===undefined||n<r.maxN));
+    const n=intervalN(b,i.from,i.to),top=b.z-i.from;
+    const rule=compiled.find(r=>r.re.test(i.name!)&&(r.minN===undefined||n>=r.minN)&&(r.maxN===undefined||n<r.maxN)
+      &&(r.minZ===undefined||top>=r.minZ)&&(r.maxZ===undefined||top<r.maxZ));
     if(!rule)unmatched.set(i.name,(unmatched.get(i.name)??0)+1);
     return {...i,unit:rule?rule.unit:i.name};
   })}));
