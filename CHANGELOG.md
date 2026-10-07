@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.6.0 — 2026-10-07
+
+### Added
+- **Coordinate systems.** A project can declare its coordinate system: an EPSG code from a registry of 477 projected systems in metres, or a PROJ definition.
+  - The registry covers the national systems of about forty countries and every WGS 84 UTM zone. It is generated from the EPSG dataset and works offline.
+  - Positions given as latitude and longitude are placed in the system suggested for the site. Choosing another system places them again.
+  - Conversions match the GSI survey calculator to the millimetre in the Japanese zones. Where the official transformation needs a grid file, the EPSG Helmert parameters are used and their accuracy is noted.
+- **Terrain for any site.** **Fetch terrain** builds a grid around the model from GSI 5 m and 10 m DEM tiles in Japan and Terrain Tiles worldwide.
+- **Maps.** **Map** drapes OpenStreetMap, or GSI maps and aerial photographs in Japan, over the terrain around the model. Imported data may be confidential, so nothing is requested from tile servers for them until asked. Every source shown is credited.
+- **Japanese borehole XML** (電子納品, versions 2 to 4, as served by KuniJiban): position and datum, collar elevation, soil and rock descriptions, SPT tests and water levels.
+- **Latitude and longitude** in CSV tables and AGS4 files (`LOCA_LAT`, `LOCA_LON`); a recognised `LOCA_GREF` sets the coordinate system.
+- **Unit rules** assign units to logged descriptions by pattern, median SPT N-value and elevation, and can be edited in the viewer. New Japanese logs start from a grouping of the soil names by principal material.
+- **A real reference site,** opened by default: 75 KuniJiban boreholes at Sakae, Yokohama, interpreted into Fill, Alluvium, Kanto Loam, Pleistocene sediments and the Kazusa Group.
+- Borehole tooltips show the logged description, SPT N-values, water level and latitude and longitude.
+
+### Changed
+- Triangulations are refined by longest-edge bisection instead of a uniform subdivision, so long thin triangles between distant boreholes follow the terrain as closely as short ones.
+- Terrain above the surface through the collars is made of what the top 5 m of the surrounding boreholes is made of, instead of all going to the unit at the surface. A thin topsoil no longer thickens on every ridge between boreholes.
+- The automatic vertical exaggeration stops at ×5, and borehole labels are shown by default up to 40 boreholes.
+- Long notices fold away the rest of their lines.
+- Files are decoded as UTF-8, in the encoding an XML file declares, or as Shift_JIS.
+- The offline single-file build grows from about 1.1 MB to 1.4 MB.
+
 ## 0.5.2 — 2026-10-07
 
 ### Fixed
