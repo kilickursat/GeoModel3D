@@ -1,4 +1,5 @@
-import {XY} from "../src/tin";
+import {XY,delaunay} from "../src/tin";
+import {GeoModel,subdivide} from "../src/model";
 
 // Deterministic PRNG (mulberry32) so geometric tests are reproducible.
 export function rng(seed:number){
@@ -39,4 +40,10 @@ export function openEdges(indices:ArrayLike<number>){
   const open:string[]=[];
   for(const [k,n] of count){const [a,b]=k.split(">");if(count.get(b+">"+a)!==n)open.push(k)}
   return open;
+}
+// Number of nodes of the subdivided borehole triangulation. The nodes added on the lines where units pinch out follow
+// them; they lie on its edges, so their values are interpolated along an edge rather than read from the terrain.
+export function latticeNodeCount(m:GeoModel){
+  const holes=m.nodes.slice(0,m.boreholes.length);
+  return subdivide(holes,delaunay(holes),m.level).nodes.length;
 }

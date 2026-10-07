@@ -5,7 +5,7 @@ import {computeSection,offsetRange} from "../src/section";
 import {valleyProject,channelProject,GeoProject,UnitDef,boreholeDepth} from "../src/geology";
 import {terrainZ,TerrainGrid} from "../src/terrain";
 import {delaunay,triangleArea,boundaryEdges,uniqueEdges} from "../src/tin";
-import {randomPoints,meshVolume,openEdges} from "./helpers";
+import {randomPoints,meshVolume,openEdges,latticeNodeCount} from "./helpers";
 import truth from "./fixtures/channel-truth.json";
 
 const ordered=(m:GeoModel)=>m.horizons.every((h,k)=>k===0||h.z.every((z,i)=>z<=m.horizons[k-1].z[i]+1e-9));
@@ -38,7 +38,7 @@ describe("terrain",()=>{
   });
   it("follows the terrain between boreholes, corrected only by the collar residuals",()=>{
     const worst=Math.max(...m.residuals.map(r=>Math.abs(r.residual)));
-    for(let n=m.boreholes.length;n<m.nodes.length;n+=37)
+    for(let n=m.boreholes.length;n<latticeNodeCount(m);n+=37)
       expect(Math.abs(m.horizons[0].z[n]-terrainZ(t,m.nodes[n].x,m.nodes[n].y))).toBeLessThanOrEqual(worst+1e-9);
   });
   it("keeps every horizon at or below the ground and the volumes closed",()=>{
@@ -64,6 +64,44 @@ describe("terrain",()=>{
     expect(unitCubicMetres(cut,0)).toBeLessThan(unitCubicMetres(flat,0)*0.85);
     expect(ordered(cut)).toBe(true);
   });
+  it("runs pinch-outs straight across triangles, exactly where the ground meets the unit's base",()=>{
+    const units:UnitDef[]=[{id:"Fill",name:"Fill",color:"#777777"},{id:"Rock",name:"Rock",color:"#888888"}];
+    const log=[{from:0,to:4,unit:"Fill"},{from:4,to:20,unit:"Rock"}];
+    const holes=[[0,0],[100,0],[0,100],[100,100]].map(([x,y],i)=>({id:"H"+i,x,y,z:50,intervals:log}));
+    const z:number[]=[];
+    for(let r=0;r<21;r++)for(let c=0;c<21;c++){const x=c*5,y=r*5;z.push(50-8*Math.exp(-(((x-50)/12)**2+((y-50)/30)**2)))}
+    const m=buildGeologicalModel({name:"cut",units,boreholes:holes,terrain:{x0:0,y0:0,dx:5,dy:5,ncols:21,nrows:21,z}});
+    // The base of the fill is 46 m everywhere; the ground dips below it in the trench.
+    let crossings=0;
+    for(let x=1;x<100;x+=0.37)for(const y of [23.3,50,61.9]){
+      const s=sampleModel(m,x,y)!;
+      expect(s[1]).toBeCloseTo(Math.min(46,s[0]),9);
+      if(s[0]<46)crossings++;
+    }
+    expect(crossings).toBeGreaterThan(20);
+    // The mesh still tiles the footprint with counter-clockwise triangles, and the horizon lines follow its edges.
+    expect(m.triangles.reduce((a,t)=>a+triangleArea(m.nodes,t),0)).toBeCloseTo(100*100,6);
+    for(const t of m.triangles)expect(triangleArea(m.nodes,t)).toBeGreaterThanOrEqual(0);
+    const edges=new Set(uniqueEdges(m.triangles).map(([a,b])=>Math.min(a,b)+":"+Math.max(a,b)));
+    for(const c of m.edgeChains)for(let j=1;j<c.length;j++)expect(edges.has(Math.min(c[j-1],c[j])+":"+Math.max(c[j-1],c[j]))).toBe(true);
+  });
+
+  it("gives terrain above the collar surface to the unit at the surface, never to a unit the boreholes lack there",()=>{
+    const units:UnitDef[]=["Fill","Clay","Rock"].map(id=>({id,name:id,color:"#888888"}));
+    const plain=[{from:0,to:5,unit:"Clay"},{from:5,to:20,unit:"Rock"}];
+    const holes=[[0,0],[100,0],[0,100],[100,100]].map(([x,y],i)=>({id:"H"+i,x,y,z:50,intervals:plain}));
+    holes.push({id:"F",x:200,y:50,z:50,intervals:[{from:0,to:2,unit:"Fill"},{from:2,to:7,unit:"Clay"},{from:7,to:20,unit:"Rock"}]});
+    const z:number[]=[];
+    for(let r=0;r<21;r++)for(let c=0;c<41;c++){const x=c*5,y=r*5;z.push(50+3*Math.exp(-((x-50)**2+(y-50)**2)/20**2))}
+    const m=buildGeologicalModel({name:"hump",units,boreholes:holes,terrain:{x0:0,y0:0,dx:5,dy:5,ncols:41,nrows:21,z}});
+    const s=sampleModel(m,50,50)!;
+    expect(s[0]).toBeGreaterThan(52.5);
+    expect(s[0]-s[1]).toBeLessThan(1e-9);
+    expect(s[2]).toBeCloseTo(45,9);
+    for(let x=2;x<100;x+=7)for(let y=2;y<100;y+=7){const v=sampleModel(m,x,y)!;expect(v[0]-v[1]).toBeLessThan(1e-9)}
+    expect(ordered(m)).toBe(true);
+  });
+
   it("reports collars that disagree with the terrain and still honours them",()=>{
     const p:GeoProject={...valleyProject,boreholes:valleyProject.boreholes.map(b=>b.id==="BH-07"?{...b,z:b.z+3}:b)};
     const m2=buildGeologicalModel(p);

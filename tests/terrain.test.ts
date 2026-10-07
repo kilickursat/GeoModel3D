@@ -3,6 +3,7 @@ import {parseAsciiGrid,parseXyzGrid,terrainZ,coarsenTerrain,isTerrainFile,Terrai
 import {buildGeologicalModel} from "../src/model";
 import {valleyProject} from "../src/geology";
 import {boundaryEdges} from "../src/tin";
+import {latticeNodeCount} from "./helpers";
 
 const plane=(x:number,y:number)=>100+0.2*x-0.1*y;
 function planeGrid(ncols=6,nrows=5,d=10):TerrainGrid{
@@ -102,7 +103,7 @@ describe("terrain around the model",()=>{
 
   it("meets the model's ground exactly along the footprint boundary",()=>{
     const m=buildGeologicalModel(valleyProject);
-    const onBoundary=new Set(boundaryEdges(m.triangles).flat());
+    const lattice=latticeNodeCount(m),onBoundary=new Set(boundaryEdges(m.triangles).flat().filter(n=>n<lattice));
     expect(onBoundary.size).toBeGreaterThan(m.level*3);
     for(const n of onBoundary)expect(m.terrainAt!(m.nodes[n].x,m.nodes[n].y)).toBeCloseTo(m.horizons[0].z[n],9);
   });
