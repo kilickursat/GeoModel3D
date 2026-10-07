@@ -36,7 +36,7 @@ button,select,input{font:inherit}
 .toggles input{margin:0;accent-color:#78c9df}
 .toggles input:disabled+*,.toggles label:has(input:disabled){opacity:.45}
 .backend{color:#708792;padding:0 2px}
-.backend a{color:#78c9df}
+.backend a{color:#78c9df;white-space:nowrap}
 
 .section-control{position:fixed;left:24px;right:24px;bottom:22px;padding:9px 14px;display:flex;align-items:center;gap:18px;color:#9bb1bd;font-size:10px;letter-spacing:.06em}
 .section-control .tag{letter-spacing:.12em}

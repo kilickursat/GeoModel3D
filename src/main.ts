@@ -24,11 +24,12 @@ const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x071018);
 const camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,0.1,1e5);
 camera.up.set(0,0,1);
-// WebGL 2 is the default backend until the WebGPU backend has been checked on real hardware; ?backend=webgpu opts in.
-const wantWebGPU=new URLSearchParams(location.search).get("backend")==="webgpu";
+// WebGPU wherever the browser offers it; the renderer falls back to WebGL 2 by itself, and ?backend=webgl forces it.
+const wantWebGPU=new URLSearchParams(location.search).get("backend")!=="webgl";
 const renderer=new THREE.WebGPURenderer({antialias:true,forceWebGL:!wantWebGPU});
 await renderer.init();
-const backendName=(renderer.backend as {isWebGPUBackend?:boolean}).isWebGPUBackend?"WebGPU":"WebGL 2";
+const webgl="WebGL 2";
+const backendName=(renderer.backend as {isWebGPUBackend?:boolean}).isWebGPUBackend?"WebGPU":webgl;
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.setSize(innerWidth,innerHeight);
 app.appendChild(renderer.domElement);
@@ -337,7 +338,7 @@ toolbar.innerHTML=`<button class="import">Import data…</button>
   <label><input type="checkbox" data-view="flip">Keep other side</label>
   <label title="Unlit legend colours: what you see is the legend colour, independent of lighting"><input type="checkbox" data-view="exact">Exact colours</label>
 </div>
-<div class="backend">Renderer: ${backendName}${wantWebGPU&&backendName!=="WebGPU"?" (WebGPU unavailable here)":` · <a href="?backend=${backendName==="WebGPU"?"webgl":"webgpu"}">use ${backendName==="WebGPU"?"WebGL 2":"WebGPU"}</a>`}</div>`;
+<div class="backend">Renderer: ${backendName}${wantWebGPU&&backendName!=="WebGPU"?" (WebGPU unavailable here)":` · <a href="?backend=${backendName==="WebGPU"?"webgl":"webgpu"}">use ${backendName==="WebGPU"?webgl:"WebGPU"}</a>`}</div>`;
 app.appendChild(toolbar);
 const fileInput=toolbar.querySelector<HTMLInputElement>(".file")!;
 
