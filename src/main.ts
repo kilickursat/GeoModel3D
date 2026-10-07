@@ -13,6 +13,7 @@ import {importFiles,toProjectJson,toBoreholeCsv,decodeText,assignColors} from ".
 import {Crs,crsRegistry,projectCrs,findCrs,customCrs,searchCrs,suggestCrs,toProjected,toGeographic} from "./crs";
 import {fetchTerrain,elevationSources,mapSources,covers,tileUrl,parseGsiTile,decodeTerrarium,mapTiles,tileXY,ElevationSource,TileSource} from "./tiles";
 import {applyUnitRules} from "./rules";
+import {reportHtml} from "./report";
 import "./style.css";
 
 const app=document.querySelector<HTMLDivElement>("#app")!;
@@ -75,6 +76,7 @@ const volumeMeshes:Array<THREE.Mesh<THREE.BufferGeometry,THREE.Material>>=[];
 const horizonLines:THREE.LineSegments[]=[];
 let holeMesh:THREE.InstancedMesh|null=null;
 let terrainMesh:THREE.Mesh|null=null;
+let gridHelper:THREE.Object3D|null=null;
 let holeInfo:Array<{hole:number;interval:number}>=[];
 let labels:CSS2DObject[]=[];
 
@@ -176,6 +178,7 @@ function buildContent(){
   }
 
   const size=niceCeil(extent*1.35),grid=new THREE.GridHelper(size,10,0x31505d,0x193039);
+  gridHelper=grid;
   grid.rotation.x=Math.PI/2;
   grid.position.z=model.base-origin.z-(b.maxZ-b.minZ)*0.03;
   content.add(grid);
@@ -314,6 +317,13 @@ function setProjectCrs(crs:Crs){
   loadProject(next,notes);
 }
 
+function creditTexts(){
+  const parts:string[]=[];
+  if(view.map&&mapLayer&&projectCrs(project))parts.push(`Map ${mapLayer.source.attribution}`);
+  if(project.terrain?.source&&view.terrain)parts.push(`Terrain ${project.terrain.source}`);
+  if(project.source)parts.push(`Data ${project.source}`);
+  return parts;
+}
 function renderCredits(){
   const parts:string[]=[];
   if(view.map&&mapLayer&&projectCrs(project))parts.push(`Map <a href="${mapLayer.source.link}" target="_blank" rel="noopener">${esc(mapLayer.source.attribution)}</a>`);
@@ -455,6 +465,8 @@ toolbar.innerHTML=`<button class="import">Import data…</button>
   <button data-export="boreholes">Boreholes (CSV)</button>
   <button data-export="svg">Section (SVG)</button>
   <button data-export="section">Section (CSV)</button>
+  <button data-export="report-A3" title="Opens the print dialog: choose Save as PDF">Report (PDF, A3)</button>
+  <button data-export="report-A4" title="Opens the print dialog: choose Save as PDF">Report (PDF, A4)</button>
 </div></details>
 <div class="toggles">
   <label><input type="checkbox" data-view="volumes" checked>Volumes</label>
@@ -618,6 +630,7 @@ function showNotice(title:string,lines:string[],error=false){
   notice.querySelector("button")!.onclick=()=>{notice.hidden=true};
 }
 
+let currentNotes:string[]=[];
 // keepView rebuilds the same site (new terrain or rules) without moving the camera or resetting the controls.
 function loadProject(p:GeoProject,importWarnings:string[]=[],keepView=false){
   const before={...origin};
@@ -644,6 +657,7 @@ function loadProject(p:GeoProject,importWarnings:string[]=[],keepView=false){
   updateSection();
   if(!keepView)fitCamera();
   const warnings=[...importWarnings,...model.warnings];
+  currentNotes=warnings;
   showNotice(`${p.name}: ${warnings.length} note${warnings.length===1?"":"s"}`,warnings);
   if(publicSites.has(p)&&!p.terrain&&projectCrs(p)&&!keepView)void fetchSiteTerrain();
   void updateMap();
@@ -674,8 +688,62 @@ function exportAs(kind:string){
   const tag=`${String(view.azimuth).padStart(3,"0")}-${view.offset>=0?"p":"m"}${Math.abs(Math.round(view.offset))}`;
   if(kind==="project")download(`${slug}.geomodel3d.json`,toProjectJson(project),"application/json");
   if(kind==="boreholes")download(`${slug}-boreholes.csv`,toBoreholeCsv(project),"text/csv");
-  if(kind==="svg")download(`${slug}-section-${tag}.svg`,sectionSvg(model,section,{width:1600,height:900,theme:"light",legend:true,buffer:sectionBuffer}),"image/svg+xml");
+  if(kind==="svg")download(`${slug}-section-${tag}.svg`,sectionSvg(model,section,{width:1600,height:900,theme:"light",legend:true,buffer:sectionBuffer,roundVe:true}),"image/svg+xml");
   if(kind==="section")download(`${slug}-section-${tag}.csv`,sectionCsv(model,section),"text/csv");
+  if(kind.startsWith("report-"))void printReport(kind==="report-A4"?"A4":"A3");
+}
+
+// The 3-D view as a PNG: rendered on white without the grid or the room kept for the section panel, and cropped
+// to the model. A blank capture, as a renderer may give, is left out.
+function captureView(){
+  const background=scene.background;
+  scene.background=new THREE.Color(0xffffff);
+  camera.clearViewOffset();
+  if(gridHelper)gridHelper.visible=false;
+  let url:string|undefined;
+  try{
+    renderer.render(scene,camera);
+    url=cropToContent(renderer.domElement);
+  }catch{url=undefined}
+  if(gridHelper)gridHelper.visible=true;
+  scene.background=background;
+  updateViewOffset();
+  invalidate();
+  return url;
+}
+function cropToContent(source:HTMLCanvasElement,maxWidth=2400){
+  const w=source.width,h=source.height,full=document.createElement("canvas");
+  full.width=w;full.height=h;
+  const ctx=full.getContext("2d",{willReadFrequently:true})!;
+  ctx.drawImage(source,0,0);
+  const px=ctx.getImageData(0,0,w,h).data;
+  let x0=w,y0=h,x1=-1,y1=-1;
+  for(let y=0;y<h;y+=2)for(let x=0;x<w;x+=2){
+    const i=(y*w+x)*4;
+    if(px[i]<245||px[i+1]<245||px[i+2]<245){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
+  }
+  if(x1<0)return undefined;
+  const pad=Math.round(Math.max(x1-x0,y1-y0)*0.03);
+  x0=Math.max(0,x0-pad);y0=Math.max(0,y0-pad);x1=Math.min(w-1,x1+pad);y1=Math.min(h-1,y1+pad);
+  const scale=Math.min(1,maxWidth/(x1-x0+1)),out=document.createElement("canvas");
+  out.width=Math.round((x1-x0+1)*scale);out.height=Math.round((y1-y0+1)*scale);
+  out.getContext("2d")!.drawImage(full,x0,y0,x1-x0+1,y1-y0+1,0,0,out.width,out.height);
+  return out.toDataURL("image/png");
+}
+// The report is printed from a hidden frame; the print dialog's "Save as PDF" makes the file.
+async function printReport(paper:"A3"|"A4"){
+  const html=reportHtml(model,section,{paper,image:captureView(),date:new Date().toISOString().slice(0,10),version:pkg.version,
+    credits:creditTexts(),notes:currentNotes,sectionBuffer,ve:view.ve});
+  const frame=document.createElement("iframe");
+  frame.className="print-frame";
+  frame.setAttribute("aria-hidden","true");
+  document.body.appendChild(frame);
+  await new Promise<void>(resolve=>{frame.onload=()=>resolve();frame.srcdoc=html});
+  const doc=frame.contentDocument!;
+  await Promise.all([...doc.images].map(img=>img.decode().catch(()=>undefined)));
+  frame.contentWindow!.focus();
+  frame.contentWindow!.print();
+  setTimeout(()=>frame.remove(),60_000);
 }
 
 datasetSelect.onchange=()=>{const i=Number(datasetSelect.value);loadProject(i<sampleProjects.length?sampleProjects[i]:imported!)};
