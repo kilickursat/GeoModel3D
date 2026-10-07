@@ -59,7 +59,7 @@ const crs=projectCrs(raw)!;
 const years=files.map(f=>f.text.match(/<調査期間_終了年月日>(\d{4})/)?.[1]).filter(Boolean).map(Number);
 const project:GeoProject={
   name:"Sakae, Yokohama (KuniJiban)",
-  description:`${boreholes.length} borehole logs from road surveys around Sakae-ku, Yokohama, Japan (Yokohama Circular South Route, Ken-O-Do and Yokohama-Shonan Road; MLIT Yokohama National Highway Office, ${Math.min(...years)}–${Math.max(...years)}). The units are an interpretation of the logged soil names, SPT N-values and elevations by the unit rules, not formations named in the logs: Alluvium is the organic soils, clay and silt with N < 5 and sand and gravel with N < 20 below the 25 m valley floors; the Kazusa Group starts at the first mudstone, cemented silt or layer with N ≥ 50 (the bearing stratum). Terrain: GSI 5 m DEM, fetched when the project opens. Left out: five rock-core logs (${EXCLUDED.join(", ")}) that describe mudstone from the collar down, where every neighbouring log shows 10–15 m of soft alluvium first.`,
+  description:`${boreholes.length} borehole logs from MLIT road surveys around Sakae-ku, Yokohama, ${Math.min(...years)}–${Math.max(...years)}, from KuniJiban. The units are an interpretation of the logged soil names, SPT N-values and elevations: see the unit rules. Terrain: GSI 5 m DEM, fetched when the project opens. Five rock-core logs that contradict their neighbours are left out.`,
   source:"国土地盤情報検索サイト「KuniJiban」の地盤情報 (KuniJiban ground information: MLIT, PWRI, PARI). Individual logs carry no copyright.",
   crs:crs.name,crsCode:crs.code,
   units,rules,boreholes

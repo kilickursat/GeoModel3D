@@ -68,6 +68,15 @@ export function sectionSvg(model:GeoModel,s:Section,o:SectionSvgOptions){
   });
 
   const buffer=o.buffer??Math.max(...holes.map(h=>Math.abs(h.p.offset)),1);
+  // Names go to the boreholes nearest the section first, and only where they overlap no name already placed; every
+  // borehole keeps its name as a tooltip.
+  const placed:Array<[number,number,number,number]>=[],named=new Set<number>();
+  for(const {p,b} of [...holes].sort((q,r)=>Math.abs(q.p.offset)-Math.abs(r.p.offset))){
+    const x=X(p.s),y=Y(p.top)-5,w=b.id.length*5.8+4,box:[number,number,number,number]=[x-w/2,y-10,x+w/2,y+2];
+    if(placed.some(q=>box[0]<q[2]&&box[2]>q[0]&&box[1]<q[3]&&box[3]>q[1]))continue;
+    placed.push(box);
+    named.add(p.index);
+  }
   for(const {p,b} of holes){
     const x=X(p.s),fade=(1-0.55*Math.min(Math.abs(p.offset)/buffer,1)).toFixed(2);
     out.push(`<g opacity="${fade}"><title>${esc(b.id)}: ${Math.round(Math.abs(p.offset))} m ${p.offset>=0?"right":"left"} of the section</title>`);
@@ -76,7 +85,7 @@ export function sectionSvg(model:GeoModel,s:Section,o:SectionSvgOptions){
       out.push(`<rect x="${(x-3).toFixed(2)}" y="${Y(b.z-i.from).toFixed(2)}" width="6" height="${Math.max(Y(b.z-i.to)-Y(b.z-i.from),0.5).toFixed(2)}" fill="${u?.color??"#999999"}" stroke="${t.hole}" stroke-width="0.6"/>`);
     }
     out.push(`<line x1="${x.toFixed(2)}" x2="${x.toFixed(2)}" y1="${Y(p.top).toFixed(2)}" y2="${Y(p.bottom).toFixed(2)}" stroke="${t.line}" stroke-width="0.6" stroke-opacity="0.6"/>`);
-    out.push(`<text x="${x.toFixed(2)}" y="${(Y(p.top)-5).toFixed(2)}" text-anchor="middle" font-size="9.5" fill="${t.text}">${esc(b.id)}</text></g>`);
+    out.push(`${named.has(p.index)?`<text x="${x.toFixed(2)}" y="${(Y(p.top)-5).toFixed(2)}" text-anchor="middle" font-size="9.5" fill="${t.text}">${esc(b.id)}</text>`:""}</g>`);
   }
 
   const a={x:s.x[0],y:s.y[0]},b={x:s.x[s.x.length-1],y:s.y[s.y.length-1]};
