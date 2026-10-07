@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.6.1 — 2026-10-07
+
+### Added
+- **PDF reports.** **Export → Report (PDF, A3 or A4)** opens the print dialog with a report to save as PDF:
+  - an overview with the 3-D view (on white, cropped to the model), a title block giving the coordinate system, ground, data source, date and version, and the units with their volumes and properties;
+  - the section as vector graphics, at a round vertical exaggeration;
+  - the unit rules when the units come from descriptions, the boreholes with positions, depths, water levels and SPT tests, and the notes on the model.
+
+  It prints with the system's fonts, so Japanese and other scripts need no embedded fonts.
+
+### Changed
+- Exported SVG sections are drawn at a round vertical exaggeration (1, 2, 2.5, 5, 10…) instead of filling the drawing.
+- Section drawings name fonts with Japanese glyphs after the Latin ones.
+
 ## 0.6.0 — 2026-10-07
 
 ### Added

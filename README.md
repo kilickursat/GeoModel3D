@@ -16,6 +16,7 @@ GeoModel3D builds layer-cake geological models from borehole logs in the browser
 - **Unit rules.** Units are assigned to logged descriptions by rules on the description, the SPT N-value and the elevation, edited in the viewer.
 - **A real reference site:** 75 KuniJiban boreholes at Sakae, Yokohama, interpreted into Fill, Alluvium, Kanto Loam, Pleistocene sediments and the Kazusa Group.
 - **Adaptive refinement.** The triangulation is refined by longest-edge bisection, so the ground follows the terrain between distant boreholes as closely as between near ones.
+- **PDF reports** (0.6.1). **Export → Report (PDF)** lays out an A3 or A4 report and opens the print dialog; choose *Save as PDF*. It holds the 3-D view with a title block and the units, the section as vector graphics at a round vertical exaggeration, and the boreholes, unit rules and notes. It prints with the system's fonts, so names in any script come out right.
 
 Since 0.5:
 - **Terrain.** Import a terrain grid (ESRI ASCII `.asc` or gridded `.xyz`). The ground follows it, corrected so every surveyed collar keeps its elevation, and the present topography cuts the units below it.
@@ -106,7 +107,8 @@ Projects imported from descriptions also keep `rules` (`match`, `unit`, and opti
 **Export** writes:
 - **Project (JSON):** the format above.
 - **Boreholes (CSV):** also usable as an import template.
-- **Section (SVG):** a vector drawing.
+- **Section (SVG):** a vector drawing at a round vertical exaggeration.
+- **Report (PDF, A3 or A4):** opens the print dialog with the report described above; choose *Save as PDF*.
 - **Section (CSV):** distance, x, y and the elevation of every horizon along the section.
 
 ## Coordinate systems, terrain and maps
@@ -157,6 +159,7 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 - `src/volume.ts` — closed unit-volume meshes
 - `src/section.ts` — vertical sections
 - `src/sectionSvg.ts` — 2-D section drawing and CSV export
+- `src/report.ts` — the printable report
 - `src/io.ts` — CSV, AGS4, borehole XML and JSON import and export
 - `src/boringXml.ts`, `src/xml.ts` — Japanese borehole logs, and a small XML reader
 - `src/rules.ts` — units from logged descriptions
@@ -187,27 +190,26 @@ Every push to `main` runs the tests, builds the site and publishes `dist/` to Gi
 Done:
 - **0.4:** import adapters (CSV, AGS4, Georeport3D), missing units and pinch-outs, sections at any orientation with export.
 - **0.5:** terrain, erosional units, unit properties, WebGPU rendering (the default since 0.5.2).
-- **0.6:** coordinate systems, fetched terrain and maps, Japanese borehole XML, unit rules, a real reference site, adaptive refinement.
+- **0.6:** coordinate systems, fetched terrain and maps, Japanese borehole XML, unit rules, a real reference site, adaptive refinement, PDF reports.
 
 Next:
 
-1. **PDF export**: sections and a report sheet with title block, legend and coordinate system.
-2. **Appearance**, data-bearing only:
+1. **Appearance**, data-bearing only:
    - standard lithology symbols in 3-D and in the SVG section;
    - optional natural-looking rock textures;
    - terrain contours and hillshade;
    - fading where the model is inferred rather than logged.
-3. **Physics fields** from the unit properties:
+2. **Physics fields** from the unit properties:
    - vertical stress, pore pressure and effective stress on volumes and sections;
    - a groundwater surface from the water levels in the logs;
    - horizontal stress only where K0 is given.
-4. A choice, per unit, of where a missing unit pinches out (at the borehole that lacks it, or between boreholes).
-5. Reference sites in other countries (published AGS4 data, the Dutch BRO).
-6. Faults; constrained TIN boundaries, pinch-out lines and geological map contacts.
-7. Fence diagrams for boreholes along an alignment (tunnels, roads).
-8. GeoJSON, DXF and LAS import; GeoTIFF terrain.
-9. Streaming and level of detail for large models.
-10. Provenance display for Georeport3D extractions.
+3. A choice, per unit, of where a missing unit pinches out (at the borehole that lacks it, or between boreholes).
+4. Reference sites in other countries (published AGS4 data, the Dutch BRO).
+5. Faults; constrained TIN boundaries, pinch-out lines and geological map contacts.
+6. Fence diagrams for boreholes along an alignment (tunnels, roads).
+7. GeoJSON, DXF and LAS import; GeoTIFF terrain.
+8. Streaming and level of detail for large models.
+9. Provenance display for Georeport3D extractions.
 
 ## Data sources
 
