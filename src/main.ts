@@ -16,6 +16,7 @@ import {Crs,crsRegistry,projectCrs,findCrs,customCrs,searchCrs,suggestCrs,toProj
 import {fetchTerrain,elevationSources,mapSources,covers,tileUrl,parseGsiTile,decodeTerrarium,mapTiles,tileXY,ElevationSource,TileSource} from "./tiles";
 import {applyUnitRules} from "./rules";
 import {reportHtml} from "./report";
+import {openEditor} from "./editor";
 import "./style.css";
 
 const app=document.querySelector<HTMLDivElement>("#app")!;
@@ -525,6 +526,7 @@ const datasetSelect=ui.querySelector<HTMLSelectElement>(".dataset")!;
 const toolbar=document.createElement("div");
 toolbar.className="toolbar";
 toolbar.innerHTML=`<button class="import">Import data…</button>
+<button class="edit-data" title="Type in or paste boreholes, logs, water levels, SPT and laboratory results, and unit properties">Edit data…</button>
 <input class="file" type="file" multiple hidden accept=".csv,.tsv,.txt,.ags,.json,.xml,.asc,.xyz">
 <details class="menu"><summary>Export</summary><div>
   <button data-export="project">Project (JSON)</button>
@@ -846,6 +848,7 @@ async function printReport(paper:"A3"|"A4"){
 
 datasetSelect.onchange=()=>{const i=Number(datasetSelect.value);loadProject(i<sampleProjects.length?sampleProjects[i]:imported!)};
 toolbar.querySelector<HTMLButtonElement>(".import")!.onclick=()=>fileInput.click();
+toolbar.querySelector<HTMLButtonElement>(".edit-data")!.onclick=()=>openEditor(project,{download,onApply:r=>{imported=r.project;loadProject(r.project,r.warnings)}});
 fileInput.onchange=()=>{if(fileInput.files?.length)importFileList(fileInput.files);fileInput.value=""};
 app.addEventListener("click",e=>{
   const kind=(e.target as HTMLElement).closest<HTMLElement>("[data-export]")?.dataset.export;

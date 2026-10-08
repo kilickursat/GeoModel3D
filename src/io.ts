@@ -616,7 +616,8 @@ export function crsFromName(label:string):Crs|undefined{
 // ---------- entry point ----------
 
 // Terrain grids (.asc, gridded .xyz) attach to the boreholes imported with them, or to `current` when they come alone.
-export function importFiles(files:TextFile[],current?:GeoProject):ImportResult{
+// `declared` is the coordinate system of CSV tables (positions given by latitude and longitude are placed in it).
+export function importFiles(files:TextFile[],current?:GeoProject,declared?:Crs):ImportResult{
   if(!files.length)throw new Error("No files to import");
   const grids=files.filter(f=>isTerrainFile(f.name,f.text)),rest=files.filter(f=>!grids.includes(f));
   if(grids.length){
@@ -651,7 +652,7 @@ export function importFiles(files:TextFile[],current?:GeoProject):ImportResult{
   const t:Tables={collars:new Map(),intervals:new Map(),units:[],warnings:[]};
   for(const f of files)readCsvTable(f,t);
   if(!t.intervals.size)throw new Error("No interval table found: the CSV files need hole id, from, to and unit columns");
-  return assemble(t,files.length===1?files[0].name.replace(/\.[^.]+$/,""):"Imported boreholes",undefined,false);
+  return assemble(t,files.length===1?files[0].name.replace(/\.[^.]+$/,""):"Imported boreholes",undefined,false,declared);
 }
 function readStructured(f:TextFile):ImportResult{
   if(/^\s*"GROUP"/.test(f.text)||/\.ags$/i.test(f.name))return readAgs4(f);
