@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns4:dov-schema xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns4="http://kern.schemas.dov.vlaanderen.be" xsi:schemaLocation="http://kern.schemas.dov.vlaanderen.be https://www.dov.vlaanderen.be/xdov/schema/latest/xsd/kern/dov.xsd">
+    <interpretaties>
+        <formelestratigrafie>
+            <boring>kb15d28w-B100</boring>
+            <dataidentifier>
+                <permkey>2023-373973</permkey>
+                <uri>https://www.dov.vlaanderen.be/data/interpretatie/2023-373973</uri>
+            </dataidentifier>
+            <auteur>
+                <persoon>
+                    <naam>VITO</naam>
+                    <voornaam>VLAKO-team</voornaam>
+                </persoon>
+                <bedrijf-dienst>
+                    <naam>VITO</naam>
+                </bedrijf-dienst>
+            </auteur>
+            <datum>2023-04-14</datum>
+            <betrouwbaarheid>goed</betrouwbaarheid>
+            <dataleverancier>
+                <naam>VLAKO (VITO)</naam>
+            </dataleverancier>
+            <opdracht>VLAKO_Ondiep Model Antwerpen v1.1</opdracht>
+            <laag>
+                <van>0.00</van>
+                <tot>2.60</tot>
+                <lid1>A</lid1>
+                <relatie_lid1_lid2>T</relatie_lid1_lid2>
+                <lid2>A</lid2>
+                <betrouwbaarheid>twijfelachtig</betrouwbaarheid>
+            </laag>
+            <laag>
+                <van>2.60</van>
+                <tot>8.35</tot>
+                <lid1>U</lid1>
+                <relatie_lid1_lid2>T</relatie_lid1_lid2>
+                <lid2>U</lid2>
+                <betrouwbaarheid>twijfelachtig</betrouwbaarheid>
+            </laag>
+            <laag>
+                <van>8.35</van>
+                <tot>25.08</tot>
+                <lid1>Bc</lid1>
+                <relatie_lid1_lid2>T</relatie_lid1_lid2>
+                <lid2>Bc</lid2>
+                <betrouwbaarheid>twijfelachtig</betrouwbaarheid>
+            </laag>
+            <laag>
+                <van>25.08</van>
+                <tot>84.00</tot>
+                <lid1>Bm</lid1>
+                <relatie_lid1_lid2>T</relatie_lid1_lid2>
+                <lid2>Bm</lid2>
+                <betrouwbaarheid>twijfelachtig</betrouwbaarheid>
+            </laag>
+        </formelestratigrafie>
+    </interpretaties>
+</ns4:dov-schema>

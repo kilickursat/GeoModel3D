@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns4:dov-schema xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns4="http://kern.schemas.dov.vlaanderen.be" xsi:schemaLocation="http://kern.schemas.dov.vlaanderen.be https://www.dov.vlaanderen.be/xdov/schema/latest/xsd/kern/dov.xsd">
+    <boring>
+        <identificatie>kb15d28w-B187</identificatie>
+        <dataidentifier>
+            <permkey>1931-084105</permkey>
+            <uri>https://www.dov.vlaanderen.be/data/boring/1931-084105</uri>
+        </dataidentifier>
+        <ligging>
+            <gml:Point srsName="urn:ogc:def:crs:EPSG::6190" srsDimension="3">
+                <gml:pos>151745.00 212969.00 6.31</gml:pos>
+            </gml:Point>
+            <metadata_locatiebepaling>
+                <methode>uit dossier</methode>
+                <uitvoerder>
+                    <naam>Belgische Geologische Dienst (BGD)</naam>
+                </uitvoerder>
+                <betrouwbaarheid>onbekend</betrouwbaarheid>
+            </metadata_locatiebepaling>
+            <metadata_hoogtebepaling>
+                <methode>uit dossier</methode>
+                <uitvoerder>
+                    <naam>Belgische Geologische Dienst (BGD)</naam>
+                </uitvoerder>
+                <betrouwbaarheid>onbekend</betrouwbaarheid>
+                <referentiepunt_type>Maaiveld</referentiepunt_type>
+            </metadata_hoogtebepaling>
+            <alternatieve_crs>
+                <gml:Point srsName="urn:ogc:def:crs:EPSG::6190" srsDimension="3">
+                    <gml:pos>151745.00 212969.00 6.31</gml:pos>
+                </gml:Point>
+                <gml:Point srsName="urn:ogc:def:crs:EPSG::8370" srsDimension="3">
+                    <gml:pos>651739.60 712969.34 6.31</gml:pos>
+                </gml:Point>
+            </alternatieve_crs>
+        </ligging>
+        <gemeente>11002</gemeente>
+        <diepte_van>0.00</diepte_van>
+        <diepte_tot>39.30</diepte_tot>
+        <datum_aanvang>1931-04-01</datum_aanvang>
+        <doel>Geologisch onderzoek</doel>
+        <wet_kader>
+            <ander_wettelijkkader>
+                <reden>Kenmerk niet gekend bij bulk-datamigratie op 24/06/2025</reden>
+            </ander_wettelijkkader>
+            <type_erkenning>f</type_erkenning>
+        </wet_kader>
+        <uitvoerder>
+            <naam>Foraky-Brussel</naam>
+        </uitvoerder>
+        <boormeester>
+            <naam>Onbekend</naam>
+        </boormeester>
+        <opdrachtgever>
+            <naam>onbekend</naam>
+        </opdrachtgever>
+        <dataleverancier>
+            <naam>onbekend</naam>
+        </dataleverancier>
+        <boorgatmeting>
+            <uitgevoerd>false</uitgevoerd>
+        </boorgatmeting>
+        <stalen>
+            <bewaard>false</bewaard>
+        </stalen>
+        <details>
+            <boormethode>
+                <van>0.00</van>
+                <tot>39.30</tot>
+                <methode>onbekend</methode>
+            </boormethode>
+        </details>
+    </boring>
+</ns4:dov-schema>

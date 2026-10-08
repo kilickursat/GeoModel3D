@@ -1,5 +1,6 @@
 import {describe,it,expect} from "vitest";
 import proj4 from "proj4";
+import {readFileSync} from "node:fs";
 import {crsRegistry,findCrs,toProjected,toGeographic,suggestCrs,searchCrs,customCrs,projectCrs} from "../src/crs";
 
 describe("coordinate reference systems",()=>{
@@ -80,5 +81,24 @@ describe("coordinate reference systems",()=>{
     expect(projectCrs({crsCode:"EPSG:6677"})!.name).toBe("JGD2011 / Japan Plane Rectangular CS IX");
     expect(projectCrs({crsCode:"EPSG:6677",crsProj4:def,crs:"Site grid"})!.proj4).toBe(def);
     expect(projectCrs({crs:"Local grid (m)"})).toBeNull();
+  });
+});
+
+// Positions published with national data in two systems: the BRO gives RD New coordinates with their ETRS89 position
+// (RDNAPTRANS2018), DOV gives Belgian Lambert 72 with Lambert 2008 (ETRS89).
+describe("datum shifts against published positions",()=>{
+  const read=(dir:string,file:string)=>readFileSync(new URL(`./fixtures/${dir}/${file}`,import.meta.url),"utf8");
+  const metres=(a:{lon:number;lat:number},b:{lon:number;lat:number})=>Math.hypot((a.lon-b.lon)*111320*Math.cos(a.lat*Math.PI/180),(a.lat-b.lat)*110574);
+  it("places RD New within a decimetre of RDNAPTRANS2018",()=>{
+    for(const f of ["BHR000000361914.xml","BHR000000470183.xml"]){
+      const s=read("bro",f),rd=s.match(/EPSG::28992"[^>]*>\s*<gml:pos>([\d.]+) ([\d.]+)/)!,etrs=s.match(/EPSG::4258"[^>]*>\s*<gml:pos>([\d.]+) ([\d.]+)/)!;
+      expect(metres(toGeographic(findCrs("EPSG:28992")!,+rd[1],+rd[2]),{lat:+etrs[1],lon:+etrs[2]})).toBeLessThan(0.15);
+    }
+  });
+  it("places Belgian Lambert 72 within a decimetre of Lambert 2008",()=>{
+    for(const f of ["boring-1931-084105.xml","boring-1948-120680.xml","boring-2016-147736.xml"]){
+      const s=read("dov",f),a=s.match(/EPSG::6190"[^>]*>\s*<gml:pos>([\d.]+) ([\d.]+)/)!,b=s.match(/EPSG::8370"[^>]*>\s*<gml:pos>([\d.]+) ([\d.]+)/)!;
+      expect(metres(toGeographic(findCrs("EPSG:31370")!,+a[1],+a[2]),toGeographic(findCrs("EPSG:3812")!,+b[1],+b[2]))).toBeLessThan(0.15);
+    }
   });
 });

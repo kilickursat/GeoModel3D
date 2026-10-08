@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns4:dov-schema xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns4="http://kern.schemas.dov.vlaanderen.be" xsi:schemaLocation="http://kern.schemas.dov.vlaanderen.be https://www.dov.vlaanderen.be/xdov/schema/latest/xsd/kern/dov.xsd">
+    <interpretaties>
+        <lithologischebeschrijving>
+            <boring>kb15d28w-B100</boring>
+            <dataidentifier>
+                <permkey>2016-252597</permkey>
+                <uri>https://www.dov.vlaanderen.be/data/interpretatie/2016-252597</uri>
+            </dataidentifier>
+            <auteur>
+                <persoon>
+                    <naam>Onbekend</naam>
+                </persoon>
+                <bedrijf-dienst>
+                    <naam>Belgische Geologische Dienst (BGD)</naam>
+                </bedrijf-dienst>
+            </auteur>
+            <betrouwbaarheid>goed</betrouwbaarheid>
+            <dataleverancier>
+                <naam>onbekend</naam>
+            </dataleverancier>
+            <kwaliteit>
+                <categorie>slecht</categorie>
+                <geschiktheid_boormethode>Onbekend</geschiktheid_boormethode>
+            </kwaliteit>
+            <laag>
+                <van>0.00</van>
+                <tot>2.60</tot>
+                <beschrijving>Terrain rapporté</beschrijving>
+            </laag>
+            <laag>
+                <van>2.60</van>
+                <tot>3.90</tot>
+                <beschrijving>Sable jaune</beschrijving>
+            </laag>
+            <laag>
+                <van>3.90</van>
+                <tot>5.40</tot>
+                <beschrijving>Sable argileux</beschrijving>
+            </laag>
+            <laag>
+                <van>5.40</van>
+                <tot>5.55</tot>
+                <beschrijving>Sable coquillier</beschrijving>
+            </laag>
+            <laag>
+                <van>5.55</van>
+                <tot>7.45</tot>
+                <beschrijving>Sable jaune</beschrijving>
+            </laag>
+            <laag>
+                <van>7.45</van>
+                <tot>8.35</tot>
+                <beschrijving>Sable et coquillage</beschrijving>
+            </laag>
+            <laag>
+                <van>8.35</van>
+                <tot>24.59</tot>
+                <beschrijving>Sable vert mouvant</beschrijving>
+            </laag>
+            <laag>
+                <van>24.59</van>
+                <tot>25.08</tot>
+                <beschrijving>Banc de pierres</beschrijving>
+            </laag>
+            <laag>
+                <van>25.08</van>
+                <tot>32.70</tot>
+                <beschrijving>Argile verte très dure</beschrijving>
+            </laag>
+            <laag>
+                <van>32.70</van>
+                <tot>32.75</tot>
+                <beschrijving>Couche de pyrite</beschrijving>
+            </laag>
+            <laag>
+                <van>32.75</van>
+                <tot>48.25</tot>
+                <beschrijving>Argile verte très dure</beschrijving>
+            </laag>
+            <laag>
+                <van>48.25</van>
+                <tot>48.42</tot>
+                <beschrijving>Banc de pierres</beschrijving>
+            </laag>
+            <laag>
+                <van>48.42</van>
+                <tot>55.10</tot>
+                <beschrijving>Argile verte très dure</beschrijving>
+            </laag>
+            <laag>
+                <van>55.10</van>
+                <tot>55.46</tot>
+                <beschrijving>Banc de pierres</beschrijving>
+            </laag>
+            <laag>
+                <van>55.46</van>
+                <tot>84.00</tot>
+                <beschrijving>Argile verte très dure</beschrijving>
+            </laag>
+            <laag>
+                <van>84.00</van>
+                <tot>92.00</tot>
+                <beschrijving>Sable</beschrijving>
+            </laag>
+        </lithologischebeschrijving>
+    </interpretaties>
+</ns4:dov-schema>
