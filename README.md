@@ -87,7 +87,7 @@ A minimal project file:
   "crs": "WGS 84 / UTM zone 54N",
   "crsCode": "EPSG:32654",
   "units": [
-    {"id": "MG", "name": "Made ground", "color": "#7d6f86", "gamma": 19, "source": "Site investigation report, table 4"},
+    {"id": "MG", "name": "Made ground", "color": "#9a5b4f", "gamma": 19, "source": "Site investigation report, table 4"},
     {"id": "CG", "name": "Channel gravel", "color": "#d08a4c", "erosive": true},
     {"id": "MS", "name": "Mudstone", "color": "#6f7686", "gamma": 23, "gammaSat": 23.5}
   ],

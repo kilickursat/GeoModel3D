@@ -18,6 +18,15 @@ describe("section drawing",()=>{
     expect(svg).toContain("Synthetic valley — Section A–A′ · azimuth 090° · offset +0 m");
   });
 
+  it("leaves hidden units unfilled and out of the legend, but keeps them in the borehole logs",()=>{
+    const all=sectionSvg(m,s,{width:1200,height:600,theme:"light",legend:true});
+    const svg=sectionSvg(m,s,{width:1200,height:600,theme:"light",legend:true,hidden:new Set(["Made Ground"])});
+    expect(svg.match(/<polygon /g)!.length).toBe(all.match(/<polygon /g)!.length-1);
+    expect(svg).not.toContain("<title>Made Ground</title>");
+    expect(svg).not.toContain(">Made Ground</text>");
+    expect(svg.match(/fill="#9a5b4f"/g)!.length).toBeGreaterThan(0);
+  });
+
   it("escapes names and never compresses the vertical scale below 1:1",()=>{
     const tall=buildGeologicalModel({...referenceProject,name:"Pit <A&B>"});
     const svg=sectionSvg(tall,computeSection(tall,{azimuth:90,offset:0}),{width:1200,height:300});

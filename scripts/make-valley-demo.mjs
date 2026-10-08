@@ -4,7 +4,7 @@ import {writeFileSync} from "node:fs";
 
 const ILLUSTRATIVE="Illustrative typical value for a synthetic dataset; not measured";
 const units=[
-  {id:"Made Ground",name:"Made Ground",color:"#7d6f86",gamma:19,t:(x,y)=>3.2*(1-((y-70)/45)**2)},
+  {id:"Made Ground",name:"Made Ground",color:"#9a5b4f",gamma:19,t:(x,y)=>3.2*(1-((y-70)/45)**2)},
   {id:"Alluvium",name:"Alluvium",color:"#c2ab7c",gamma:18,gammaSat:19.5,t:(x,y)=>11*(1-((x-215)/125)**2)*(0.85+0.15*Math.sin(y/70))},
   {id:"Terrace Gravel",name:"Terrace Gravel",color:"#d08a4c",gamma:20,gammaSat:21,t:(x,y)=>6.5*(1-((x-135)**2+(y-215)**2)/105**2)},
   {id:"Mudstone",name:"Mudstone",color:"#6f7686",gamma:23,t:(x,y)=>9+0.025*y+2*Math.sin(x/80)},

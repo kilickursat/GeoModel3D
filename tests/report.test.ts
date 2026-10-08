@@ -30,6 +30,10 @@ describe("printable report",()=>{
     expect(html).toContain("Local grid (m) (not georeferenced)");
     expect(html).not.toContain("Units from logged descriptions");
   });
+  it("lists units hidden in the view in the notes",()=>{
+    const v=buildGeologicalModel(valleyProject),html=reportHtml(v,computeSection(v,{azimuth:80,offset:0}),{...options,hidden:new Set(["Made Ground","Alluvium"])});
+    expect(html).toContain("Hidden in the 3-D view and the section: Made Ground, Alluvium");
+  });
   it("escapes names",()=>{
     const p:GeoProject={...valleyProject,name:"Site <b>&",units:valleyProject.units.map((u,k)=>k?u:{...u,name:"Fill <x>"})};
     const v=buildGeologicalModel(p),html=reportHtml(v,computeSection(v,{azimuth:80,offset:0}),options);

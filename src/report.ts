@@ -16,6 +16,7 @@ export interface ReportOptions {
   notes:string[];
   sectionBuffer:number;
   ve:number;
+  hidden?:ReadonlySet<string>;  // units hidden in the view are left out of the 3-D image and the section
 }
 
 const esc=(s:string)=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]!));
@@ -50,7 +51,9 @@ export function reportHtml(model:GeoModel,section:Section,o:ReportOptions){
     const water=b.water?.length?Math.min(...b.water.map(x=>x.depth)):NaN,n=(b.spt??[]).map(sptN);
     return `<tr><td>${esc(b.id)}</td><td class="num">${fmt(b.x,1)}</td><td class="num">${fmt(b.y,1)}</td><td class="num">${fmt(b.z,2)}</td><td class="num">${fmt(boreholeDepth(b),2)}</td><td class="num">${b.lat===undefined?"":fmt(b.lat,6)}</td><td class="num">${b.lon===undefined?"":fmt(b.lon,6)}</td><td class="num">${fmt(water,2)}</td><td class="num">${n.length?`${n.length} (max ${fmt(Math.max(...n))})`:""}</td></tr>`;
   }).join("");
-  const svg=sectionSvg(model,section,{width:1600,height:Math.round(1600*(h-60)/(w-24)),theme:"light",legend:true,buffer:o.sectionBuffer,title:false,roundVe:true});
+  const svg=sectionSvg(model,section,{width:1600,height:Math.round(1600*(h-60)/(w-24)),theme:"light",legend:true,buffer:o.sectionBuffer,title:false,roundVe:true,hidden:o.hidden});
+  const hidden=model.units.filter(u=>o.hidden?.has(u.id)).map(u=>u.name);
+  const notes=hidden.length?[`Hidden in the 3-D view and the section: ${hidden.join(", ")}`,...o.notes]:o.notes;
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${esc(p.name)} — GeoModel3D report</title><style>
 @page{size:${o.paper} landscape;margin:12mm}
 *{box-sizing:border-box}
@@ -93,7 +96,7 @@ ${foot("Overview")}</section>
 ${foot("Section")}</section>
 <section class="page">${rules}<h2>Boreholes</h2>
 <table><thead><tr><th>Borehole</th><th>Easting (m)</th><th>Northing (m)</th><th>Collar (m)</th><th>Depth (m)</th><th>Latitude</th><th>Longitude</th><th>Water (m deep)</th><th>SPT tests</th></tr></thead><tbody>${holes}</tbody></table>
-${o.notes.length?`<h3>Notes on the model (${o.notes.length})</h3><ul class="notes">${o.notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul>`:""}
+${notes.length?`<h3>Notes on the model (${notes.length})</h3><ul class="notes">${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul>`:""}
 ${foot(rules?"Interpretation, boreholes and notes":"Boreholes and notes")}</section>
 </body></html>`;
 }

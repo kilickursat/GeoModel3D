@@ -355,14 +355,14 @@ export function inferUnitOrder(boreholes:Borehole[]){
 }
 
 const KEYWORD_COLORS:Array<[RegExp,string]>=[
-  [/made ground|fill|埋土|盛土/i,"#7d6f86"],[/topsoil|表土/i,"#5b4a3a"],[/peat|organic|泥炭|腐植/i,"#4a3b2a"],
+  [/made ground|fill|埋土|盛土/i,"#9a5b4f"],[/topsoil|表土/i,"#5b4a3a"],[/peat|organic|泥炭|腐植/i,"#4a3b2a"],
   [/sandstone|砂岩/i,"#b9925c"],[/siltstone/i,"#8a8170"],[/mudstone|shale|claystone|泥岩|頁岩/i,"#6f7686"],
   [/limestone|石灰岩/i,"#9fb4c0"],[/chalk/i,"#ddd8c8"],[/coal|石炭/i,"#3a3a3a"],[/conglomerate|礫岩/i,"#b07a4f"],
   [/granite|花崗岩/i,"#a3999c"],[/basalt|andesite|玄武岩|安山岩/i,"#5f6366"],[/tuff|凝灰岩/i,"#b5a99a"],
   [/schist|gneiss|片岩|片麻岩/i,"#7f8a7a"],[/weathered|風化/i,"#8f806d"],[/alluvi|沖積/i,"#c2ab7c"],
   [/gravel|礫/i,"#d08a4c"],[/clay|粘土/i,"#9c7a5b"],[/silt|シルト/i,"#a89a7a"],[/sand|砂/i,"#d9b871"]
 ];
-const PALETTE=["#c2ab7c","#8f806d","#d08a4c","#6f7686","#b9925c","#a3999c","#7f8a7a","#9fb4c0","#9c7a5b","#b5a99a","#7d6f86","#5f6366"];
+const PALETTE=["#c2ab7c","#8f806d","#d08a4c","#6f7686","#b9925c","#a3999c","#7f8a7a","#9fb4c0","#9c7a5b","#b5a99a","#8e6c9c","#5f6366"];
 function normaliseColor(c:unknown){
   if(typeof c!=="string")return undefined;
   const s=c.trim();

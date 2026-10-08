@@ -3,7 +3,8 @@ import {Section} from "./section";
 import {toCsv} from "./io";
 
 // roundVe draws at a round vertical exaggeration (1, 2, 2.5, 5, 10…), as drawings state it, instead of filling the height.
-export interface SectionSvgOptions { width:number; height:number; theme?:"dark"|"light"; title?:boolean; legend?:boolean; buffer?:number; roundVe?:boolean }
+// Units whose ids are in `hidden` are left unfilled and out of the legend, as in the 3-D view; borehole logs keep them.
+export interface SectionSvgOptions { width:number; height:number; theme?:"dark"|"light"; title?:boolean; legend?:boolean; buffer?:number; roundVe?:boolean; hidden?:ReadonlySet<string> }
 
 const THEMES={
   dark:{bg:"#0b1620",text:"#d9edf5",muted:"#8aa2ae",grid:"rgba(160,190,200,.14)",line:"#e8f5ff",hole:"#0b1620"},
@@ -28,7 +29,8 @@ export function sectionTitle(s:Section){
 // boreholes within the buffer projected onto the section line.
 export function sectionSvg(model:GeoModel,s:Section,o:SectionSvgOptions){
   const t=THEMES[o.theme??"dark"],W=o.width,H=o.height;
-  const legendRows=o.legend?Math.ceil(model.units.length/4):0,title=o.title??true;
+  const shown=model.units.filter(u=>!o.hidden?.has(u.id));
+  const legendRows=o.legend?Math.ceil(shown.length/4):0,title=o.title??true;
   const m={l:58,r:18,t:title?42:26,b:44+legendRows*18};
   let pw=W-m.l-m.r;
   const ph=H-m.t-m.b;
@@ -61,7 +63,7 @@ export function sectionSvg(model:GeoModel,s:Section,o:SectionSvgOptions){
 
   const pt=(j:number,k:number)=>`${X(s.s[j]).toFixed(2)},${Y(s.z[k][j]).toFixed(2)}`;
   model.units.forEach((u,k)=>{
-    if(s.z[k].every((z,j)=>z-s.z[k+1][j]<1e-9))return;
+    if(o.hidden?.has(u.id)||s.z[k].every((z,j)=>z-s.z[k+1][j]<1e-9))return;
     const top=s.s.map((_,j)=>pt(j,k)),bottom=s.s.map((_,j)=>pt(j,k+1)).reverse();
     out.push(`<polygon points="${[...top,...bottom].join(" ")}" fill="${u.color}" stroke="${u.color}" stroke-width="0.5"><title>${esc(u.name)}</title></polygon>`);
   });
@@ -100,7 +102,7 @@ export function sectionSvg(model:GeoModel,s:Section,o:SectionSvgOptions){
   out.push(`<rect x="${m.l}" y="${m.t}" width="${pw}" height="${ph}" fill="none" stroke="${t.muted}" stroke-opacity="0.5"/>`);
   out.push(`<text x="${m.l+pw/2}" y="${m.t+ph+30}" text-anchor="middle" font-size="10.5" fill="${t.muted}">Distance along section (m) · V.E. ×${ve<10?ve.toFixed(1):Math.round(ve)} · dashed = inferred</text>`);
   out.push(`<text transform="translate(${m.l-44} ${m.t+ph/2}) rotate(-90)" text-anchor="middle" font-size="10.5" fill="${t.muted}">Elevation (m)</text>`);
-  if(o.legend)model.units.forEach((u,k)=>{
+  if(o.legend)shown.forEach((u,k)=>{
     const lx=m.l+(k%4)*Math.min(pw/4,190),ly=H-12-(legendRows-1-Math.floor(k/4))*18;
     out.push(`<rect x="${lx}" y="${ly-9}" width="10" height="10" fill="${u.color}"/><text x="${lx+15}" y="${ly}" font-size="10.5" fill="${t.text}">${esc(u.name)}</text>`);
   });

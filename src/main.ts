@@ -366,6 +366,7 @@ function updateSection(){
   const s=section,n=s.s.length,pos:number[]=[],col:number[]=[],lines:number[]=[],c=new THREE.Color();
   const p=(j:number,z:number)=>[s.x[j]-origin.x,s.y[j]-origin.y,z-origin.z];
   model.units.forEach((u,k)=>{
+    if(view.hidden.has(u.id))return;
     c.set(u.color);
     for(let j=0;j<n-1;j++){
       const t0=s.z[k][j],b0=s.z[k+1][j],t1=s.z[k][j+1],b1=s.z[k+1][j+1];
@@ -617,7 +618,7 @@ function syncControls(){
 function renderSectionPanel(){
   if(!view.panel||!section)return;
   sectionView.querySelector(".section-name")!.textContent=`Section A–A′ · ${String(view.azimuth).padStart(3,"0")}° · ${view.offset>=0?"+":""}${Math.round(view.offset)} m`;
-  sectionBody.innerHTML=sectionSvg(model,section,{width:sectionBody.clientWidth,height:sectionBody.clientHeight,theme:"dark",title:false,buffer:sectionBuffer});
+  sectionBody.innerHTML=sectionSvg(model,section,{width:sectionBody.clientWidth,height:sectionBody.clientHeight,theme:"dark",title:false,buffer:sectionBuffer,hidden:view.hidden});
 }
 
 function showNotice(title:string,lines:string[],error=false){
@@ -688,7 +689,7 @@ function exportAs(kind:string){
   const tag=`${String(view.azimuth).padStart(3,"0")}-${view.offset>=0?"p":"m"}${Math.abs(Math.round(view.offset))}`;
   if(kind==="project")download(`${slug}.geomodel3d.json`,toProjectJson(project),"application/json");
   if(kind==="boreholes")download(`${slug}-boreholes.csv`,toBoreholeCsv(project),"text/csv");
-  if(kind==="svg")download(`${slug}-section-${tag}.svg`,sectionSvg(model,section,{width:1600,height:900,theme:"light",legend:true,buffer:sectionBuffer,roundVe:true}),"image/svg+xml");
+  if(kind==="svg")download(`${slug}-section-${tag}.svg`,sectionSvg(model,section,{width:1600,height:900,theme:"light",legend:true,buffer:sectionBuffer,roundVe:true,hidden:view.hidden}),"image/svg+xml");
   if(kind==="section")download(`${slug}-section-${tag}.csv`,sectionCsv(model,section),"text/csv");
   if(kind.startsWith("report-"))void printReport(kind==="report-A4"?"A4":"A3");
 }
@@ -733,7 +734,7 @@ function cropToContent(source:HTMLCanvasElement,maxWidth=2400){
 // The report is printed from a hidden frame; the print dialog's "Save as PDF" makes the file.
 async function printReport(paper:"A3"|"A4"){
   const html=reportHtml(model,section,{paper,image:captureView(),date:new Date().toISOString().slice(0,10),version:pkg.version,
-    credits:creditTexts(),notes:currentNotes,sectionBuffer,ve:view.ve});
+    credits:creditTexts(),notes:currentNotes,sectionBuffer,ve:view.ve,hidden:view.hidden});
   const frame=document.createElement("iframe");
   frame.className="print-frame";
   frame.setAttribute("aria-hidden","true");
@@ -765,7 +766,7 @@ toolbar.querySelectorAll<HTMLInputElement>("[data-view]").forEach(input=>{
 ui.querySelector(".legend")!.addEventListener("change",e=>{
   const input=e.target as HTMLInputElement,id=input.dataset.unit!;
   if(input.checked)view.hidden.delete(id);else view.hidden.add(id);
-  applyDisplay();
+  updateSection();
 });
 toolbar.querySelector<HTMLSelectElement>(".map-source")!.onchange=e=>{view.mapSource=(e.target as HTMLSelectElement).value;void updateMap()};
 toolbar.querySelector<HTMLButtonElement>(".fetch-terrain")!.onclick=()=>void fetchSiteTerrain();
