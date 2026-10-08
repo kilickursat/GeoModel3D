@@ -1,9 +1,10 @@
 import proj4 from "proj4";
-import {Borehole,GeoProject,Interval,UnitDef,UnitRule,SptTest,WaterLevel,boreholeDepth} from "./geology";
+import {Borehole,GeoProject,Interval,UnitDef,UnitRule,SptTest,WaterLevel,TestResult,boreholeDepth,sptN} from "./geology";
 import {TerrainGrid,isTerrainFile,readTerrain} from "./terrain";
 import {Crs,findCrs,projectCrs,suggestCrs,toProjected,searchCrs} from "./crs";
 import {isBoringXml,readBoringXml} from "./boringXml";
-import {applyUnitRules,japaneseLithologyRules} from "./rules";
+import {applyUnitRules,japaneseLithologyRules,lithologyRules} from "./rules";
+import {propertyFromHeader,propertyKey,propertyDef,implausibleTests} from "./properties";
 
 export interface TextFile { name:string; text:string }
 export interface ImportResult { project:GeoProject; warnings:string[] }
@@ -57,7 +58,8 @@ function csvField(v:string|number|undefined){
 }
 export function toCsv(rows:Array<Array<string|number|undefined>>){return rows.map(r=>r.map(csvField).join(",")).join("\n")+"\n"}
 
-const norm=(h:string)=>h.toLowerCase().replace(/[^a-z0-9]/g,"");
+// Header names are matched without case, punctuation or a unit in brackets: "Depth From (m)" is "depthfrom".
+const norm=(h:string)=>h.toLowerCase().replace(/\([^)]*\)|\[[^\]]*\]/g,"").replace(/[^a-z0-9]/g,"");
 const round=(v:number)=>Math.round(v*100)/100;
 const ALIASES={
   id:["holeid","boreholeid","bhid","hole","borehole","bh","boreholename","boreholeno","holeno","locaid","locationid","location","pointid","name","id"],
@@ -71,6 +73,15 @@ const ALIASES={
   to:["to","depthto","todepth","bottom","base","basedepth","bottomdepth","depthbase","depthbottom","geolbase"],
   unit:["unit","unitid","unitcode","stratigraphicunit","geologicalunit","formation","stratum","geology","lithology","litho","lith","lithcode","geolgeol","geolleg","layer","soil","material","code"],
   name:["name","unitname","description","desc"],
+  description:["description","desc","soildescription","logdescription","geoldesc","lithologydescription"],
+  water:["water","waterdepth","waterlevel","depthtowater","gwl","groundwater","groundwaterdepth","groundwaterlevel","wstgdpth"],
+  date:["date","waterdate","readingdate","measured","datetime"],
+  testDepth:["depth","testdepth","sampledepth","sampletop","depthtop","specdpth","samptop","isptop","from","top","depthm"],
+  testTo:["to","samplebase","depthbase","base","bottom","sampbase","specbase"],
+  blows:["blows","blowcount","totalblows","sptblows"],
+  penetration:["penetration","penetrationmm","pen","totalpenetration"],
+  property:["property","parameter","test","quantity","measurand"],
+  value:["value","result","reading","measuredvalue"],
   color:["color","colour","hex","rgb"],
   erosive:["erosive","erosion","erosivebase","unconformity"],
   gamma:["gamma","unitweight","bulkunitweight","gammabulk","gammaknm3"],
@@ -90,40 +101,92 @@ function num(v:string|undefined){
   return Number(/^-?\d+,\d+$/.test(s)?s.replace(",","."):s);
 }
 
-interface Collar { x:number; y:number; z:number; depth?:number; lon?:number; lat?:number; spt?:SptTest[]; water?:WaterLevel[] }
-interface Tables { collars:Map<string,Collar>; intervals:Map<string,Interval[]>; units:UnitDef[]; warnings:string[] }
+interface Collar { x:number; y:number; z:number; depth?:number; lon?:number; lat?:number; spt?:SptTest[]; water?:WaterLevel[]; tests?:TestResult[] }
+// Tests and water readings per borehole, from tables other than the collars. `rules` group logged descriptions into
+// units when the intervals carry descriptions only.
+interface Tables { collars:Map<string,Collar>; intervals:Map<string,Interval[]>; units:UnitDef[]; warnings:string[]; measured?:Map<string,Measured>; rules?:UnitRule[] }
+interface Measured { spt:SptTest[]; water:WaterLevel[]; tests:TestResult[] }
+function measuredOf(t:Tables,id:string){
+  t.measured??=new Map();
+  if(!t.measured.has(id))t.measured.set(id,{spt:[],water:[],tests:[]});
+  return t.measured.get(id)!;
+}
+// A value of a property at a depth: SPT N-values join the borehole's SPT tests (as complete 300 mm tests).
+function addTest(m:Measured,depth:number,to:number,key:string,value:number){
+  if(!Number.isFinite(depth)||!Number.isFinite(value))return;
+  if(key==="N")m.spt.push({depth,blows:value,penetration:300});
+  else m.tests.push({depth,...(Number.isFinite(to)&&to>depth?{to}:{}),property:key,value});
+}
 
+const TABLES="a borehole table (hole id, x, y, z, from, to, unit or description), or separate collar (hole id, x, y or latitude, longitude, z), interval (hole id, from, to, unit or description), unit, test (hole id, depth and a column per property, or property and value columns), SPT (hole id, depth, N) or water-level (hole id, water depth) tables";
 function readCsvTable(file:TextFile,t:Tables){
   const rows=parseCsv(file.text);
   if(rows.length<2){t.warnings.push(`${file.name}: no data rows`);return}
   const c=columns(rows[0]),has=(...f:Field[])=>f.every(k=>c[k]!==undefined);
   const data=rows.slice(1);
   const cell=(r:string[],f:Field)=>c[f]===undefined?undefined:r[c[f]!]?.trim();
-  const collar=(r:string[]):Collar=>({x:num(cell(r,"x")),y:num(cell(r,"y")),z:num(cell(r,"z")),depth:num(cell(r,"depth")),lon:num(cell(r,"lon")),lat:num(cell(r,"lat"))});
-  if(has("id","from","to","unit")){
+  const water=(r:string[])=>{
+    const d=num(cell(r,"water")),date=cell(r,"date");
+    return Number.isFinite(d)?[{depth:d,...(date?{date}:{})}]:undefined;
+  };
+  const collar=(r:string[]):Collar=>({x:num(cell(r,"x")),y:num(cell(r,"y")),z:num(cell(r,"z")),depth:num(cell(r,"depth")),lon:num(cell(r,"lon")),lat:num(cell(r,"lat")),water:water(r)});
+  // Property columns are the columns not taken by an identifying field; in a table of located boreholes, "E" and "N"
+  // are eastings and northings, elsewhere a modulus and SPT N-values.
+  const located=has("x","y")||has("lat","lon");
+  const taken=new Set((["id","testDepth","testTo","unit","from","to","description","name","color","source","water","date",...(located?["x","y","z","lat","lon","depth"]:[])] as Field[]).map(f=>c[f]));
+  const props=rows[0].map((h,i)=>({i,p:propertyFromHeader(h)})).filter(q=>q.p&&!taken.has(q.i)) as Array<{i:number;p:{key:string;scale:number}}>;
+  const described=c.description!==undefined&&c.description!==c.unit;
+  if(has("id","from","to")&&(has("unit")||described)&&!props.length){
     const combined=has("x","y","z")||has("lat","lon","z");
     for(const r of data){
       const id=cell(r,"id");
       if(!id){t.warnings.push(`${file.name}: row without a borehole id skipped`);continue}
-      const from=num(cell(r,"from")),to=num(cell(r,"to")),unit=cell(r,"unit")??"";
+      const from=num(cell(r,"from")),to=num(cell(r,"to")),unit=cell(r,"unit")??"",name=described?cell(r,"description"):undefined;
       if(!t.intervals.has(id))t.intervals.set(id,[]);
-      t.intervals.get(id)!.push({from,to,unit});
+      t.intervals.get(id)!.push({from,to,unit,...(name?{name}:{})});
       if(combined&&!t.collars.has(id))t.collars.set(id,collar(r));
     }
-  }else if(has("id","x","y")||has("id","lat","lon")){
+    if(!has("unit"))t.rules=lithologyRules;
+  }else if(has("id")&&located){
     for(const r of data){
       const id=cell(r,"id");
       if(!id)continue;
       if(t.collars.has(id))t.warnings.push(`${file.name}: duplicate collar ${id}; first row kept`);
       else t.collars.set(id,collar(r));
     }
-  }else if(c.unit!==undefined&&(["color","name","erosive","gamma","gammaSat"] as Field[]).some(f=>c[f]!==undefined)){
+  }else if(has("id","testDepth","property","value")){
+    for(const r of data){
+      const id=cell(r,"id"),name=cell(r,"property");
+      if(!id||!name)continue;
+      const unit=c.unit!==undefined?cell(r,"unit"):"",header=propertyFromHeader(unit?`${name} (${unit})`:name);
+      addTest(measuredOf(t,id),num(cell(r,"testDepth")),num(cell(r,"testTo")),header?.key??propertyKey(name),num(cell(r,"value"))*(header?.scale??1));
+    }
+  }else if(c.unit!==undefined&&(props.length||(["color","name","erosive","gamma","gammaSat","source"] as Field[]).some(f=>c[f]!==undefined))){
     for(const r of data){
       const id=cell(r,"unit");
-      if(id)t.units.push(unitDef({id,name:cell(r,"name"),color:cell(r,"color"),erosive:cell(r,"erosive"),gamma:cell(r,"gamma"),gammaSat:cell(r,"gammaSat"),source:cell(r,"source")}));
+      if(!id)continue;
+      const params:Record<string,number>={};
+      for(const {i,p} of props)if(p.key!=="gamma"&&Number.isFinite(num(r[i])))params[p.key]=num(r[i])*p.scale;
+      t.units.push(unitDef({id,name:cell(r,"name"),color:cell(r,"color"),erosive:cell(r,"erosive"),gamma:cell(r,"gamma"),gammaSat:cell(r,"gammaSat"),source:cell(r,"source"),params}));
+    }
+  }else if(has("id","testDepth")&&(props.length||has("blows"))){
+    for(const r of data){
+      const id=cell(r,"id");
+      if(!id)continue;
+      const m=measuredOf(t,id),depth=num(cell(r,"testDepth")),to=num(cell(r,"testTo"));
+      for(const {i,p} of props)addTest(m,depth,to,p.key,num(r[i])*p.scale);
+      if(has("blows")){
+        const blows=num(cell(r,"blows")),pen=num(cell(r,"penetration"));
+        if(Number.isFinite(depth)&&Number.isFinite(blows))m.spt.push({depth,blows,penetration:Number.isFinite(pen)?pen:300});
+      }
+    }
+  }else if(has("id","water")){
+    for(const r of data){
+      const id=cell(r,"id"),w=water(r);
+      if(id&&w)measuredOf(t,id).water.push(...w);
     }
   }else{
-    throw new Error(`${file.name}: unrecognised columns (${rows[0].join(", ")}). Expected a borehole table with hole id, x, y, z, from, to and unit columns, or separate collar (hole id, x, y, z) and interval (hole id, from, to, unit) tables.`);
+    throw new Error(`${file.name}: unrecognised columns (${rows[0].join(", ")}). Expected ${TABLES}.`);
   }
 }
 
@@ -140,12 +203,22 @@ export function parseAgs4(text:string){
   }
   return groups;
 }
+// Laboratory and in-situ results read from AGS4: group, heading, property and the factor to the catalogue unit.
+// Laboratory groups give the specimen depth (SPEC_DPTH) or the sample top (SAMP_TOP).
+const G=9.80665;
+const AGS_TESTS:Array<[string,string,string,number]>=[
+  ["LNMC","LNMC_MC","w",1],["LDEN","LDEN_BDEN","gamma",G],["LDEN","LDEN_DDEN","gammaDry",G],
+  ["LLPL","LLPL_LL","LL",1],["LLPL","LLPL_PL","PL",1],["LLPL","LLPL_PI","PI",1],["GRAG","GRAG_FINE","fines",1],
+  ["TRIT","TRIT_CU","su",1],["LVAN","LVAN_VNPK","su",1],["LPEN","LPEN_PPEN","su",1],["IVAN","IVAN_IVAN","su",1],
+  ["TREG","TREG_COH","c",1],["TREG","TREG_PHI","phi",1],["SHBG","SHBG_PCOH","c",1],["SHBG","SHBG_PHI","phi",1],
+  ["RUCS","RUCS_UCS","ucs",1],["RUCS","RUCS_E","E",1000],["PTST","PTST_K","k",1]
+];
 function readAgs4(file:TextFile):ImportResult{
   const g=parseAgs4(file.text),warnings:string[]=[];
   const loca=g.get("LOCA")??[],geol=g.get("GEOL")??[];
   if(!loca.length||!geol.length)throw new Error(`${file.name}: an AGS4 model needs LOCA (locations) and GEOL (field geological descriptions) groups`);
   const key=["GEOL_GEOL","GEOL_GEO2","GEOL_LEG"].find(k=>geol.some(r=>r[k]?.trim()));
-  if(!key)throw new Error(`${file.name}: GEOL rows carry no GEOL_GEOL, GEOL_GEO2 or GEOL_LEG unit codes`);
+  if(!key&&!geol.some(r=>r.GEOL_DESC?.trim()))throw new Error(`${file.name}: GEOL rows carry no GEOL_GEOL, GEOL_GEO2 or GEOL_LEG unit codes and no GEOL_DESC descriptions`);
   const names=new Map((g.get("ABBR")??[]).filter(r=>r.ABBR_HDNG===key).map(r=>[r.ABBR_CODE,r.ABBR_DESC]));
   const t:Tables={collars:new Map(),intervals:new Map(),units:[],warnings};
   let local=false;
@@ -156,18 +229,28 @@ function readAgs4(file:TextFile):ImportResult{
     t.collars.set(r.LOCA_ID,{x,y,z,depth:num(r.LOCA_FDEP),lon,lat});
   }
   if(local)warnings.push("Some locations have no national grid coordinates; local LOCA_LOCX/LOCA_LOCY were used for them");
+  // Without unit codes, the descriptions are grouped by their principal soil or rock.
   for(const r of geol){
-    const code=r[key]?.trim();
-    if(!code){warnings.push(`${r.LOCA_ID}: GEOL ${r.GEOL_TOP}–${r.GEOL_BASE} m has no ${key}; skipped`);continue}
+    const code=key?r[key]?.trim():"",desc=r.GEOL_DESC?.trim();
+    if(key&&!code){warnings.push(`${r.LOCA_ID}: GEOL ${r.GEOL_TOP}–${r.GEOL_BASE} m has no ${key}; skipped`);continue}
     if(!t.intervals.has(r.LOCA_ID))t.intervals.set(r.LOCA_ID,[]);
-    t.intervals.get(r.LOCA_ID)!.push({from:num(r.GEOL_TOP),to:num(r.GEOL_BASE),unit:code});
+    t.intervals.get(r.LOCA_ID)!.push({from:num(r.GEOL_TOP),to:num(r.GEOL_BASE),unit:code??"",...(desc?{name:desc}:{})});
   }
-  t.units=[...new Set(geol.map(r=>r[key]?.trim()).filter(Boolean))].filter(c=>names.has(c)).map(c=>({id:c,name:names.get(c)!,color:""}));
+  if(key)t.units=[...new Set(geol.map(r=>r[key]?.trim()).filter(Boolean))].filter(c=>names.has(c)).map(c=>({id:c,name:names.get(c)!,color:""}));
+  for(const r of g.get("ISPT")??[])addTest(measuredOf(t,r.LOCA_ID),num(r.ISPT_TOP),NaN,"N",num(r.ISPT_NVAL));
+  // Water: the level a strike rose to (WSTD_POST) where recorded, else the depth of the strike.
+  const rose=new Set((g.get("WSTD")??[]).filter(r=>Number.isFinite(num(r.WSTD_POST))).map(r=>r.LOCA_ID));
+  for(const r of g.get("WSTD")??[])if(Number.isFinite(num(r.WSTD_POST)))measuredOf(t,r.LOCA_ID).water.push({depth:num(r.WSTD_POST)});
+  for(const r of g.get("WSTG")??[])if(!rose.has(r.LOCA_ID)&&Number.isFinite(num(r.WSTG_DPTH)))measuredOf(t,r.LOCA_ID).water.push({depth:num(r.WSTG_DPTH),...(r.WSTG_DTIM?{date:r.WSTG_DTIM.slice(0,10)}:{})});
+  for(const [group,heading,property,scale] of AGS_TESTS)for(const r of g.get(group)??[]){
+    const depth=group==="IVAN"?num(r.IVAN_DPTH):Number.isFinite(num(r.SPEC_DPTH))?num(r.SPEC_DPTH):num(r.SAMP_TOP);
+    addTest(measuredOf(t,r.LOCA_ID),depth,num(r.SPEC_BASE),property,num(r[heading])*scale);
+  }
   const proj=g.get("PROJ")?.[0];
   const grefs=[...new Set(loca.map(r=>r.LOCA_GREF).filter(Boolean))];
   const named=grefs.length===1?crsFromName(grefs[0]):undefined;
-  const result=assemble(t,proj?.PROJ_NAME||file.name.replace(/\.[^.]+$/,""),named?named.name:grefs.length===1?grefs[0]:undefined,true,named);
-  result.project.description=`Imported from AGS4 (${file.name}); units from ${key}.`;
+  const result=assemble(t,proj?.PROJ_NAME||file.name.replace(/\.[^.]+$/,""),named?named.name:grefs.length===1?grefs[0]:undefined,true,named,key?undefined:lithologyRules);
+  result.project.description=`Imported from AGS4 (${file.name}); units from ${key??"the GEOL_DESC descriptions, grouped by principal soil or rock"}.`;
   return result;
 }
 
@@ -192,13 +275,17 @@ function readGeoreport3D(doc:any,file:string):ImportResult{
   return result;
 }
 // A unit definition from loosely typed input: booleans as yes/no/true/1, numbers as text or numbers.
-function unitDef(u:{id:string;name?:unknown;color?:unknown;erosive?:unknown;gamma?:unknown;gammaSat?:unknown;source?:unknown}):UnitDef{
+function unitDef(u:{id:string;name?:unknown;color?:unknown;erosive?:unknown;gamma?:unknown;gammaSat?:unknown;source?:unknown;params?:unknown}):UnitDef{
   const out:UnitDef={id:u.id,name:typeof u.name==="string"&&u.name.trim()?u.name.trim():u.id,color:normaliseColor(u.color)??""};
   if(u.erosive===true||typeof u.erosive==="string"&&/^(y|yes|true|1|x)$/i.test(u.erosive.trim()))out.erosive=true;
   const gamma=typeof u.gamma==="number"?u.gamma:num(u.gamma as string|undefined);
   const gammaSat=typeof u.gammaSat==="number"?u.gammaSat:num(u.gammaSat as string|undefined);
   if(Number.isFinite(gamma))out.gamma=gamma;
   if(Number.isFinite(gammaSat))out.gammaSat=gammaSat;
+  if(u.params&&typeof u.params==="object"){
+    const params=Object.fromEntries(Object.entries(u.params as Record<string,unknown>).map(([k,v])=>[propertyKey(k),Number(v)]).filter(([,v])=>Number.isFinite(v)));
+    if(Object.keys(params).length)out.params=params;
+  }
   if(typeof u.source==="string"&&u.source.trim())out.source=u.source.trim();
   return out;
 }
@@ -221,7 +308,9 @@ function readProjectJson(doc:any,file:string):ImportResult{
     const list=(v:unknown,keys:string[])=>Array.isArray(v)?v.filter(o=>o&&keys.every(k=>Number.isFinite(Number(o[k])))):undefined;
     t.collars.set(id,{x:Number(b.x),y:Number(b.y),z:Number(b.z),depth:b.depth===undefined?undefined:Number(b.depth),
       lon:b.lon===undefined?undefined:Number(b.lon),lat:b.lat===undefined?undefined:Number(b.lat),
-      spt:list(b.spt,["depth","blows","penetration"]),water:list(b.water,["depth"])});
+      spt:list(b.spt,["depth","blows","penetration"]),water:list(b.water,["depth"]),
+      tests:list(b.tests,["depth","value"])?.filter((o:any)=>typeof o.property==="string"&&o.property.trim())
+        .map((o:any)=>({depth:Number(o.depth),...(Number.isFinite(Number(o.to))&&o.to!==undefined&&o.to!==null?{to:Number(o.to)}:{}),property:propertyKey(o.property),value:Number(o.value)}))});
     t.intervals.set(id,(b.intervals??[]).map((i:any)=>({from:Number(i.from),to:Number(i.to),unit:String(i.unit??"").trim(),...(typeof i.name==="string"?{name:i.name}:{})})));
   }
   const rules:UnitRule[]|undefined=Array.isArray(doc.rules)?doc.rules.filter((r:any)=>r&&typeof r.match==="string"&&typeof r.unit==="string"):undefined;
@@ -231,6 +320,7 @@ function readProjectJson(doc:any,file:string):ImportResult{
   if(doc.description)result.project.description=String(doc.description);
   if(doc.source)result.project.source=String(doc.source);
   if(Number.isFinite(doc.base))result.project.base=Number(doc.base);
+  if(Number.isFinite(doc.groundwaterDepth))result.project.groundwaterDepth=Number(doc.groundwaterDepth);
   const g=doc.terrain;
   if(g){
     const ok=["x0","y0","dx","dy","ncols","nrows"].every(k=>Number.isFinite(g[k]))&&Array.isArray(g.z)&&g.z.length===g.ncols*g.nrows;
@@ -242,12 +332,26 @@ function readProjectJson(doc:any,file:string):ImportResult{
 // JSON has no NaN, so terrain cells without data are written as null.
 export function toProjectJson(p:GeoProject){
   const doc={format:"geomodel3d-project",version:1,name:p.name,description:p.description,source:p.source,crs:p.crs,crsCode:p.crsCode,crsProj4:p.crsProj4,
-    base:p.base,units:p.units,rules:p.rules,boreholes:p.boreholes,terrain:p.terrain};
+    base:p.base,groundwaterDepth:p.groundwaterDepth,units:p.units,rules:p.rules,boreholes:p.boreholes,terrain:p.terrain};
   return JSON.stringify(doc,null,1).replace(/"z": \[[^\]]*\]/,m=>m.replace(/\s+/g,""))+"\n";
 }
+// One row per interval with the collar, the logged description where there is one, and the shallowest water level.
 export function toBoreholeCsv(p:GeoProject){
-  const rows:Array<Array<string|number|undefined>>=[["hole_id","x","y","z","depth","from","to","unit"]];
-  for(const b of p.boreholes)for(const i of b.intervals)rows.push([b.id,b.x,b.y,b.z,b.depth,i.from,i.to,i.unit]);
+  const described=p.boreholes.some(b=>b.intervals.some(i=>i.name)),wet=p.boreholes.some(b=>b.water?.length);
+  const rows:Array<Array<string|number|undefined>>=[["hole_id","x","y","z","depth",...(wet?["water_depth"]:[]),"from","to","unit",...(described?["description"]:[])]];
+  for(const b of p.boreholes){
+    const water=b.water?.length?Math.min(...b.water.map(w=>w.depth)):undefined;
+    for(const i of b.intervals)rows.push([b.id,b.x,b.y,b.z,b.depth,...(wet?[water]:[]),i.from,i.to,i.unit,...(described?[i.name]:[])]);
+  }
+  return toCsv(rows);
+}
+// Tests in long form, one row per value; SPT tests as N-values.
+export function toTestsCsv(p:GeoProject){
+  const rows:Array<Array<string|number|undefined>>=[["hole_id","depth","to","property","value","unit"]];
+  for(const b of p.boreholes){
+    const all=[...(b.spt??[]).map(t=>({depth:t.depth,to:undefined as number|undefined,property:"N",value:Math.round(sptN(t)*10)/10})),...(b.tests??[])].sort((q,r)=>q.depth-r.depth);
+    for(const t of all)rows.push([b.id,t.depth,t.to,t.property,t.value,propertyDef(t.property).unit]);
+  }
   return toCsv(rows);
 }
 
@@ -265,8 +369,8 @@ function georeference(t:Tables,declared?:Crs):Crs|undefined{
   return crs;
 }
 
-function assemble(t:Tables,name:string,crsName:string|undefined,inferUnits:boolean,declared?:Crs,rules?:UnitRule[]):ImportResult{
-  const warnings=t.warnings,boreholes:Borehole[]=[];
+function assemble(t:Tables,name:string,crsName:string|undefined,inferUnits:boolean,declared?:Crs,ruleSet?:UnitRule[]):ImportResult{
+  const warnings=t.warnings,boreholes:Borehole[]=[],rules=ruleSet??t.rules;
   const crs=georeference(t,declared);
   for(const [id,raw] of t.intervals){
     const collar=t.collars.get(id);
@@ -285,10 +389,15 @@ function assemble(t:Tables,name:string,crsName:string|undefined,inferUnits:boole
     const b:Borehole={id,x:collar.x,y:collar.y,z:collar.z,intervals};
     if(collar.depth!==undefined&&Number.isFinite(collar.depth)&&collar.depth>boreholeDepth(b))b.depth=collar.depth;
     if(Number.isFinite(collar.lon)&&Number.isFinite(collar.lat)){b.lon=collar.lon;b.lat=collar.lat}
-    if(collar.spt?.length)b.spt=collar.spt;
-    if(collar.water?.length)b.water=collar.water;
+    const m=t.measured?.get(id),byDepth=(p:{depth:number},q:{depth:number})=>p.depth-q.depth;
+    const spt=[...collar.spt??[],...m?.spt??[]].sort(byDepth),water=[...collar.water??[],...m?.water??[]],tests=[...collar.tests??[],...m?.tests??[]].sort(byDepth);
+    if(spt.length)b.spt=spt;
+    if(water.length)b.water=water;
+    if(tests.length)b.tests=tests;
     boreholes.push(b);
   }
+  for(const id of t.measured?.keys()??[])if(!t.intervals.has(id))warnings.push(`${id}: tests or water levels for a borehole without a log; ignored`);
+  warnings.push(...implausibleTests(boreholes));
   if(rules?.length){
     const mapped=applyUnitRules(boreholes,rules);
     boreholes.splice(0,boreholes.length,...mapped.boreholes);

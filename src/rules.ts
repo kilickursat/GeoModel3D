@@ -28,6 +28,28 @@ export function applyUnitRules(boreholes:Borehole[],rules:UnitRule[]){
   return {boreholes:out,unmatched};
 }
 
+// A first grouping of soil and rock descriptions in English (BS 5930, ASTM D2488 and the like) or Dutch by their
+// principal material, to start from when no stratigraphy is defined: the first soil noun of the description, so
+// "Firm grey slightly sandy CLAY with gravel" is Clay and "Sand, silty, with gravel" is Sand; adjectives (sandy,
+// clayey…) do not count. Like the Japanese rules below, it describes lithology, not formations.
+const SOILS={clay:"clay|klei",silt:"silt|leem",sand:"sand|zand",gravel:"gravel|cobbles|boulders|grind|keien",peat:"peat|veen"};
+const firstNoun=(soil:keyof typeof SOILS)=>{
+  const others=(Object.keys(SOILS) as Array<keyof typeof SOILS>).filter(k=>k!==soil).map(k=>SOILS[k]).join("|");
+  return `^(?:(?!\\b(?:${others})\\b).)*\\b(?:${SOILS[soil]})\\b`;
+};
+export const lithologyRules:UnitRule[]=[
+  {match:"made ground|\\b(?:back)?fill\\b|topsoil|concrete|asphalt|tarmac|rubble|hardcore|\\bbrick|\\bslag\\b|antropogeen|ophoging|\\bpuin\\b|\\bbeton\\b",unit:"Made ground"},
+  {match:firstNoun("peat"),unit:"Peat"},
+  {match:"mudstone|siltstone|claystone|shale|\\bmarl",unit:"Mudstone and siltstone"},
+  {match:"sandstone|conglomerate|breccia",unit:"Sandstone"},
+  {match:"limestone|chalk|dolomite|kalksteen|\\bkrijt\\b",unit:"Limestone and chalk"},
+  {match:"granite|basalt|andesite|rhyolite|diorite|gabbro|gneiss|schist|quartzite|slate|\\btuff\\b|\\brock\\b|bedrock",unit:"Rock"},
+  {match:firstNoun("gravel"),unit:"Gravel"},
+  {match:firstNoun("sand"),unit:"Sand"},
+  {match:firstNoun("silt"),unit:"Silt"},
+  {match:firstNoun("clay"),unit:"Clay"}
+];
+
 // A first grouping of Japanese soil and rock names by their principal material (the last word of the name), to
 // start from when no stratigraphy is defined. It describes lithology, not formations: edit the rules to model those.
 export const japaneseLithologyRules:UnitRule[]=[
