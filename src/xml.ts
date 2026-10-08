@@ -59,3 +59,8 @@ export function textOf(n:XmlNode,tag:string):string{
   }
   return "";
 }
+// The same tree with namespace prefixes dropped from element names ("bhrgtcom:layer" becomes "layer"), for formats
+// whose prefixes vary between producers.
+export function withoutPrefixes(n:XmlNode):XmlNode{
+  return {...n,tag:n.tag.replace(/^[^:]*:/,""),children:n.children.map(withoutPrefixes)};
+}

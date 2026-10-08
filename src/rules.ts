@@ -28,17 +28,24 @@ export function applyUnitRules(boreholes:Borehole[],rules:UnitRule[]){
   return {boreholes:out,unmatched};
 }
 
-// A first grouping of soil and rock descriptions in English (BS 5930, ASTM D2488 and the like) or Dutch by their
-// principal material, to start from when no stratigraphy is defined: the first soil noun of the description, so
-// "Firm grey slightly sandy CLAY with gravel" is Clay and "Sand, silty, with gravel" is Sand; adjectives (sandy,
-// clayey…) do not count. Like the Japanese rules below, it describes lithology, not formations.
-const SOILS={clay:"clay|klei",silt:"silt|leem",sand:"sand|zand",gravel:"gravel|cobbles|boulders|grind|keien",peat:"peat|veen"};
+// A first grouping of soil and rock descriptions in English (BS 5930, ASTM D2488 and the like), Dutch, French, German,
+// Spanish, Portuguese or Italian by their principal material, to start from when no stratigraphy is defined: the
+// first soil noun of the description, so "Firm grey slightly sandy CLAY with gravel" is Clay and "Sable argileux" is
+// Sand; adjectives (sandy, argileux…) do not count. Like the Japanese rules below, it describes lithology, not
+// formations.
+const SOILS={
+  clay:"clay|klei|argile|ton|arcilla|argila|argilla",
+  silt:"silt|leem|limon|schluff|lehm|limo|loess|löss",
+  sand:"sand|zand|sable|arena|areia|sabbia",
+  gravel:"gravel|cobbles|boulders|grind|keien|gravier|galets|cailloux|pierres|kies|steine|grava|cascalho|ghiaia|ciottoli",
+  peat:"peat|veen|tourbe|torf|turba|torba"
+};
 const firstNoun=(soil:keyof typeof SOILS)=>{
   const others=(Object.keys(SOILS) as Array<keyof typeof SOILS>).filter(k=>k!==soil).map(k=>SOILS[k]).join("|");
   return `^(?:(?!\\b(?:${others})\\b).)*\\b(?:${SOILS[soil]})\\b`;
 };
 export const lithologyRules:UnitRule[]=[
-  {match:"made ground|\\b(?:back)?fill\\b|topsoil|concrete|asphalt|tarmac|rubble|hardcore|\\bbrick|\\bslag\\b|antropogeen|ophoging|\\bpuin\\b|\\bbeton\\b",unit:"Made ground"},
+  {match:"made ground|\\b(?:back)?fill\\b|topsoil|concrete|asphalt|tarmac|rubble|hardcore|\\bbrick|\\bslag\\b|antropogeen|ophoging|\\bpuin\\b|\\bbeton\\b|remblai|terrain rapporté|terre végétale|auff[üu]llung|mutterboden|relleno|aterro|riporto",unit:"Made ground"},
   {match:firstNoun("peat"),unit:"Peat"},
   {match:"mudstone|siltstone|claystone|shale|\\bmarl",unit:"Mudstone and siltstone"},
   {match:"sandstone|conglomerate|breccia",unit:"Sandstone"},

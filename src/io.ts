@@ -3,6 +3,8 @@ import {Borehole,GeoProject,Interval,UnitDef,UnitRule,SptTest,WaterLevel,TestRes
 import {TerrainGrid,isTerrainFile,readTerrain} from "./terrain";
 import {Crs,findCrs,projectCrs,suggestCrs,toProjected,searchCrs} from "./crs";
 import {isBoringXml,readBoringXml} from "./boringXml";
+import {isBroXml,readBroXml} from "./broXml";
+import {isDovXml,readDovXml,interpretationKinds,kindNames,formationOf,stratigraphicName,DovInterpretation} from "./dovXml";
 import {applyUnitRules,japaneseLithologyRules,lithologyRules} from "./rules";
 import {propertyFromHeader,propertyKey,propertyDef,implausibleTests} from "./properties";
 
@@ -530,6 +532,75 @@ function readBoringLogs(files:TextFile[],current?:GeoProject):ImportResult{
   return result;
 }
 
+// ---------- Dutch BRO geotechnical boreholes ----------
+
+// Units come from the descriptions through the current project's rules or, for a new project, a first grouping of
+// the soil names by principal soil.
+function readBroLogs(files:TextFile[],current?:GeoProject):ImportResult{
+  const t:Tables={collars:new Map(),intervals:new Map(),units:current?.rules?current.units.map(u=>({...u})):[],warnings:[]};
+  let rd=0;
+  for(const f of files){
+    let logs;
+    try{logs=readBroXml(f.text,f.name)}catch(e){t.warnings.push((e as Error).message);continue}
+    for(const log of logs){
+      if(t.collars.has(log.id)){t.warnings.push(`${log.id}: in more than one file; ${f.name} ignored`);continue}
+      for(const n of log.notes)t.warnings.push(`${log.id}: ${n}`);
+      if(Number.isFinite(log.x))rd++;
+      t.collars.set(log.id,{x:log.x,y:log.y,z:log.z,depth:log.depth,lon:log.lon,lat:log.lat,water:log.water!==undefined?[{depth:log.water}]:undefined,tests:log.tests});
+      t.intervals.set(log.id,log.intervals.map(i=>({...i,unit:""})));
+    }
+  }
+  const rules=current?.rules??lithologyRules;
+  const declared=rd?findCrs("EPSG:28992"):projectCrs(current??{})??undefined;
+  const result=assemble(t,files.length===1?files[0].name.replace(/\.[^.]+$/,""):"Imported BRO boreholes",undefined,!current?.rules,declared,rules);
+  if(!current?.rules)result.warnings.push("Units are a first grouping of the soil names by principal soil (lithology, not formations); edit the unit rules to model the stratigraphy");
+  result.warnings.push("Elevations are in metres NAP (Normaal Amsterdams Peil)");
+  result.project.description=`Imported from ${t.collars.size} BRO geotechnical borehole${t.collars.size===1?"":"s"} (BHR-GT, IMBRO XML).`;
+  result.project.source="BRO, Basisregistratie Ondergrond (BHR-GT)";
+  return result;
+}
+
+// ---------- Flemish DOV boreholes and interpretations ----------
+
+// Boreholes give the positions, interpretations the layers; they are joined by the borehole's identifier. The most
+// geological kind of interpretation present is used for every borehole (the latest one where there are several), so
+// the units are consistent; formal stratigraphy is modelled by formation, with members kept in the descriptions.
+function readDovFiles(files:TextFile[],current?:GeoProject):ImportResult{
+  const t:Tables={collars:new Map(),intervals:new Map(),units:current?.rules?current.units.map(u=>({...u})):[],warnings:[]};
+  const borings=new Map<string,{x:number;y:number;z:number;depth:number}>(),found:DovInterpretation[]=[];
+  for(const f of files){
+    try{const r=readDovXml(f.text,f.name);for(const b of r.borings)borings.set(b.id,b);found.push(...r.interpretations)}
+    catch(e){t.warnings.push((e as Error).message)}
+  }
+  const kind=interpretationKinds.find(k=>found.some(i=>i.kind===k&&borings.has(i.boring)));
+  if(!kind){
+    if(found.length)throw new Error("The DOV interpretations have no matching borehole files: add the borehole XML (dov.vlaanderen.be/data/boring/…), which holds the positions");
+    throw new Error("No DOV interpretation among the files: add the interpretations (dov.vlaanderen.be/data/interpretatie/…), which hold the layers");
+  }
+  const latest=new Map<string,DovInterpretation>();
+  for(const i of found)if(i.kind===kind){
+    const prev=latest.get(i.boring);
+    if(!prev||i.date>prev.date||(i.date===prev.date&&i.permkey>prev.permkey))latest.set(i.boring,i);
+  }
+  const coded=kind==="formelestratigrafie"||kind==="quartairstratigrafie";
+  for(const [id,i] of latest){
+    const b=borings.get(id);
+    if(!b){t.warnings.push(`${id}: interpretation ${i.permkey} without its borehole file; not placed`);continue}
+    t.collars.set(id,{x:b.x,y:b.y,z:b.z,depth:b.depth});
+    t.intervals.set(id,i.layers.map(l=>coded?{from:l.from,to:l.to,unit:formationOf(l.code),name:l.name}:{from:l.from,to:l.to,unit:"",name:l.name}));
+  }
+  for(const id of borings.keys())if(!latest.has(id))t.warnings.push(`${id}: no ${kindNames[kind]} among the files; not placed`);
+  const others=new Set(found.filter(i=>i.kind!==kind).map(i=>kindNames[i.kind]));
+  if(others.size)t.warnings.push(`Layers from the ${kindNames[kind]}; also in the files: ${[...others].join(", ")}`);
+  const rules=coded?undefined:current?.rules??lithologyRules;
+  const result=assemble(t,files.length===1?files[0].name.replace(/\.[^.]+$/,""):"Imported DOV boreholes",undefined,true,findCrs("EPSG:31370"),rules);
+  if(coded)for(const u of result.project.units)if(u.name===u.id)u.name=stratigraphicName(u.id);
+  result.warnings.push("Elevations are in metres TAW (Tweede Algemene Waterpassing), about 2.3 m below NAP and mean sea level");
+  result.project.description=`Imported from DOV: ${latest.size} borehole${latest.size===1?"":"s"} with their ${kindNames[kind]}.`;
+  result.project.source="Databank Ondergrond Vlaanderen (DOV)";
+  return result;
+}
+
 // The coordinate system an AGS4 LOCA_GREF or similar label names, if it can be recognised.
 export function crsFromName(label:string):Crs|undefined{
   const code=label.match(/epsg\D{0,3}(\d{4,5})/i);
@@ -555,6 +626,13 @@ export function importFiles(files:TextFile[],current?:GeoProject):ImportResult{
     if(!result)throw new Error("Load or import boreholes before adding a terrain grid");
     result.project.terrain=terrain;
     result.warnings.unshift(note,...grids.slice(1).map(f=>`Only one terrain grid is used; ${f.name} was ignored`));
+    return result;
+  }
+  for(const [is,read,what] of [[isBroXml,readBroLogs,"BRO borehole"],[isDovXml,readDovFiles,"DOV"]] as const){
+    const xml=files.filter(f=>is(f.text));
+    if(!xml.length)continue;
+    const result=read(xml,current);
+    if(xml.length<files.length)result.warnings.unshift(`Only the ${what} files were read; ${files.length-xml.length} other file${files.length-xml.length>1?"s were":" was"} ignored`);
     return result;
   }
   const logs=files.filter(f=>isBoringXml(f.text));
