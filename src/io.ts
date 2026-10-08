@@ -114,6 +114,8 @@ function measuredOf(t:Tables,id:string){
   return t.measured.get(id)!;
 }
 // A value of a property at a depth: SPT N-values join the borehole's SPT tests (as complete 300 mm tests).
+// Converted values keep six significant figures, so a density of 1.95 Mg/m³ reads as a unit weight of 19.123.
+export const converted=(v:number,scale:number)=>scale===1?v:Number((v*scale).toPrecision(6));
 function addTest(m:Measured,depth:number,to:number,key:string,value:number){
   if(!Number.isFinite(depth)||!Number.isFinite(value))return;
   if(key==="N")m.spt.push({depth,blows:value,penetration:300});
@@ -161,14 +163,14 @@ function readCsvTable(file:TextFile,t:Tables){
       const id=cell(r,"id"),name=cell(r,"property");
       if(!id||!name)continue;
       const unit=c.unit!==undefined?cell(r,"unit"):"",header=propertyFromHeader(unit?`${name} (${unit})`:name);
-      addTest(measuredOf(t,id),num(cell(r,"testDepth")),num(cell(r,"testTo")),header?.key??propertyKey(name),num(cell(r,"value"))*(header?.scale??1));
+      addTest(measuredOf(t,id),num(cell(r,"testDepth")),num(cell(r,"testTo")),header?.key??propertyKey(name),converted(num(cell(r,"value")),header?.scale??1));
     }
   }else if(c.unit!==undefined&&(props.length||(["color","name","erosive","gamma","gammaSat","source"] as Field[]).some(f=>c[f]!==undefined))){
     for(const r of data){
       const id=cell(r,"unit");
       if(!id)continue;
       const params:Record<string,number>={};
-      for(const {i,p} of props)if(p.key!=="gamma"&&Number.isFinite(num(r[i])))params[p.key]=num(r[i])*p.scale;
+      for(const {i,p} of props)if(p.key!=="gamma"&&Number.isFinite(num(r[i])))params[p.key]=converted(num(r[i]),p.scale);
       t.units.push(unitDef({id,name:cell(r,"name"),color:cell(r,"color"),erosive:cell(r,"erosive"),gamma:cell(r,"gamma"),gammaSat:cell(r,"gammaSat"),source:cell(r,"source"),params}));
     }
   }else if(has("id","testDepth")&&(props.length||has("blows"))){
@@ -176,7 +178,7 @@ function readCsvTable(file:TextFile,t:Tables){
       const id=cell(r,"id");
       if(!id)continue;
       const m=measuredOf(t,id),depth=num(cell(r,"testDepth")),to=num(cell(r,"testTo"));
-      for(const {i,p} of props)addTest(m,depth,to,p.key,num(r[i])*p.scale);
+      for(const {i,p} of props)addTest(m,depth,to,p.key,converted(num(r[i]),p.scale));
       if(has("blows")){
         const blows=num(cell(r,"blows")),pen=num(cell(r,"penetration"));
         if(Number.isFinite(depth)&&Number.isFinite(blows))m.spt.push({depth,blows,penetration:Number.isFinite(pen)?pen:300});
@@ -246,7 +248,7 @@ function readAgs4(file:TextFile):ImportResult{
   for(const r of g.get("WSTG")??[])if(!rose.has(r.LOCA_ID)&&Number.isFinite(num(r.WSTG_DPTH)))measuredOf(t,r.LOCA_ID).water.push({depth:num(r.WSTG_DPTH),...(r.WSTG_DTIM?{date:r.WSTG_DTIM.slice(0,10)}:{})});
   for(const [group,heading,property,scale] of AGS_TESTS)for(const r of g.get(group)??[]){
     const depth=group==="IVAN"?num(r.IVAN_DPTH):Number.isFinite(num(r.SPEC_DPTH))?num(r.SPEC_DPTH):num(r.SAMP_TOP);
-    addTest(measuredOf(t,r.LOCA_ID),depth,num(r.SPEC_BASE),property,num(r[heading])*scale);
+    addTest(measuredOf(t,r.LOCA_ID),depth,num(r.SPEC_BASE),property,converted(num(r[heading]),scale));
   }
   const proj=g.get("PROJ")?.[0];
   const grefs=[...new Set(loca.map(r=>r.LOCA_GREF).filter(Boolean))];

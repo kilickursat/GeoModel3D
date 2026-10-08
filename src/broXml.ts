@@ -70,7 +70,7 @@ function labTests(root:XmlNode){
     for(const [determination,element,property,scale] of LAB)for(const d of childNodes(iv,determination)){
       // The water content of a determination is its own; water contents inside consistency limits are test points.
       const holder=determination==="waterContentDetermination"?childNodes(d,"determinationResult")[0]??d:d;
-      const value=num(textOf(holder,element))*scale;
+      const raw=num(textOf(holder,element)),value=scale===1?raw:Number((raw*scale).toPrecision(6));
       if(Number.isFinite(value))tests.push({depth,...(Number.isFinite(to)&&to>depth?{to}:{}),property,value});
     }
   }

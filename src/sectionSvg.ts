@@ -33,7 +33,15 @@ export function sectionTitle(s:Section){
 export function sectionSvg(model:GeoModel,s:Section,o:SectionSvgOptions){
   const t=THEMES[o.theme??"dark"],W=o.width,H=o.height;
   const shown=model.units.filter(u=>!o.hidden?.has(u.id));
-  const legendRows=o.legend?Math.ceil(shown.length/4):0,title=o.title??true;
+  // Legend entries run left to right and wrap, each as wide as its name (about 6.2 px a character at 10.5 px).
+  const legendAt:Array<[number,number]>=[];
+  let lx=0,row=0;
+  for(const u of shown){
+    const w=15+[...u.name].reduce((a,ch)=>a+(ch.charCodeAt(0)>0x2e80?10.5:6.2),0)+24;
+    if(lx>0&&lx+w>W-76){lx=0;row++}
+    legendAt.push([lx,row]);lx+=w;
+  }
+  const legendRows=o.legend&&shown.length?row+1:0,title=o.title??true;
   const m={l:58,r:18,t:title?42:26,b:44+legendRows*18+(o.field?30:0)};
   let pw=W-m.l-m.r;
   const ph=H-m.t-m.b;
@@ -87,7 +95,8 @@ export function sectionSvg(model:GeoModel,s:Section,o:SectionSvgOptions){
       const yTop=Math.max(m.t,Y(c.z[0])-cell),yBottom=Math.min(m.t+ph,Y(c.z[K])+cell);
       let y=yTop;
       for(;y<yBottom;y+=cell){
-        const e=z1-(y+cell/2-m.t)/ph*(z1-z0),k=field.unitAt(d,e);
+        // A cell across the ground or the base takes the value just inside the model; the clip trims it.
+        const e=Math.min(c.z[0]-1e-6,Math.max(c.z[K]+1e-6,z1-(y+cell/2-m.t)/ph*(z1-z0))),k=field.unitAt(d,e);
         const color=k<0||o.hidden?.has(model.units[k].id)?null:scale.colorOf(field.at(d,e));
         if(run&&run.color!==color)flush(y);
         if(color&&!run)run={y,color};
@@ -150,7 +159,7 @@ export function sectionSvg(model:GeoModel,s:Section,o:SectionSvgOptions){
   }
   out.push(`<text transform="translate(${m.l-44} ${m.t+ph/2}) rotate(-90)" text-anchor="middle" font-size="10.5" fill="${t.muted}">Elevation (m)</text>`);
   if(o.legend)shown.forEach((u,k)=>{
-    const lx=m.l+(k%4)*Math.min(pw/4,190),ly=H-12-(legendRows-1-Math.floor(k/4))*18;
+    const lx=m.l+legendAt[k][0],ly=H-12-(legendRows-1-legendAt[k][1])*18;
     out.push(`<rect x="${lx}" y="${ly-9}" width="10" height="10" fill="${u.color}"/><text x="${lx+15}" y="${ly}" font-size="10.5" fill="${t.text}">${esc(u.name)}</text>`);
   });
   out.push("</svg>");

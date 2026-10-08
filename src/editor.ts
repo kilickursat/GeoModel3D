@@ -96,7 +96,8 @@ ${field("base","Model base (m)","Elevation of the flat model base; empty for the
     const el=e.target as HTMLElement,b=el.closest("button");
     if(!b)return;
     const row=Number(b.closest("tr")?.dataset.r);
-    if(b.dataset.tab){tab=b.dataset.tab as Tab;filter=PER_HOLE.includes(tab as TableName)&&t.rows[tab as TableName].length>MAX_ROWS?holes()[0]??"":"";render();return}
+    // A large table opens on the first borehole that has rows in it.
+    if(b.dataset.tab){tab=b.dataset.tab as Tab;filter=PER_HOLE.includes(tab as TableName)&&t.rows[tab as TableName].length>MAX_ROWS?t.rows[tab as TableName].find(r=>r[0].trim())?.[0]??"":"";render();return}
     if(b.classList.contains("ed-close")){keep();dialog.close();return}
     if(tab==="project")return finish(b);
     const name=tab;

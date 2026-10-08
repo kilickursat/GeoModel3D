@@ -41,7 +41,9 @@ export const propertyLabel=(key:string)=>{const p=propertyDef(key);return `${p.n
 export function formatValue(key:string,v:number){
   const p=propertyDef(key);
   if(!Number.isFinite(v))return "";
-  if(p.log||(v!==0&&Math.abs(v)<10**-p.decimals))return v.toExponential(1);
+  if(p.log||(v!==0&&Math.abs(v)<1e-3))return v.toExponential(1);
+  // Small values keep two significant figures where the usual decimals would round them to 0.
+  if(v!==0&&Math.abs(v)<10**-p.decimals)return String(Number(v.toPrecision(2)));
   return v.toLocaleString("en-US",{maximumFractionDigits:p.decimals});
 }
 

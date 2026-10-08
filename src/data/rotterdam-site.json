@@ -2849,7 +2849,7 @@
      "depth": 3.02,
      "to": 3.07,
      "property": "gamma",
-     "value": 20.005565999999998
+     "value": 20.0056
     },
     {
      "depth": 3.07,
@@ -2861,7 +2861,7 @@
      "depth": 3.07,
      "to": 3.18,
      "property": "gamma",
-     "value": 20.790098
+     "value": 20.7901
     },
     {
      "depth": 5.2,
@@ -2879,7 +2879,7 @@
      "depth": 5.37,
      "to": 5.42,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 5.47,
@@ -2891,7 +2891,7 @@
      "depth": 5.47,
      "to": 5.58,
      "property": "gamma",
-     "value": 20.103632499999996
+     "value": 20.1036
     },
     {
      "depth": 7.6,
@@ -2909,7 +2909,7 @@
      "depth": 7.67,
      "to": 7.77,
      "property": "gamma",
-     "value": 20.299765499999996
+     "value": 20.2998
     },
     {
      "depth": 7.83,
@@ -2921,7 +2921,7 @@
      "depth": 7.83,
      "to": 7.88,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 9.47,
@@ -2933,7 +2933,7 @@
      "depth": 9.47,
      "to": 9.58,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 10.8,
@@ -2951,7 +2951,7 @@
      "depth": 11.1,
      "to": 11.2,
      "property": "gamma",
-     "value": 19.907499499999997
+     "value": 19.9075
     },
     {
      "depth": 12.82,
@@ -2963,7 +2963,7 @@
      "depth": 12.82,
      "to": 12.93,
      "property": "gamma",
-     "value": 20.201698999999998
+     "value": 20.2017
     },
     {
      "depth": 14,
@@ -2981,7 +2981,7 @@
      "depth": 14.29,
      "to": 14.4,
      "property": "gamma",
-     "value": 20.4958985
+     "value": 20.4959
     },
     {
      "depth": 16.68,
@@ -2993,7 +2993,7 @@
      "depth": 16.68,
      "to": 16.78,
      "property": "gamma",
-     "value": 20.986231
+     "value": 20.9862
     },
     {
      "depth": 17.2,
@@ -3011,7 +3011,7 @@
      "depth": 17.23,
      "to": 17.33,
      "property": "gamma",
-     "value": 20.397832
+     "value": 20.3978
     },
     {
      "depth": 18.95,
@@ -3023,7 +3023,7 @@
      "depth": 18.95,
      "to": 19.06,
      "property": "gamma",
-     "value": 18.5345685
+     "value": 18.5346
     },
     {
      "depth": 20,
@@ -3041,7 +3041,7 @@
      "depth": 20.22,
      "to": 20.33,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 21.85,
@@ -3053,7 +3053,7 @@
      "depth": 21.85,
      "to": 21.9,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 21.9,
@@ -3065,7 +3065,7 @@
      "depth": 21.9,
      "to": 22,
      "property": "gamma",
-     "value": 20.201698999999998
+     "value": 20.2017
     },
     {
      "depth": 22.73,
@@ -3083,7 +3083,7 @@
      "depth": 22.77,
      "to": 22.8,
      "property": "gamma",
-     "value": 17.063571
+     "value": 17.0636
     },
     {
      "depth": 22.98,
@@ -3101,7 +3101,7 @@
      "depth": 23.03,
      "to": 23.08,
      "property": "gamma",
-     "value": 18.044236
+     "value": 18.0442
     },
     {
      "depth": 23.08,
@@ -3113,7 +3113,7 @@
      "depth": 23.08,
      "to": 23.19,
      "property": "gamma",
-     "value": 13.140911000000001
+     "value": 13.1409
     },
     {
      "depth": 23.42,
@@ -3131,7 +3131,7 @@
      "depth": 23.47,
      "to": 23.52,
      "property": "gamma",
-     "value": 16.279038999999997
+     "value": 16.279
     },
     {
      "depth": 23.47,
@@ -3155,7 +3155,7 @@
      "depth": 23.71,
      "to": 23.76,
      "property": "gamma",
-     "value": 16.1809725
+     "value": 16.181
     },
     {
      "depth": 24.18,
@@ -3179,7 +3179,7 @@
      "depth": 24.23,
      "to": 24.28,
      "property": "gamma",
-     "value": 17.9461695
+     "value": 17.9462
     },
     {
      "depth": 24.28,
@@ -3191,7 +3191,7 @@
      "depth": 24.28,
      "to": 24.38,
      "property": "gamma",
-     "value": 17.3577705
+     "value": 17.3578
     },
     {
      "depth": 24.55,
@@ -3215,7 +3215,7 @@
      "depth": 24.6,
      "to": 24.65,
      "property": "gamma",
-     "value": 17.455837
+     "value": 17.4558
     },
     {
      "depth": 24.91,
@@ -3233,7 +3233,7 @@
      "depth": 24.96,
      "to": 25.01,
      "property": "gamma",
-     "value": 13.0428445
+     "value": 13.0428
     },
     {
      "depth": 25.44,
@@ -3251,7 +3251,7 @@
      "depth": 25.49,
      "to": 25.54,
      "property": "gamma",
-     "value": 15.984839499999998
+     "value": 15.9848
     },
     {
      "depth": 25.77,
@@ -3263,7 +3263,7 @@
      "depth": 25.77,
      "to": 25.82,
      "property": "gamma",
-     "value": 16.965504499999998
+     "value": 16.9655
     },
     {
      "depth": 25.77,
@@ -3281,7 +3281,7 @@
      "depth": 25.87,
      "to": 25.98,
      "property": "gamma",
-     "value": 17.848103
+     "value": 17.8481
     },
     {
      "depth": 25.87,
@@ -3323,7 +3323,7 @@
      "depth": 26.24,
      "to": 26.29,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 26.52,
@@ -3341,7 +3341,7 @@
      "depth": 26.57,
      "to": 26.62,
      "property": "gamma",
-     "value": 17.848103
+     "value": 17.8481
     },
     {
      "depth": 27.6,
@@ -3359,7 +3359,7 @@
      "depth": 27.89,
      "to": 28,
      "property": "gamma",
-     "value": 20.6920315
+     "value": 20.692
     },
     {
      "depth": 29.42,
@@ -3371,7 +3371,7 @@
      "depth": 29.42,
      "to": 29.47,
      "property": "gamma",
-     "value": 20.397832
+     "value": 20.3978
     },
     {
      "depth": 29.47,
@@ -3383,7 +3383,7 @@
      "depth": 29.47,
      "to": 29.57,
      "property": "gamma",
-     "value": 20.8881645
+     "value": 20.8882
     },
     {
      "depth": 30.45,
@@ -3395,7 +3395,7 @@
      "depth": 30.45,
      "to": 30.56,
      "property": "gamma",
-     "value": 20.8881645
+     "value": 20.8882
     },
     {
      "depth": 31.6,
@@ -3413,7 +3413,7 @@
      "depth": 31.84,
      "to": 31.94,
      "property": "gamma",
-     "value": 21.57463
+     "value": 21.5746
     },
     {
      "depth": 33.25,
@@ -3425,7 +3425,7 @@
      "depth": 33.25,
      "to": 33.36,
      "property": "gamma",
-     "value": 21.182364
+     "value": 21.1824
     },
     {
      "depth": 34,
@@ -3443,7 +3443,7 @@
      "depth": 35.02,
      "to": 35.12,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 36.4,
@@ -3461,7 +3461,7 @@
      "depth": 36.65,
      "to": 36.76,
      "property": "gamma",
-     "value": 19.907499499999997
+     "value": 19.9075
     }
    ]
   },
@@ -3713,7 +3713,7 @@
      "depth": 1.06,
      "to": 1.11,
      "property": "gamma",
-     "value": 14.317708999999999
+     "value": 14.3177
     },
     {
      "depth": 1.3,
@@ -3731,7 +3731,7 @@
      "depth": 1.33,
      "to": 1.43,
      "property": "gamma",
-     "value": 13.140911000000001
+     "value": 13.1409
     },
     {
      "depth": 1.33,
@@ -3767,7 +3767,7 @@
      "depth": 1.48,
      "to": 1.53,
      "property": "gamma",
-     "value": 13.533176999999998
+     "value": 13.5332
     },
     {
      "depth": 1.77,
@@ -3785,7 +3785,7 @@
      "depth": 1.82,
      "to": 1.87,
      "property": "gamma",
-     "value": 15.0041745
+     "value": 15.0042
     },
     {
      "depth": 2.1,
@@ -3797,7 +3797,7 @@
      "depth": 2.1,
      "to": 2.15,
      "property": "gamma",
-     "value": 13.2389775
+     "value": 13.239
     },
     {
      "depth": 2.1,
@@ -3821,7 +3821,7 @@
      "depth": 2.23,
      "to": 2.28,
      "property": "gamma",
-     "value": 16.671305
+     "value": 16.6713
     },
     {
      "depth": 2.4,
@@ -3833,7 +3833,7 @@
      "depth": 2.4,
      "to": 2.5,
      "property": "gamma",
-     "value": 15.886773
+     "value": 15.8868
     },
     {
      "depth": 2.47,
@@ -3869,7 +3869,7 @@
      "depth": 2.57,
      "to": 2.62,
      "property": "gamma",
-     "value": 14.513841999999999
+     "value": 14.5138
     },
     {
      "depth": 2.61,
@@ -3893,7 +3893,7 @@
      "depth": 4.84,
      "to": 4.94,
      "property": "gamma",
-     "value": 21.084297499999998
+     "value": 21.0843
     },
     {
      "depth": 6.69,
@@ -3905,7 +3905,7 @@
      "depth": 6.69,
      "to": 6.8,
      "property": "gamma",
-     "value": 20.299765499999996
+     "value": 20.2998
     },
     {
      "depth": 7.6,
@@ -3923,7 +3923,7 @@
      "depth": 11.89,
      "to": 11.99,
      "property": "gamma",
-     "value": 20.4958985
+     "value": 20.4959
     },
     {
      "depth": 13.2,
@@ -3941,7 +3941,7 @@
      "depth": 14.67,
      "to": 14.78,
      "property": "gamma",
-     "value": 20.103632499999996
+     "value": 20.1036
     },
     {
      "depth": 16.4,
@@ -3989,7 +3989,7 @@
      "depth": 23.15,
      "to": 23.2,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 23.31,
@@ -4001,7 +4001,7 @@
      "depth": 23.31,
      "to": 23.41,
      "property": "gamma",
-     "value": 20.005565999999998
+     "value": 20.0056
     },
     {
      "depth": 23.41,
@@ -4013,7 +4013,7 @@
      "depth": 23.41,
      "to": 23.46,
      "property": "gamma",
-     "value": 19.809433
+     "value": 19.8094
     },
     {
      "depth": 23.82,
@@ -4031,7 +4031,7 @@
      "depth": 23.87,
      "to": 23.92,
      "property": "gamma",
-     "value": 19.809433
+     "value": 19.8094
     },
     {
      "depth": 24.25,
@@ -4049,7 +4049,7 @@
      "depth": 24.3,
      "to": 24.35,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 24.85,
@@ -4061,7 +4061,7 @@
      "depth": 24.85,
      "to": 24.96,
      "property": "gamma",
-     "value": 20.4958985
+     "value": 20.4959
     },
     {
      "depth": 24.96,
@@ -4073,7 +4073,7 @@
      "depth": 24.96,
      "to": 25.01,
      "property": "gamma",
-     "value": 19.809433
+     "value": 19.8094
     },
     {
      "depth": 25.36,
@@ -4091,7 +4091,7 @@
      "depth": 25.41,
      "to": 25.46,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 25.83,
@@ -4109,7 +4109,7 @@
      "depth": 25.88,
      "to": 25.93,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 26.19,
@@ -4127,7 +4127,7 @@
      "depth": 26.24,
      "to": 26.29,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 26.85,
@@ -4139,7 +4139,7 @@
      "depth": 26.85,
      "to": 26.9,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 26.9,
@@ -4175,7 +4175,7 @@
      "depth": 27.71,
      "to": 27.76,
      "property": "gamma",
-     "value": 19.024901
+     "value": 19.0249
     },
     {
      "depth": 27.76,
@@ -4187,7 +4187,7 @@
      "depth": 27.76,
      "to": 27.86,
      "property": "gamma",
-     "value": 20.103632499999996
+     "value": 20.1036
     },
     {
      "depth": 28.06,
@@ -4199,7 +4199,7 @@
      "depth": 28.06,
      "to": 28.11,
      "property": "gamma",
-     "value": 19.024901
+     "value": 19.0249
     },
     {
      "depth": 28.12,
@@ -4217,7 +4217,7 @@
      "depth": 28.17,
      "to": 28.28,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 28.28,
@@ -4229,7 +4229,7 @@
      "depth": 28.28,
      "to": 28.33,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 28.6,
@@ -4247,7 +4247,7 @@
      "depth": 28.65,
      "to": 28.7,
      "property": "gamma",
-     "value": 19.809433
+     "value": 19.8094
     },
     {
      "depth": 29.67,
@@ -4433,7 +4433,7 @@
      "depth": 0.75,
      "to": 0.8,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 1.38,
@@ -4451,7 +4451,7 @@
      "depth": 1.43,
      "to": 1.48,
      "property": "gamma",
-     "value": 18.5345685
+     "value": 18.5346
     },
     {
      "depth": 1.48,
@@ -4463,7 +4463,7 @@
      "depth": 1.48,
      "to": 1.58,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 1.48,
@@ -4505,7 +4505,7 @@
      "depth": 1.76,
      "to": 1.81,
      "property": "gamma",
-     "value": 17.7500365
+     "value": 17.75
     },
     {
      "depth": 1.81,
@@ -4517,7 +4517,7 @@
      "depth": 1.81,
      "to": 1.86,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 2.07,
@@ -4535,7 +4535,7 @@
      "depth": 2.12,
      "to": 2.17,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 2.17,
@@ -4547,7 +4547,7 @@
      "depth": 2.17,
      "to": 2.22,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 2.62,
@@ -4559,7 +4559,7 @@
      "depth": 2.62,
      "to": 2.67,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 2.67,
@@ -4571,7 +4571,7 @@
      "depth": 2.67,
      "to": 2.78,
      "property": "gamma",
-     "value": 20.299765499999996
+     "value": 20.2998
     },
     {
      "depth": 2.67,
@@ -4607,7 +4607,7 @@
      "depth": 3.89,
      "to": 3.94,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 4.4,
@@ -4643,7 +4643,7 @@
      "depth": 8.29,
      "to": 8.4,
      "property": "gamma",
-     "value": 20.103632499999996
+     "value": 20.1036
     },
     {
      "depth": 10.4,
@@ -4661,7 +4661,7 @@
      "depth": 10.62,
      "to": 10.72,
      "property": "gamma",
-     "value": 20.299765499999996
+     "value": 20.2998
     },
     {
      "depth": 13.6,
@@ -4679,7 +4679,7 @@
      "depth": 15.47,
      "to": 15.58,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 16.4,
@@ -4697,7 +4697,7 @@
      "depth": 17.48,
      "to": 17.58,
      "property": "gamma",
-     "value": 20.103632499999996
+     "value": 20.1036
     },
     {
      "depth": 20,
@@ -4715,7 +4715,7 @@
      "depth": 20.3,
      "to": 20.4,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 22,
@@ -4937,7 +4937,7 @@
      "depth": 1.45,
      "to": 1.5,
      "property": "gamma",
-     "value": 19.024901
+     "value": 19.0249
     },
     {
      "depth": 2.22,
@@ -4955,7 +4955,7 @@
      "depth": 2.27,
      "to": 2.32,
      "property": "gamma",
-     "value": 12.748645
+     "value": 12.7486
     },
     {
      "depth": 2.46,
@@ -4997,7 +4997,7 @@
      "depth": 2.54,
      "to": 2.59,
      "property": "gamma",
-     "value": 17.9461695
+     "value": 17.9462
     },
     {
      "depth": 2.58,
@@ -5009,7 +5009,7 @@
      "depth": 2.58,
      "to": 2.69,
      "property": "gamma",
-     "value": 18.240369
+     "value": 18.2404
     },
     {
      "depth": 2.93,
@@ -5027,7 +5027,7 @@
      "depth": 2.98,
      "to": 3.03,
      "property": "gamma",
-     "value": 18.240369
+     "value": 18.2404
     },
     {
      "depth": 3.03,
@@ -5063,7 +5063,7 @@
      "depth": 3.25,
      "to": 3.3,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 3.28,
@@ -5075,7 +5075,7 @@
      "depth": 3.28,
      "to": 3.38,
      "property": "gamma",
-     "value": 19.024901
+     "value": 19.0249
     },
     {
      "depth": 3.3,
@@ -5123,7 +5123,7 @@
      "depth": 3.77,
      "to": 3.82,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 3.89,
@@ -5135,7 +5135,7 @@
      "depth": 3.89,
      "to": 4,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 4.05,
@@ -5171,7 +5171,7 @@
      "depth": 5.02,
      "to": 5.07,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 5.46,
@@ -5189,7 +5189,7 @@
      "depth": 5.51,
      "to": 5.56,
      "property": "gamma",
-     "value": 13.729309999999998
+     "value": 13.7293
     },
     {
      "depth": 5.69,
@@ -5207,7 +5207,7 @@
      "depth": 5.74,
      "to": 5.79,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 5.79,
@@ -5219,7 +5219,7 @@
      "depth": 5.79,
      "to": 5.9,
      "property": "gamma",
-     "value": 18.5345685
+     "value": 18.5346
     },
     {
      "depth": 5.79,
@@ -5255,7 +5255,7 @@
      "depth": 7.48,
      "to": 7.59,
      "property": "gamma",
-     "value": 20.397832
+     "value": 20.3978
     },
     {
      "depth": 8,
@@ -5273,7 +5273,7 @@
      "depth": 8.28,
      "to": 8.39,
      "property": "gamma",
-     "value": 20.4958985
+     "value": 20.4959
     },
     {
      "depth": 9.09,
@@ -5285,7 +5285,7 @@
      "depth": 9.09,
      "to": 9.2,
      "property": "gamma",
-     "value": 19.809433
+     "value": 19.8094
     },
     {
      "depth": 10.25,
@@ -5315,7 +5315,7 @@
      "depth": 11.09,
      "to": 11.2,
      "property": "gamma",
-     "value": 19.024901
+     "value": 19.0249
     },
     {
      "depth": 14.4,
@@ -5686,7 +5686,7 @@
      "depth": 1.9,
      "to": 2,
      "property": "gamma",
-     "value": 18.436501999999997
+     "value": 18.4365
     },
     {
      "depth": 2.8,
@@ -5704,7 +5704,7 @@
      "depth": 3.3,
      "to": 3.4,
      "property": "gamma",
-     "value": 19.809433
+     "value": 19.8094
     },
     {
      "depth": 4,
@@ -5728,7 +5728,7 @@
      "depth": 9.47,
      "to": 9.57,
      "property": "gamma",
-     "value": 19.809433
+     "value": 19.8094
     },
     {
      "depth": 10.4,
@@ -5746,7 +5746,7 @@
      "depth": 10.93,
      "to": 11.03,
      "property": "gamma",
-     "value": 19.809433
+     "value": 19.8094
     },
     {
      "depth": 13.6,
@@ -5764,7 +5764,7 @@
      "depth": 15.73,
      "to": 15.83,
      "property": "gamma",
-     "value": 20.4958985
+     "value": 20.4959
     },
     {
      "depth": 16.8,
@@ -5794,7 +5794,7 @@
      "depth": 19.79,
      "to": 19.89,
      "property": "gamma",
-     "value": 18.9268345
+     "value": 18.9268
     },
     {
      "depth": 20,
@@ -5818,7 +5818,7 @@
      "depth": 23.45,
      "to": 23.55,
      "property": "gamma",
-     "value": 20.299765499999996
+     "value": 20.2998
     },
     {
      "depth": 25.6,
@@ -5836,7 +5836,7 @@
      "depth": 26.46,
      "to": 26.56,
      "property": "gamma",
-     "value": 20.4958985
+     "value": 20.4959
     },
     {
      "depth": 28.29,
@@ -5848,7 +5848,7 @@
      "depth": 28.29,
      "to": 28.39,
      "property": "gamma",
-     "value": 20.790098
+     "value": 20.7901
     },
     {
      "depth": 28.8,
@@ -5866,7 +5866,7 @@
      "depth": 29.88,
      "to": 29.98,
      "property": "gamma",
-     "value": 18.632634999999997
+     "value": 18.6326
     },
     {
      "depth": 30.4,
@@ -5902,7 +5902,7 @@
      "depth": 37.85,
      "to": 37.95,
      "property": "gamma",
-     "value": 18.9268345
+     "value": 18.9268
     }
    ]
   },
@@ -6112,7 +6112,7 @@
      "depth": 1.49,
      "to": 1.54,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 2.13,
@@ -6124,7 +6124,7 @@
      "depth": 2.13,
      "to": 2.18,
      "property": "gamma",
-     "value": 17.161637499999998
+     "value": 17.1616
     },
     {
      "depth": 2.18,
@@ -6148,7 +6148,7 @@
      "depth": 2.3,
      "to": 2.35,
      "property": "gamma",
-     "value": 13.533176999999998
+     "value": 13.5332
     },
     {
      "depth": 2.52,
@@ -6166,7 +6166,7 @@
      "depth": 2.57,
      "to": 2.62,
      "property": "gamma",
-     "value": 15.102241
+     "value": 15.1022
     },
     {
      "depth": 2.62,
@@ -6202,7 +6202,7 @@
      "depth": 2.65,
      "to": 2.76,
      "property": "gamma",
-     "value": 15.7887065
+     "value": 15.7887
     },
     {
      "depth": 3.47,
@@ -6220,7 +6220,7 @@
      "depth": 3.52,
      "to": 3.57,
      "property": "gamma",
-     "value": 17.455837
+     "value": 17.4558
     },
     {
      "depth": 3.88,
@@ -6244,7 +6244,7 @@
      "depth": 3.93,
      "to": 3.98,
      "property": "gamma",
-     "value": 16.965504499999998
+     "value": 16.9655
     },
     {
      "depth": 4.3,
@@ -6268,7 +6268,7 @@
      "depth": 4.35,
      "to": 4.4,
      "property": "gamma",
-     "value": 16.7693715
+     "value": 16.7694
     },
     {
      "depth": 4.65,
@@ -6286,7 +6286,7 @@
      "depth": 4.7,
      "to": 4.75,
      "property": "gamma",
-     "value": 15.69064
+     "value": 15.6906
     },
     {
      "depth": 4.85,
@@ -6304,7 +6304,7 @@
      "depth": 4.91,
      "to": 4.96,
      "property": "gamma",
-     "value": 14.709975
+     "value": 14.71
     },
     {
      "depth": 4.97,
@@ -6340,7 +6340,7 @@
      "depth": 4.98,
      "to": 5.09,
      "property": "gamma",
-     "value": 16.082905999999998
+     "value": 16.0829
     },
     {
      "depth": 5.27,
@@ -6358,7 +6358,7 @@
      "depth": 5.32,
      "to": 5.37,
      "property": "gamma",
-     "value": 19.024901
+     "value": 19.0249
     },
     {
      "depth": 6.23,
@@ -6370,7 +6370,7 @@
      "depth": 6.23,
      "to": 6.28,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 7.2,
@@ -6388,7 +6388,7 @@
      "depth": 7.47,
      "to": 7.58,
      "property": "gamma",
-     "value": 20.986231
+     "value": 20.9862
     },
     {
      "depth": 8.69,
@@ -6400,7 +6400,7 @@
      "depth": 8.69,
      "to": 8.79,
      "property": "gamma",
-     "value": 21.084297499999998
+     "value": 21.0843
     },
     {
      "depth": 10,
@@ -6418,7 +6418,7 @@
      "depth": 10.3,
      "to": 10.4,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 12.4,
@@ -6436,7 +6436,7 @@
      "depth": 12.7,
      "to": 12.75,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 15.2,
@@ -6454,7 +6454,7 @@
      "depth": 15.28,
      "to": 15.38,
      "property": "gamma",
-     "value": 18.1423025
+     "value": 18.1423
     },
     {
      "depth": 17.2,
@@ -6472,7 +6472,7 @@
      "depth": 17.5,
      "to": 17.6,
      "property": "gamma",
-     "value": 20.299765499999996
+     "value": 20.2998
     },
     {
      "depth": 19.2,
@@ -6843,7 +6843,7 @@
      "depth": 2.18,
      "to": 2.29,
      "property": "gamma",
-     "value": 19.907499499999997
+     "value": 19.9075
     },
     {
      "depth": 3.65,
@@ -6855,7 +6855,7 @@
      "depth": 3.65,
      "to": 3.75,
      "property": "gamma",
-     "value": 21.280430499999998
+     "value": 21.2804
     },
     {
      "depth": 4.8,
@@ -6873,7 +6873,7 @@
      "depth": 6.16,
      "to": 6.27,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 7.6,
@@ -6891,7 +6891,7 @@
      "depth": 7.79,
      "to": 7.9,
      "property": "gamma",
-     "value": 20.593965
+     "value": 20.594
     },
     {
      "depth": 9.45,
@@ -6927,7 +6927,7 @@
      "depth": 10.96,
      "to": 11.07,
      "property": "gamma",
-     "value": 19.809433
+     "value": 19.8094
     },
     {
      "depth": 11.8,
@@ -6939,7 +6939,7 @@
      "depth": 11.8,
      "to": 11.85,
      "property": "gamma",
-     "value": 15.886773
+     "value": 15.8868
     },
     {
      "depth": 11.95,
@@ -6951,7 +6951,7 @@
      "depth": 11.95,
      "to": 12,
      "property": "gamma",
-     "value": 18.240369
+     "value": 18.2404
     },
     {
      "depth": 11.95,
@@ -6969,7 +6969,7 @@
      "depth": 13.08,
      "to": 13.19,
      "property": "gamma",
-     "value": 18.9268345
+     "value": 18.9268
     },
     {
      "depth": 14.26,
@@ -6981,7 +6981,7 @@
      "depth": 14.26,
      "to": 14.37,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 14.95,
@@ -6993,7 +6993,7 @@
      "depth": 14.95,
      "to": 15,
      "property": "gamma",
-     "value": 17.7500365
+     "value": 17.75
     },
     {
      "depth": 15.15,
@@ -7005,7 +7005,7 @@
      "depth": 15.15,
      "to": 15.2,
      "property": "gamma",
-     "value": 17.3577705
+     "value": 17.3578
     },
     {
      "depth": 15.89,
@@ -7017,7 +7017,7 @@
      "depth": 15.89,
      "to": 16,
      "property": "gamma",
-     "value": 18.1423025
+     "value": 18.1423
     },
     {
      "depth": 17.2,
@@ -7035,7 +7035,7 @@
      "depth": 17.36,
      "to": 17.47,
      "property": "gamma",
-     "value": 19.907499499999997
+     "value": 19.9075
     },
     {
      "depth": 18.84,
@@ -7047,7 +7047,7 @@
      "depth": 18.84,
      "to": 18.94,
      "property": "gamma",
-     "value": 20.593965
+     "value": 20.594
     },
     {
      "depth": 20,
@@ -7071,7 +7071,7 @@
      "depth": 23.03,
      "to": 23.08,
      "property": "gamma",
-     "value": 16.5732385
+     "value": 16.5732
     },
     {
      "depth": 23.03,
@@ -7095,7 +7095,7 @@
      "depth": 23.13,
      "to": 23.18,
      "property": "gamma",
-     "value": 15.886773
+     "value": 15.8868
     },
     {
      "depth": 23.35,
@@ -7107,7 +7107,7 @@
      "depth": 23.35,
      "to": 23.4,
      "property": "gamma",
-     "value": 15.7887065
+     "value": 15.7887
     },
     {
      "depth": 23.35,
@@ -7125,7 +7125,7 @@
      "depth": 23.4,
      "to": 23.45,
      "property": "gamma",
-     "value": 15.5925735
+     "value": 15.5926
     },
     {
      "depth": 23.45,
@@ -7137,7 +7137,7 @@
      "depth": 23.45,
      "to": 23.55,
      "property": "gamma",
-     "value": 15.7887065
+     "value": 15.7887
     },
     {
      "depth": 23.55,
@@ -7155,7 +7155,7 @@
      "depth": 24.08,
      "to": 24.19,
      "property": "gamma",
-     "value": 14.415775499999999
+     "value": 14.4158
     },
     {
      "depth": 24.64,
@@ -7167,7 +7167,7 @@
      "depth": 24.64,
      "to": 24.69,
      "property": "gamma",
-     "value": 18.044236
+     "value": 18.0442
     },
     {
      "depth": 24.64,
@@ -7185,7 +7185,7 @@
      "depth": 24.69,
      "to": 24.74,
      "property": "gamma",
-     "value": 15.102241
+     "value": 15.1022
     },
     {
      "depth": 24.69,
@@ -7203,7 +7203,7 @@
      "depth": 24.83,
      "to": 24.88,
      "property": "gamma",
-     "value": 18.1423025
+     "value": 18.1423
     },
     {
      "depth": 24.83,
@@ -7221,7 +7221,7 @@
      "depth": 24.88,
      "to": 24.93,
      "property": "gamma",
-     "value": 17.9461695
+     "value": 17.9462
     },
     {
      "depth": 24.88,
@@ -7239,7 +7239,7 @@
      "depth": 24.93,
      "to": 25.04,
      "property": "gamma",
-     "value": 15.298373999999999
+     "value": 15.2984
     },
     {
      "depth": 26.8,
@@ -7257,7 +7257,7 @@
      "depth": 27.68,
      "to": 27.73,
      "property": "gamma",
-     "value": 15.984839499999998
+     "value": 15.9848
     },
     {
      "depth": 27.68,
@@ -7275,7 +7275,7 @@
      "depth": 27.74,
      "to": 27.85,
      "property": "gamma",
-     "value": 17.259704
+     "value": 17.2597
     },
     {
      "depth": 28.68,
@@ -7287,7 +7287,7 @@
      "depth": 28.68,
      "to": 28.79,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 28.8,
@@ -7305,7 +7305,7 @@
      "depth": 28.99,
      "to": 29.04,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 29.2,
@@ -7323,7 +7323,7 @@
      "depth": 29.54,
      "to": 29.59,
      "property": "gamma",
-     "value": 20.005565999999998
+     "value": 20.0056
     },
     {
      "depth": 29.9,
@@ -7335,7 +7335,7 @@
      "depth": 29.9,
      "to": 30,
      "property": "gamma",
-     "value": 21.084297499999998
+     "value": 21.0843
     },
     {
      "depth": 30.02,
@@ -7347,7 +7347,7 @@
      "depth": 30.02,
      "to": 30.12,
      "property": "gamma",
-     "value": 18.436501999999997
+     "value": 18.4365
     },
     {
      "depth": 31.88,
@@ -7359,7 +7359,7 @@
      "depth": 31.88,
      "to": 31.99,
      "property": "gamma",
-     "value": 21.182364
+     "value": 21.1824
     },
     {
      "depth": 32.8,
@@ -7377,7 +7377,7 @@
      "depth": 33.47,
      "to": 33.58,
      "property": "gamma",
-     "value": 19.024901
+     "value": 19.0249
     },
     {
      "depth": 34.62,
@@ -7389,7 +7389,7 @@
      "depth": 34.62,
      "to": 34.73,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 36.4,
@@ -7407,7 +7407,7 @@
      "depth": 36.64,
      "to": 36.75,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     }
    ]
   },
@@ -7724,7 +7724,7 @@
      "depth": 2.05,
      "to": 2.15,
      "property": "gamma",
-     "value": 21.280430499999998
+     "value": 21.2804
     },
     {
      "depth": 2.15,
@@ -7736,7 +7736,7 @@
      "depth": 2.15,
      "to": 2.2,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 3.2,
@@ -7754,7 +7754,7 @@
      "depth": 3.73,
      "to": 3.83,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 5.6,
@@ -7772,7 +7772,7 @@
      "depth": 6.04,
      "to": 6.14,
      "property": "gamma",
-     "value": 20.790098
+     "value": 20.7901
     },
     {
      "depth": 6.14,
@@ -7796,7 +7796,7 @@
      "depth": 7.64,
      "to": 7.74,
      "property": "gamma",
-     "value": 20.005565999999998
+     "value": 20.0056
     },
     {
      "depth": 9.05,
@@ -7808,7 +7808,7 @@
      "depth": 9.05,
      "to": 9.15,
      "property": "gamma",
-     "value": 20.4958985
+     "value": 20.4959
     },
     {
      "depth": 9.2,
@@ -7826,7 +7826,7 @@
      "depth": 10.84,
      "to": 10.94,
      "property": "gamma",
-     "value": 20.4958985
+     "value": 20.4959
     },
     {
      "depth": 12,
@@ -7844,7 +7844,7 @@
      "depth": 12.62,
      "to": 12.65,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 12.65,
@@ -7856,7 +7856,7 @@
      "depth": 12.65,
      "to": 12.75,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 12.85,
@@ -7868,7 +7868,7 @@
      "depth": 12.85,
      "to": 12.95,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 14.23,
@@ -7880,7 +7880,7 @@
      "depth": 14.23,
      "to": 14.33,
      "property": "gamma",
-     "value": 20.397832
+     "value": 20.3978
     },
     {
      "depth": 14.8,
@@ -7898,7 +7898,7 @@
      "depth": 15.65,
      "to": 15.75,
      "property": "gamma",
-     "value": 21.084297499999998
+     "value": 21.0843
     },
     {
      "depth": 17.35,
@@ -7910,7 +7910,7 @@
      "depth": 17.35,
      "to": 17.46,
      "property": "gamma",
-     "value": 20.103632499999996
+     "value": 20.1036
     },
     {
      "depth": 17.6,
@@ -7928,7 +7928,7 @@
      "depth": 18.05,
      "to": 18.15,
      "property": "gamma",
-     "value": 20.6920315
+     "value": 20.692
     },
     {
      "depth": 19.04,
@@ -7940,7 +7940,7 @@
      "depth": 19.04,
      "to": 19.14,
      "property": "gamma",
-     "value": 20.790098
+     "value": 20.7901
     },
     {
      "depth": 19.6,
@@ -7952,7 +7952,7 @@
      "depth": 19.6,
      "to": 19.71,
      "property": "gamma",
-     "value": 19.907499499999997
+     "value": 19.9075
     },
     {
      "depth": 19.75,
@@ -7964,7 +7964,7 @@
      "depth": 19.75,
      "to": 19.8,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 20,
@@ -7982,7 +7982,7 @@
      "depth": 20.44,
      "to": 20.54,
      "property": "gamma",
-     "value": 20.4958985
+     "value": 20.4959
     },
     {
      "depth": 22.52,
@@ -8000,7 +8000,7 @@
      "depth": 22.57,
      "to": 22.62,
      "property": "gamma",
-     "value": 18.5345685
+     "value": 18.5346
     },
     {
      "depth": 22.86,
@@ -8012,7 +8012,7 @@
      "depth": 22.86,
      "to": 22.96,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 23.36,
@@ -8030,7 +8030,7 @@
      "depth": 23.41,
      "to": 23.46,
      "property": "gamma",
-     "value": 18.436501999999997
+     "value": 18.4365
     },
     {
      "depth": 23.6,
@@ -8048,7 +8048,7 @@
      "depth": 23.8,
      "to": 23.85,
      "property": "gamma",
-     "value": 17.848103
+     "value": 17.8481
     },
     {
      "depth": 24.52,
@@ -8066,7 +8066,7 @@
      "depth": 24.57,
      "to": 24.62,
      "property": "gamma",
-     "value": 17.65197
+     "value": 17.652
     },
     {
      "depth": 24.62,
@@ -8078,7 +8078,7 @@
      "depth": 24.62,
      "to": 24.72,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 25.05,
@@ -8096,7 +8096,7 @@
      "depth": 25.1,
      "to": 25.15,
      "property": "gamma",
-     "value": 17.259704
+     "value": 17.2597
     },
     {
      "depth": 25.41,
@@ -8108,7 +8108,7 @@
      "depth": 25.41,
      "to": 25.52,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 26.17,
@@ -8120,7 +8120,7 @@
      "depth": 26.17,
      "to": 26.27,
      "property": "gamma",
-     "value": 20.397832
+     "value": 20.3978
     },
     {
      "depth": 27.2,
@@ -8138,7 +8138,7 @@
      "depth": 28.91,
      "to": 28.96,
      "property": "gamma",
-     "value": 17.848103
+     "value": 17.8481
     },
     {
      "depth": 29.02,
@@ -8150,7 +8150,7 @@
      "depth": 29.02,
      "to": 29.12,
      "property": "gamma",
-     "value": 18.240369
+     "value": 18.2404
     },
     {
      "depth": 29.6,
@@ -8168,7 +8168,7 @@
      "depth": 30.89,
      "to": 30.94,
      "property": "gamma",
-     "value": 20.103632499999996
+     "value": 20.1036
     },
     {
      "depth": 30.94,
@@ -8180,7 +8180,7 @@
      "depth": 30.94,
      "to": 31.05,
      "property": "gamma",
-     "value": 20.6920315
+     "value": 20.692
     },
     {
      "depth": 32.8,
@@ -8198,7 +8198,7 @@
      "depth": 34.65,
      "to": 34.75,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 35.6,
@@ -8336,7 +8336,7 @@
      "depth": 2.46,
      "to": 2.51,
      "property": "gamma",
-     "value": 18.436501999999997
+     "value": 18.4365
     },
     {
      "depth": 2.64,
@@ -8348,7 +8348,7 @@
      "depth": 2.64,
      "to": 2.69,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 2.69,
@@ -8408,7 +8408,7 @@
      "depth": 3.36,
      "to": 3.38,
      "property": "gamma",
-     "value": 11.669913499999998
+     "value": 11.6699
     },
     {
      "depth": 3.39,
@@ -8426,7 +8426,7 @@
      "depth": 3.41,
      "to": 3.52,
      "property": "gamma",
-     "value": 15.2003075
+     "value": 15.2003
     },
     {
      "depth": 4.8,
@@ -8450,7 +8450,7 @@
      "depth": 6.98,
      "to": 7.09,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 8,
@@ -8468,7 +8468,7 @@
      "depth": 8.23,
      "to": 8.27,
      "property": "gamma",
-     "value": 18.5345685
+     "value": 18.5346
     },
     {
      "depth": 8.27,
@@ -8480,7 +8480,7 @@
      "depth": 8.27,
      "to": 8.38,
      "property": "gamma",
-     "value": 20.6920315
+     "value": 20.692
     },
     {
      "depth": 9.08,
@@ -8492,7 +8492,7 @@
      "depth": 9.08,
      "to": 9.19,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 10.03,
@@ -8504,7 +8504,7 @@
      "depth": 10.03,
      "to": 10.13,
      "property": "gamma",
-     "value": 20.005565999999998
+     "value": 20.0056
     },
     {
      "depth": 10.13,
@@ -8534,7 +8534,7 @@
      "depth": 11,
      "to": 11.1,
      "property": "gamma",
-     "value": 20.593965
+     "value": 20.594
     },
     {
      "depth": 12.3,
@@ -8546,7 +8546,7 @@
      "depth": 12.3,
      "to": 12.4,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 12.8,
@@ -8564,7 +8564,7 @@
      "depth": 13.09,
      "to": 13.2,
      "property": "gamma",
-     "value": 18.5345685
+     "value": 18.5346
     }
    ]
   },
@@ -8887,7 +8887,7 @@
      "depth": 2.6,
      "to": 2.7,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 2.8,
@@ -8905,7 +8905,7 @@
      "depth": 4.55,
      "to": 4.65,
      "property": "gamma",
-     "value": 18.1423025
+     "value": 18.1423
     },
     {
      "depth": 4.71,
@@ -8917,7 +8917,7 @@
      "depth": 4.71,
      "to": 4.76,
      "property": "gamma",
-     "value": 18.436501999999997
+     "value": 18.4365
     },
     {
      "depth": 6.06,
@@ -8929,7 +8929,7 @@
      "depth": 6.06,
      "to": 6.16,
      "property": "gamma",
-     "value": 20.299765499999996
+     "value": 20.2998
     },
     {
      "depth": 6.4,
@@ -8947,7 +8947,7 @@
      "depth": 7.84,
      "to": 7.94,
      "property": "gamma",
-     "value": 20.790098
+     "value": 20.7901
     },
     {
      "depth": 8.8,
@@ -8965,7 +8965,7 @@
      "depth": 10.44,
      "to": 10.54,
      "property": "gamma",
-     "value": 20.103632499999996
+     "value": 20.1036
     },
     {
      "depth": 10.63,
@@ -8977,7 +8977,7 @@
      "depth": 10.63,
      "to": 10.68,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 12,
@@ -8995,7 +8995,7 @@
      "depth": 13.5,
      "to": 13.55,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 13.88,
@@ -9007,7 +9007,7 @@
      "depth": 13.88,
      "to": 13.98,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 15.2,
@@ -9025,7 +9025,7 @@
      "depth": 16.05,
      "to": 16.15,
      "property": "gamma",
-     "value": 20.005565999999998
+     "value": 20.0056
     },
     {
      "depth": 16.33,
@@ -9037,7 +9037,7 @@
      "depth": 16.33,
      "to": 16.38,
      "property": "gamma",
-     "value": 18.5345685
+     "value": 18.5346
     },
     {
      "depth": 18,
@@ -9061,7 +9061,7 @@
      "depth": 21.04,
      "to": 21.14,
      "property": "gamma",
-     "value": 20.005565999999998
+     "value": 20.0056
     },
     {
      "depth": 22.5,
@@ -9079,7 +9079,7 @@
      "depth": 22.55,
      "to": 22.6,
      "property": "gamma",
-     "value": 16.671305
+     "value": 16.6713
     },
     {
      "depth": 22.6,
@@ -9091,7 +9091,7 @@
      "depth": 22.6,
      "to": 22.7,
      "property": "gamma",
-     "value": 17.259704
+     "value": 17.2597
     },
     {
      "depth": 22.6,
@@ -9133,7 +9133,7 @@
      "depth": 23.11,
      "to": 23.16,
      "property": "gamma",
-     "value": 15.2003075
+     "value": 15.2003
     },
     {
      "depth": 23.39,
@@ -9151,7 +9151,7 @@
      "depth": 23.44,
      "to": 23.49,
      "property": "gamma",
-     "value": 12.356378999999999
+     "value": 12.3564
     },
     {
      "depth": 23.65,
@@ -9163,7 +9163,7 @@
      "depth": 23.65,
      "to": 23.75,
      "property": "gamma",
-     "value": 15.396440499999999
+     "value": 15.3964
     },
     {
      "depth": 23.65,
@@ -9205,7 +9205,7 @@
      "depth": 23.92,
      "to": 23.97,
      "property": "gamma",
-     "value": 13.2389775
+     "value": 13.239
     },
     {
      "depth": 24.17,
@@ -9223,7 +9223,7 @@
      "depth": 24.22,
      "to": 24.27,
      "property": "gamma",
-     "value": 16.7693715
+     "value": 16.7694
     },
     {
      "depth": 24.61,
@@ -9241,7 +9241,7 @@
      "depth": 24.66,
      "to": 24.71,
      "property": "gamma",
-     "value": 18.5345685
+     "value": 18.5346
     },
     {
      "depth": 24.71,
@@ -9253,7 +9253,7 @@
      "depth": 24.71,
      "to": 24.76,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 26.07,
@@ -9265,7 +9265,7 @@
      "depth": 26.07,
      "to": 26.14,
      "property": "gamma",
-     "value": 16.5732385
+     "value": 16.5732
     },
     {
      "depth": 26.07,
@@ -9307,7 +9307,7 @@
      "depth": 26.16,
      "to": 26.26,
      "property": "gamma",
-     "value": 17.848103
+     "value": 17.8481
     },
     {
      "depth": 26.26,
@@ -9319,7 +9319,7 @@
      "depth": 26.26,
      "to": 26.31,
      "property": "gamma",
-     "value": 15.69064
+     "value": 15.6906
     },
     {
      "depth": 27.06,
@@ -9331,7 +9331,7 @@
      "depth": 27.06,
      "to": 27.16,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 28,
@@ -9349,7 +9349,7 @@
      "depth": 29.46,
      "to": 29.56,
      "property": "gamma",
-     "value": 20.4958985
+     "value": 20.4959
     },
     {
      "depth": 31.2,
@@ -9367,7 +9367,7 @@
      "depth": 31.43,
      "to": 31.53,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 33.6,
@@ -9391,7 +9391,7 @@
      "depth": 38.05,
      "to": 38.15,
      "property": "gamma",
-     "value": 21.378497
+     "value": 21.3785
     }
    ]
   },
@@ -9565,7 +9565,7 @@
      "depth": 1.77,
      "to": 1.82,
      "property": "gamma",
-     "value": 19.024901
+     "value": 19.0249
     },
     {
      "depth": 2.86,
@@ -9583,7 +9583,7 @@
      "depth": 2.91,
      "to": 2.96,
      "property": "gamma",
-     "value": 14.906108
+     "value": 14.9061
     },
     {
      "depth": 3.2,
@@ -9595,7 +9595,7 @@
      "depth": 3.2,
      "to": 3.3,
      "property": "gamma",
-     "value": 15.494507
+     "value": 15.4945
     },
     {
      "depth": 3.2,
@@ -9637,7 +9637,7 @@
      "depth": 3.4,
      "to": 3.45,
      "property": "gamma",
-     "value": 13.925442999999998
+     "value": 13.9254
     },
     {
      "depth": 4.08,
@@ -9655,7 +9655,7 @@
      "depth": 4.13,
      "to": 4.18,
      "property": "gamma",
-     "value": 12.0621795
+     "value": 12.0622
     },
     {
      "depth": 4.5,
@@ -9673,7 +9673,7 @@
      "depth": 4.55,
      "to": 4.6,
      "property": "gamma",
-     "value": 16.7693715
+     "value": 16.7694
     },
     {
      "depth": 4.79,
@@ -9691,7 +9691,7 @@
      "depth": 4.84,
      "to": 4.89,
      "property": "gamma",
-     "value": 16.475171999999997
+     "value": 16.4752
     },
     {
      "depth": 4.89,
@@ -9703,7 +9703,7 @@
      "depth": 4.89,
      "to": 4.99,
      "property": "gamma",
-     "value": 17.3577705
+     "value": 17.3578
     },
     {
      "depth": 4.89,
@@ -9739,7 +9739,7 @@
      "depth": 5.24,
      "to": 5.29,
      "property": "gamma",
-     "value": 16.475171999999997
+     "value": 16.4752
     },
     {
      "depth": 5.51,
@@ -9757,7 +9757,7 @@
      "depth": 5.56,
      "to": 5.61,
      "property": "gamma",
-     "value": 18.240369
+     "value": 18.2404
     },
     {
      "depth": 5.61,
@@ -9769,7 +9769,7 @@
      "depth": 5.61,
      "to": 5.66,
      "property": "gamma",
-     "value": 17.5539035
+     "value": 17.5539
     },
     {
      "depth": 9.05,
@@ -9787,7 +9787,7 @@
      "depth": 9.31,
      "to": 9.36,
      "property": "gamma",
-     "value": 20.005565999999998
+     "value": 20.0056
     },
     {
      "depth": 10.45,
@@ -9799,7 +9799,7 @@
      "depth": 10.45,
      "to": 10.56,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 11.72,
@@ -9811,7 +9811,7 @@
      "depth": 11.72,
      "to": 11.83,
      "property": "gamma",
-     "value": 18.044236
+     "value": 18.0442
     },
     {
      "depth": 12.65,
@@ -9829,7 +9829,7 @@
      "depth": 12.92,
      "to": 13.03,
      "property": "gamma",
-     "value": 19.024901
+     "value": 19.0249
     },
     {
      "depth": 15.45,
@@ -9847,7 +9847,7 @@
      "depth": 15.74,
      "to": 15.85,
      "property": "gamma",
-     "value": 18.436501999999997
+     "value": 18.4365
     }
    ]
   },
@@ -10147,7 +10147,7 @@
      "depth": 1.04,
      "to": 1.09,
      "property": "gamma",
-     "value": 17.161637499999998
+     "value": 17.1616
     },
     {
      "depth": 1.09,
@@ -10159,7 +10159,7 @@
      "depth": 1.09,
      "to": 1.2,
      "property": "gamma",
-     "value": 18.632634999999997
+     "value": 18.6326
     },
     {
      "depth": 1.09,
@@ -10201,7 +10201,7 @@
      "depth": 1.39,
      "to": 1.44,
      "property": "gamma",
-     "value": 16.965504499999998
+     "value": 16.9655
     },
     {
      "depth": 1.5,
@@ -10219,7 +10219,7 @@
      "depth": 1.55,
      "to": 1.6,
      "property": "gamma",
-     "value": 13.925442999999998
+     "value": 13.9254
     },
     {
      "depth": 1.86,
@@ -10237,7 +10237,7 @@
      "depth": 1.91,
      "to": 1.96,
      "property": "gamma",
-     "value": 18.5345685
+     "value": 18.5346
     },
     {
      "depth": 2.13,
@@ -10255,7 +10255,7 @@
      "depth": 2.18,
      "to": 2.23,
      "property": "gamma",
-     "value": 17.3577705
+     "value": 17.3578
     },
     {
      "depth": 2.23,
@@ -10267,7 +10267,7 @@
      "depth": 2.23,
      "to": 2.34,
      "property": "gamma",
-     "value": 17.7500365
+     "value": 17.75
     },
     {
      "depth": 2.23,
@@ -10309,7 +10309,7 @@
      "depth": 3.37,
      "to": 3.42,
      "property": "gamma",
-     "value": 17.259704
+     "value": 17.2597
     },
     {
      "depth": 3.42,
@@ -10321,7 +10321,7 @@
      "depth": 3.42,
      "to": 3.53,
      "property": "gamma",
-     "value": 17.848103
+     "value": 17.8481
     },
     {
      "depth": 3.42,
@@ -10357,7 +10357,7 @@
      "depth": 3.67,
      "to": 3.72,
      "property": "gamma",
-     "value": 20.103632499999996
+     "value": 20.1036
     },
     {
      "depth": 3.72,
@@ -10393,7 +10393,7 @@
      "depth": 8.67,
      "to": 8.78,
      "property": "gamma",
-     "value": 19.809433
+     "value": 19.8094
     },
     {
      "depth": 12.8,
@@ -10411,7 +10411,7 @@
      "depth": 14.66,
      "to": 14.77,
      "property": "gamma",
-     "value": 19.809433
+     "value": 19.8094
     },
     {
      "depth": 16,
@@ -10435,7 +10435,7 @@
      "depth": 20.9,
      "to": 20.96,
      "property": "gamma",
-     "value": 19.907499499999997
+     "value": 19.9075
     },
     {
      "depth": 20.9,
@@ -10453,7 +10453,7 @@
      "depth": 20.96,
      "to": 21.01,
      "property": "gamma",
-     "value": 20.005565999999998
+     "value": 20.0056
     },
     {
      "depth": 21.01,
@@ -10465,7 +10465,7 @@
      "depth": 21.01,
      "to": 21.12,
      "property": "gamma",
-     "value": 20.593965
+     "value": 20.594
     },
     {
      "depth": 21.45,
@@ -10483,7 +10483,7 @@
      "depth": 21.5,
      "to": 21.55,
      "property": "gamma",
-     "value": 19.907499499999997
+     "value": 19.9075
     },
     {
      "depth": 21.81,
@@ -10501,7 +10501,7 @@
      "depth": 21.86,
      "to": 21.91,
      "property": "gamma",
-     "value": 20.201698999999998
+     "value": 20.2017
     },
     {
      "depth": 22.22,
@@ -10519,7 +10519,7 @@
      "depth": 22.27,
      "to": 22.32,
      "property": "gamma",
-     "value": 20.299765499999996
+     "value": 20.2998
     },
     {
      "depth": 22.43,
@@ -10531,7 +10531,7 @@
      "depth": 22.43,
      "to": 22.48,
      "property": "gamma",
-     "value": 20.103632499999996
+     "value": 20.1036
     },
     {
      "depth": 22.48,
@@ -10549,7 +10549,7 @@
      "depth": 22.52,
      "to": 22.63,
      "property": "gamma",
-     "value": 20.4958985
+     "value": 20.4959
     },
     {
      "depth": 23.05,
@@ -10567,7 +10567,7 @@
      "depth": 23.1,
      "to": 23.15,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 23.41,
@@ -10585,7 +10585,7 @@
      "depth": 23.46,
      "to": 23.51,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 23.64,
@@ -10597,7 +10597,7 @@
      "depth": 23.64,
      "to": 23.7,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 23.64,
@@ -10615,7 +10615,7 @@
      "depth": 23.7,
      "to": 23.75,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 23.75,
@@ -10627,7 +10627,7 @@
      "depth": 23.75,
      "to": 23.86,
      "property": "gamma",
-     "value": 20.005565999999998
+     "value": 20.0056
     },
     {
      "depth": 25.03,
@@ -10639,7 +10639,7 @@
      "depth": 25.03,
      "to": 25.08,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 25.44,
@@ -10651,7 +10651,7 @@
      "depth": 25.44,
      "to": 25.49,
      "property": "gamma",
-     "value": 18.9268345
+     "value": 18.9268
     },
     {
      "depth": 25.8,
@@ -10669,7 +10669,7 @@
      "depth": 25.85,
      "to": 25.9,
      "property": "gamma",
-     "value": 19.907499499999997
+     "value": 19.9075
     },
     {
      "depth": 26.09,
@@ -10681,7 +10681,7 @@
      "depth": 26.09,
      "to": 26.14,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 26.14,
@@ -10693,7 +10693,7 @@
      "depth": 26.14,
      "to": 26.19,
      "property": "gamma",
-     "value": 18.436501999999997
+     "value": 18.4365
     },
     {
      "depth": 26.19,
@@ -10705,7 +10705,7 @@
      "depth": 26.19,
      "to": 26.3,
      "property": "gamma",
-     "value": 20.201698999999998
+     "value": 20.2017
     },
     {
      "depth": 26.19,
@@ -10723,7 +10723,7 @@
      "depth": 27.83,
      "to": 27.94,
      "property": "gamma",
-     "value": 20.4958985
+     "value": 20.4959
     },
     {
      "depth": 28,
@@ -10861,7 +10861,7 @@
      "depth": 1.35,
      "to": 1.4,
      "property": "gamma",
-     "value": 16.082905999999998
+     "value": 16.0829
     },
     {
      "depth": 1.64,
@@ -10879,7 +10879,7 @@
      "depth": 1.69,
      "to": 1.74,
      "property": "gamma",
-     "value": 14.906108
+     "value": 14.9061
     },
     {
      "depth": 1.97,
@@ -10891,7 +10891,7 @@
      "depth": 1.97,
      "to": 2.08,
      "property": "gamma",
-     "value": 12.6505785
+     "value": 12.6506
     },
     {
      "depth": 1.97,
@@ -10933,7 +10933,7 @@
      "depth": 2.84,
      "to": 2.89,
      "property": "gamma",
-     "value": 17.3577705
+     "value": 17.3578
     },
     {
      "depth": 3.12,
@@ -10975,7 +10975,7 @@
      "depth": 3.22,
      "to": 3.27,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 4.6,
@@ -10993,7 +10993,7 @@
      "depth": 5.52,
      "to": 5.62,
      "property": "gamma",
-     "value": 20.6920315
+     "value": 20.692
     },
     {
      "depth": 6.08,
@@ -11011,7 +11011,7 @@
      "depth": 6.13,
      "to": 6.18,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 7.4,
@@ -11029,7 +11029,7 @@
      "depth": 7.68,
      "to": 7.79,
      "property": "gamma",
-     "value": 20.299765499999996
+     "value": 20.2998
     },
     {
      "depth": 10.2,
@@ -11047,7 +11047,7 @@
      "depth": 11.22,
      "to": 11.33,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     }
    ]
   },
@@ -11167,7 +11167,7 @@
      "depth": 1.33,
      "to": 1.38,
      "property": "gamma",
-     "value": 18.240369
+     "value": 18.2404
     },
     {
      "depth": 3.33,
@@ -11185,7 +11185,7 @@
      "depth": 3.37,
      "to": 3.42,
      "property": "gamma",
-     "value": 18.3384355
+     "value": 18.3384
     },
     {
      "depth": 3.42,
@@ -11197,7 +11197,7 @@
      "depth": 3.42,
      "to": 3.53,
      "property": "gamma",
-     "value": 18.3384355
+     "value": 18.3384
     },
     {
      "depth": 3.42,
@@ -11239,7 +11239,7 @@
      "depth": 3.84,
      "to": 3.89,
      "property": "gamma",
-     "value": 15.396440499999999
+     "value": 15.3964
     },
     {
      "depth": 4.15,
@@ -11257,7 +11257,7 @@
      "depth": 4.19,
      "to": 4.24,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 4.24,
@@ -11269,7 +11269,7 @@
      "depth": 4.24,
      "to": 4.35,
      "property": "gamma",
-     "value": 18.632634999999997
+     "value": 18.6326
     },
     {
      "depth": 4.24,
@@ -11311,7 +11311,7 @@
      "depth": 4.53,
      "to": 4.58,
      "property": "gamma",
-     "value": 16.965504499999998
+     "value": 16.9655
     },
     {
      "depth": 4.65,
@@ -11329,7 +11329,7 @@
      "depth": 4.7,
      "to": 4.75,
      "property": "gamma",
-     "value": 14.317708999999999
+     "value": 14.3177
     },
     {
      "depth": 6.8,
@@ -11347,7 +11347,7 @@
      "depth": 7.1,
      "to": 7.2,
      "property": "gamma",
-     "value": 21.084297499999998
+     "value": 21.0843
     },
     {
      "depth": 8.29,
@@ -11359,7 +11359,7 @@
      "depth": 8.29,
      "to": 8.4,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 9.2,
@@ -11688,7 +11688,7 @@
      "depth": 2.21,
      "to": 2.31,
      "property": "gamma",
-     "value": 19.024901
+     "value": 19.0249
     },
     {
      "depth": 2.8,
@@ -11706,7 +11706,7 @@
      "depth": 5.48,
      "to": 5.58,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 5.6,
@@ -11724,7 +11724,7 @@
      "depth": 8.46,
      "to": 8.56,
      "property": "gamma",
-     "value": 20.8881645
+     "value": 20.8882
     },
     {
      "depth": 8.63,
@@ -11736,7 +11736,7 @@
      "depth": 8.63,
      "to": 8.68,
      "property": "gamma",
-     "value": 12.944778
+     "value": 12.9448
     },
     {
      "depth": 9.2,
@@ -11766,7 +11766,7 @@
      "depth": 16.28,
      "to": 16.38,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 17.6,
@@ -11790,7 +11790,7 @@
      "depth": 21.02,
      "to": 21.12,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 22.85,
@@ -11802,7 +11802,7 @@
      "depth": 22.85,
      "to": 22.9,
      "property": "gamma",
-     "value": 17.455837
+     "value": 17.4558
     },
     {
      "depth": 22.9,
@@ -11820,7 +11820,7 @@
      "depth": 22.95,
      "to": 23,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 23.43,
@@ -11838,7 +11838,7 @@
      "depth": 23.48,
      "to": 23.53,
      "property": "gamma",
-     "value": 16.475171999999997
+     "value": 16.4752
     },
     {
      "depth": 23.75,
@@ -11856,7 +11856,7 @@
      "depth": 23.8,
      "to": 23.85,
      "property": "gamma",
-     "value": 18.632634999999997
+     "value": 18.6326
     },
     {
      "depth": 23.85,
@@ -11868,7 +11868,7 @@
      "depth": 23.85,
      "to": 23.95,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 23.85,
@@ -11910,7 +11910,7 @@
      "depth": 24.6,
      "to": 24.65,
      "property": "gamma",
-     "value": 17.848103
+     "value": 17.8481
     },
     {
      "depth": 24.65,
@@ -11922,7 +11922,7 @@
      "depth": 24.65,
      "to": 24.75,
      "property": "gamma",
-     "value": 17.65197
+     "value": 17.652
     },
     {
      "depth": 24.65,
@@ -11958,7 +11958,7 @@
      "depth": 24.85,
      "to": 24.9,
      "property": "gamma",
-     "value": 15.984839499999998
+     "value": 15.9848
     },
     {
      "depth": 24.9,
@@ -11982,7 +11982,7 @@
      "depth": 25.43,
      "to": 25.48,
      "property": "gamma",
-     "value": 16.965504499999998
+     "value": 16.9655
     },
     {
      "depth": 25.67,
@@ -12000,7 +12000,7 @@
      "depth": 25.72,
      "to": 25.77,
      "property": "gamma",
-     "value": 19.809433
+     "value": 19.8094
     },
     {
      "depth": 25.77,
@@ -12012,7 +12012,7 @@
      "depth": 25.77,
      "to": 25.87,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 25.87,
@@ -12024,7 +12024,7 @@
      "depth": 25.87,
      "to": 25.92,
      "property": "gamma",
-     "value": 18.240369
+     "value": 18.2404
     },
     {
      "depth": 26.04,
@@ -12036,7 +12036,7 @@
      "depth": 26.04,
      "to": 26.14,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 26.04,
@@ -12072,7 +12072,7 @@
      "depth": 26.24,
      "to": 26.29,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 28.4,
@@ -12090,7 +12090,7 @@
      "depth": 28.67,
      "to": 28.78,
      "property": "gamma",
-     "value": 20.593965
+     "value": 20.594
     },
     {
      "depth": 30.8,
@@ -12108,7 +12108,7 @@
      "depth": 31.86,
      "to": 31.97,
      "property": "gamma",
-     "value": 20.4958985
+     "value": 20.4959
     },
     {
      "depth": 33.6,
@@ -12144,7 +12144,7 @@
      "depth": 38.23,
      "to": 38.34,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     }
    ]
   },
@@ -12324,7 +12324,7 @@
      "depth": 0.8,
      "to": 0.85,
      "property": "gamma",
-     "value": 16.7693715
+     "value": 16.7694
     },
     {
      "depth": 0.85,
@@ -12336,7 +12336,7 @@
      "depth": 0.85,
      "to": 0.96,
      "property": "gamma",
-     "value": 17.848103
+     "value": 17.8481
     },
     {
      "depth": 0.85,
@@ -12378,7 +12378,7 @@
      "depth": 1.1,
      "to": 1.15,
      "property": "gamma",
-     "value": 15.984839499999998
+     "value": 15.9848
     },
     {
      "depth": 1.3,
@@ -12390,7 +12390,7 @@
      "depth": 1.3,
      "to": 1.35,
      "property": "gamma",
-     "value": 12.160245999999999
+     "value": 12.1602
     },
     {
      "depth": 1.58,
@@ -12408,7 +12408,7 @@
      "depth": 1.63,
      "to": 1.68,
      "property": "gamma",
-     "value": 16.1809725
+     "value": 16.181
     },
     {
      "depth": 1.68,
@@ -12420,7 +12420,7 @@
      "depth": 1.68,
      "to": 1.73,
      "property": "gamma",
-     "value": 16.279038999999997
+     "value": 16.279
     },
     {
      "depth": 1.88,
@@ -12438,7 +12438,7 @@
      "depth": 1.93,
      "to": 1.98,
      "property": "gamma",
-     "value": 18.3384355
+     "value": 18.3384
     },
     {
      "depth": 1.98,
@@ -12450,7 +12450,7 @@
      "depth": 1.98,
      "to": 2.08,
      "property": "gamma",
-     "value": 20.201698999999998
+     "value": 20.2017
     },
     {
      "depth": 1.98,
@@ -12492,7 +12492,7 @@
      "depth": 3.66,
      "to": 3.71,
      "property": "gamma",
-     "value": 18.632634999999997
+     "value": 18.6326
     },
     {
      "depth": 4.95,
@@ -12504,7 +12504,7 @@
      "depth": 4.95,
      "to": 5,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 6.2,
@@ -12522,7 +12522,7 @@
      "depth": 6.38,
      "to": 6.48,
      "property": "gamma",
-     "value": 20.201698999999998
+     "value": 20.2017
     },
     {
      "depth": 9.27,
@@ -12534,7 +12534,7 @@
      "depth": 9.27,
      "to": 9.38,
      "property": "gamma",
-     "value": 18.436501999999997
+     "value": 18.4365
     },
     {
      "depth": 9.4,
@@ -12552,7 +12552,7 @@
      "depth": 11.68,
      "to": 11.78,
      "property": "gamma",
-     "value": 20.6920315
+     "value": 20.692
     },
     {
      "depth": 13,
@@ -12570,7 +12570,7 @@
      "depth": 14.46,
      "to": 14.57,
      "property": "gamma",
-     "value": 19.024901
+     "value": 19.0249
     },
     {
      "depth": 16.6,
@@ -12588,7 +12588,7 @@
      "depth": 18.77,
      "to": 18.88,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 19.8,
@@ -12953,7 +12953,7 @@
      "depth": 17.08,
      "to": 17.18,
      "property": "gamma",
-     "value": 20.4958985
+     "value": 20.4959
     },
     {
      "depth": 17.18,
@@ -12965,7 +12965,7 @@
      "depth": 17.18,
      "to": 17.28,
      "property": "gamma",
-     "value": 19.907499499999997
+     "value": 19.9075
     },
     {
      "depth": 17.28,
@@ -12977,7 +12977,7 @@
      "depth": 17.28,
      "to": 17.38,
      "property": "gamma",
-     "value": 20.005565999999998
+     "value": 20.0056
     },
     {
      "depth": 18,
@@ -13025,7 +13025,7 @@
      "depth": 23.06,
      "to": 23.16,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 23.21,
@@ -13037,7 +13037,7 @@
      "depth": 23.21,
      "to": 23.31,
      "property": "gamma",
-     "value": 20.6920315
+     "value": 20.692
     },
     {
      "depth": 23.5,
@@ -13055,7 +13055,7 @@
      "depth": 23.58,
      "to": 23.68,
      "property": "gamma",
-     "value": 20.299765499999996
+     "value": 20.2998
     },
     {
      "depth": 24.21,
@@ -13073,7 +13073,7 @@
      "depth": 24.69,
      "to": 24.74,
      "property": "gamma",
-     "value": 14.513841999999999
+     "value": 14.5138
     },
     {
      "depth": 24.69,
@@ -13091,7 +13091,7 @@
      "depth": 24.84,
      "to": 24.89,
      "property": "gamma",
-     "value": 11.8660465
+     "value": 11.866
     },
     {
      "depth": 24.84,
@@ -13115,7 +13115,7 @@
      "depth": 25.22,
      "to": 25.27,
      "property": "gamma",
-     "value": 12.0621795
+     "value": 12.0622
     },
     {
      "depth": 25.5,
@@ -13133,7 +13133,7 @@
      "depth": 26.26,
      "to": 26.36,
      "property": "gamma",
-     "value": 20.397832
+     "value": 20.3978
     },
     {
      "depth": 26.64,
@@ -13151,7 +13151,7 @@
      "depth": 26.64,
      "to": 26.74,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 26.64,
@@ -13187,7 +13187,7 @@
      "depth": 26.74,
      "to": 26.84,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 27.5,
@@ -13217,7 +13217,7 @@
      "depth": 28.6,
      "to": 28.7,
      "property": "gamma",
-     "value": 20.397832
+     "value": 20.3978
     },
     {
      "depth": 28.7,
@@ -13229,7 +13229,7 @@
      "depth": 28.7,
      "to": 28.8,
      "property": "gamma",
-     "value": 20.8881645
+     "value": 20.8882
     },
     {
      "depth": 30,
@@ -13247,7 +13247,7 @@
      "depth": 34.22,
      "to": 34.27,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 34.35,
@@ -13259,7 +13259,7 @@
      "depth": 34.35,
      "to": 34.4,
      "property": "gamma",
-     "value": 17.848103
+     "value": 17.8481
     }
    ]
   },
@@ -13564,7 +13564,7 @@
      "depth": 6.06,
      "to": 6.16,
      "property": "gamma",
-     "value": 20.986231
+     "value": 20.9862
     },
     {
      "depth": 6.16,
@@ -13576,7 +13576,7 @@
      "depth": 6.16,
      "to": 6.26,
      "property": "gamma",
-     "value": 20.8881645
+     "value": 20.8882
     },
     {
      "depth": 6.26,
@@ -13588,7 +13588,7 @@
      "depth": 6.26,
      "to": 6.36,
      "property": "gamma",
-     "value": 19.907499499999997
+     "value": 19.9075
     },
     {
      "depth": 8,
@@ -13648,7 +13648,7 @@
      "depth": 16.03,
      "to": 16.13,
      "property": "gamma",
-     "value": 20.103632499999996
+     "value": 20.1036
     },
     {
      "depth": 16.55,
@@ -13660,7 +13660,7 @@
      "depth": 16.55,
      "to": 16.65,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 16.65,
@@ -13684,7 +13684,7 @@
      "depth": 18.23,
      "to": 18.33,
      "property": "gamma",
-     "value": 19.809433
+     "value": 19.8094
     },
     {
      "depth": 18.5,
@@ -13714,7 +13714,7 @@
      "depth": 18.65,
      "to": 18.75,
      "property": "gamma",
-     "value": 19.907499499999997
+     "value": 19.9075
     },
     {
      "depth": 20,
@@ -13774,7 +13774,7 @@
      "depth": 26.7,
      "to": 26.8,
      "property": "gamma",
-     "value": 18.1423025
+     "value": 18.1423
     },
     {
      "depth": 26.7,
@@ -13810,7 +13810,7 @@
      "depth": 26.8,
      "to": 26.9,
      "property": "gamma",
-     "value": 18.3384355
+     "value": 18.3384
     },
     {
      "depth": 27.16,
@@ -13834,7 +13834,7 @@
      "depth": 27.21,
      "to": 27.31,
      "property": "gamma",
-     "value": 14.611908499999998
+     "value": 14.6119
     },
     {
      "depth": 27.61,
@@ -13858,7 +13858,7 @@
      "depth": 28.1,
      "to": 28.2,
      "property": "gamma",
-     "value": 20.790098
+     "value": 20.7901
     },
     {
      "depth": 28.2,
@@ -13870,7 +13870,7 @@
      "depth": 28.2,
      "to": 28.3,
      "property": "gamma",
-     "value": 20.8881645
+     "value": 20.8882
     },
     {
      "depth": 28.3,
@@ -13882,7 +13882,7 @@
      "depth": 28.3,
      "to": 28.4,
      "property": "gamma",
-     "value": 20.8881645
+     "value": 20.8882
     },
     {
      "depth": 30,
@@ -13900,7 +13900,7 @@
      "depth": 34.35,
      "to": 34.4,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     }
    ]
   },
@@ -14229,7 +14229,7 @@
      "depth": 12.07,
      "to": 12.17,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 12.17,
@@ -14241,7 +14241,7 @@
      "depth": 12.17,
      "to": 12.27,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 12.27,
@@ -14253,7 +14253,7 @@
      "depth": 12.27,
      "to": 12.37,
      "property": "gamma",
-     "value": 19.907499499999997
+     "value": 19.9075
     },
     {
      "depth": 13.5,
@@ -14277,7 +14277,7 @@
      "depth": 17.14,
      "to": 17.24,
      "property": "gamma",
-     "value": 20.4958985
+     "value": 20.4959
     },
     {
      "depth": 17.24,
@@ -14289,7 +14289,7 @@
      "depth": 17.24,
      "to": 17.34,
      "property": "gamma",
-     "value": 19.809433
+     "value": 19.8094
     },
     {
      "depth": 17.5,
@@ -14307,7 +14307,7 @@
      "depth": 17.59,
      "to": 17.69,
      "property": "gamma",
-     "value": 20.201698999999998
+     "value": 20.2017
     },
     {
      "depth": 18.5,
@@ -14337,7 +14337,7 @@
      "depth": 21.58,
      "to": 21.68,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 21.68,
@@ -14349,7 +14349,7 @@
      "depth": 21.68,
      "to": 21.78,
      "property": "gamma",
-     "value": 19.809433
+     "value": 19.8094
     },
     {
      "depth": 21.78,
@@ -14391,7 +14391,7 @@
      "depth": 25.28,
      "to": 25.38,
      "property": "gamma",
-     "value": 12.8467115
+     "value": 12.8467
     },
     {
      "depth": 26.57,
@@ -14409,7 +14409,7 @@
      "depth": 26.62,
      "to": 26.72,
      "property": "gamma",
-     "value": 20.201698999999998
+     "value": 20.2017
     },
     {
      "depth": 26.62,
@@ -14445,7 +14445,7 @@
      "depth": 26.72,
      "to": 26.82,
      "property": "gamma",
-     "value": 19.809433
+     "value": 19.8094
     },
     {
      "depth": 27.5,
@@ -14511,7 +14511,7 @@
      "depth": 34.81,
      "to": 34.86,
      "property": "gamma",
-     "value": 17.063571
+     "value": 17.0636
     }
    ]
   },
@@ -14846,7 +14846,7 @@
      "depth": 13.07,
      "to": 13.17,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 13.17,
@@ -14858,7 +14858,7 @@
      "depth": 13.17,
      "to": 13.27,
      "property": "gamma",
-     "value": 18.240369
+     "value": 18.2404
     },
     {
      "depth": 13.27,
@@ -14870,7 +14870,7 @@
      "depth": 13.27,
      "to": 13.37,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 14,
@@ -14918,7 +14918,7 @@
      "depth": 19.6,
      "to": 19.7,
      "property": "gamma",
-     "value": 20.201698999999998
+     "value": 20.2017
     },
     {
      "depth": 19.7,
@@ -14930,7 +14930,7 @@
      "depth": 19.7,
      "to": 19.8,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 19.8,
@@ -14942,7 +14942,7 @@
      "depth": 19.8,
      "to": 19.9,
      "property": "gamma",
-     "value": 18.9268345
+     "value": 18.9268
     },
     {
      "depth": 20,
@@ -14972,7 +14972,7 @@
      "depth": 22.69,
      "to": 22.79,
      "property": "gamma",
-     "value": 16.5732385
+     "value": 16.5732
     },
     {
      "depth": 22.79,
@@ -14984,7 +14984,7 @@
      "depth": 22.79,
      "to": 22.89,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 23.15,
@@ -14996,7 +14996,7 @@
      "depth": 23.15,
      "to": 23.25,
      "property": "gamma",
-     "value": 16.671305
+     "value": 16.6713
     },
     {
      "depth": 23.76,
@@ -15008,7 +15008,7 @@
      "depth": 23.76,
      "to": 23.86,
      "property": "gamma",
-     "value": 13.631243499999998
+     "value": 13.6312
     },
     {
      "depth": 24.1,
@@ -15032,7 +15032,7 @@
      "depth": 24.2,
      "to": 24.3,
      "property": "gamma",
-     "value": 15.5925735
+     "value": 15.5926
     },
     {
      "depth": 24.2,
@@ -15080,7 +15080,7 @@
      "depth": 26.2,
      "to": 26.3,
      "property": "gamma",
-     "value": 20.8881645
+     "value": 20.8882
     },
     {
      "depth": 26.3,
@@ -15092,7 +15092,7 @@
      "depth": 26.3,
      "to": 26.4,
      "property": "gamma",
-     "value": 15.886773
+     "value": 15.8868
     },
     {
      "depth": 26.5,
@@ -15110,7 +15110,7 @@
      "depth": 26.59,
      "to": 26.69,
      "property": "gamma",
-     "value": 20.790098
+     "value": 20.7901
     },
     {
      "depth": 26.69,
@@ -15122,7 +15122,7 @@
      "depth": 26.69,
      "to": 26.79,
      "property": "gamma",
-     "value": 20.299765499999996
+     "value": 20.2998
     },
     {
      "depth": 28,
@@ -15481,7 +15481,7 @@
      "depth": 15.59,
      "to": 15.69,
      "property": "gamma",
-     "value": 21.770763000000002
+     "value": 21.7708
     },
     {
      "depth": 15.69,
@@ -15493,7 +15493,7 @@
      "depth": 15.69,
      "to": 15.79,
      "property": "gamma",
-     "value": 20.103632499999996
+     "value": 20.1036
     },
     {
      "depth": 16.3,
@@ -15511,7 +15511,7 @@
      "depth": 18.21,
      "to": 18.31,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 18.5,
@@ -15529,7 +15529,7 @@
      "depth": 18.53,
      "to": 18.63,
      "property": "gamma",
-     "value": 20.103632499999996
+     "value": 20.1036
     },
     {
      "depth": 18.77,
@@ -15541,7 +15541,7 @@
      "depth": 18.77,
      "to": 18.87,
      "property": "gamma",
-     "value": 20.103632499999996
+     "value": 20.1036
     },
     {
      "depth": 20,
@@ -15571,7 +15571,7 @@
      "depth": 22.1,
      "to": 22.2,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 22.58,
@@ -15583,7 +15583,7 @@
      "depth": 22.58,
      "to": 22.68,
      "property": "gamma",
-     "value": 18.9268345
+     "value": 18.9268
     },
     {
      "depth": 22.75,
@@ -15595,7 +15595,7 @@
      "depth": 22.75,
      "to": 22.85,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 23.09,
@@ -15619,7 +15619,7 @@
      "depth": 23.28,
      "to": 23.38,
      "property": "gamma",
-     "value": 17.259704
+     "value": 17.2597
     },
     {
      "depth": 23.58,
@@ -15631,7 +15631,7 @@
      "depth": 23.58,
      "to": 23.68,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 23.68,
@@ -15643,7 +15643,7 @@
      "depth": 23.68,
      "to": 23.78,
      "property": "gamma",
-     "value": 18.436501999999997
+     "value": 18.4365
     },
     {
      "depth": 23.78,
@@ -15661,7 +15661,7 @@
      "depth": 23.78,
      "to": 23.88,
      "property": "gamma",
-     "value": 18.1423025
+     "value": 18.1423
     },
     {
      "depth": 24.1,
@@ -15673,7 +15673,7 @@
      "depth": 24.1,
      "to": 24.2,
      "property": "gamma",
-     "value": 18.5345685
+     "value": 18.5346
     },
     {
      "depth": 24.1,
@@ -15709,7 +15709,7 @@
      "depth": 24.2,
      "to": 24.3,
      "property": "gamma",
-     "value": 18.044236
+     "value": 18.0442
     },
     {
      "depth": 24.3,
@@ -15721,7 +15721,7 @@
      "depth": 24.3,
      "to": 24.4,
      "property": "gamma",
-     "value": 18.3384355
+     "value": 18.3384
     },
     {
      "depth": 24.59,
@@ -15733,7 +15733,7 @@
      "depth": 24.59,
      "to": 24.69,
      "property": "gamma",
-     "value": 17.9461695
+     "value": 17.9462
     },
     {
      "depth": 24.69,
@@ -15745,7 +15745,7 @@
      "depth": 24.69,
      "to": 24.79,
      "property": "gamma",
-     "value": 17.5539035
+     "value": 17.5539
     },
     {
      "depth": 24.79,
@@ -15757,7 +15757,7 @@
      "depth": 24.79,
      "to": 24.89,
      "property": "gamma",
-     "value": 17.259704
+     "value": 17.2597
     },
     {
      "depth": 25,
@@ -15775,7 +15775,7 @@
      "depth": 25.25,
      "to": 25.3,
      "property": "gamma",
-     "value": 16.279038999999997
+     "value": 16.279
     },
     {
      "depth": 25.25,
@@ -15793,7 +15793,7 @@
      "depth": 26.1,
      "to": 26.2,
      "property": "gamma",
-     "value": 18.3384355
+     "value": 18.3384
     },
     {
      "depth": 26.2,
@@ -15805,7 +15805,7 @@
      "depth": 26.2,
      "to": 26.3,
      "property": "gamma",
-     "value": 18.1423025
+     "value": 18.1423
     },
     {
      "depth": 26.3,
@@ -15817,7 +15817,7 @@
      "depth": 26.3,
      "to": 26.4,
      "property": "gamma",
-     "value": 17.65197
+     "value": 17.652
     },
     {
      "depth": 27.5,
@@ -15835,7 +15835,7 @@
      "depth": 27.55,
      "to": 27.65,
      "property": "gamma",
-     "value": 20.986231
+     "value": 20.9862
     },
     {
      "depth": 29,
@@ -16176,7 +16176,7 @@
      "depth": 9.08,
      "to": 9.18,
      "property": "gamma",
-     "value": 21.378497
+     "value": 21.3785
     },
     {
      "depth": 9.18,
@@ -16188,7 +16188,7 @@
      "depth": 9.18,
      "to": 9.28,
      "property": "gamma",
-     "value": 20.201698999999998
+     "value": 20.2017
     },
     {
      "depth": 10,
@@ -16230,7 +16230,7 @@
      "depth": 13.58,
      "to": 13.68,
      "property": "gamma",
-     "value": 20.201698999999998
+     "value": 20.2017
     },
     {
      "depth": 13.68,
@@ -16242,7 +16242,7 @@
      "depth": 13.68,
      "to": 13.78,
      "property": "gamma",
-     "value": 17.455837
+     "value": 17.4558
     },
     {
      "depth": 13.78,
@@ -16254,7 +16254,7 @@
      "depth": 13.78,
      "to": 13.88,
      "property": "gamma",
-     "value": 20.8881645
+     "value": 20.8882
     },
     {
      "depth": 15,
@@ -16290,7 +16290,7 @@
      "depth": 17.1,
      "to": 17.2,
      "property": "gamma",
-     "value": 17.65197
+     "value": 17.652
     },
     {
      "depth": 17.2,
@@ -16302,7 +16302,7 @@
      "depth": 17.2,
      "to": 17.3,
      "property": "gamma",
-     "value": 18.3384355
+     "value": 18.3384
     },
     {
      "depth": 17.3,
@@ -16314,7 +16314,7 @@
      "depth": 17.3,
      "to": 17.4,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 18.5,
@@ -16338,7 +16338,7 @@
      "depth": 20.09,
      "to": 20.19,
      "property": "gamma",
-     "value": 19.907499499999997
+     "value": 19.9075
     },
     {
      "depth": 20.19,
@@ -16350,7 +16350,7 @@
      "depth": 20.19,
      "to": 20.29,
      "property": "gamma",
-     "value": 20.103632499999996
+     "value": 20.1036
     },
     {
      "depth": 20.29,
@@ -16362,7 +16362,7 @@
      "depth": 20.29,
      "to": 20.39,
      "property": "gamma",
-     "value": 19.024901
+     "value": 19.0249
     },
     {
      "depth": 20.5,
@@ -16416,7 +16416,7 @@
      "depth": 26.66,
      "to": 26.76,
      "property": "gamma",
-     "value": 18.240369
+     "value": 18.2404
     },
     {
      "depth": 26.76,
@@ -16428,7 +16428,7 @@
      "depth": 26.76,
      "to": 26.86,
      "property": "gamma",
-     "value": 18.632634999999997
+     "value": 18.6326
     },
     {
      "depth": 27.2,
@@ -16440,7 +16440,7 @@
      "depth": 27.2,
      "to": 27.3,
      "property": "gamma",
-     "value": 14.611908499999998
+     "value": 14.6119
     },
     {
      "depth": 27.2,
@@ -16482,7 +16482,7 @@
      "depth": 27.68,
      "to": 27.73,
      "property": "gamma",
-     "value": 20.103632499999996
+     "value": 20.1036
     },
     {
      "depth": 28.5,
@@ -16500,7 +16500,7 @@
      "depth": 28.61,
      "to": 28.71,
      "property": "gamma",
-     "value": 20.6920315
+     "value": 20.692
     },
     {
      "depth": 28.71,
@@ -16512,7 +16512,7 @@
      "depth": 28.71,
      "to": 28.81,
      "property": "gamma",
-     "value": 20.6920315
+     "value": 20.692
     },
     {
      "depth": 30.5,
@@ -17009,7 +17009,7 @@
      "depth": 2.3,
      "to": 2.35,
      "property": "gamma",
-     "value": 17.848103
+     "value": 17.8481
     },
     {
      "depth": 2.4,
@@ -17057,7 +17057,7 @@
      "depth": 6.5,
      "to": 6.55,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 11.6,
@@ -17087,7 +17087,7 @@
      "depth": 14.5,
      "to": 14.55,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 15.9,
@@ -17099,7 +17099,7 @@
      "depth": 15.9,
      "to": 15.95,
      "property": "gamma",
-     "value": 18.3384355
+     "value": 18.3384
     },
     {
      "depth": 16,
@@ -17117,7 +17117,7 @@
      "depth": 16.2,
      "to": 16.25,
      "property": "gamma",
-     "value": 18.9268345
+     "value": 18.9268
     },
     {
      "depth": 17.2,
@@ -17153,7 +17153,7 @@
      "depth": 21.4,
      "to": 21.45,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 23.2,
@@ -17183,7 +17183,7 @@
      "depth": 25.15,
      "to": 25.25,
      "property": "gamma",
-     "value": 16.279038999999997
+     "value": 16.279
     },
     {
      "depth": 25.2,
@@ -17219,7 +17219,7 @@
      "depth": 25.25,
      "to": 25.35,
      "property": "gamma",
-     "value": 15.0041745
+     "value": 15.0042
     },
     {
      "depth": 25.35,
@@ -17231,7 +17231,7 @@
      "depth": 25.35,
      "to": 25.45,
      "property": "gamma",
-     "value": 14.317708999999999
+     "value": 14.3177
     },
     {
      "depth": 25.4,
@@ -17243,7 +17243,7 @@
      "depth": 25.4,
      "to": 25.45,
      "property": "gamma",
-     "value": 10.983448000000001
+     "value": 10.9834
     },
     {
      "depth": 25.5,
@@ -17255,7 +17255,7 @@
      "depth": 25.5,
      "to": 25.55,
      "property": "gamma",
-     "value": 14.513841999999999
+     "value": 14.5138
     },
     {
      "depth": 25.6,
@@ -17291,7 +17291,7 @@
      "depth": 25.65,
      "to": 25.75,
      "property": "gamma",
-     "value": 14.415775499999999
+     "value": 14.4158
     },
     {
      "depth": 25.75,
@@ -17303,7 +17303,7 @@
      "depth": 25.75,
      "to": 25.85,
      "property": "gamma",
-     "value": 15.7887065
+     "value": 15.7887
     },
     {
      "depth": 25.8,
@@ -17315,7 +17315,7 @@
      "depth": 25.8,
      "to": 25.85,
      "property": "gamma",
-     "value": 15.494507
+     "value": 15.4945
     },
     {
      "depth": 25.85,
@@ -17327,7 +17327,7 @@
      "depth": 25.85,
      "to": 25.95,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 25.9,
@@ -17339,7 +17339,7 @@
      "depth": 25.9,
      "to": 25.95,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 26.4,
@@ -17363,7 +17363,7 @@
      "depth": 27.8,
      "to": 27.85,
      "property": "gamma",
-     "value": 18.632634999999997
+     "value": 18.6326
     },
     {
      "depth": 28.4,
@@ -17393,7 +17393,7 @@
      "depth": 36.1,
      "to": 36.15,
      "property": "gamma",
-     "value": 19.907499499999997
+     "value": 19.9075
     }
    ]
   },
@@ -17854,7 +17854,7 @@
      "depth": 1.4,
      "to": 1.45,
      "property": "gamma",
-     "value": 19.024901
+     "value": 19.0249
     },
     {
      "depth": 1.6,
@@ -17962,7 +17962,7 @@
      "depth": 6.3,
      "to": 6.35,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 10.4,
@@ -17986,7 +17986,7 @@
      "depth": 10.6,
      "to": 10.65,
      "property": "gamma",
-     "value": 18.240369
+     "value": 18.2404
     },
     {
      "depth": 12,
@@ -18058,7 +18058,7 @@
      "depth": 18.6,
      "to": 18.65,
      "property": "gamma",
-     "value": 16.7693715
+     "value": 16.7694
     },
     {
      "depth": 20,
@@ -18082,7 +18082,7 @@
      "depth": 20.3,
      "to": 20.35,
      "property": "gamma",
-     "value": 20.8881645
+     "value": 20.8882
     },
     {
      "depth": 21.6,
@@ -18190,7 +18190,7 @@
      "depth": 25.6,
      "to": 25.7,
      "property": "gamma",
-     "value": 12.6505785
+     "value": 12.6506
     },
     {
      "depth": 25.7,
@@ -18202,7 +18202,7 @@
      "depth": 25.7,
      "to": 25.8,
      "property": "gamma",
-     "value": 14.415775499999999
+     "value": 14.4158
     },
     {
      "depth": 25.8,
@@ -18214,7 +18214,7 @@
      "depth": 25.8,
      "to": 25.85,
      "property": "gamma",
-     "value": 16.965504499999998
+     "value": 16.9655
     },
     {
      "depth": 25.8,
@@ -18226,7 +18226,7 @@
      "depth": 25.8,
      "to": 25.9,
      "property": "gamma",
-     "value": 13.827376499999998
+     "value": 13.8274
     },
     {
      "depth": 26,
@@ -18238,7 +18238,7 @@
      "depth": 26,
      "to": 26.1,
      "property": "gamma",
-     "value": 15.2003075
+     "value": 15.2003
     },
     {
      "depth": 26.1,
@@ -18250,7 +18250,7 @@
      "depth": 26.1,
      "to": 26.2,
      "property": "gamma",
-     "value": 18.044236
+     "value": 18.0442
     },
     {
      "depth": 26.2,
@@ -18262,7 +18262,7 @@
      "depth": 26.2,
      "to": 26.3,
      "property": "gamma",
-     "value": 16.965504499999998
+     "value": 16.9655
     },
     {
      "depth": 26.2,
@@ -18274,7 +18274,7 @@
      "depth": 26.2,
      "to": 26.25,
      "property": "gamma",
-     "value": 16.867438
+     "value": 16.8674
     },
     {
      "depth": 26.4,
@@ -18358,7 +18358,7 @@
      "depth": 29.2,
      "to": 29.3,
      "property": "gamma",
-     "value": 20.299765499999996
+     "value": 20.2998
     },
     {
      "depth": 29.2,
@@ -18394,7 +18394,7 @@
      "depth": 29.3,
      "to": 29.4,
      "property": "gamma",
-     "value": 19.907499499999997
+     "value": 19.9075
     },
     {
      "depth": 29.4,
@@ -18406,7 +18406,7 @@
      "depth": 29.4,
      "to": 29.5,
      "property": "gamma",
-     "value": 19.809433
+     "value": 19.8094
     },
     {
      "depth": 29.4,
@@ -18418,7 +18418,7 @@
      "depth": 29.4,
      "to": 29.45,
      "property": "gamma",
-     "value": 14.121576
+     "value": 14.1216
     },
     {
      "depth": 29.5,
@@ -18430,7 +18430,7 @@
      "depth": 29.5,
      "to": 29.55,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 29.55,
@@ -18442,7 +18442,7 @@
      "depth": 29.55,
      "to": 29.65,
      "property": "gamma",
-     "value": 20.593965
+     "value": 20.594
     },
     {
      "depth": 29.65,
@@ -18454,7 +18454,7 @@
      "depth": 29.65,
      "to": 29.75,
      "property": "gamma",
-     "value": 20.103632499999996
+     "value": 20.1036
     },
     {
      "depth": 29.75,
@@ -18466,7 +18466,7 @@
      "depth": 29.75,
      "to": 29.85,
      "property": "gamma",
-     "value": 20.005565999999998
+     "value": 20.0056
     },
     {
      "depth": 29.8,
@@ -18478,7 +18478,7 @@
      "depth": 29.8,
      "to": 29.85,
      "property": "gamma",
-     "value": 14.709975
+     "value": 14.71
     },
     {
      "depth": 35.2,
@@ -18496,7 +18496,7 @@
      "depth": 35.3,
      "to": 35.35,
      "property": "gamma",
-     "value": 18.632634999999997
+     "value": 18.6326
     }
    ]
   },
@@ -21610,7 +21610,7 @@
      "depth": 15.12,
      "to": 15.17,
      "property": "gamma",
-     "value": 19.024901
+     "value": 19.0249
     },
     {
      "depth": 15.38,
@@ -21622,7 +21622,7 @@
      "depth": 15.38,
      "to": 15.43,
      "property": "gamma",
-     "value": 18.9268345
+     "value": 18.9268
     },
     {
      "depth": 15.6,
@@ -21640,7 +21640,7 @@
      "depth": 15.75,
      "to": 15.8,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 16.2,
@@ -21652,7 +21652,7 @@
      "depth": 16.2,
      "to": 16.25,
      "property": "gamma",
-     "value": 18.9268345
+     "value": 18.9268
     },
     {
      "depth": 16.53,
@@ -21664,7 +21664,7 @@
      "depth": 16.53,
      "to": 16.58,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 16.84,
@@ -21676,7 +21676,7 @@
      "depth": 16.84,
      "to": 16.94,
      "property": "gamma",
-     "value": 20.201698999999998
+     "value": 20.2017
     },
     {
      "depth": 17.42,
@@ -21688,7 +21688,7 @@
      "depth": 17.42,
      "to": 17.52,
      "property": "gamma",
-     "value": 20.005565999999998
+     "value": 20.0056
     },
     {
      "depth": 17.92,
@@ -21700,7 +21700,7 @@
      "depth": 17.92,
      "to": 17.97,
      "property": "gamma",
-     "value": 17.161637499999998
+     "value": 17.1616
     },
     {
      "depth": 18.2,
@@ -21712,7 +21712,7 @@
      "depth": 18.2,
      "to": 18.3,
      "property": "gamma",
-     "value": 20.6920315
+     "value": 20.692
     },
     {
      "depth": 18.4,
@@ -21730,7 +21730,7 @@
      "depth": 18.62,
      "to": 18.67,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 18.95,
@@ -21742,7 +21742,7 @@
      "depth": 18.95,
      "to": 19,
      "property": "gamma",
-     "value": 20.397832
+     "value": 20.3978
     },
     {
      "depth": 19.05,
@@ -21754,7 +21754,7 @@
      "depth": 19.05,
      "to": 19.1,
      "property": "gamma",
-     "value": 15.494507
+     "value": 15.4945
     },
     {
      "depth": 19.34,
@@ -21766,7 +21766,7 @@
      "depth": 19.34,
      "to": 19.44,
      "property": "gamma",
-     "value": 21.182364
+     "value": 21.1824
     },
     {
      "depth": 19.66,
@@ -21778,7 +21778,7 @@
      "depth": 19.66,
      "to": 19.76,
      "property": "gamma",
-     "value": 20.299765499999996
+     "value": 20.2998
     },
     {
      "depth": 20.21,
@@ -21790,7 +21790,7 @@
      "depth": 20.21,
      "to": 20.31,
      "property": "gamma",
-     "value": 20.005565999999998
+     "value": 20.0056
     },
     {
      "depth": 20.57,
@@ -21802,7 +21802,7 @@
      "depth": 20.57,
      "to": 20.62,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 20.9,
@@ -21814,7 +21814,7 @@
      "depth": 20.9,
      "to": 20.95,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 21.13,
@@ -21826,7 +21826,7 @@
      "depth": 21.13,
      "to": 21.18,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 21.51,
@@ -21838,7 +21838,7 @@
      "depth": 21.51,
      "to": 21.56,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 21.65,
@@ -21850,7 +21850,7 @@
      "depth": 21.65,
      "to": 21.7,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 22.12,
@@ -21862,7 +21862,7 @@
      "depth": 22.12,
      "to": 22.17,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 22.52,
@@ -21874,7 +21874,7 @@
      "depth": 22.52,
      "to": 22.57,
      "property": "gamma",
-     "value": 18.632634999999997
+     "value": 18.6326
     },
     {
      "depth": 22.8,
@@ -22107,7 +22107,7 @@
      "depth": 11.94,
      "to": 11.99,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 12.05,
@@ -22119,7 +22119,7 @@
      "depth": 12.05,
      "to": 12.1,
      "property": "gamma",
-     "value": 19.907499499999997
+     "value": 19.9075
     },
     {
      "depth": 12.13,
@@ -22131,7 +22131,7 @@
      "depth": 12.13,
      "to": 12.18,
      "property": "gamma",
-     "value": 18.5345685
+     "value": 18.5346
     },
     {
      "depth": 12.4,
@@ -22149,7 +22149,7 @@
      "depth": 12.74,
      "to": 12.79,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 13.08,
@@ -22161,7 +22161,7 @@
      "depth": 13.08,
      "to": 13.13,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 13.48,
@@ -22173,7 +22173,7 @@
      "depth": 13.48,
      "to": 13.53,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 13.81,
@@ -22185,7 +22185,7 @@
      "depth": 13.81,
      "to": 13.86,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 14.3,
@@ -22197,7 +22197,7 @@
      "depth": 14.3,
      "to": 14.35,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 14.66,
@@ -22209,7 +22209,7 @@
      "depth": 14.66,
      "to": 14.71,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 15.02,
@@ -22221,7 +22221,7 @@
      "depth": 15.02,
      "to": 15.07,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 15.25,
@@ -22233,7 +22233,7 @@
      "depth": 15.25,
      "to": 15.3,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 15.6,
@@ -22251,7 +22251,7 @@
      "depth": 15.86,
      "to": 15.91,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 16.05,
@@ -22263,7 +22263,7 @@
      "depth": 16.05,
      "to": 16.15,
      "property": "gamma",
-     "value": 20.4958985
+     "value": 20.4959
     },
     {
      "depth": 16.48,
@@ -22275,7 +22275,7 @@
      "depth": 16.48,
      "to": 16.58,
      "property": "gamma",
-     "value": 20.299765499999996
+     "value": 20.2998
     },
     {
      "depth": 17.04,
@@ -22287,7 +22287,7 @@
      "depth": 17.04,
      "to": 17.14,
      "property": "gamma",
-     "value": 20.201698999999998
+     "value": 20.2017
     },
     {
      "depth": 17.25,
@@ -22299,7 +22299,7 @@
      "depth": 17.25,
      "to": 17.35,
      "property": "gamma",
-     "value": 20.790098
+     "value": 20.7901
     },
     {
      "depth": 17.69,
@@ -22311,7 +22311,7 @@
      "depth": 17.69,
      "to": 17.79,
      "property": "gamma",
-     "value": 19.907499499999997
+     "value": 19.9075
     },
     {
      "depth": 18.24,
@@ -22323,7 +22323,7 @@
      "depth": 18.24,
      "to": 18.34,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 18.6,
@@ -22335,7 +22335,7 @@
      "depth": 18.6,
      "to": 18.65,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 19.09,
@@ -22347,7 +22347,7 @@
      "depth": 19.09,
      "to": 19.14,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 19.2,
@@ -22365,7 +22365,7 @@
      "depth": 20.13,
      "to": 20.18,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 20.64,
@@ -22377,7 +22377,7 @@
      "depth": 20.64,
      "to": 20.68,
      "property": "gamma",
-     "value": 18.1423025
+     "value": 18.1423
     },
     {
      "depth": 20.72,
@@ -22389,7 +22389,7 @@
      "depth": 20.72,
      "to": 20.77,
      "property": "gamma",
-     "value": 16.1809725
+     "value": 16.181
     },
     {
      "depth": 21.02,
@@ -22401,7 +22401,7 @@
      "depth": 21.02,
      "to": 21.07,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 21.6,
@@ -22628,7 +22628,7 @@
      "depth": 11.4,
      "to": 11.45,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 11.92,
@@ -22640,7 +22640,7 @@
      "depth": 11.92,
      "to": 11.97,
      "property": "gamma",
-     "value": 19.024901
+     "value": 19.0249
     },
     {
      "depth": 12.15,
@@ -22652,7 +22652,7 @@
      "depth": 12.15,
      "to": 12.2,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 12.6,
@@ -22664,7 +22664,7 @@
      "depth": 12.6,
      "to": 12.65,
      "property": "gamma",
-     "value": 19.024901
+     "value": 19.0249
     },
     {
      "depth": 12.74,
@@ -22676,7 +22676,7 @@
      "depth": 12.74,
      "to": 12.78,
      "property": "gamma",
-     "value": 18.632634999999997
+     "value": 18.6326
     },
     {
      "depth": 13.08,
@@ -22688,7 +22688,7 @@
      "depth": 13.08,
      "to": 13.18,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 13.39,
@@ -22700,7 +22700,7 @@
      "depth": 13.39,
      "to": 13.44,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 13.49,
@@ -22712,7 +22712,7 @@
      "depth": 13.49,
      "to": 13.59,
      "property": "gamma",
-     "value": 20.103632499999996
+     "value": 20.1036
     },
     {
      "depth": 13.85,
@@ -22742,7 +22742,7 @@
      "depth": 14.34,
      "to": 14.39,
      "property": "gamma",
-     "value": 18.9268345
+     "value": 18.9268
     },
     {
      "depth": 14.6,
@@ -22754,7 +22754,7 @@
      "depth": 14.6,
      "to": 14.65,
      "property": "gamma",
-     "value": 18.9268345
+     "value": 18.9268
     },
     {
      "depth": 15.04,
@@ -22766,7 +22766,7 @@
      "depth": 15.04,
      "to": 15.09,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 15.45,
@@ -22778,7 +22778,7 @@
      "depth": 15.45,
      "to": 15.5,
      "property": "gamma",
-     "value": 18.436501999999997
+     "value": 18.4365
     },
     {
      "depth": 15.65,
@@ -22790,7 +22790,7 @@
      "depth": 15.65,
      "to": 15.75,
      "property": "gamma",
-     "value": 18.9268345
+     "value": 18.9268
     },
     {
      "depth": 16.23,
@@ -22802,7 +22802,7 @@
      "depth": 16.23,
      "to": 16.33,
      "property": "gamma",
-     "value": 20.005565999999998
+     "value": 20.0056
     },
     {
      "depth": 16.82,
@@ -22814,7 +22814,7 @@
      "depth": 16.82,
      "to": 16.92,
      "property": "gamma",
-     "value": 20.201698999999998
+     "value": 20.2017
     },
     {
      "depth": 17.2,
@@ -22832,7 +22832,7 @@
      "depth": 17.42,
      "to": 17.47,
      "property": "gamma",
-     "value": 18.436501999999997
+     "value": 18.4365
     },
     {
      "depth": 17.86,
@@ -22844,7 +22844,7 @@
      "depth": 17.86,
      "to": 17.9,
      "property": "gamma",
-     "value": 18.1423025
+     "value": 18.1423
     },
     {
      "depth": 18.1,
@@ -22856,7 +22856,7 @@
      "depth": 18.1,
      "to": 18.15,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 18.22,
@@ -22868,7 +22868,7 @@
      "depth": 18.22,
      "to": 18.26,
      "property": "gamma",
-     "value": 17.7500365
+     "value": 17.75
     },
     {
      "depth": 18.5,
@@ -22880,7 +22880,7 @@
      "depth": 18.5,
      "to": 18.55,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 18.62,
@@ -22892,7 +22892,7 @@
      "depth": 18.62,
      "to": 18.66,
      "property": "gamma",
-     "value": 18.240369
+     "value": 18.2404
     },
     {
      "depth": 19.11,
@@ -22904,7 +22904,7 @@
      "depth": 19.11,
      "to": 19.16,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 19.31,
@@ -22916,7 +22916,7 @@
      "depth": 19.31,
      "to": 19.35,
      "property": "gamma",
-     "value": 18.5345685
+     "value": 18.5346
     },
     {
      "depth": 19.49,
@@ -22928,7 +22928,7 @@
      "depth": 19.49,
      "to": 19.53,
      "property": "gamma",
-     "value": 17.65197
+     "value": 17.652
     },
     {
      "depth": 19.6,
@@ -22946,7 +22946,7 @@
      "depth": 19.75,
      "to": 19.8,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 22.4,
@@ -23179,7 +23179,7 @@
      "depth": 11.71,
      "to": 11.76,
      "property": "gamma",
-     "value": 16.3771055
+     "value": 16.3771
     },
     {
      "depth": 11.91,
@@ -23191,7 +23191,7 @@
      "depth": 11.91,
      "to": 11.96,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 12.05,
@@ -23203,7 +23203,7 @@
      "depth": 12.05,
      "to": 12.16,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 12.4,
@@ -23221,7 +23221,7 @@
      "depth": 12.45,
      "to": 12.55,
      "property": "gamma",
-     "value": 20.299765499999996
+     "value": 20.2998
     },
     {
      "depth": 12.88,
@@ -23233,7 +23233,7 @@
      "depth": 12.88,
      "to": 12.93,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 12.98,
@@ -23245,7 +23245,7 @@
      "depth": 12.98,
      "to": 13.03,
      "property": "gamma",
-     "value": 15.2003075
+     "value": 15.2003
     },
     {
      "depth": 13.3,
@@ -23257,7 +23257,7 @@
      "depth": 13.3,
      "to": 13.35,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 13.48,
@@ -23269,7 +23269,7 @@
      "depth": 13.48,
      "to": 13.53,
      "property": "gamma",
-     "value": 16.867438
+     "value": 16.8674
     },
     {
      "depth": 13.7,
@@ -23281,7 +23281,7 @@
      "depth": 13.7,
      "to": 13.75,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 13.9,
@@ -23293,7 +23293,7 @@
      "depth": 13.9,
      "to": 13.94,
      "property": "gamma",
-     "value": 17.161637499999998
+     "value": 17.1616
     },
     {
      "depth": 14.08,
@@ -23305,7 +23305,7 @@
      "depth": 14.08,
      "to": 14.13,
      "property": "gamma",
-     "value": 18.3384355
+     "value": 18.3384
     },
     {
      "depth": 14.22,
@@ -23317,7 +23317,7 @@
      "depth": 14.22,
      "to": 14.27,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 14.58,
@@ -23329,7 +23329,7 @@
      "depth": 14.58,
      "to": 14.69,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 14.89,
@@ -23341,7 +23341,7 @@
      "depth": 14.89,
      "to": 14.94,
      "property": "gamma",
-     "value": 17.063571
+     "value": 17.0636
     },
     {
      "depth": 15.15,
@@ -23353,7 +23353,7 @@
      "depth": 15.15,
      "to": 15.2,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 15.4,
@@ -23365,7 +23365,7 @@
      "depth": 15.4,
      "to": 15.45,
      "property": "gamma",
-     "value": 18.5345685
+     "value": 18.5346
     },
     {
      "depth": 15.75,
@@ -23377,7 +23377,7 @@
      "depth": 15.75,
      "to": 15.8,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 16,
@@ -23395,7 +23395,7 @@
      "depth": 16.27,
      "to": 16.32,
      "property": "gamma",
-     "value": 19.024901
+     "value": 19.0249
     },
     {
      "depth": 16.66,
@@ -23407,7 +23407,7 @@
      "depth": 16.66,
      "to": 16.76,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 17.04,
@@ -23419,7 +23419,7 @@
      "depth": 17.04,
      "to": 17.14,
      "property": "gamma",
-     "value": 20.8881645
+     "value": 20.8882
     },
     {
      "depth": 17.33,
@@ -23431,7 +23431,7 @@
      "depth": 17.33,
      "to": 17.44,
      "property": "gamma",
-     "value": 20.005565999999998
+     "value": 20.0056
     },
     {
      "depth": 17.65,
@@ -23455,7 +23455,7 @@
      "depth": 17.79,
      "to": 17.84,
      "property": "gamma",
-     "value": 17.259704
+     "value": 17.2597
     },
     {
      "depth": 18.1,
@@ -23479,7 +23479,7 @@
      "depth": 18.23,
      "to": 18.28,
      "property": "gamma",
-     "value": 18.044236
+     "value": 18.0442
     },
     {
      "depth": 18.55,
@@ -23491,7 +23491,7 @@
      "depth": 18.55,
      "to": 18.6,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 18.8,
@@ -23509,7 +23509,7 @@
      "depth": 18.94,
      "to": 18.99,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 19.3,
@@ -23521,7 +23521,7 @@
      "depth": 19.3,
      "to": 19.35,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 19.48,
@@ -23533,7 +23533,7 @@
      "depth": 19.48,
      "to": 19.52,
      "property": "gamma",
-     "value": 15.7887065
+     "value": 15.7887
     },
     {
      "depth": 19.77,
@@ -23545,7 +23545,7 @@
      "depth": 19.77,
      "to": 19.82,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 19.94,
@@ -23557,7 +23557,7 @@
      "depth": 19.94,
      "to": 19.99,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 22.8,
@@ -23778,7 +23778,7 @@
      "depth": 11.48,
      "to": 11.53,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 11.72,
@@ -23790,7 +23790,7 @@
      "depth": 11.72,
      "to": 11.77,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 11.87,
@@ -23802,7 +23802,7 @@
      "depth": 11.87,
      "to": 11.92,
      "property": "gamma",
-     "value": 18.632634999999997
+     "value": 18.6326
     },
     {
      "depth": 12.19,
@@ -23814,7 +23814,7 @@
      "depth": 12.19,
      "to": 12.24,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 12.68,
@@ -23826,7 +23826,7 @@
      "depth": 12.68,
      "to": 12.73,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 12.8,
@@ -23844,7 +23844,7 @@
      "depth": 12.95,
      "to": 13,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 13.3,
@@ -23868,7 +23868,7 @@
      "depth": 13.75,
      "to": 13.8,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 14.22,
@@ -23880,7 +23880,7 @@
      "depth": 14.22,
      "to": 14.32,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 14.63,
@@ -23892,7 +23892,7 @@
      "depth": 14.63,
      "to": 14.73,
      "property": "gamma",
-     "value": 19.809433
+     "value": 19.8094
     },
     {
      "depth": 16,
@@ -23910,7 +23910,7 @@
      "depth": 16.15,
      "to": 16.2,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 16.47,
@@ -23922,7 +23922,7 @@
      "depth": 16.47,
      "to": 16.58,
      "property": "gamma",
-     "value": 20.299765499999996
+     "value": 20.2998
     },
     {
      "depth": 16.85,
@@ -23934,7 +23934,7 @@
      "depth": 16.85,
      "to": 16.96,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 17.01,
@@ -23946,7 +23946,7 @@
      "depth": 17.01,
      "to": 17.06,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 17.25,
@@ -23958,7 +23958,7 @@
      "depth": 17.25,
      "to": 17.36,
      "property": "gamma",
-     "value": 19.809433
+     "value": 19.8094
     },
     {
      "depth": 17.84,
@@ -23970,7 +23970,7 @@
      "depth": 17.84,
      "to": 17.94,
      "property": "gamma",
-     "value": 19.907499499999997
+     "value": 19.9075
     },
     {
      "depth": 18.23,
@@ -23982,7 +23982,7 @@
      "depth": 18.23,
      "to": 18.28,
      "property": "gamma",
-     "value": 16.7693715
+     "value": 16.7694
     },
     {
      "depth": 20.4,
@@ -24402,7 +24402,7 @@
      "depth": 1.53,
      "to": 1.58,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 2.85,
@@ -24420,7 +24420,7 @@
      "depth": 2.85,
      "to": 2.95,
      "property": "gamma",
-     "value": 17.848103
+     "value": 17.8481
     },
     {
      "depth": 2.85,
@@ -24456,7 +24456,7 @@
      "depth": 2.95,
      "to": 3.05,
      "property": "gamma",
-     "value": 17.455837
+     "value": 17.4558
     },
     {
      "depth": 3.05,
@@ -24474,7 +24474,7 @@
      "depth": 3.33,
      "to": 3.43,
      "property": "gamma",
-     "value": 17.5539035
+     "value": 17.5539
     },
     {
      "depth": 3.84,
@@ -24492,7 +24492,7 @@
      "depth": 3.89,
      "to": 3.94,
      "property": "gamma",
-     "value": 14.415775499999999
+     "value": 14.4158
     },
     {
      "depth": 3.89,
@@ -24522,7 +24522,7 @@
      "depth": 4.51,
      "to": 4.61,
      "property": "gamma",
-     "value": 17.259704
+     "value": 17.2597
     },
     {
      "depth": 4.61,
@@ -24534,7 +24534,7 @@
      "depth": 4.61,
      "to": 4.71,
      "property": "gamma",
-     "value": 16.965504499999998
+     "value": 16.9655
     },
     {
      "depth": 4.87,
@@ -24546,7 +24546,7 @@
      "depth": 4.87,
      "to": 4.97,
      "property": "gamma",
-     "value": 17.5539035
+     "value": 17.5539
     },
     {
      "depth": 5.21,
@@ -24564,7 +24564,7 @@
      "depth": 5.26,
      "to": 5.36,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 5.26,
@@ -24600,7 +24600,7 @@
      "depth": 5.36,
      "to": 5.46,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 5.65,
@@ -24624,7 +24624,7 @@
      "depth": 5.8,
      "to": 5.9,
      "property": "gamma",
-     "value": 18.3384355
+     "value": 18.3384
     },
     {
      "depth": 6.05,
@@ -24636,7 +24636,7 @@
      "depth": 6.05,
      "to": 6.15,
      "property": "gamma",
-     "value": 17.9461695
+     "value": 17.9462
     },
     {
      "depth": 6.8,
@@ -25047,7 +25047,7 @@
      "depth": 6.74,
      "to": 6.79,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 6.8,
@@ -25083,7 +25083,7 @@
      "depth": 7.88,
      "to": 7.93,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 9.39,
@@ -25107,7 +25107,7 @@
      "depth": 11.25,
      "to": 11.3,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 13.6,
@@ -25125,7 +25125,7 @@
      "depth": 13.92,
      "to": 13.97,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 14.45,
@@ -25137,7 +25137,7 @@
      "depth": 14.45,
      "to": 14.5,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 16,
@@ -25167,7 +25167,7 @@
      "depth": 17.47,
      "to": 17.52,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 18.4,
@@ -25203,7 +25203,7 @@
      "depth": 21.47,
      "to": 21.52,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 23.88,
@@ -25215,7 +25215,7 @@
      "depth": 23.88,
      "to": 23.93,
      "property": "gamma",
-     "value": 15.0041745
+     "value": 15.0042
     },
     {
      "depth": 24.05,
@@ -25227,7 +25227,7 @@
      "depth": 24.05,
      "to": 24.15,
      "property": "gamma",
-     "value": 15.886773
+     "value": 15.8868
     },
     {
      "depth": 24.15,
@@ -25239,7 +25239,7 @@
      "depth": 24.15,
      "to": 24.25,
      "property": "gamma",
-     "value": 16.082905999999998
+     "value": 16.0829
     },
     {
      "depth": 24.44,
@@ -25281,7 +25281,7 @@
      "depth": 24.49,
      "to": 24.59,
      "property": "gamma",
-     "value": 14.317708999999999
+     "value": 14.3177
     },
     {
      "depth": 24.59,
@@ -25305,7 +25305,7 @@
      "depth": 25.07,
      "to": 25.12,
      "property": "gamma",
-     "value": 16.671305
+     "value": 16.6713
     },
     {
      "depth": 25.47,
@@ -25347,7 +25347,7 @@
      "depth": 25.71,
      "to": 25.81,
      "property": "gamma",
-     "value": 15.69064
+     "value": 15.6906
     },
     {
      "depth": 25.81,
@@ -25359,7 +25359,7 @@
      "depth": 25.81,
      "to": 25.91,
      "property": "gamma",
-     "value": 14.0235095
+     "value": 14.0235
     },
     {
      "depth": 26.06,
@@ -25377,7 +25377,7 @@
      "depth": 26.06,
      "to": 26.16,
      "property": "gamma",
-     "value": 16.475171999999997
+     "value": 16.4752
     },
     {
      "depth": 26.16,
@@ -25395,7 +25395,7 @@
      "depth": 27.9,
      "to": 27.95,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 48.65,
@@ -25407,7 +25407,7 @@
      "depth": 48.65,
      "to": 48.75,
      "property": "gamma",
-     "value": 20.103632499999996
+     "value": 20.1036
     },
     {
      "depth": 48.83,
@@ -25425,7 +25425,7 @@
      "depth": 48.87,
      "to": 48.97,
      "property": "gamma",
-     "value": 20.005565999999998
+     "value": 20.0056
     },
     {
      "depth": 48.97,
@@ -25437,7 +25437,7 @@
      "depth": 48.97,
      "to": 49.07,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     }
    ]
   },
@@ -25659,7 +25659,7 @@
      "depth": 0.34,
      "to": 0.39,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 0.4,
@@ -25683,7 +25683,7 @@
      "depth": 1.14,
      "to": 1.19,
      "property": "gamma",
-     "value": 18.1423025
+     "value": 18.1423
     },
     {
      "depth": 1.2,
@@ -25719,7 +25719,7 @@
      "depth": 2.17,
      "to": 2.22,
      "property": "gamma",
-     "value": 18.1423025
+     "value": 18.1423
     },
     {
      "depth": 2.4,
@@ -25743,7 +25743,7 @@
      "depth": 3,
      "to": 3.04,
      "property": "gamma",
-     "value": 18.3384355
+     "value": 18.3384
     },
     {
      "depth": 3.28,
@@ -25761,7 +25761,7 @@
      "depth": 3.28,
      "to": 3.38,
      "property": "gamma",
-     "value": 16.279038999999997
+     "value": 16.279
     },
     {
      "depth": 3.38,
@@ -25773,7 +25773,7 @@
      "depth": 3.38,
      "to": 3.48,
      "property": "gamma",
-     "value": 16.671305
+     "value": 16.6713
     },
     {
      "depth": 3.48,
@@ -25785,7 +25785,7 @@
      "depth": 3.48,
      "to": 3.58,
      "property": "gamma",
-     "value": 16.5732385
+     "value": 16.5732
     },
     {
      "depth": 3.67,
@@ -25797,7 +25797,7 @@
      "depth": 3.67,
      "to": 3.77,
      "property": "gamma",
-     "value": 15.494507
+     "value": 15.4945
     },
     {
      "depth": 3.76,
@@ -25821,7 +25821,7 @@
      "depth": 3.77,
      "to": 3.87,
      "property": "gamma",
-     "value": 15.102241
+     "value": 15.1022
     },
     {
      "depth": 4.16,
@@ -25839,7 +25839,7 @@
      "depth": 4.16,
      "to": 4.26,
      "property": "gamma",
-     "value": 19.907499499999997
+     "value": 19.9075
     }
    ]
   },
@@ -25959,7 +25959,7 @@
      "depth": 0.64,
      "to": 0.69,
      "property": "gamma",
-     "value": 16.671305
+     "value": 16.6713
     },
     {
      "depth": 1.35,
@@ -25971,7 +25971,7 @@
      "depth": 1.35,
      "to": 1.4,
      "property": "gamma",
-     "value": 16.671305
+     "value": 16.6713
     },
     {
      "depth": 1.35,
@@ -25995,7 +25995,7 @@
      "depth": 2.15,
      "to": 2.2,
      "property": "gamma",
-     "value": 16.279038999999997
+     "value": 16.279
     },
     {
      "depth": 2.4,
@@ -26049,7 +26049,7 @@
      "depth": 2.75,
      "to": 2.8,
      "property": "gamma",
-     "value": 16.5732385
+     "value": 16.5732
     },
     {
      "depth": 3.6,
@@ -26067,7 +26067,7 @@
      "depth": 3.65,
      "to": 3.71,
      "property": "gamma",
-     "value": 15.298373999999999
+     "value": 15.2984
     },
     {
      "depth": 3.65,
@@ -26085,7 +26085,7 @@
      "depth": 4.11,
      "to": 4.17,
      "property": "gamma",
-     "value": 15.396440499999999
+     "value": 15.3964
     },
     {
      "depth": 4.11,
@@ -26103,7 +26103,7 @@
      "depth": 4.45,
      "to": 4.5,
      "property": "gamma",
-     "value": 17.7500365
+     "value": 17.75
     },
     {
      "depth": 4.7,
@@ -26145,7 +26145,7 @@
      "depth": 4.94,
      "to": 5,
      "property": "gamma",
-     "value": 15.298373999999999
+     "value": 15.2984
     },
     {
      "depth": 4.94,
@@ -26169,7 +26169,7 @@
      "depth": 5.91,
      "to": 5.96,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 6.27,
@@ -26181,7 +26181,7 @@
      "depth": 6.27,
      "to": 6.32,
      "property": "gamma",
-     "value": 17.9461695
+     "value": 17.9462
     }
    ]
   },
@@ -26283,7 +26283,7 @@
      "depth": 0.19,
      "to": 0.25,
      "property": "gamma",
-     "value": 17.9461695
+     "value": 17.9462
     },
     {
      "depth": 1.14,
@@ -26295,7 +26295,7 @@
      "depth": 1.14,
      "to": 1.19,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 1.6,
@@ -26313,7 +26313,7 @@
      "depth": 1.89,
      "to": 1.94,
      "property": "gamma",
-     "value": 19.024901
+     "value": 19.0249
     },
     {
      "depth": 2.67,
@@ -26325,7 +26325,7 @@
      "depth": 2.67,
      "to": 2.72,
      "property": "gamma",
-     "value": 19.024901
+     "value": 19.0249
     },
     {
      "depth": 3.2,
@@ -26349,7 +26349,7 @@
      "depth": 3.25,
      "to": 3.3,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 4.26,
@@ -26361,7 +26361,7 @@
      "depth": 4.26,
      "to": 4.31,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 4.8,
@@ -26379,7 +26379,7 @@
      "depth": 5.12,
      "to": 5.17,
      "property": "gamma",
-     "value": 20.201698999999998
+     "value": 20.2017
     }
    ]
   },
@@ -26613,7 +26613,7 @@
      "depth": 1.83,
      "to": 1.88,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 2,
@@ -26643,7 +26643,7 @@
      "depth": 3.46,
      "to": 3.51,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 4.59,
@@ -26667,7 +26667,7 @@
      "depth": 4.9,
      "to": 5,
      "property": "gamma",
-     "value": 18.436501999999997
+     "value": 18.4365
     },
     {
      "depth": 5,
@@ -26679,7 +26679,7 @@
      "depth": 5,
      "to": 5.1,
      "property": "gamma",
-     "value": 16.671305
+     "value": 16.6713
     },
     {
      "depth": 5.1,
@@ -26691,7 +26691,7 @@
      "depth": 5.1,
      "to": 5.2,
      "property": "gamma",
-     "value": 17.063571
+     "value": 17.0636
     },
     {
      "depth": 5.1,
@@ -26709,7 +26709,7 @@
      "depth": 5.33,
      "to": 5.43,
      "property": "gamma",
-     "value": 16.671305
+     "value": 16.6713
     },
     {
      "depth": 5.43,
@@ -26721,7 +26721,7 @@
      "depth": 5.43,
      "to": 5.53,
      "property": "gamma",
-     "value": 17.455837
+     "value": 17.4558
     },
     {
      "depth": 5.6,
@@ -26757,7 +26757,7 @@
      "depth": 5.65,
      "to": 5.75,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 5.65,
@@ -26829,7 +26829,7 @@
      "depth": 11.95,
      "to": 12,
      "property": "gamma",
-     "value": 20.299765499999996
+     "value": 20.2998
     },
     {
      "depth": 15.6,
@@ -26853,7 +26853,7 @@
      "depth": 21.52,
      "to": 21.57,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 26,
@@ -27236,7 +27236,7 @@
      "depth": 4.33,
      "to": 4.38,
      "property": "gamma",
-     "value": 18.044236
+     "value": 18.0442
     },
     {
      "depth": 6.4,
@@ -27254,7 +27254,7 @@
      "depth": 6.46,
      "to": 6.51,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 7.53,
@@ -27266,7 +27266,7 @@
      "depth": 7.53,
      "to": 7.58,
      "property": "gamma",
-     "value": 20.299765499999996
+     "value": 20.2998
     },
     {
      "depth": 8.62,
@@ -27290,7 +27290,7 @@
      "depth": 9.55,
      "to": 9.6,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 12.17,
@@ -27308,7 +27308,7 @@
      "depth": 12.35,
      "to": 12.4,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 16,
@@ -27326,7 +27326,7 @@
      "depth": 16.33,
      "to": 16.38,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 16.8,
@@ -27344,7 +27344,7 @@
      "depth": 18.33,
      "to": 18.38,
      "property": "gamma",
-     "value": 19.024901
+     "value": 19.0249
     },
     {
      "depth": 19.2,
@@ -27362,7 +27362,7 @@
      "depth": 21.04,
      "to": 21.09,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 22,
@@ -27380,7 +27380,7 @@
      "depth": 22.45,
      "to": 22.5,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 23.74,
@@ -27398,7 +27398,7 @@
      "depth": 24.5,
      "to": 24.6,
      "property": "gamma",
-     "value": 15.396440499999999
+     "value": 15.3964
     },
     {
      "depth": 24.6,
@@ -27410,7 +27410,7 @@
      "depth": 24.6,
      "to": 24.7,
      "property": "gamma",
-     "value": 17.848103
+     "value": 17.8481
     },
     {
      "depth": 24.8,
@@ -27422,7 +27422,7 @@
      "depth": 24.8,
      "to": 24.9,
      "property": "gamma",
-     "value": 16.082905999999998
+     "value": 16.0829
     },
     {
      "depth": 25.26,
@@ -27470,7 +27470,7 @@
      "depth": 26.08,
      "to": 26.18,
      "property": "gamma",
-     "value": 16.671305
+     "value": 16.6713
     },
     {
      "depth": 26.18,
@@ -27482,7 +27482,7 @@
      "depth": 26.18,
      "to": 26.28,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 26.55,
@@ -27500,7 +27500,7 @@
      "depth": 26.55,
      "to": 26.65,
      "property": "gamma",
-     "value": 18.632634999999997
+     "value": 18.6326
     },
     {
      "depth": 27.39,
@@ -27530,7 +27530,7 @@
      "depth": 48.65,
      "to": 48.7,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 48.88,
@@ -27554,7 +27554,7 @@
      "depth": 49,
      "to": 49.1,
      "property": "gamma",
-     "value": 21.182364
+     "value": 21.1824
     }
    ]
   },
@@ -27913,7 +27913,7 @@
      "depth": 3.85,
      "to": 3.9,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 4.8,
@@ -27931,7 +27931,7 @@
      "depth": 4.85,
      "to": 4.9,
      "property": "gamma",
-     "value": 20.201698999999998
+     "value": 20.2017
     },
     {
      "depth": 9.53,
@@ -27943,7 +27943,7 @@
      "depth": 9.53,
      "to": 9.58,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 12.05,
@@ -27955,7 +27955,7 @@
      "depth": 12.05,
      "to": 12.1,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 14.4,
@@ -27973,7 +27973,7 @@
      "depth": 14.45,
      "to": 14.5,
      "property": "gamma",
-     "value": 19.809433
+     "value": 19.8094
     },
     {
      "depth": 15.2,
@@ -27991,7 +27991,7 @@
      "depth": 15.41,
      "to": 15.46,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 16.35,
@@ -28003,7 +28003,7 @@
      "depth": 16.35,
      "to": 16.4,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 19.6,
@@ -28021,7 +28021,7 @@
      "depth": 19.93,
      "to": 19.98,
      "property": "gamma",
-     "value": 18.9268345
+     "value": 18.9268
     },
     {
      "depth": 23.24,
@@ -28045,7 +28045,7 @@
      "depth": 23.29,
      "to": 23.39,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 23.39,
@@ -28057,7 +28057,7 @@
      "depth": 23.39,
      "to": 23.49,
      "property": "gamma",
-     "value": 18.9268345
+     "value": 18.9268
     },
     {
      "depth": 23.49,
@@ -28069,7 +28069,7 @@
      "depth": 23.49,
      "to": 23.59,
      "property": "gamma",
-     "value": 20.103632499999996
+     "value": 20.1036
     },
     {
      "depth": 23.88,
@@ -28081,7 +28081,7 @@
      "depth": 23.88,
      "to": 23.98,
      "property": "gamma",
-     "value": 13.4351105
+     "value": 13.4351
     },
     {
      "depth": 24.07,
@@ -28099,7 +28099,7 @@
      "depth": 24.07,
      "to": 24.17,
      "property": "gamma",
-     "value": 16.7693715
+     "value": 16.7694
     },
     {
      "depth": 24.07,
@@ -28135,7 +28135,7 @@
      "depth": 24.17,
      "to": 24.27,
      "property": "gamma",
-     "value": 18.1423025
+     "value": 18.1423
     },
     {
      "depth": 24.17,
@@ -28159,7 +28159,7 @@
      "depth": 24.86,
      "to": 24.96,
      "property": "gamma",
-     "value": 20.4958985
+     "value": 20.4959
     },
     {
      "depth": 25.6,
@@ -28177,7 +28177,7 @@
      "depth": 25.65,
      "to": 25.7,
      "property": "gamma",
-     "value": 20.4958985
+     "value": 20.4959
     },
     {
      "depth": 32.4,
@@ -28453,7 +28453,7 @@
      "depth": 0.5,
      "to": 0.55,
      "property": "gamma",
-     "value": 18.3384355
+     "value": 18.3384
     },
     {
      "depth": 0.8,
@@ -28483,7 +28483,7 @@
      "depth": 1.91,
      "to": 1.96,
      "property": "gamma",
-     "value": 18.3384355
+     "value": 18.3384
     },
     {
      "depth": 2,
@@ -28543,7 +28543,7 @@
      "depth": 3.32,
      "to": 3.42,
      "property": "gamma",
-     "value": 19.907499499999997
+     "value": 19.9075
     },
     {
      "depth": 3.32,
@@ -28579,7 +28579,7 @@
      "depth": 3.42,
      "to": 3.52,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 3.69,
@@ -28591,7 +28591,7 @@
      "depth": 3.69,
      "to": 3.79,
      "property": "gamma",
-     "value": 20.103632499999996
+     "value": 20.1036
     },
     {
      "depth": 3.69,
@@ -28609,7 +28609,7 @@
      "depth": 3.79,
      "to": 3.89,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 3.89,
@@ -28621,7 +28621,7 @@
      "depth": 3.89,
      "to": 3.99,
      "property": "gamma",
-     "value": 19.809433
+     "value": 19.8094
     },
     {
      "depth": 4.14,
@@ -28639,7 +28639,7 @@
      "depth": 4.14,
      "to": 4.24,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 4.4,
@@ -28687,7 +28687,7 @@
      "depth": 17.14,
      "to": 17.19,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 23.6,
@@ -29064,7 +29064,7 @@
      "depth": 5.35,
      "to": 5.5,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 8.4,
@@ -29082,7 +29082,7 @@
      "depth": 8.67,
      "to": 8.72,
      "property": "gamma",
-     "value": 20.005565999999998
+     "value": 20.0056
     },
     {
      "depth": 9.31,
@@ -29094,7 +29094,7 @@
      "depth": 9.31,
      "to": 9.36,
      "property": "gamma",
-     "value": 20.6920315
+     "value": 20.692
     },
     {
      "depth": 10.4,
@@ -29112,7 +29112,7 @@
      "depth": 12.1,
      "to": 12.15,
      "property": "gamma",
-     "value": 18.9268345
+     "value": 18.9268
     },
     {
      "depth": 13.2,
@@ -29136,7 +29136,7 @@
      "depth": 13.92,
      "to": 13.97,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 15.7,
@@ -29160,7 +29160,7 @@
      "depth": 17.93,
      "to": 17.98,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 19.2,
@@ -29208,7 +29208,7 @@
      "depth": 23.95,
      "to": 24,
      "property": "gamma",
-     "value": 16.082905999999998
+     "value": 16.0829
     },
     {
      "depth": 24.24,
@@ -29220,7 +29220,7 @@
      "depth": 24.24,
      "to": 24.34,
      "property": "gamma",
-     "value": 17.7500365
+     "value": 17.75
     },
     {
      "depth": 24.24,
@@ -29238,7 +29238,7 @@
      "depth": 24.48,
      "to": 24.58,
      "property": "gamma",
-     "value": 17.5539035
+     "value": 17.5539
     },
     {
      "depth": 24.68,
@@ -29250,7 +29250,7 @@
      "depth": 24.68,
      "to": 24.78,
      "property": "gamma",
-     "value": 16.671305
+     "value": 16.6713
     },
     {
      "depth": 24.87,
@@ -29268,7 +29268,7 @@
      "depth": 24.98,
      "to": 25.08,
      "property": "gamma",
-     "value": 16.475171999999997
+     "value": 16.4752
     },
     {
      "depth": 25.38,
@@ -29280,7 +29280,7 @@
      "depth": 25.38,
      "to": 25.48,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 25.48,
@@ -29292,7 +29292,7 @@
      "depth": 25.48,
      "to": 25.58,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 26.24,
@@ -29334,7 +29334,7 @@
      "depth": 26.29,
      "to": 26.34,
      "property": "gamma",
-     "value": 16.7693715
+     "value": 16.7694
     },
     {
      "depth": 26.67,
@@ -29346,7 +29346,7 @@
      "depth": 26.67,
      "to": 26.77,
      "property": "gamma",
-     "value": 20.005565999999998
+     "value": 20.0056
     },
     {
      "depth": 26.88,
@@ -29358,7 +29358,7 @@
      "depth": 26.88,
      "to": 26.98,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 26.98,
@@ -29370,7 +29370,7 @@
      "depth": 26.98,
      "to": 27.08,
      "property": "gamma",
-     "value": 17.5539035
+     "value": 17.5539
     },
     {
      "depth": 33.2,
@@ -29508,7 +29508,7 @@
      "depth": 1.12,
      "to": 1.17,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 2.4,
@@ -29526,7 +29526,7 @@
      "depth": 2.45,
      "to": 2.5,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 2.74,
@@ -29538,7 +29538,7 @@
      "depth": 2.74,
      "to": 2.79,
      "property": "gamma",
-     "value": 18.436501999999997
+     "value": 18.4365
     },
     {
      "depth": 4.4,
@@ -29556,7 +29556,7 @@
      "depth": 4.71,
      "to": 4.76,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 5.25,
@@ -29568,7 +29568,7 @@
      "depth": 5.25,
      "to": 5.3,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 5.47,
@@ -29580,7 +29580,7 @@
      "depth": 5.47,
      "to": 5.52,
      "property": "gamma",
-     "value": 17.848103
+     "value": 17.8481
     },
     {
      "depth": 5.47,
@@ -29664,7 +29664,7 @@
      "depth": 5.65,
      "to": 5.7,
      "property": "gamma",
-     "value": 16.671305
+     "value": 16.6713
     },
     {
      "depth": 5.65,
@@ -29778,7 +29778,7 @@
      "depth": 0.5,
      "to": 0.55,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 0.5,
@@ -29802,7 +29802,7 @@
      "depth": 1.48,
      "to": 1.53,
      "property": "gamma",
-     "value": 16.475171999999997
+     "value": 16.4752
     },
     {
      "depth": 2.15,
@@ -29814,7 +29814,7 @@
      "depth": 2.15,
      "to": 2.2,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 2.15,
@@ -29856,7 +29856,7 @@
      "depth": 2.45,
      "to": 2.5,
      "property": "gamma",
-     "value": 18.1423025
+     "value": 18.1423
     },
     {
      "depth": 2.45,
@@ -29910,7 +29910,7 @@
      "depth": 3.48,
      "to": 3.53,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 4.4,
@@ -29928,7 +29928,7 @@
      "depth": 4.71,
      "to": 4.76,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     }
    ]
   },
@@ -30287,7 +30287,7 @@
      "depth": 6.65,
      "to": 6.7,
      "property": "gamma",
-     "value": 19.907499499999997
+     "value": 19.9075
     },
     {
      "depth": 7.43,
@@ -30299,7 +30299,7 @@
      "depth": 7.43,
      "to": 7.48,
      "property": "gamma",
-     "value": 19.907499499999997
+     "value": 19.9075
     },
     {
      "depth": 8.31,
@@ -30311,7 +30311,7 @@
      "depth": 8.31,
      "to": 8.36,
      "property": "gamma",
-     "value": 20.103632499999996
+     "value": 20.1036
     },
     {
      "depth": 9.6,
@@ -30329,7 +30329,7 @@
      "depth": 9.93,
      "to": 9.98,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 11.47,
@@ -30347,7 +30347,7 @@
      "depth": 11.54,
      "to": 11.59,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 12.65,
@@ -30359,7 +30359,7 @@
      "depth": 12.65,
      "to": 12.7,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 13.82,
@@ -30383,7 +30383,7 @@
      "depth": 14.67,
      "to": 14.72,
      "property": "gamma",
-     "value": 19.024901
+     "value": 19.0249
     },
     {
      "depth": 15.6,
@@ -30401,7 +30401,7 @@
      "depth": 15.94,
      "to": 15.99,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 17.2,
@@ -30431,7 +30431,7 @@
      "depth": 23.04,
      "to": 23.13,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 23.29,
@@ -30443,7 +30443,7 @@
      "depth": 23.29,
      "to": 23.39,
      "property": "gamma",
-     "value": 19.809433
+     "value": 19.8094
     },
     {
      "depth": 23.39,
@@ -30455,7 +30455,7 @@
      "depth": 23.39,
      "to": 23.49,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 23.49,
@@ -30473,7 +30473,7 @@
      "depth": 23.7,
      "to": 23.8,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 23.8,
@@ -30485,7 +30485,7 @@
      "depth": 23.8,
      "to": 23.9,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 23.9,
@@ -30497,7 +30497,7 @@
      "depth": 23.9,
      "to": 24,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 24.05,
@@ -30545,7 +30545,7 @@
      "depth": 24.1,
      "to": 24.15,
      "property": "gamma",
-     "value": 17.65197
+     "value": 17.652
     },
     {
      "depth": 24.61,
@@ -30557,7 +30557,7 @@
      "depth": 24.61,
      "to": 24.71,
      "property": "gamma",
-     "value": 13.631243499999998
+     "value": 13.6312
     },
     {
      "depth": 24.85,
@@ -30575,7 +30575,7 @@
      "depth": 24.85,
      "to": 24.95,
      "property": "gamma",
-     "value": 16.867438
+     "value": 16.8674
     },
     {
      "depth": 24.95,
@@ -30587,7 +30587,7 @@
      "depth": 24.95,
      "to": 25.05,
      "property": "gamma",
-     "value": 15.0041745
+     "value": 15.0042
     },
     {
      "depth": 25.05,
@@ -30605,7 +30605,7 @@
      "depth": 25.32,
      "to": 25.42,
      "property": "gamma",
-     "value": 16.671305
+     "value": 16.6713
     },
     {
      "depth": 25.42,
@@ -30617,7 +30617,7 @@
      "depth": 25.42,
      "to": 25.52,
      "property": "gamma",
-     "value": 17.063571
+     "value": 17.0636
     },
     {
      "depth": 25.67,
@@ -30635,7 +30635,7 @@
      "depth": 25.67,
      "to": 25.77,
      "property": "gamma",
-     "value": 18.436501999999997
+     "value": 18.4365
     },
     {
      "depth": 25.77,
@@ -30677,7 +30677,7 @@
      "depth": 26.24,
      "to": 26.29,
      "property": "gamma",
-     "value": 17.848103
+     "value": 17.8481
     },
     {
      "depth": 27.2,
@@ -30695,7 +30695,7 @@
      "depth": 27.53,
      "to": 27.58,
      "property": "gamma",
-     "value": 20.6920315
+     "value": 20.692
     },
     {
      "depth": 28.4,
@@ -30713,7 +30713,7 @@
      "depth": 28.62,
      "to": 28.67,
      "property": "gamma",
-     "value": 20.299765499999996
+     "value": 20.2998
     }
    ]
   },
@@ -30839,7 +30839,7 @@
      "depth": 1.45,
      "to": 1.5,
      "property": "gamma",
-     "value": 13.337044
+     "value": 13.337
     },
     {
      "depth": 2.18,
@@ -30857,7 +30857,7 @@
      "depth": 2.25,
      "to": 2.3,
      "property": "gamma",
-     "value": 18.044236
+     "value": 18.0442
     },
     {
      "depth": 2.4,
@@ -30899,7 +30899,7 @@
      "depth": 2.61,
      "to": 2.66,
      "property": "gamma",
-     "value": 17.259704
+     "value": 17.2597
     },
     {
      "depth": 2.93,
@@ -30923,7 +30923,7 @@
      "depth": 2.99,
      "to": 3.05,
      "property": "gamma",
-     "value": 13.729309999999998
+     "value": 13.7293
     },
     {
      "depth": 2.99,
@@ -30941,7 +30941,7 @@
      "depth": 3.76,
      "to": 3.82,
      "property": "gamma",
-     "value": 17.7500365
+     "value": 17.75
     },
     {
      "depth": 3.76,
@@ -30959,7 +30959,7 @@
      "depth": 4.45,
      "to": 4.5,
      "property": "gamma",
-     "value": 15.69064
+     "value": 15.6906
     },
     {
      "depth": 4.59,
@@ -30983,7 +30983,7 @@
      "depth": 5.85,
      "to": 5.9,
      "property": "gamma",
-     "value": 14.906108
+     "value": 14.9061
     }
    ]
   },
@@ -31127,7 +31127,7 @@
      "depth": 2.13,
      "to": 2.18,
      "property": "gamma",
-     "value": 15.494507
+     "value": 15.4945
     },
     {
      "depth": 2.13,
@@ -31145,7 +31145,7 @@
      "depth": 2.73,
      "to": 2.78,
      "property": "gamma",
-     "value": 14.709975
+     "value": 14.71
     },
     {
      "depth": 2.73,
@@ -31181,7 +31181,7 @@
      "depth": 3.45,
      "to": 3.5,
      "property": "gamma",
-     "value": 17.259704
+     "value": 17.2597
     },
     {
      "depth": 3.6,
@@ -31205,7 +31205,7 @@
      "depth": 3.83,
      "to": 3.88,
      "property": "gamma",
-     "value": 16.1809725
+     "value": 16.181
     },
     {
      "depth": 4.62,
@@ -31223,7 +31223,7 @@
      "depth": 4.67,
      "to": 4.72,
      "property": "gamma",
-     "value": 18.1423025
+     "value": 18.1423
     },
     {
      "depth": 5.25,
@@ -31241,7 +31241,7 @@
      "depth": 5.25,
      "to": 5.3,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 8.24,
@@ -31259,7 +31259,7 @@
      "depth": 8.29,
      "to": 8.34,
      "property": "gamma",
-     "value": 14.8080415
+     "value": 14.808
     }
    ]
   },
@@ -31397,7 +31397,7 @@
      "depth": 0.58,
      "to": 0.63,
      "property": "gamma",
-     "value": 17.161637499999998
+     "value": 17.1616
     },
     {
      "depth": 0.58,
@@ -31415,7 +31415,7 @@
      "depth": 1.13,
      "to": 1.19,
      "property": "gamma",
-     "value": 18.436501999999997
+     "value": 18.4365
     },
     {
      "depth": 1.13,
@@ -31469,7 +31469,7 @@
      "depth": 1.5,
      "to": 1.55,
      "property": "gamma",
-     "value": 17.65197
+     "value": 17.652
     },
     {
      "depth": 1.87,
@@ -31505,7 +31505,7 @@
      "depth": 1.9,
      "to": 1.96,
      "property": "gamma",
-     "value": 18.1423025
+     "value": 18.1423
     },
     {
      "depth": 1.9,
@@ -31529,7 +31529,7 @@
      "depth": 2.97,
      "to": 3.02,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 4,
@@ -31547,7 +31547,7 @@
      "depth": 4.05,
      "to": 4.1,
      "property": "gamma",
-     "value": 19.809433
+     "value": 19.8094
     },
     {
      "depth": 4.85,
@@ -31559,7 +31559,7 @@
      "depth": 4.85,
      "to": 4.91,
      "property": "gamma",
-     "value": 15.7887065
+     "value": 15.7887
     },
     {
      "depth": 4.85,
@@ -31673,7 +31673,7 @@
      "depth": 1.05,
      "to": 1.1,
      "property": "gamma",
-     "value": 15.0041745
+     "value": 15.0042
     },
     {
      "depth": 2.19,
@@ -31715,7 +31715,7 @@
      "depth": 2.33,
      "to": 2.38,
      "property": "gamma",
-     "value": 16.279038999999997
+     "value": 16.279
     },
     {
      "depth": 2.5,
@@ -31727,7 +31727,7 @@
      "depth": 2.5,
      "to": 2.56,
      "property": "gamma",
-     "value": 17.063571
+     "value": 17.0636
     },
     {
      "depth": 2.5,
@@ -31781,7 +31781,7 @@
      "depth": 3.27,
      "to": 3.33,
      "property": "gamma",
-     "value": 15.984839499999998
+     "value": 15.9848
     },
     {
      "depth": 3.27,
@@ -31799,7 +31799,7 @@
      "depth": 3.45,
      "to": 3.5,
      "property": "gamma",
-     "value": 18.9268345
+     "value": 18.9268
     },
     {
      "depth": 3.81,
@@ -31823,7 +31823,7 @@
      "depth": 3.81,
      "to": 3.86,
      "property": "gamma",
-     "value": 17.5539035
+     "value": 17.5539
     },
     {
      "depth": 4.8,
@@ -31841,7 +31841,7 @@
      "depth": 5.06,
      "to": 5.11,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     }
    ]
   },
@@ -31955,7 +31955,7 @@
      "depth": 0.3,
      "to": 0.37,
      "property": "gamma",
-     "value": 15.494507
+     "value": 15.4945
     },
     {
      "depth": 0.3,
@@ -31985,7 +31985,7 @@
      "depth": 0.9,
      "to": 0.95,
      "property": "gamma",
-     "value": 15.298373999999999
+     "value": 15.2984
     },
     {
      "depth": 1.35,
@@ -32021,7 +32021,7 @@
      "depth": 1.35,
      "to": 1.4,
      "property": "gamma",
-     "value": 16.5732385
+     "value": 16.5732
     },
     {
      "depth": 1.4,
@@ -32051,7 +32051,7 @@
      "depth": 1.83,
      "to": 1.88,
      "property": "gamma",
-     "value": 18.3384355
+     "value": 18.3384
     },
     {
      "depth": 2.15,
@@ -32093,7 +32093,7 @@
      "depth": 2.2,
      "to": 2.25,
      "property": "gamma",
-     "value": 17.3577705
+     "value": 17.3578
     },
     {
      "depth": 2.45,
@@ -32105,7 +32105,7 @@
      "depth": 2.45,
      "to": 2.5,
      "property": "gamma",
-     "value": 17.7500365
+     "value": 17.75
     },
     {
      "depth": 2.5,
@@ -32129,7 +32129,7 @@
      "depth": 3.55,
      "to": 3.6,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     },
     {
      "depth": 4.05,
@@ -32147,7 +32147,7 @@
      "depth": 4.23,
      "to": 4.28,
      "property": "gamma",
-     "value": 17.9461695
+     "value": 17.9462
     },
     {
      "depth": 4.8,
@@ -32165,7 +32165,7 @@
      "depth": 5.1,
      "to": 5.15,
      "property": "gamma",
-     "value": 19.907499499999997
+     "value": 19.9075
     },
     {
      "depth": 5.6,
@@ -32183,7 +32183,7 @@
      "depth": 5.9,
      "to": 5.95,
      "property": "gamma",
-     "value": 20.6920315
+     "value": 20.692
     }
    ]
   },
@@ -32285,7 +32285,7 @@
      "depth": 0.74,
      "to": 0.79,
      "property": "gamma",
-     "value": 17.5539035
+     "value": 17.5539
     },
     {
      "depth": 1.45,
@@ -32297,7 +32297,7 @@
      "depth": 1.45,
      "to": 1.5,
      "property": "gamma",
-     "value": 16.671305
+     "value": 16.6713
     },
     {
      "depth": 1.45,
@@ -32345,7 +32345,7 @@
      "depth": 2.17,
      "to": 2.22,
      "property": "gamma",
-     "value": 14.0235095
+     "value": 14.0235
     },
     {
      "depth": 2.61,
@@ -32363,7 +32363,7 @@
      "depth": 2.66,
      "to": 2.71,
      "property": "gamma",
-     "value": 16.5732385
+     "value": 16.5732
     },
     {
      "depth": 2.66,
@@ -32411,7 +32411,7 @@
      "depth": 3.51,
      "to": 3.56,
      "property": "gamma",
-     "value": 16.965504499999998
+     "value": 16.9655
     },
     {
      "depth": 3.83,
@@ -32429,7 +32429,7 @@
      "depth": 3.88,
      "to": 3.93,
      "property": "gamma",
-     "value": 18.3384355
+     "value": 18.3384
     },
     {
      "depth": 3.88,
@@ -32453,7 +32453,7 @@
      "depth": 4.59,
      "to": 4.64,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 5.6,
@@ -32471,7 +32471,7 @@
      "depth": 5.9,
      "to": 5.95,
      "property": "gamma",
-     "value": 20.4958985
+     "value": 20.4959
     }
    ]
   },
@@ -32573,7 +32573,7 @@
      "depth": 0.1,
      "to": 0.15,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 1.55,
@@ -32585,7 +32585,7 @@
      "depth": 1.55,
      "to": 1.6,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 2.33,
@@ -32597,7 +32597,7 @@
      "depth": 2.33,
      "to": 2.38,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 3.2,
@@ -32615,7 +32615,7 @@
      "depth": 3.31,
      "to": 3.36,
      "property": "gamma",
-     "value": 18.9268345
+     "value": 18.9268
     },
     {
      "depth": 4.28,
@@ -32627,7 +32627,7 @@
      "depth": 4.28,
      "to": 4.33,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 5.12,
@@ -32639,7 +32639,7 @@
      "depth": 5.12,
      "to": 5.17,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 5.6,
@@ -32657,7 +32657,7 @@
      "depth": 5.91,
      "to": 5.96,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 6.8,
@@ -32675,7 +32675,7 @@
      "depth": 7.11,
      "to": 7.16,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     }
    ]
   },
@@ -32789,7 +32789,7 @@
      "depth": 0.13,
      "to": 0.18,
      "property": "gamma",
-     "value": 15.0041745
+     "value": 15.0042
     },
     {
      "depth": 0.13,
@@ -32813,7 +32813,7 @@
      "depth": 0.95,
      "to": 1,
      "property": "gamma",
-     "value": 15.2003075
+     "value": 15.2003
     },
     {
      "depth": 0.95,
@@ -32837,7 +32837,7 @@
      "depth": 2.71,
      "to": 2.76,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 4,
@@ -32855,7 +32855,7 @@
      "depth": 4.31,
      "to": 4.36,
      "property": "gamma",
-     "value": 19.122967499999998
+     "value": 19.123
     },
     {
      "depth": 5.6,
@@ -32873,7 +32873,7 @@
      "depth": 5.93,
      "to": 5.98,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 6.95,
@@ -32885,7 +32885,7 @@
      "depth": 6.95,
      "to": 7,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     }
    ]
   },
@@ -32981,7 +32981,7 @@
      "depth": 0.25,
      "to": 0.3,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 0.9,
@@ -32993,7 +32993,7 @@
      "depth": 0.9,
      "to": 0.95,
      "property": "gamma",
-     "value": 18.1423025
+     "value": 18.1423
     },
     {
      "depth": 2,
@@ -33011,7 +33011,7 @@
      "depth": 2.05,
      "to": 2.1,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 2.3,
@@ -33023,7 +33023,7 @@
      "depth": 2.3,
      "to": 2.35,
      "property": "gamma",
-     "value": 17.3577705
+     "value": 17.3578
     },
     {
      "depth": 3.6,
@@ -33041,7 +33041,7 @@
      "depth": 3.8,
      "to": 3.85,
      "property": "gamma",
-     "value": 18.9268345
+     "value": 18.9268
     },
     {
      "depth": 4.55,
@@ -33053,7 +33053,7 @@
      "depth": 4.55,
      "to": 4.6,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 5.6,
@@ -33071,7 +33071,7 @@
      "depth": 5.92,
      "to": 5.97,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 7,
@@ -33083,7 +33083,7 @@
      "depth": 7,
      "to": 7.05,
      "property": "gamma",
-     "value": 20.005565999999998
+     "value": 20.0056
     }
    ]
   },
@@ -33203,7 +33203,7 @@
      "depth": 1.87,
      "to": 1.92,
      "property": "gamma",
-     "value": 16.082905999999998
+     "value": 16.0829
     },
     {
      "depth": 2.4,
@@ -33221,7 +33221,7 @@
      "depth": 2.6,
      "to": 2.65,
      "property": "gamma",
-     "value": 18.240369
+     "value": 18.2404
     },
     {
      "depth": 3.07,
@@ -33233,7 +33233,7 @@
      "depth": 3.07,
      "to": 3.12,
      "property": "gamma",
-     "value": 17.3577705
+     "value": 17.3578
     },
     {
      "depth": 3.71,
@@ -33257,7 +33257,7 @@
      "depth": 3.71,
      "to": 3.76,
      "property": "gamma",
-     "value": 17.259704
+     "value": 17.2597
     },
     {
      "depth": 4.4,
@@ -33287,7 +33287,7 @@
      "depth": 5.91,
      "to": 5.96,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     }
    ]
   },
@@ -33389,7 +33389,7 @@
      "depth": 0.55,
      "to": 0.6,
      "property": "gamma",
-     "value": 16.475171999999997
+     "value": 16.4752
     },
     {
      "depth": 0.99,
@@ -33431,7 +33431,7 @@
      "depth": 1.04,
      "to": 1.09,
      "property": "gamma",
-     "value": 15.5925735
+     "value": 15.5926
     },
     {
      "depth": 1.35,
@@ -33443,7 +33443,7 @@
      "depth": 1.35,
      "to": 1.4,
      "property": "gamma",
-     "value": 15.7887065
+     "value": 15.7887
     },
     {
      "depth": 1.4,
@@ -33461,7 +33461,7 @@
      "depth": 1.7,
      "to": 1.75,
      "property": "gamma",
-     "value": 12.748645
+     "value": 12.7486
     },
     {
      "depth": 1.7,
@@ -33515,7 +33515,7 @@
      "depth": 2.95,
      "to": 3,
      "property": "gamma",
-     "value": 13.631243499999998
+     "value": 13.6312
     },
     {
      "depth": 3.32,
@@ -33533,7 +33533,7 @@
      "depth": 3.37,
      "to": 3.42,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 3.37,
@@ -33557,7 +33557,7 @@
      "depth": 4.74,
      "to": 4.79,
      "property": "gamma",
-     "value": 20.103632499999996
+     "value": 20.1036
     },
     {
      "depth": 6,
@@ -33575,7 +33575,7 @@
      "depth": 6.33,
      "to": 6.38,
      "property": "gamma",
-     "value": 18.9268345
+     "value": 18.9268
     }
    ]
   },
@@ -33701,7 +33701,7 @@
      "depth": 1.45,
      "to": 1.5,
      "property": "gamma",
-     "value": 16.7693715
+     "value": 16.7694
     },
     {
      "depth": 1.45,
@@ -33725,7 +33725,7 @@
      "depth": 1.81,
      "to": 1.86,
      "property": "gamma",
-     "value": 13.4351105
+     "value": 13.4351
     },
     {
      "depth": 2.52,
@@ -33767,7 +33767,7 @@
      "depth": 2.57,
      "to": 2.62,
      "property": "gamma",
-     "value": 12.748645
+     "value": 12.7486
     },
     {
      "depth": 2.95,
@@ -33785,7 +33785,7 @@
      "depth": 2.95,
      "to": 3,
      "property": "gamma",
-     "value": 13.631243499999998
+     "value": 13.6312
     },
     {
      "depth": 3,
@@ -33809,7 +33809,7 @@
      "depth": 4.15,
      "to": 4.2,
      "property": "gamma",
-     "value": 14.709975
+     "value": 14.71
     },
     {
      "depth": 5.82,
@@ -33833,7 +33833,7 @@
      "depth": 5.87,
      "to": 5.92,
      "property": "gamma",
-     "value": 15.0041745
+     "value": 15.0042
     },
     {
      "depth": 7.85,
@@ -33851,7 +33851,7 @@
      "depth": 7.9,
      "to": 7.95,
      "property": "gamma",
-     "value": 15.7887065
+     "value": 15.7887
     },
     {
      "depth": 9.48,
@@ -33863,7 +33863,7 @@
      "depth": 9.48,
      "to": 9.53,
      "property": "gamma",
-     "value": 17.65197
+     "value": 17.652
     }
    ]
   },
@@ -33959,7 +33959,7 @@
      "depth": 0.53,
      "to": 0.58,
      "property": "gamma",
-     "value": 14.121576
+     "value": 14.1216
     },
     {
      "depth": 0.53,
@@ -34007,7 +34007,7 @@
      "depth": 0.94,
      "to": 0.99,
      "property": "gamma",
-     "value": 15.886773
+     "value": 15.8868
     },
     {
      "depth": 1.42,
@@ -34025,7 +34025,7 @@
      "depth": 1.47,
      "to": 1.52,
      "property": "gamma",
-     "value": 17.3577705
+     "value": 17.3578
     },
     {
      "depth": 2.16,
@@ -34043,7 +34043,7 @@
      "depth": 2.21,
      "to": 2.26,
      "property": "gamma",
-     "value": 13.0428445
+     "value": 13.0428
     },
     {
      "depth": 2.49,
@@ -34061,7 +34061,7 @@
      "depth": 2.54,
      "to": 2.59,
      "property": "gamma",
-     "value": 17.848103
+     "value": 17.8481
     },
     {
      "depth": 2.54,
@@ -34109,7 +34109,7 @@
      "depth": 2.9,
      "to": 2.95,
      "property": "gamma",
-     "value": 18.044236
+     "value": 18.0442
     },
     {
      "depth": 3.02,
@@ -34121,7 +34121,7 @@
      "depth": 3.02,
      "to": 3.07,
      "property": "gamma",
-     "value": 17.7500365
+     "value": 17.75
     },
     {
      "depth": 3.88,
@@ -34139,7 +34139,7 @@
      "depth": 3.93,
      "to": 3.98,
      "property": "gamma",
-     "value": 17.259704
+     "value": 17.2597
     },
     {
      "depth": 4.8,
@@ -34157,7 +34157,7 @@
      "depth": 5.09,
      "to": 5.14,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 5.2,
@@ -34175,7 +34175,7 @@
      "depth": 5.44,
      "to": 5.49,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 6.45,
@@ -34193,7 +34193,7 @@
      "depth": 6.45,
      "to": 6.5,
      "property": "gamma",
-     "value": 19.024901
+     "value": 19.0249
     }
    ]
   },
@@ -34349,7 +34349,7 @@
      "depth": 2.3,
      "to": 2.35,
      "property": "gamma",
-     "value": 12.4544455
+     "value": 12.4544
     },
     {
      "depth": 2.6,
@@ -34373,7 +34373,7 @@
      "depth": 2.65,
      "to": 2.7,
      "property": "gamma",
-     "value": 13.4351105
+     "value": 13.4351
     },
     {
      "depth": 3.3,
@@ -34397,7 +34397,7 @@
      "depth": 3.4,
      "to": 3.45,
      "property": "gamma",
-     "value": 13.827376499999998
+     "value": 13.8274
     },
     {
      "depth": 3.7,
@@ -34439,7 +34439,7 @@
      "depth": 3.85,
      "to": 3.9,
      "property": "gamma",
-     "value": 12.8467115
+     "value": 12.8467
     },
     {
      "depth": 5.34,
@@ -34631,7 +34631,7 @@
      "depth": 3.87,
      "to": 3.92,
      "property": "gamma",
-     "value": 12.8467115
+     "value": 12.8467
     },
     {
      "depth": 4.52,
@@ -34649,7 +34649,7 @@
      "depth": 4.57,
      "to": 4.62,
      "property": "gamma",
-     "value": 11.964113
+     "value": 11.9641
     },
     {
      "depth": 5.82,
@@ -34667,7 +34667,7 @@
      "depth": 5.87,
      "to": 5.92,
      "property": "gamma",
-     "value": 14.317708999999999
+     "value": 14.3177
     },
     {
      "depth": 8.24,
@@ -34679,7 +34679,7 @@
      "depth": 8.24,
      "to": 8.29,
      "property": "gamma",
-     "value": 12.944778
+     "value": 12.9448
     },
     {
      "depth": 8.29,
@@ -34805,7 +34805,7 @@
      "depth": 2.15,
      "to": 2.23,
      "property": "gamma",
-     "value": 13.631243499999998
+     "value": 13.6312
     },
     {
      "depth": 2.15,
@@ -34853,7 +34853,7 @@
      "depth": 3.01,
      "to": 3.06,
      "property": "gamma",
-     "value": 12.4544455
+     "value": 12.4544
     },
     {
      "depth": 3.47,
@@ -34877,7 +34877,7 @@
      "depth": 3.52,
      "to": 3.57,
      "property": "gamma",
-     "value": 12.748645
+     "value": 12.7486
     },
     {
      "depth": 4,
@@ -34913,7 +34913,7 @@
      "depth": 4.21,
      "to": 4.28,
      "property": "gamma",
-     "value": 13.2389775
+     "value": 13.239
     },
     {
      "depth": 5.8,
@@ -34937,7 +34937,7 @@
      "depth": 5.85,
      "to": 5.9,
      "property": "gamma",
-     "value": 14.0235095
+     "value": 14.0235
     },
     {
      "depth": 8.95,
@@ -34955,7 +34955,7 @@
      "depth": 8.98,
      "to": 9.03,
      "property": "gamma",
-     "value": 18.9268345
+     "value": 18.9268
     }
    ]
   },
@@ -35093,7 +35093,7 @@
      "depth": 0.45,
      "to": 0.5,
      "property": "gamma",
-     "value": 16.671305
+     "value": 16.6713
     },
     {
      "depth": 0.5,
@@ -35117,7 +35117,7 @@
      "depth": 1,
      "to": 1.05,
      "property": "gamma",
-     "value": 17.063571
+     "value": 17.0636
     },
     {
      "depth": 1.77,
@@ -35135,7 +35135,7 @@
      "depth": 1.82,
      "to": 1.87,
      "property": "gamma",
-     "value": 16.3771055
+     "value": 16.3771
     },
     {
      "depth": 2.16,
@@ -35153,7 +35153,7 @@
      "depth": 2.21,
      "to": 2.26,
      "property": "gamma",
-     "value": 16.5732385
+     "value": 16.5732
     },
     {
      "depth": 2.96,
@@ -35171,7 +35171,7 @@
      "depth": 3.01,
      "to": 3.06,
      "property": "gamma",
-     "value": 14.317708999999999
+     "value": 14.3177
     },
     {
      "depth": 3.39,
@@ -35189,7 +35189,7 @@
      "depth": 3.44,
      "to": 3.49,
      "property": "gamma",
-     "value": 14.513841999999999
+     "value": 14.5138
     },
     {
      "depth": 4,
@@ -35231,7 +35231,7 @@
      "depth": 4.05,
      "to": 4.1,
      "property": "gamma",
-     "value": 17.161637499999998
+     "value": 17.1616
     },
     {
      "depth": 4.1,
@@ -35261,7 +35261,7 @@
      "depth": 4.6,
      "to": 4.65,
      "property": "gamma",
-     "value": 11.964113
+     "value": 11.9641
     },
     {
      "depth": 4.85,
@@ -35273,7 +35273,7 @@
      "depth": 4.85,
      "to": 4.9,
      "property": "gamma",
-     "value": 17.65197
+     "value": 17.652
     },
     {
      "depth": 4.9,
@@ -35297,7 +35297,7 @@
      "depth": 5.04,
      "to": 5.09,
      "property": "gamma",
-     "value": 18.828767999999997
+     "value": 18.8288
     }
    ]
   },
@@ -35638,7 +35638,7 @@
      "depth": 2.71,
      "to": 2.76,
      "property": "gamma",
-     "value": 17.259704
+     "value": 17.2597
     },
     {
      "depth": 10,
@@ -35656,7 +35656,7 @@
      "depth": 10.12,
      "to": 10.17,
      "property": "gamma",
-     "value": 19.515233499999997
+     "value": 19.5152
     },
     {
      "depth": 13.2,
@@ -35674,7 +35674,7 @@
      "depth": 13.4,
      "to": 13.45,
      "property": "gamma",
-     "value": 18.5345685
+     "value": 18.5346
     },
     {
      "depth": 14.06,
@@ -35692,7 +35692,7 @@
      "depth": 14.11,
      "to": 14.21,
      "property": "gamma",
-     "value": 17.9461695
+     "value": 17.9462
     },
     {
      "depth": 14.11,
@@ -35758,7 +35758,7 @@
      "depth": 15.52,
      "to": 15.57,
      "property": "gamma",
-     "value": 18.1423025
+     "value": 18.1423
     },
     {
      "depth": 16,
@@ -35776,7 +35776,7 @@
      "depth": 16.29,
      "to": 16.34,
      "property": "gamma",
-     "value": 18.436501999999997
+     "value": 18.4365
     },
     {
      "depth": 17.6,
@@ -35794,7 +35794,7 @@
      "depth": 17.92,
      "to": 17.97,
      "property": "gamma",
-     "value": 18.632634999999997
+     "value": 18.6326
     },
     {
      "depth": 19.2,
@@ -35812,7 +35812,7 @@
      "depth": 19.25,
      "to": 19.3,
      "property": "gamma",
-     "value": 18.9268345
+     "value": 18.9268
     },
     {
      "depth": 21.2,
@@ -35830,7 +35830,7 @@
      "depth": 21.25,
      "to": 21.3,
      "property": "gamma",
-     "value": 18.7307015
+     "value": 18.7307
     },
     {
      "depth": 22.64,
@@ -35854,7 +35854,7 @@
      "depth": 24.2,
      "to": 24.3,
      "property": "gamma",
-     "value": 13.729309999999998
+     "value": 13.7293
     },
     {
      "depth": 24.49,
@@ -35872,7 +35872,7 @@
      "depth": 24.53,
      "to": 24.63,
      "property": "gamma",
-     "value": 19.417167
+     "value": 19.4172
     },
     {
      "depth": 25.6,
@@ -36273,7 +36273,7 @@
      "depth": 6.05,
      "to": 6.1,
      "property": "gamma",
-     "value": 20.299765499999996
+     "value": 20.2998
     },
     {
      "depth": 7.2,
@@ -36297,7 +36297,7 @@
      "depth": 8.72,
      "to": 8.77,
      "property": "gamma",
-     "value": 16.867438
+     "value": 16.8674
     },
     {
      "depth": 9.6,
@@ -36315,7 +36315,7 @@
      "depth": 11.01,
      "to": 11.06,
      "property": "gamma",
-     "value": 19.809433
+     "value": 19.8094
     },
     {
      "depth": 11.84,
@@ -36339,7 +36339,7 @@
      "depth": 14.65,
      "to": 14.7,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     },
     {
      "depth": 15.52,
@@ -36351,7 +36351,7 @@
      "depth": 15.52,
      "to": 15.57,
      "property": "gamma",
-     "value": 19.024901
+     "value": 19.0249
     },
     {
      "depth": 16,
@@ -36381,7 +36381,7 @@
      "depth": 17.12,
      "to": 17.17,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 18,
@@ -36471,7 +36471,7 @@
      "depth": 24.27,
      "to": 24.32,
      "property": "gamma",
-     "value": 13.729309999999998
+     "value": 13.7293
     },
     {
      "depth": 24.53,
@@ -36519,7 +36519,7 @@
      "depth": 24.89,
      "to": 24.99,
      "property": "gamma",
-     "value": 14.709975
+     "value": 14.71
     },
     {
      "depth": 25.07,
@@ -36531,7 +36531,7 @@
      "depth": 25.07,
      "to": 25.17,
      "property": "gamma",
-     "value": 12.944778
+     "value": 12.9448
     },
     {
      "depth": 25.31,
@@ -36543,7 +36543,7 @@
      "depth": 25.31,
      "to": 25.41,
      "property": "gamma",
-     "value": 16.279038999999997
+     "value": 16.279
     },
     {
      "depth": 25.31,
@@ -36591,7 +36591,7 @@
      "depth": 25.72,
      "to": 25.82,
      "property": "gamma",
-     "value": 17.259704
+     "value": 17.2597
     },
     {
      "depth": 25.82,
@@ -36603,7 +36603,7 @@
      "depth": 25.82,
      "to": 25.92,
      "property": "gamma",
-     "value": 17.455837
+     "value": 17.4558
     },
     {
      "depth": 26.05,
@@ -36615,7 +36615,7 @@
      "depth": 26.05,
      "to": 26.15,
      "property": "gamma",
-     "value": 17.161637499999998
+     "value": 17.1616
     },
     {
      "depth": 26.05,
@@ -36663,7 +36663,7 @@
      "depth": 27.05,
      "to": 27.1,
      "property": "gamma",
-     "value": 19.711366499999997
+     "value": 19.7114
     },
     {
      "depth": 27.6,
@@ -36681,7 +36681,7 @@
      "depth": 27.93,
      "to": 27.98,
      "property": "gamma",
-     "value": 20.103632499999996
+     "value": 20.1036
     }
    ]
   },
@@ -36783,7 +36783,7 @@
      "depth": 0.73,
      "to": 0.78,
      "property": "gamma",
-     "value": 18.632634999999997
+     "value": 18.6326
     },
     {
      "depth": 1.42,
@@ -36825,7 +36825,7 @@
      "depth": 1.54,
      "to": 1.59,
      "property": "gamma",
-     "value": 14.8080415
+     "value": 14.808
     },
     {
      "depth": 1.76,
@@ -36843,7 +36843,7 @@
      "depth": 1.81,
      "to": 1.86,
      "property": "gamma",
-     "value": 14.0235095
+     "value": 14.0235
     },
     {
      "depth": 1.81,
@@ -36873,7 +36873,7 @@
      "depth": 2.55,
      "to": 2.61,
      "property": "gamma",
-     "value": 16.965504499999998
+     "value": 16.9655
     },
     {
      "depth": 2.55,
@@ -36921,7 +36921,7 @@
      "depth": 3.12,
      "to": 3.17,
      "property": "gamma",
-     "value": 15.984839499999998
+     "value": 15.9848
     },
     {
      "depth": 3.6,
@@ -36939,7 +36939,7 @@
      "depth": 3.81,
      "to": 3.86,
      "property": "gamma",
-     "value": 19.319100499999998
+     "value": 19.3191
     },
     {
      "depth": 4.85,
@@ -36957,7 +36957,7 @@
      "depth": 4.93,
      "to": 4.98,
      "property": "gamma",
-     "value": 19.221034
+     "value": 19.221
     }
    ]
   }
