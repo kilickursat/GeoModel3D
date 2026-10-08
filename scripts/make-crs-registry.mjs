@@ -44,8 +44,12 @@ const groups=[
   ["Argentina",range(5343,5349),/^POSGAR 2007 \/ Argentina/],
 ];
 // Datum shifts given by grid files that the browser library cannot load are replaced by the EPSG Helmert
-// transformation to WGS 84, with its stated accuracy.
+// transformation to WGS 84, with its stated accuracy. Some PROJ strings from epsg.io carry the parameters of a
+// Molodensky-Badekas transformation without its rotation point, which a +towgs84 string cannot express (170 m off for
+// RD New); those are always replaced ("force") by the equivalent Helmert parameters.
 const helmert=[
+  [/^Amersfoort\b/,"565.417,50.3319,465.552,-0.398957,0.343988,-1.8774,4.0725","1 m (RDNAPTRANS grid not applied)",true],
+  [/^LUREF\b/,"-189.681,18.3463,-42.7695,-0.33746,-3.09264,2.53861,0.4598","1 m",true],
   [/^OSGB36\b|OSGB 1936/,"446.448,-125.157,542.06,0.15,0.247,0.842,-20.489","2 m (OSTN15 grid not applied)"],
   [/^DHDN\b/,"598.1,73.7,418.2,0.202,0.045,-2.455,6.7","3 m (BETA2007 grid not applied)"],
   [/^MGI\b/,"577.326,90.129,463.919,5.137,1.474,5.297,2.4232","1.5 m (grid not applied)"],
@@ -78,7 +82,7 @@ for(const [region,codes,filter] of groups){
     let proj4=(await (await get(`https://epsg.io/${code}.proj4`)).text()).trim().replace(/\s*\+type=crs/,"");
     const base=json.base_crs?.name??"";
     const h=helmert.find(([re])=>re.test(json.name)||re.test(base));
-    if(/\+nadgrids=/.test(proj4)||(!/\+towgs84=|\+datum=/.test(proj4)&&!/GRS80|WGS84/.test(proj4))){
+    if(h?.[3]||/\+nadgrids=/.test(proj4)||(!/\+towgs84=|\+datum=/.test(proj4)&&!/GRS80|WGS84/.test(proj4))){
       if(!h){skipped.push(`${code}: ${json.name}: datum shift unavailable (${proj4})`);continue}
       proj4=proj4.replace(/\s*\+nadgrids=\S+/,"").replace(/\s*\+towgs84=\S+/,"").replace(" +units"," +towgs84="+h[1]+" +units");
     }

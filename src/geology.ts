@@ -1,30 +1,37 @@
 import valleyDemo from "./data/valley-demo.json";
 import channelDemo from "./data/channel-demo.json";
 import sakaeSite from "./data/sakae-site.json";
+import antwerpSite from "./data/antwerp-site.json";
+import rotterdamSite from "./data/rotterdam-site.json";
 import {TerrainGrid} from "./terrain";
 
 // Geological units are listed in stratigraphic order, youngest (top) to oldest (bottom). An erosive unit's base
-// is an unconformity that cuts down into older units. Unit weights are in kN/m³; `source` records where the
-// properties come from.
-export interface UnitDef { id:string; name:string; color:string; erosive?:boolean; gamma?:number; gammaSat?:number; source?:string }
+// is an unconformity that cuts down into older units. Unit weights are in kN/m³; `params` holds other design values
+// keyed as in src/properties.ts (c, phi, su, E, k…); `source` records where the properties come from.
+export interface UnitDef { id:string; name:string; color:string; erosive?:boolean; gamma?:number; gammaSat?:number; params?:Record<string,number>; source?:string }
 // Depths are metres below the collar; `unit` refers to UnitDef.id. `name` is the logged description (soil or rock
 // name) when units are assigned to descriptions by the project's rules.
 export interface Interval { from:number; to:number; unit:string; name?:string }
 // Standard penetration test: blows for the penetration in millimetres (300 for a complete test).
 export interface SptTest { depth:number; blows:number; penetration:number }
 export interface WaterLevel { depth:number; date?:string }
+// A laboratory test on a sample, or an in-situ test, at `depth` (to `to` for a sample over a depth range). `property`
+// is a key of the catalogue in src/properties.ts (w, gamma, su…) or any other name; `value` is in that property's unit.
+export interface TestResult { depth:number; to?:number; property:string; value:number }
 // Collar position (x, y) and elevation (z) in the project coordinate system; `depth` is the final depth when it
 // exceeds the logged intervals. `lon`, `lat` keep the surveyed geographic position, so the collar can be placed again
 // in another coordinate system.
-export interface Borehole { id:string; x:number; y:number; z:number; depth?:number; intervals:Interval[]; lon?:number; lat?:number; spt?:SptTest[]; water?:WaterLevel[] }
+export interface Borehole { id:string; x:number; y:number; z:number; depth?:number; intervals:Interval[]; lon?:number; lat?:number; spt?:SptTest[]; water?:WaterLevel[]; tests?:TestResult[] }
 // Assigns a unit to every logged description that matches the regular expression `match` (case-insensitive) and,
 // when given, whose median SPT N-value in the interval lies in [minN, maxN) and whose top elevation lies in
 // [minZ, maxZ). The first matching rule wins.
 export interface UnitRule { match:string; unit:string; minN?:number; maxN?:number; minZ?:number; maxZ?:number }
 // x, y are in the system named by `crs`; `crsCode` (e.g. EPSG:6677) or the PROJ definition `crsProj4` georeferences it.
-// `source` credits where the data come from.
+// `source` credits where the data come from. `groundwaterDepth` is an assumed depth of the water table below ground,
+// used where no borehole records a water level.
 export interface GeoProject {
   name:string; description?:string; source?:string; crs?:string; crsCode?:string; crsProj4?:string; base?:number;
+  groundwaterDepth?:number;
   units:UnitDef[]; rules?:UnitRule[]; boreholes:Borehole[]; terrain?:TerrainGrid;
 }
 
@@ -55,9 +62,13 @@ function fromJson(p:unknown):GeoProject{
   return project;
 }
 export const sakaeProject=fromJson(sakaeSite);
+export const antwerpProject=fromJson(antwerpSite);
+export const rotterdamProject=fromJson(rotterdamSite);
 export const valleyProject=fromJson(valleyDemo);
 export const channelProject=fromJson(channelDemo);
-export const sampleProjects:GeoProject[]=[sakaeProject,valleyProject,channelProject,referenceProject];
+// Real sites first (published data, each with its source), then the synthetic datasets.
+export const realSites:GeoProject[]=[sakaeProject,antwerpProject,rotterdamProject];
+export const sampleProjects:GeoProject[]=[...realSites,valleyProject,channelProject,referenceProject];
 
 export function boreholeDepth(b:Borehole){return Math.max(b.depth??0,...b.intervals.map(i=>i.to))}
 // SPT N-value; a test stopped short of 300 mm is scaled to 300 mm (a converted N-value).

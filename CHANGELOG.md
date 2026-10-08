@@ -1,5 +1,47 @@
 # Changelog
 
+## 0.7.0 — 2026-10-08
+
+### Added
+- **Real sites in Belgium and the Netherlands**, next to Sakae, Japan:
+  - **Antwerp:** 173 DOV boreholes with their formal lithostratigraphy (made ground, Quaternary deposits, and the Kattendijk, Berchem and Boom formations), in Belgian Lambert 72 with TAW heights.
+  - **Maasvlakte 2, Port of Rotterdam:** 100 BRO geotechnical boreholes with 3,188 laboratory results and 56 groundwater levels, in RD New with NAP heights.
+- **Laboratory and in-situ test results.** Boreholes carry test results:
+  - water content, unit weight, Atterberg limits, fines, organic content, su, qu, UCS, c′, φ′, E, k, qc, Vs, RQD or any named property;
+  - read from CSV (a table with one column per property, or with property and value columns), AGS4 (`LNMC`, `LDEN`, `LLPL`, `GRAG`, `TRIT`, `LVAN`, `LPEN`, `IVAN`, `TREG`, `SHBG`, `RUCS`, `PTST`) and BRO files;
+  - summarised per unit in the report.
+
+  Units carry design values (c′, φ′, su, E, k…).
+- **Groundwater and stresses.**
+  - A water table runs through the water levels in the logs, or lies at an assumed depth.
+  - Sections can be coloured by vertical total stress, pore water pressure or vertical effective stress, or by a measured property interpolated within each unit.
+  - Hovering over a section reads out the unit, depth and stresses.
+  - The field can be exported on a grid as CSV, and the report gains a page for it and a ground-parameters table.
+- **Data editor.** **Edit data…** opens the project as tables:
+  - settings, boreholes, logs, water levels, SPT, tests and units;
+  - cells pasted from a spreadsheet;
+  - units filled in from descriptions;
+  - a CSV download per table.
+
+  Apply checks typed data as the importer checks files.
+- **Dutch BRO and Flemish DOV borehole XML.** BRO (BHR-GT) gives positions, NAP levels, layers, groundwater levels and laboratory determinations. DOV gives boreholes and their interpretations: formal stratigraphy by formation, else Quaternary or informal stratigraphy, descriptions or geotechnical coding.
+- **AGS4:** SPT N-values (`ISPT`) and water strikes (`WSTG`, `WSTD`). Logs with descriptions but no unit codes (`GEOL_DESC`) are modelled.
+- **CSV:** SPT and water-level tables, a water depth column on the collars, and descriptions on the intervals.
+- **Descriptions grouped by principal soil** (Made ground, Peat, Clay, Silt, Sand, Gravel, rock types), in English, Dutch, French, German, Spanish, Portuguese and Italian, when logs carry no unit codes.
+- **Templates** for every CSV table in `docs/templates`, and a README section on preparing data.
+- **A map without terrain.** Without a terrain grid, a georeferenced model shows its map on a plane at the collars' median elevation.
+
+### Changed
+- **Logs that begin below the collar:** the contacts above their first unit are now inferred from the neighbouring boreholes. Before, the topmost unit was given the upper half of the unlogged part.
+- **Collar-to-terrain offsets:** a consistent offset between collars and a terrain grid, as with another height datum, is reported once instead of for every borehole.
+- **Exports:** the borehole CSV export includes descriptions and water depths, and a tests CSV export is added.
+- **Page:** the page has a fuller description and a preview image for links and search engines.
+
+### Fixed
+- **Datum shifts:** latitudes and longitudes in RD New (Netherlands) and Luxembourg TM were placed about 170 m off. The PROJ strings from epsg.io carried Molodensky-Badekas parameters without their rotation point. Both now use the equivalent Helmert parameters, and tests check RD New against BRO positions and Belgian Lambert 72 against DOV's Lambert 2008 coordinates.
+- **Hidden units:** units hidden in the legend were still drawn on the 3-D section face and in the 2-D section.
+- **Colours:** Made Ground in the valley dataset, and the colour given to fill units, were nearly the grey of Mudstone.
+
 ## 0.6.1 — 2026-10-07
 
 ### Added

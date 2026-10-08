@@ -12,6 +12,8 @@ export interface Section extends SectionSpec, SectionFrame {
   z:number[][];
   observed:boolean[][];
   boreholes:ProjectedBorehole[];
+  // The water table along the section, where groundwater is known.
+  water?:number[];
 }
 
 export function modelCentre(model:GeoModel):XY{
@@ -50,13 +52,13 @@ export function computeSection(model:GeoModel,spec:SectionSpec,buffer=Infinity):
   const H=model.horizons;
   const b=model.nodes.length?Math.max(...model.nodes.map(p=>Math.abs(across(p))+Math.abs(along(p))),1):1;
   const eps=1e-9*b;
-  const samples:Array<{s:number;x:number;y:number;z:number[];observed:boolean[]}>=[];
-  const atVertex=new Set<number>();
+  const samples:Array<{s:number;x:number;y:number;z:number[];observed:boolean[];w:number}>=[];
+  const atVertex=new Set<number>(),W=model.water?.z;
   const vertex=(i:number)=>{
     if(atVertex.has(i))return;
     atVertex.add(i);
     const p=model.nodes[i];
-    samples.push({s:along(p),x:p.x,y:p.y,z:H.map(h=>h.z[i]),observed:H.map(h=>!!h.observed[i])});
+    samples.push({s:along(p),x:p.x,y:p.y,z:H.map(h=>h.z[i]),observed:H.map(h=>!!h.observed[i]),w:W?W[i]:NaN});
   };
   model.edges??=uniqueEdges(model.triangles);
   for(const [i,j] of model.edges){
@@ -65,7 +67,7 @@ export function computeSection(model:GeoModel,spec:SectionSpec,buffer=Infinity):
     if(Math.abs(fj)<=eps)vertex(j);
     if(Math.abs(fi)<=eps||Math.abs(fj)<=eps||fi*fj>0)continue;
     const t=fi/(fi-fj),p={x:model.nodes[i].x+t*(model.nodes[j].x-model.nodes[i].x),y:model.nodes[i].y+t*(model.nodes[j].y-model.nodes[i].y)};
-    samples.push({s:along(p),x:p.x,y:p.y,z:H.map(h=>h.z[i]+t*(h.z[j]-h.z[i])),observed:H.map(h=>!!(h.observed[i]&&h.observed[j]))});
+    samples.push({s:along(p),x:p.x,y:p.y,z:H.map(h=>h.z[i]+t*(h.z[j]-h.z[i])),observed:H.map(h=>!!(h.observed[i]&&h.observed[j])),w:W?W[i]+t*(W[j]-W[i]):NaN});
   }
   samples.sort((p,q)=>p.s-q.s);
   const unique=samples.filter((p,k)=>k===0||p.s-samples[k-1].s>eps);
@@ -79,5 +81,6 @@ export function computeSection(model:GeoModel,spec:SectionSpec,buffer=Infinity):
     s:unique.map(p=>p.s),x:unique.map(p=>p.x),y:unique.map(p=>p.y),
     z:H.map((_,k)=>unique.map(p=>p.z[k])),
     observed:H.map((_,k)=>unique.map(p=>p.observed[k])),
-    boreholes};
+    boreholes,
+    ...(W?{water:unique.map(p=>p.w)}:{})};
 }

@@ -26,15 +26,19 @@ export interface GeoModel {
   residuals:CollarResidual[];
   terrainAt?:(x:number,y:number)=>number;
   edges?:Array<[number,number]>;
+  // The water table at every node, where groundwater is known, and where it comes from.
+  water?:{z:Float64Array;source:string};
 }
-export interface BoreholeContacts { depth:Array<number|null>; eroded:Array<number|null>; deepest:number; eoh:number; notes:string[] }
+// `start` is the depth where a log begins, when it begins below the collar.
+export interface BoreholeContacts { depth:Array<number|null>; eroded:Array<number|null>; deepest:number; eoh:number; notes:string[]; start?:number }
 
 const fmt=(v:number)=>String(Math.round(v*100)/100);
 
 // Reads one log as a layer-cake: depth[k] is the depth of horizon k where the log shows it, `deepest` the last
 // unit the hole entered (its base is not seen), `eoh` the final depth. Units skipped by the log have zero
 // thickness, unless the unit above the contact is erosive: then the skipped units were eroded, and eroded[k] is
-// the depth of the erosion surface, above which their original surfaces lay.
+// the depth of the erosion surface, above which their original surfaces lay. A log that begins below the collar says
+// nothing about the units above its first one: those contacts are left unknown (null) and `start` records the depth.
 export function boreholeContacts(b:Borehole,units:UnitDef[]):BoreholeContacts{
   const index=new Map(units.map((u,i)=>[u.id,i]));
   const depth:Array<number|null>=new Array(units.length+1).fill(null);
@@ -42,11 +46,15 @@ export function boreholeContacts(b:Borehole,units:UnitDef[]):BoreholeContacts{
   depth[0]=0;
   const notes:string[]=[];
   const intervals=b.intervals.filter(i=>index.has(i.unit)).sort((p,q)=>p.from-q.from||p.to-q.to);
-  let deepest=-1,prevTo=0;
+  let deepest=-1,prevTo=0,start:number|undefined;
   for(const i of intervals){
     const u=index.get(i.unit)!;
     if(i.from<prevTo-1e-6)notes.push(`interval ${fmt(i.from)}–${fmt(i.to)} m overlaps the one above`);
-    if(u<deepest){
+    if(deepest<0&&u>=1&&i.from>1e-6){
+      start=i.from;
+      notes.push(`not logged above ${fmt(i.from)} m; the contacts above are inferred from the neighbouring boreholes`);
+      deepest=u;
+    }else if(u<deepest){
       notes.push(`${units[u].name} at ${fmt(i.from)}–${fmt(i.to)} m lies below ${units[deepest].name}, out of stratigraphic order; modelled as ${units[deepest].name}`);
     }else if(u>deepest){
       const first=Math.max(deepest+1,1);
@@ -64,7 +72,7 @@ export function boreholeContacts(b:Borehole,units:UnitDef[]):BoreholeContacts{
     }
     prevTo=Math.max(prevTo,i.to);
   }
-  return {depth,eroded,deepest,eoh:Math.max(boreholeDepth(b),prevTo),notes};
+  return {depth,eroded,deepest,eoh:Math.max(boreholeDepth(b),prevTo),notes,...(start!==undefined?{start}:{})};
 }
 
 function idw(samples:Array<{x:number;y:number;v:number}>,p:XY){
@@ -252,6 +260,21 @@ export function buildGeologicalModel(project:GeoProject):GeoModel{
   const eohZ=contacts.map((c,i)=>boreholes[i].z-c.eoh);
   const base=project.base??(N?Math.min(...eohZ):0);
 
+  // Logs that begin below the collar: the contacts above their first unit come from the holes that logged them, kept
+  // between the ground and the depth where the log begins (the first unit is there, so its top is no deeper).
+  const logged=new Map<number,Array<{x:number;y:number;v:number}>>();
+  const loggedAt=(k:number)=>{
+    if(!logged.has(k)){const s:Array<{x:number;y:number;v:number}>=[];for(let j=0;j<N;j++)if(observed[k][j])s.push({x:nodes[j].x,y:nodes[j].y,v:raw[k][j]});logged.set(k,s)}
+    return logged.get(k)!;
+  };
+  contacts.forEach((c,i)=>{
+    if(c.start===undefined)return;
+    const floor=boreholes[i].z-c.start;
+    for(let k=1;k<=c.deepest;k++)if(c.depth[k]===null&&c.eroded[k]===null){
+      const s=loggedAt(k);
+      raw[k][i]=Math.min(boreholes[i].z,Math.max(s.length?idw(s,nodes[i]):floor,floor));
+    }
+  });
   // Surfaces removed by erosion at a hole: their original elevation comes from the holes that logged them and is
   // never below the erosion surface; the ordering below then cuts them at that surface.
   for(let k=1;k<=K;k++){
@@ -330,11 +353,29 @@ export function buildGeologicalModel(project:GeoProject):GeoModel{
     }
     const outside=residuals.filter(q=>!Number.isFinite(q.terrain));
     if(outside.length)warnings.push(`Terrain grid does not cover ${outside.map(q=>q.id).join(", ")}`);
-    const off=residuals.filter(q=>Math.abs(q.residual)>1);
+    // A consistent offset, as when the collars are in another height datum than the terrain grid, is reported once;
+    // collars that differ from it by more than 1 m are listed.
+    const sorted=residuals.map(q=>q.residual).filter(Number.isFinite).sort((a,b)=>a-b);
+    const median=sorted.length?sorted[Math.floor(sorted.length/2)]:0,shift=Math.abs(median)>0.5?median:0;
+    if(shift)warnings.push(`Collars lie ${fmt(Math.abs(shift))} m ${shift>0?"above":"below"} the terrain grid on average, as when the heights use another datum; the terrain is adjusted to the collars`);
+    const off=residuals.filter(q=>Math.abs(q.residual-shift)>1);
     for(const q of off)warnings.push(`${q.id}: collar ${fmt(q.collar)} m, terrain ${fmt(q.terrain)} m (${q.residual>0?"+":""}${fmt(q.residual)} m); terrain adjusted to the collar`);
     if(missing)warnings.push(`Terrain has no data under ${Math.round(missing/(M-N)*100)} % of the model; the surface between boreholes is used there`);
     const field=boundaryResidual(convexHull(boreholes.map((b,i)=>({x:b.x,y:b.y,r:r[i]}))));
     terrainAt=(x,y)=>terrainZ(t,x,y)+field(x,y);
+  }
+
+  // Groundwater: the water table through the shallowest water level logged in each borehole, interpolated by inverse
+  // distance and kept at or below the ground; where no borehole records one, the project's assumed depth below ground.
+  const readings:Array<{x:number;y:number;v:number}>=[];
+  for(const b of boreholes)if(b.water?.length)readings.push({x:b.x,y:b.y,v:b.z-Math.min(...b.water.map(w=>w.depth))});
+  let W:number[]|undefined,waterSource="";
+  if(readings.length){
+    W=mesh.nodes.map((p,n)=>Math.min(idw(readings,p),z[0][n]));
+    waterSource=`water levels logged in ${readings.length} of ${N} boreholes (the shallowest reading of each), interpolated between them`;
+  }else if(project.groundwaterDepth!==undefined&&Number.isFinite(project.groundwaterDepth)){
+    W=Array.from(z[0],g=>g-project.groundwaterDepth!);
+    waterSource=`assumed ${fmt(project.groundwaterDepth)} m below ground (no water level is logged)`;
   }
 
   // Stratigraphic ordering: each horizon lies at or below the one above and at or above the model base. This
@@ -342,7 +383,7 @@ export function buildGeologicalModel(project:GeoProject):GeoModel{
   // horizon meets the one above or the base are first added to the mesh, so pinch-outs and outcrops run straight
   // across the triangles instead of stepping along their edges.
   const Z=z.map(a=>Array.from(a)),known01=known.map(a=>Array.from(a));
-  const cut=splittableMesh(mesh.nodes,mesh.triangles,mesh.edgeChains,Z,known01);
+  const cut=splittableMesh(mesh.nodes,mesh.triangles,mesh.edgeChains,W?[...Z,W]:Z,known01);
   for(let k=1;k<=K;k++){
     const zk=Z[k],above=Z[k-1];
     if(k===K)zk.fill(base);
@@ -357,7 +398,8 @@ export function buildGeologicalModel(project:GeoProject):GeoModel{
     name:k===0?"Ground surface":k===K?"Model base":"Base of "+units[k-1].name,
     z:Float64Array.from(zk),observed:Uint8Array.from(known01[k])
   }));
-  return {project,units,boreholes,nodes:cut.mesh.nodes,triangles:cut.mesh.triangles,horizons,base,warnings,edgeChains:cut.mesh.chains,spacing,meshNodes:M,residuals,terrainAt};
+  return {project,units,boreholes,nodes:cut.mesh.nodes,triangles:cut.mesh.triangles,horizons,base,warnings,edgeChains:cut.mesh.chains,spacing,meshNodes:M,residuals,terrainAt,
+    ...(W?{water:{z:Float64Array.from(W),source:waterSource}}:{})};
 }
 
 export function horizonSurface(model:GeoModel,k:number):TINSurface{

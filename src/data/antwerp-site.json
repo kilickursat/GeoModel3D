@@ -1,0 +1,5059 @@
+{
+ "format": "geomodel3d-project",
+ "version": 1,
+ "name": "Antwerp, Belgium (DOV)",
+ "description": "173 boreholes in the centre of Antwerp, 15 m deep or more, with DOV's formal lithostratigraphic interpretation of each (2000–2024): made ground and Quaternary deposits over the Pliocene Kattendijk and Miocene Berchem sands and the Oligocene Boom Clay. The thin Quaternary formations are one unit here; each interval keeps DOV's name. Heights in metres TAW. Terrain from Terrain Tiles, fetched when the project opens.",
+ "source": "Databank Ondergrond Vlaanderen (DOV): formal stratigraphy, Flemish Government (VPO); consulted on 07/10/2026, on https://www.dov.vlaanderen.be. Free reuse under the Flemish model licence for free reuse.",
+ "crs": "BD72 / Belgian Lambert 72",
+ "crsCode": "EPSG:31370",
+ "units": [
+  {
+   "id": "Made ground",
+   "name": "Made ground and disturbed ground",
+   "color": "#9a5b4f"
+  },
+  {
+   "id": "Quaternary",
+   "name": "Quaternary deposits",
+   "color": "#e9dba0",
+   "erosive": true
+  },
+  {
+   "id": "Kattendijk",
+   "name": "Kattendijk Formation (Pliocene)",
+   "color": "#c4c27a"
+  },
+  {
+   "id": "Berchem",
+   "name": "Berchem Formation (Miocene)",
+   "color": "#6f9e6b"
+  },
+  {
+   "id": "Boom",
+   "name": "Boom Formation (Oligocene)",
+   "color": "#6b7b90"
+  }
+ ],
+ "boreholes": [
+  {
+   "id": "kb15d28w-B88",
+   "x": 152191,
+   "y": 211334,
+   "z": 8,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2.85,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 2.85,
+     "to": 11.63,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 11.63,
+     "to": 24.98,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B89",
+   "x": 151882,
+   "y": 211627,
+   "z": 8,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 7.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 7.5,
+     "to": 7.85,
+     "unit": "Quaternary",
+     "name": "Calais Member (Vlaanderen Formation) or Dunkerque Member (Vlaanderen Formation)"
+    },
+    {
+     "from": 7.85,
+     "to": 10,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 10,
+     "to": 25.2,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 25.2,
+     "to": 85.5,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B516",
+   "x": 151147,
+   "y": 211083,
+   "z": -5,
+   "intervals": [
+    {
+     "from": 10.6,
+     "to": 15,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B518",
+   "x": 151611,
+   "y": 211828,
+   "z": -0.2,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 17.8,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 17.8,
+     "to": 19.8,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B512",
+   "x": 150711,
+   "y": 211108,
+   "z": -4,
+   "intervals": [
+    {
+     "from": 10.2,
+     "to": 16,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B513",
+   "x": 150747,
+   "y": 211035,
+   "z": -2,
+   "intervals": [
+    {
+     "from": 9.7,
+     "to": 18,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B514",
+   "x": 150967,
+   "y": 211001,
+   "z": -1,
+   "intervals": [
+    {
+     "from": 11.7,
+     "to": 19,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B519",
+   "x": 151733,
+   "y": 212084,
+   "z": -0.5,
+   "intervals": [
+    {
+     "from": 18.5,
+     "to": 19.5,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B515",
+   "x": 150860,
+   "y": 210809,
+   "z": 1.2,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4.2,
+     "unit": "Quaternary",
+     "name": "Calais Member (Vlaanderen Formation) or Dunkerque Member (Vlaanderen Formation)"
+    },
+    {
+     "from": 13.2,
+     "to": 21,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B517",
+   "x": 151467,
+   "y": 211492,
+   "z": -2,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 1,
+     "to": 15,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 15,
+     "to": 18,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B86",
+   "x": 151962,
+   "y": 211437,
+   "z": 2,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 5.5,
+     "to": 14.5,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 14.5,
+     "to": 30.9,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 30.9,
+     "to": 40,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B99",
+   "x": 153424,
+   "y": 213238,
+   "z": 2,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 2,
+     "to": 4.5,
+     "unit": "Quaternary",
+     "name": "Ongedifferentieerd Lid (Formatie van Arenberg)"
+    },
+    {
+     "from": 4.5,
+     "to": 4.9,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 4.9,
+     "to": 8.7,
+     "unit": "Kattendijk",
+     "name": "Kattendijk Formation"
+    },
+    {
+     "from": 8.7,
+     "to": 22,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B562",
+   "x": 151062,
+   "y": 211804,
+   "z": 6.8,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5.9,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 5.9,
+     "to": 7.6,
+     "unit": "Quaternary",
+     "name": "Calais Member (Vlaanderen Formation) or Dunkerque Member (Vlaanderen Formation)"
+    },
+    {
+     "from": 7.6,
+     "to": 9.6,
+     "unit": "Quaternary",
+     "name": "Rotselaar Member (Arenberg Formation)"
+    },
+    {
+     "from": 9.6,
+     "to": 10.5,
+     "unit": "Quaternary",
+     "name": "Wichelen Member (Arenberg Formation)"
+    },
+    {
+     "from": 10.5,
+     "to": 19.4,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 19.4,
+     "to": 23.3,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B560",
+   "x": 151681,
+   "y": 211572,
+   "z": 7.96,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 7,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 7,
+     "to": 21,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 21,
+     "to": 25.2,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B561",
+   "x": 151062,
+   "y": 211749,
+   "z": 5.7,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 6.25,
+     "unit": "Quaternary",
+     "name": "Calais Member (Vlaanderen Formation) or Dunkerque Member (Vlaanderen Formation)"
+    },
+    {
+     "from": 6.25,
+     "to": 7.4,
+     "unit": "Quaternary",
+     "name": "Rotselaar Member (Arenberg Formation)"
+    },
+    {
+     "from": 7.4,
+     "to": 8,
+     "unit": "Quaternary",
+     "name": "Wichelen Member (Arenberg Formation)"
+    },
+    {
+     "from": 8,
+     "to": 17.1,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 17.1,
+     "to": 21.6,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 21.6,
+     "to": 23.5,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B102",
+   "x": 152502,
+   "y": 212396,
+   "z": 2,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 8,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 8,
+     "to": 22.5,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B101",
+   "x": 151525,
+   "y": 210931,
+   "z": 2,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 2.5,
+     "to": 5.2,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 5.2,
+     "to": 12.35,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 12.35,
+     "to": 21,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B104",
+   "x": 152440,
+   "y": 213000,
+   "z": 7,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 1,
+     "to": 2.9,
+     "unit": "Quaternary",
+     "name": "Ongedifferentieerd Lid (Formatie van Arenberg)"
+    },
+    {
+     "from": 2.9,
+     "to": 7.1,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 7.1,
+     "to": 16.25,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B105",
+   "x": 150881,
+   "y": 212072,
+   "z": 2,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 16,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B106",
+   "x": 152793,
+   "y": 212130,
+   "z": 2,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 3.5,
+     "to": 9.1,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 9.1,
+     "to": 14,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 14,
+     "to": 27.65,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 27.65,
+     "to": 37.9,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B580",
+   "x": 152243,
+   "y": 213287,
+   "z": 1.05,
+   "intervals": [
+    {
+     "from": 12.8,
+     "to": 18.3,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 18.3,
+     "to": 27.4,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 27.4,
+     "to": 28.3,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B499",
+   "x": 151763,
+   "y": 212091,
+   "z": 7.05,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 1.5,
+     "to": 7.5,
+     "unit": "Quaternary",
+     "name": "Calais Member (Vlaanderen Formation) or Dunkerque Member (Vlaanderen Formation)"
+    },
+    {
+     "from": 7.5,
+     "to": 9.5,
+     "unit": "Quaternary",
+     "name": "Rotselaar Member (Arenberg Formation)"
+    },
+    {
+     "from": 9.5,
+     "to": 11.7,
+     "unit": "Quaternary",
+     "name": "Wichelen Member (Arenberg Formation)"
+    },
+    {
+     "from": 23.8,
+     "to": 26,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B501",
+   "x": 151501,
+   "y": 212188,
+   "z": 6.9,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 23.3,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 23.3,
+     "to": 25,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B498",
+   "x": 151391,
+   "y": 212207,
+   "z": 5.06,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 3,
+     "to": 5.1,
+     "unit": "Quaternary",
+     "name": "Calais Member (Vlaanderen Formation) or Dunkerque Member (Vlaanderen Formation)"
+    },
+    {
+     "from": 5.1,
+     "to": 7.5,
+     "unit": "Quaternary",
+     "name": "Rotselaar Member (Arenberg Formation)"
+    },
+    {
+     "from": 7.5,
+     "to": 22,
+     "unit": "Quaternary",
+     "name": "Wichelen Member (Arenberg Formation)"
+    },
+    {
+     "from": 22,
+     "to": 24.5,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B500",
+   "x": 151779,
+   "y": 212017,
+   "z": 6.9,
+   "intervals": [
+    {
+     "from": 23.5,
+     "to": 25,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B125",
+   "x": 151831,
+   "y": 211352,
+   "z": 2,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 4,
+     "to": 7,
+     "unit": "Quaternary",
+     "name": "Achterbos Member (Gent Formation)"
+    },
+    {
+     "from": 7,
+     "to": 7.9,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 7.9,
+     "to": 23.7,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 23.7,
+     "to": 35,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B148",
+   "x": 153381,
+   "y": 211883,
+   "z": 1,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 3,
+     "to": 17,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B156",
+   "x": 152859,
+   "y": 212707,
+   "z": 8,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 4,
+     "to": 6,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 6,
+     "to": 8,
+     "unit": "Kattendijk",
+     "name": "Kattendijk Formation"
+    },
+    {
+     "from": 8,
+     "to": 20,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B163",
+   "x": 151735,
+   "y": 213020,
+   "z": 8,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 6.4,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 6.4,
+     "to": 7.45,
+     "unit": "Quaternary",
+     "name": "Rotselaar Member (Arenberg Formation)"
+    },
+    {
+     "from": 7.45,
+     "to": 8.25,
+     "unit": "Quaternary",
+     "name": "Wichelen Member (Arenberg Formation)"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B160",
+   "x": 150701,
+   "y": 211572,
+   "z": 2.3,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2.3,
+     "unit": "Quaternary",
+     "name": "Calais Member (Vlaanderen Formation) or Dunkerque Member (Vlaanderen Formation)"
+    },
+    {
+     "from": 2.3,
+     "to": 3.3,
+     "unit": "Quaternary",
+     "name": "Rotselaar Member (Arenberg Formation)"
+    },
+    {
+     "from": 3.3,
+     "to": 13.3,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B162",
+   "x": 150579,
+   "y": 211785,
+   "z": 2.3,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 2,
+     "to": 5,
+     "unit": "Quaternary",
+     "name": "Rotselaar Member (Arenberg Formation)"
+    },
+    {
+     "from": 5,
+     "to": 6.5,
+     "unit": "Quaternary",
+     "name": "Wichelen Member (Arenberg Formation)"
+    },
+    {
+     "from": 6.5,
+     "to": 16,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B164",
+   "x": 152301,
+   "y": 211682,
+   "z": 8,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5.5,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 5.5,
+     "to": 18.3,
+     "unit": "Kattendijk",
+     "name": "Kattendijk Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B187",
+   "x": 151745,
+   "y": 212969,
+   "z": 6.31,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 15.5,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 15.5,
+     "to": 24.5,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 24.5,
+     "to": 39.3,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B179",
+   "x": 152346,
+   "y": 212957,
+   "z": 6.89,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 4,
+     "to": 11,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 11,
+     "to": 19,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 19,
+     "to": 26,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 26,
+     "to": 32,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B165",
+   "x": 151226,
+   "y": 213000,
+   "z": 7.44,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 7,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 7,
+     "to": 7.5,
+     "unit": "Quaternary",
+     "name": "Calais Member (Vlaanderen Formation) or Dunkerque Member (Vlaanderen Formation)"
+    },
+    {
+     "from": 7.5,
+     "to": 10,
+     "unit": "Quaternary",
+     "name": "Rotselaar Member (Arenberg Formation)"
+    },
+    {
+     "from": 10,
+     "to": 18,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 18,
+     "to": 25,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 25,
+     "to": 28,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B166",
+   "x": 151037,
+   "y": 212969,
+   "z": 7.55,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 7,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 7,
+     "to": 9,
+     "unit": "Quaternary",
+     "name": "Calais Member (Vlaanderen Formation) or Dunkerque Member (Vlaanderen Formation)"
+    },
+    {
+     "from": 9,
+     "to": 11,
+     "unit": "Quaternary",
+     "name": "Rotselaar Member (Arenberg Formation)"
+    },
+    {
+     "from": 11,
+     "to": 20,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 20,
+     "to": 24,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 24,
+     "to": 28,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B167",
+   "x": 151409,
+   "y": 212957,
+   "z": 6.99,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 17,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 17,
+     "to": 19,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 19,
+     "to": 25,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 25,
+     "to": 29.3,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B168",
+   "x": 151089,
+   "y": 213000,
+   "z": 6.97,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 6,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 6,
+     "to": 9,
+     "unit": "Quaternary",
+     "name": "Calais Member (Vlaanderen Formation) or Dunkerque Member (Vlaanderen Formation)"
+    },
+    {
+     "from": 9,
+     "to": 10,
+     "unit": "Quaternary",
+     "name": "Rotselaar Member (Arenberg Formation)"
+    },
+    {
+     "from": 10,
+     "to": 18,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 18,
+     "to": 24,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 24,
+     "to": 27.6,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B170",
+   "x": 151336,
+   "y": 212994,
+   "z": 7.14,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 18,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 18,
+     "to": 19,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 19,
+     "to": 26,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 26,
+     "to": 29,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B172",
+   "x": 151284,
+   "y": 212969,
+   "z": 7.42,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 20,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 20,
+     "to": 26,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 26,
+     "to": 29,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B174",
+   "x": 151577,
+   "y": 212969,
+   "z": 6.32,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 6,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 6,
+     "to": 7,
+     "unit": "Quaternary",
+     "name": "Calais Member (Vlaanderen Formation) or Dunkerque Member (Vlaanderen Formation)"
+    },
+    {
+     "from": 7,
+     "to": 19,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 19,
+     "to": 25,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 25,
+     "to": 34.4,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B176",
+   "x": 152191,
+   "y": 212945,
+   "z": 6.98,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 4,
+     "to": 10,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 10,
+     "to": 16,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 16,
+     "to": 25.8,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 25.8,
+     "to": 36.8,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B169",
+   "x": 151147,
+   "y": 212969,
+   "z": 7.74,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 7.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 7.5,
+     "to": 8,
+     "unit": "Quaternary",
+     "name": "Calais Member (Vlaanderen Formation) or Dunkerque Member (Vlaanderen Formation)"
+    },
+    {
+     "from": 8,
+     "to": 9,
+     "unit": "Quaternary",
+     "name": "Rotselaar Member (Arenberg Formation)"
+    },
+    {
+     "from": 9,
+     "to": 18,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 18,
+     "to": 26,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 26,
+     "to": 28.35,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B171",
+   "x": 151477,
+   "y": 212988,
+   "z": 6.94,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 5,
+     "to": 9,
+     "unit": "Quaternary",
+     "name": "Calais Member (Vlaanderen Formation) or Dunkerque Member (Vlaanderen Formation)"
+    },
+    {
+     "from": 9,
+     "to": 10,
+     "unit": "Quaternary",
+     "name": "Rotselaar Member (Arenberg Formation)"
+    },
+    {
+     "from": 10,
+     "to": 16,
+     "unit": "Quaternary",
+     "name": "Wichelen Member (Arenberg Formation)"
+    },
+    {
+     "from": 16,
+     "to": 18,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 18,
+     "to": 25,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 25,
+     "to": 31.2,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B173",
+   "x": 151525,
+   "y": 212969,
+   "z": 6.47,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 16,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 16,
+     "to": 20,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 20,
+     "to": 24,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 24,
+     "to": 31.85,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B175",
+   "x": 152111,
+   "y": 212957,
+   "z": 7.11,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 9,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 9,
+     "to": 12,
+     "unit": "Kattendijk",
+     "name": "Kattendijk Formation"
+    },
+    {
+     "from": 12,
+     "to": 17,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 17,
+     "to": 26,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 26,
+     "to": 38,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B177",
+   "x": 152258,
+   "y": 212969,
+   "z": 6.92,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 5,
+     "to": 10,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 10,
+     "to": 11,
+     "unit": "Kattendijk",
+     "name": "Kattendijk Formation"
+    },
+    {
+     "from": 11,
+     "to": 17,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 17,
+     "to": 26.13,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 26.13,
+     "to": 34.7,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B178",
+   "x": 152291,
+   "y": 212945,
+   "z": 6.79,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 6,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 6,
+     "to": 10,
+     "unit": "Kattendijk",
+     "name": "Kattendijk Formation"
+    },
+    {
+     "from": 10,
+     "to": 18,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 18,
+     "to": 25,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 25,
+     "to": 32.35,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B180",
+   "x": 152347,
+   "y": 212945,
+   "z": 6.84,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 7,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 7,
+     "to": 11,
+     "unit": "Kattendijk",
+     "name": "Kattendijk Formation"
+    },
+    {
+     "from": 11,
+     "to": 19,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 19,
+     "to": 26,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 26,
+     "to": 29.6,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B181",
+   "x": 152526,
+   "y": 212957,
+   "z": 7.11,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 4,
+     "to": 8,
+     "unit": "Quaternary",
+     "name": "Ongedifferentieerd Lid (Formatie van Arenberg)"
+    },
+    {
+     "from": 8,
+     "to": 17,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 17,
+     "to": 26,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 26,
+     "to": 29.7,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B184",
+   "x": 152731,
+   "y": 212969,
+   "z": 6.53,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 6,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 6,
+     "to": 7,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 7,
+     "to": 12,
+     "unit": "Kattendijk",
+     "name": "Kattendijk Formation"
+    },
+    {
+     "from": 12,
+     "to": 19,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 19,
+     "to": 26,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 26,
+     "to": 29.9,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B186",
+   "x": 151675,
+   "y": 212969,
+   "z": 6.21,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 17.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 17.5,
+     "to": 20.5,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 20.5,
+     "to": 24.85,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 24.85,
+     "to": 36,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B182",
+   "x": 152600,
+   "y": 212945,
+   "z": 6.27,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 4,
+     "to": 10,
+     "unit": "Kattendijk",
+     "name": "Kattendijk Formation"
+    },
+    {
+     "from": 10,
+     "to": 26,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 26,
+     "to": 29.5,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B183",
+   "x": 152661,
+   "y": 212945,
+   "z": 6.24,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 3,
+     "to": 4,
+     "unit": "Quaternary",
+     "name": "Ongedifferentieerd Lid (Formatie van Arenberg)"
+    },
+    {
+     "from": 4,
+     "to": 5,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 5,
+     "to": 11,
+     "unit": "Kattendijk",
+     "name": "Kattendijk Formation"
+    },
+    {
+     "from": 11,
+     "to": 17,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 17,
+     "to": 26,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 26,
+     "to": 29.7,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B188",
+   "x": 152000,
+   "y": 213000,
+   "z": 0.62,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 16,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 16,
+     "to": 24,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 24,
+     "to": 41,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B224",
+   "x": 151851,
+   "y": 212080,
+   "z": 7.5,
+   "intervals": [
+    {
+     "from": 24.15,
+     "to": 36,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B225",
+   "x": 151850,
+   "y": 212050,
+   "z": 1.85,
+   "intervals": [
+    {
+     "from": 16.65,
+     "to": 16.8,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B208",
+   "x": 151266,
+   "y": 212127,
+   "z": 3.67,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 3,
+     "to": 5.5,
+     "unit": "Quaternary",
+     "name": "Rotselaar Member (Arenberg Formation)"
+    },
+    {
+     "from": 5.5,
+     "to": 13.67,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 13.67,
+     "to": 19.67,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 19.67,
+     "to": 32,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B214",
+   "x": 151593,
+   "y": 212933,
+   "z": 7,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 16,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B216",
+   "x": 151595,
+   "y": 212933,
+   "z": 7.5,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 15.5,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B217",
+   "x": 151596,
+   "y": 212933,
+   "z": 8,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 17,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B284",
+   "x": 151501,
+   "y": 213189,
+   "z": 7,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 7.3,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 7.3,
+     "to": 8,
+     "unit": "Quaternary",
+     "name": "Calais Member (Vlaanderen Formation) or Dunkerque Member (Vlaanderen Formation)"
+    },
+    {
+     "from": 8,
+     "to": 11.6,
+     "unit": "Quaternary",
+     "name": "Rotselaar Member (Arenberg Formation)"
+    },
+    {
+     "from": 11.6,
+     "to": 13.1,
+     "unit": "Quaternary",
+     "name": "Wichelen Member (Arenberg Formation)"
+    },
+    {
+     "from": 13.1,
+     "to": 19.2,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 19.2,
+     "to": 19.81,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B289",
+   "x": 153475,
+   "y": 211804,
+   "z": 3.5,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 3,
+     "to": 5,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 5,
+     "to": 20.5,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B290",
+   "x": 152438,
+   "y": 212042,
+   "z": 2,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 8,
+     "to": 15,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "GEO-48/634-B",
+   "x": 152072,
+   "y": 212752,
+   "z": 7.27,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 6,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 6,
+     "to": 11,
+     "unit": "Kattendijk",
+     "name": "Kattendijk Formation"
+    },
+    {
+     "from": 11,
+     "to": 20,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "GEO-48/634-D",
+   "x": 152124,
+   "y": 212905,
+   "z": 7.27,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 8,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 8,
+     "to": 20,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "GEO-48/634-A",
+   "x": 152042,
+   "y": 212675,
+   "z": 7.25,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 5,
+     "to": 9,
+     "unit": "Kattendijk",
+     "name": "Kattendijk Formation"
+    },
+    {
+     "from": 9,
+     "to": 21,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 21,
+     "to": 25,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 25,
+     "to": 26,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B291",
+   "x": 151989,
+   "y": 212622,
+   "z": 7.05,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 5,
+     "to": 9.5,
+     "unit": "Kattendijk",
+     "name": "Kattendijk Formation"
+    },
+    {
+     "from": 9.5,
+     "to": 25,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 25,
+     "to": 26,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B292",
+   "x": 152026,
+   "y": 212719,
+   "z": 7,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 5.5,
+     "to": 10.5,
+     "unit": "Kattendijk",
+     "name": "Kattendijk Formation"
+    },
+    {
+     "from": 10.5,
+     "to": 20,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B293",
+   "x": 152026,
+   "y": 212768,
+   "z": 7,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 6,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 6,
+     "to": 10.5,
+     "unit": "Kattendijk",
+     "name": "Kattendijk Formation"
+    },
+    {
+     "from": 10.5,
+     "to": 20,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B294",
+   "x": 152047,
+   "y": 212866,
+   "z": 7,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 8,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 8,
+     "to": 11,
+     "unit": "Kattendijk",
+     "name": "Kattendijk Formation"
+    },
+    {
+     "from": 11,
+     "to": 20,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B295",
+   "x": 151715,
+   "y": 211517,
+   "z": 8,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 4,
+     "to": 6,
+     "unit": "Quaternary",
+     "name": "Calais Member (Vlaanderen Formation) or Dunkerque Member (Vlaanderen Formation)"
+    },
+    {
+     "from": 6,
+     "to": 14,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 14,
+     "to": 16,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B299",
+   "x": 153039,
+   "y": 211804,
+   "z": 2,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 7,
+     "to": 16,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B334",
+   "x": 152813,
+   "y": 212518,
+   "z": 2,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 2,
+     "to": 5,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 11,
+     "to": 20,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B335",
+   "x": 152813,
+   "y": 212518,
+   "z": 2,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 11,
+     "to": 25,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-67/235-DB1",
+   "x": 152810,
+   "y": 211995,
+   "z": 7,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3.75,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 6.4,
+     "to": 9,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 9,
+     "to": 20,
+     "unit": "Berchem",
+     "name": "Kiel Member (Berchem Formation)"
+    },
+    {
+     "from": 20,
+     "to": 28.7,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 28.7,
+     "to": 32.4,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-70/056-B (II)",
+   "x": 152808,
+   "y": 212001,
+   "z": 7.6,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 6.4,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 6.4,
+     "to": 7.5,
+     "unit": "Kattendijk",
+     "name": "Kattendijk Formation"
+    },
+    {
+     "from": 7.5,
+     "to": 15.2,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "GEO-70/056-E (V)",
+   "x": 153228,
+   "y": 211982,
+   "z": 8.01,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 6.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 6.5,
+     "to": 7,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 7,
+     "to": 10,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 10,
+     "to": 15.2,
+     "unit": "Berchem",
+     "name": "Kiel Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "GEO-72/254-DBI",
+   "x": 151356,
+   "y": 211141,
+   "z": 6.6,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 8.6,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 8.6,
+     "to": 20.5,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 20.5,
+     "to": 24,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-72/254-DBII",
+   "x": 151377,
+   "y": 211113,
+   "z": 6.5,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 9.75,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 9.75,
+     "to": 20.25,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 20.25,
+     "to": 23.5,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-72/254-DBIII",
+   "x": 151368,
+   "y": 211101,
+   "z": 6.5,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 9.75,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 9.75,
+     "to": 20.75,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 20.75,
+     "to": 24,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B409",
+   "x": 151284,
+   "y": 211083,
+   "z": 5.6,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 10,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 10,
+     "to": 20,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 20,
+     "to": 24,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B410",
+   "x": 151284,
+   "y": 211059,
+   "z": 5.5,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 9.5,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 9.5,
+     "to": 20.5,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 20.5,
+     "to": 23.5,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B411",
+   "x": 151284,
+   "y": 211035,
+   "z": 6,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 11.5,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 11.5,
+     "to": 17.5,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 17.5,
+     "to": 20.5,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 20.5,
+     "to": 24,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-73/434-B1",
+   "x": 153338,
+   "y": 212262,
+   "z": 8.8,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 4,
+     "to": 6.4,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 6.4,
+     "to": 8,
+     "unit": "Kattendijk",
+     "name": "Kattendijk Formation"
+    },
+    {
+     "from": 8,
+     "to": 20,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "GEO-73/434-B3",
+   "x": 153396,
+   "y": 212163,
+   "z": 9.34,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 5,
+     "to": 7,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 7,
+     "to": 8.5,
+     "unit": "Kattendijk",
+     "name": "Kattendijk Formation"
+    },
+    {
+     "from": 8.5,
+     "to": 20,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "GEO-73/434-B4",
+   "x": 153304,
+   "y": 212063,
+   "z": 8.01,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4.8,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 4.8,
+     "to": 5.5,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 5.5,
+     "to": 7,
+     "unit": "Kattendijk",
+     "name": "Kattendijk Formation"
+    },
+    {
+     "from": 7,
+     "to": 20,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "GEO-78/157-hb14",
+   "x": 152109,
+   "y": 210859,
+   "z": 6.66,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 2.5,
+     "to": 5,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 5,
+     "to": 10,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 10,
+     "to": 15,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-78/157-B1",
+   "x": 150606,
+   "y": 212213,
+   "z": 5.84,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 8.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 8.5,
+     "to": 17.5,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 17.5,
+     "to": 19,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 19,
+     "to": 20.5,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-78/136-BLO6",
+   "x": 151448,
+   "y": 212353,
+   "z": 6.84,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 5.5,
+     "to": 9,
+     "unit": "Quaternary",
+     "name": "Rotselaar Member (Arenberg Formation)"
+    },
+    {
+     "from": 9,
+     "to": 13,
+     "unit": "Quaternary",
+     "name": "Wichelen Member (Arenberg Formation)"
+    },
+    {
+     "from": 13,
+     "to": 18,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 18,
+     "to": 23.35,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 23.35,
+     "to": 25,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-78/134-DBLO2",
+   "x": 151778,
+   "y": 212204,
+   "z": -10.75,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Quaternary",
+     "name": "Calais Member (Vlaanderen Formation) or Dunkerque Member (Vlaanderen Formation)"
+    },
+    {
+     "from": 1,
+     "to": 3,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 3,
+     "to": 6,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 6,
+     "to": 20.5,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-78/134-DBLO3",
+   "x": 151739,
+   "y": 212318,
+   "z": -11.56,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 4,
+     "to": 5.7,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 5.7,
+     "to": 20.5,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-78/134-DBLO4",
+   "x": 151608,
+   "y": 212260,
+   "z": -12.21,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.5,
+     "unit": "Quaternary",
+     "name": "Calais Member (Vlaanderen Formation) or Dunkerque Member (Vlaanderen Formation)"
+    },
+    {
+     "from": 0.5,
+     "to": 1.5,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 1.5,
+     "to": 4.35,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 4.35,
+     "to": 18,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-78/134-DBLO5",
+   "x": 151555,
+   "y": 212341,
+   "z": -10.87,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 0.5,
+     "unit": "Quaternary",
+     "name": "Calais Member (Vlaanderen Formation) or Dunkerque Member (Vlaanderen Formation)"
+    },
+    {
+     "from": 0.5,
+     "to": 6,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 6,
+     "to": 15.5,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-78/136-BLO1",
+   "x": 151891,
+   "y": 212244,
+   "z": 6.86,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 7.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 7.5,
+     "to": 13,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 13,
+     "to": 18,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 18,
+     "to": 24.58,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 24.58,
+     "to": 31.5,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-78/157-hb1",
+   "x": 153428,
+   "y": 212828,
+   "z": 5.9,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2.9,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 2.9,
+     "to": 3.4,
+     "unit": "Quaternary",
+     "name": "Ongedifferentieerd Lid (Formatie van Arenberg)"
+    },
+    {
+     "from": 3.4,
+     "to": 4.25,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 4.25,
+     "to": 7,
+     "unit": "Kattendijk",
+     "name": "Kattendijk Formation"
+    },
+    {
+     "from": 7,
+     "to": 9,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 9,
+     "to": 15,
+     "unit": "Berchem",
+     "name": "Kiel Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "GEO-78/157-hb4",
+   "x": 153044,
+   "y": 212599,
+   "z": 7.28,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 2.5,
+     "to": 4,
+     "unit": "Quaternary",
+     "name": "Ongedifferentieerd Lid (Formatie van Arenberg)"
+    },
+    {
+     "from": 4,
+     "to": 5.2,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 5.2,
+     "to": 7.5,
+     "unit": "Kattendijk",
+     "name": "Kattendijk Formation"
+    },
+    {
+     "from": 7.5,
+     "to": 15,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "GEO-78/157-hb5",
+   "x": 152128,
+   "y": 212334,
+   "z": 8.59,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4.3,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 4.3,
+     "to": 5,
+     "unit": "Quaternary",
+     "name": "Calais Member (Vlaanderen Formation) or Dunkerque Member (Vlaanderen Formation)"
+    },
+    {
+     "from": 5,
+     "to": 9,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 9,
+     "to": 15,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "GEO-78/157-hb6",
+   "x": 152143,
+   "y": 211867,
+   "z": 8.79,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4.6,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 4.6,
+     "to": 8,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 8,
+     "to": 15,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-78/157-hb3",
+   "x": 152200,
+   "y": 212603,
+   "z": 7.66,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 3.5,
+     "to": 9,
+     "unit": "Quaternary",
+     "name": "Calais Member (Vlaanderen Formation) or Dunkerque Member (Vlaanderen Formation)"
+    },
+    {
+     "from": 9,
+     "to": 15,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B657",
+   "x": 153283,
+   "y": 211395,
+   "z": 3,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 2,
+     "to": 4,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 4,
+     "to": 24,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B658",
+   "x": 153134,
+   "y": 211456,
+   "z": 3,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 2,
+     "to": 4,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 4,
+     "to": 24,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B659",
+   "x": 152951,
+   "y": 211267,
+   "z": 3,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 8,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 8,
+     "to": 24,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B660",
+   "x": 153063,
+   "y": 211157,
+   "z": 3.5,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 8,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 8,
+     "to": 24,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B661",
+   "x": 153323,
+   "y": 211138,
+   "z": 3.5,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 4,
+     "to": 8,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 8,
+     "to": 24,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-81/347-DBLO9",
+   "x": 151069,
+   "y": 212282,
+   "z": 6.96,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 19.6,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 19.6,
+     "to": 21.6,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 21.6,
+     "to": 24.5,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-81/347-DBLO8",
+   "x": 151295,
+   "y": 212348,
+   "z": 7.03,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 19,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 19,
+     "to": 23.7,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 23.7,
+     "to": 37,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-81/347-DBLO10",
+   "x": 150893,
+   "y": 212273,
+   "z": 6.73,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 6.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 6.5,
+     "to": 7.5,
+     "unit": "Quaternary",
+     "name": "Rotselaar Member (Arenberg Formation)"
+    },
+    {
+     "from": 7.5,
+     "to": 20,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 20,
+     "to": 21.4,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 21.4,
+     "to": 24.5,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-81/347-BLO13",
+   "x": 151130,
+   "y": 212290,
+   "z": 7.1,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 8.1,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 8.1,
+     "to": 9.1,
+     "unit": "Quaternary",
+     "name": "Rotselaar Member (Arenberg Formation)"
+    },
+    {
+     "from": 9.1,
+     "to": 18.5,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 18.5,
+     "to": 21,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 21,
+     "to": 22.6,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 22.6,
+     "to": 23,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-82/020-RA3",
+   "x": 151836,
+   "y": 212182,
+   "z": 7.02,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 20,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 20,
+     "to": 23.75,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 23.75,
+     "to": 50,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-82/220-BLO17",
+   "x": 151860,
+   "y": 212259,
+   "z": 6.96,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 17.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 17.5,
+     "to": 18.5,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 18.5,
+     "to": 21,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "GEO-82/020-LA3",
+   "x": 151244,
+   "y": 212369,
+   "z": 7.33,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 10,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 10,
+     "to": 11,
+     "unit": "Quaternary",
+     "name": "Rotselaar Member (Arenberg Formation)"
+    },
+    {
+     "from": 11,
+     "to": 18,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 18,
+     "to": 23.7,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 23.7,
+     "to": 50,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-81/347-DBLO7",
+   "x": 152077,
+   "y": 212166,
+   "z": 8.21,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 9.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 9.5,
+     "to": 25.8,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 25.8,
+     "to": 39,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-81/347-BLO16",
+   "x": 152199,
+   "y": 212097,
+   "z": 7.08,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3.3,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 3.3,
+     "to": 4,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 4,
+     "to": 7,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 7,
+     "to": 15,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-81/347-DBAN1",
+   "x": 152276,
+   "y": 212043,
+   "z": 7.21,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 3,
+     "to": 6.5,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 6.5,
+     "to": 23.7,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 23.7,
+     "to": 26.7,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-82/392-DBLO21",
+   "x": 151875,
+   "y": 212256,
+   "z": 6.86,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 12,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 12,
+     "to": 24.5,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 24.5,
+     "to": 25,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-84/164-165-B.Z.4",
+   "x": 152906,
+   "y": 211427,
+   "z": 7.16,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 6.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 6.5,
+     "to": 15,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 15,
+     "to": 17,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-84/164-165-B.Z.5",
+   "x": 152954,
+   "y": 211524,
+   "z": 7.19,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 6,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 6,
+     "to": 12,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 13.5,
+     "to": 16,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "GEO-84/164-165-DB.Z.1",
+   "x": 153191,
+   "y": 211743,
+   "z": 7.85,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 6.25,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 6.25,
+     "to": 26.15,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 26.15,
+     "to": 28.37,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-84/164-165-DB.Z.10",
+   "x": 152401,
+   "y": 210998,
+   "z": 6.4,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2.35,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 2.35,
+     "to": 7,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 7,
+     "to": 16,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 16,
+     "to": 24,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 24,
+     "to": 26.4,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-84/164-165-DB.Z.3",
+   "x": 153005,
+   "y": 211529,
+   "z": 6.98,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 2.5,
+     "to": 4.5,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 4.5,
+     "to": 24,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 24,
+     "to": 26.4,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-84/164-165-DB.Z.6",
+   "x": 152852,
+   "y": 211394,
+   "z": 7,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 7,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 7,
+     "to": 9,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 9,
+     "to": 23.5,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 23.5,
+     "to": 26.4,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-84/164-165-DB.Z.7",
+   "x": 152751,
+   "y": 211223,
+   "z": 6.86,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 5.5,
+     "to": 6,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 6,
+     "to": 23.65,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 23.65,
+     "to": 26.4,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-84/164-165-DB.Z.8",
+   "x": 152565,
+   "y": 211069,
+   "z": 6.53,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 5,
+     "to": 6.5,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 6.5,
+     "to": 22,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 22,
+     "to": 24.4,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-87/185-B2",
+   "x": 151426,
+   "y": 212357,
+   "z": 27.28,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 10,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 10,
+     "to": 11,
+     "unit": "Quaternary",
+     "name": "Calais Member (Vlaanderen Formation) or Dunkerque Member (Vlaanderen Formation)"
+    },
+    {
+     "from": 11,
+     "to": 12,
+     "unit": "Quaternary",
+     "name": "Rotselaar Member (Arenberg Formation)"
+    },
+    {
+     "from": 12,
+     "to": 13,
+     "unit": "Quaternary",
+     "name": "Wichelen Member (Arenberg Formation)"
+    },
+    {
+     "from": 13,
+     "to": 18.5,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 18.5,
+     "to": 23.6,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 23.6,
+     "to": 30.1,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-87/185-B3",
+   "x": 151414,
+   "y": 212361,
+   "z": 27.26,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 6.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 6.5,
+     "to": 7.5,
+     "unit": "Quaternary",
+     "name": "Calais Member (Vlaanderen Formation) or Dunkerque Member (Vlaanderen Formation)"
+    },
+    {
+     "from": 7.5,
+     "to": 9.2,
+     "unit": "Quaternary",
+     "name": "Rotselaar Member (Arenberg Formation)"
+    },
+    {
+     "from": 9.2,
+     "to": 11.35,
+     "unit": "Quaternary",
+     "name": "Wichelen Member (Arenberg Formation)"
+    },
+    {
+     "from": 11.35,
+     "to": 18.35,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 18.35,
+     "to": 23.9,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 23.9,
+     "to": 30,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-87/185-B1",
+   "x": 151443,
+   "y": 212345,
+   "z": 28.52,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 9,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 9,
+     "to": 9.5,
+     "unit": "Quaternary",
+     "name": "Rotselaar Member (Arenberg Formation)"
+    },
+    {
+     "from": 9.5,
+     "to": 13.5,
+     "unit": "Quaternary",
+     "name": "Wichelen Member (Arenberg Formation)"
+    },
+    {
+     "from": 13.5,
+     "to": 20,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 20,
+     "to": 25.2,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 25.2,
+     "to": 30,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-98/107-B1A",
+   "x": 151566.55,
+   "y": 212428.22,
+   "z": -6.46,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 3,
+     "to": 10.15,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 10.15,
+     "to": 30,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-99/089-B-S1-B",
+   "x": 151750.63,
+   "y": 212036.93,
+   "z": 6.98,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 19,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 19,
+     "to": 22,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 22,
+     "to": 28,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-99/089-B-S2-C",
+   "x": 151787.11,
+   "y": 212085.03,
+   "z": 6.96,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 18.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 18.5,
+     "to": 19.5,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 19.5,
+     "to": 23,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "GEO-99/089-B-S3-A",
+   "x": 151757.6,
+   "y": 211978.58,
+   "z": 6.78,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 10.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 10.5,
+     "to": 17,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    }
+   ]
+  },
+  {
+   "id": "GEO-98/187-B26B",
+   "x": 151977.35,
+   "y": 213476.45,
+   "z": -4.5,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 6,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 6,
+     "to": 15,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 15,
+     "to": 17.5,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-99/089-B-S1-J",
+   "x": 151918.19,
+   "y": 212392.19,
+   "z": 6.61,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 14.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 14.5,
+     "to": 16,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "GEO-99/089-B-S2-I",
+   "x": 151906.84,
+   "y": 212352.54,
+   "z": 6.93,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 10.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 10.5,
+     "to": 19.5,
+     "unit": "Berchem",
+     "name": "Kiel Member (Berchem Formation)"
+    },
+    {
+     "from": 19.5,
+     "to": 25,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 25,
+     "to": 29,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-00/129-BNB17",
+   "x": 152682.47,
+   "y": 211204.58,
+   "z": 6.97,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 3.5,
+     "to": 5.5,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 5.5,
+     "to": 23.2,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 23.2,
+     "to": 27,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-00/127-BNB5",
+   "x": 152833,
+   "y": 211349,
+   "z": 6.96,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 5,
+     "to": 24,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 24,
+     "to": 27,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-00/129-BNB16",
+   "x": 152743.3,
+   "y": 211275.1,
+   "z": 7.11,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 2,
+     "to": 8.5,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 8.5,
+     "to": 24.2,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 24.2,
+     "to": 28,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-06/156-B1",
+   "x": 153186.61,
+   "y": 211863.75,
+   "z": 8.13,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 7,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 7,
+     "to": 10,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 10,
+     "to": 19.5,
+     "unit": "Berchem",
+     "name": "Kiel Member (Berchem Formation)"
+    },
+    {
+     "from": 19.5,
+     "to": 25.5,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 25.5,
+     "to": 29,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-06/156-BHA1",
+   "x": 153133.07,
+   "y": 211741.1,
+   "z": 8.27,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5.75,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 5.75,
+     "to": 20,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "GEO-06/156-BHA2",
+   "x": 153226.29,
+   "y": 212775.94,
+   "z": 6.63,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 5.5,
+     "to": 15,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "GEO-06/156-B2",
+   "x": 153276.15,
+   "y": 212108.59,
+   "z": 8.29,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 7,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 7,
+     "to": 10,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 10,
+     "to": 21,
+     "unit": "Berchem",
+     "name": "Kiel Member (Berchem Formation)"
+    },
+    {
+     "from": 21,
+     "to": 27,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 27,
+     "to": 30,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-09/061-B145",
+   "x": 151427.65,
+   "y": 211400.17,
+   "z": 6.85,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 18,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 18,
+     "to": 20.9,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 20.9,
+     "to": 28,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-09/061-B134",
+   "x": 151712.81,
+   "y": 211947.84,
+   "z": 6.95,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 18,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 18,
+     "to": 22,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 22,
+     "to": 30,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-09/061-B141",
+   "x": 151561.03,
+   "y": 211624.7,
+   "z": 7,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 17.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 17.5,
+     "to": 22.15,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 22.15,
+     "to": 25,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-09/061-B147",
+   "x": 151368.27,
+   "y": 211320.23,
+   "z": 6.79,
+   "intervals": [
+    {
+     "from": 0.14,
+     "to": 18.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 18.5,
+     "to": 21,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 21,
+     "to": 25,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-09/061-B153",
+   "x": 151180.23,
+   "y": 211083.98,
+   "z": 6.91,
+   "intervals": [
+    {
+     "from": 0.16,
+     "to": 17,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 17,
+     "to": 19.7,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 19.7,
+     "to": 27,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-09/079-B157",
+   "x": 151006.2,
+   "y": 210896.6,
+   "z": 7.26,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 14.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 14.5,
+     "to": 18.5,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 18.5,
+     "to": 22,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-10/041-B116",
+   "x": 152303,
+   "y": 213520,
+   "z": 7.19,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 15,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 15,
+     "to": 27.4,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 27.4,
+     "to": 35.5,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-11/013-B127",
+   "x": 152143.5,
+   "y": 212988.7,
+   "z": 6.94,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 14.75,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 14.75,
+     "to": 21.5,
+     "unit": "Berchem",
+     "name": "Kiel Member (Berchem Formation)"
+    },
+    {
+     "from": 21.5,
+     "to": 25.8,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 25.8,
+     "to": 29.5,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-11/013-B132",
+   "x": 151973.4,
+   "y": 212492.3,
+   "z": 7.08,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 7.9,
+     "to": 22,
+     "unit": "Berchem",
+     "name": "Antwerpen Member (Berchem Formation)"
+    },
+    {
+     "from": 22,
+     "to": 25.5,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 25.5,
+     "to": 29.5,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-11/013-B199",
+   "x": 152022.2,
+   "y": 212677.8,
+   "z": 7.07,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 12.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 12.5,
+     "to": 20,
+     "unit": "Berchem",
+     "name": "Kiel Member (Berchem Formation)"
+    },
+    {
+     "from": 20,
+     "to": 24.5,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 24.5,
+     "to": 29,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-10/041-B121",
+   "x": 152257.1,
+   "y": 213279.05,
+   "z": 7.68,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 17.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 17.5,
+     "to": 26.2,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 26.2,
+     "to": 34,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-14/034-B12",
+   "x": 150677,
+   "y": 211372.5,
+   "z": 8.27,
+   "intervals": [
+    {
+     "from": 1.5,
+     "to": 17.4,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 17.4,
+     "to": 20,
+     "unit": "Quaternary",
+     "name": "Eeklo Formation or Gent Formation"
+    },
+    {
+     "from": 20,
+     "to": 20.75,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 20.75,
+     "to": 25,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-15/022-BKB2",
+   "x": 152201.8,
+   "y": 213074.9,
+   "z": 6.95,
+   "intervals": [
+    {
+     "from": 0.15,
+     "to": 10,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 10,
+     "to": 16.95,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-15/022-B2",
+   "x": 152192.2,
+   "y": 213032.9,
+   "z": 6.94,
+   "intervals": [
+    {
+     "from": 0.12,
+     "to": 9.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 9.5,
+     "to": 15,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-15/022-B4",
+   "x": 152197.5,
+   "y": 213115,
+   "z": 6.96,
+   "intervals": [
+    {
+     "from": 0.15,
+     "to": 16.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 16.5,
+     "to": 21.5,
+     "unit": "Berchem",
+     "name": "Kiel Member (Berchem Formation)"
+    },
+    {
+     "from": 21.5,
+     "to": 25.5,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 25.5,
+     "to": 29,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-15/048-B11",
+   "x": 151794.03,
+   "y": 213374.67,
+   "z": 8.16,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 3.5,
+     "to": 20,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 20,
+     "to": 22.5,
+     "unit": "Berchem",
+     "name": "Kiel Member (Berchem Formation)"
+    },
+    {
+     "from": 22.5,
+     "to": 27,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 27,
+     "to": 30,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "GEO-15/048-B6",
+   "x": 151769.21,
+   "y": 213366.16,
+   "z": 7.84,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 4.5,
+     "to": 18,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 18,
+     "to": 24,
+     "unit": "Berchem",
+     "name": "Kiel Member (Berchem Formation)"
+    },
+    {
+     "from": 24,
+     "to": 27,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 27,
+     "to": 30,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B87",
+   "x": 152430,
+   "y": 211950,
+   "z": 2,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2.65,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 2.65,
+     "to": 24,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    }
+   ]
+  },
+  {
+   "id": "kb15d28w-B100",
+   "x": 151850,
+   "y": 211858,
+   "z": 2,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2.6,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 8.35,
+     "to": 25.08,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    },
+    {
+     "from": 25.08,
+     "to": 84,
+     "unit": "Boom",
+     "name": "Boom Formation"
+    }
+   ]
+  },
+  {
+   "id": "1405-B030420192",
+   "x": 151816.55,
+   "y": 211394.09,
+   "z": 7.71,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5,
+     "unit": "Quaternary",
+     "name": "Quaternary deposits"
+    },
+    {
+     "from": 5,
+     "to": 22,
+     "unit": "Berchem",
+     "name": "Berchem Formation"
+    }
+   ]
+  },
+  {
+   "id": "1411-GEO-23/022-B1",
+   "x": 150946.82,
+   "y": 211603.45,
+   "z": 8.26,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 6.5,
+     "unit": "Made ground",
+     "name": "geroerd/verstoord Group"
+    },
+    {
+     "from": 6.5,
+     "to": 13.5,
+     "unit": "Quaternary",
+     "name": "Quartair Holoceen"
+    },
+    {
+     "from": 13.5,
+     "to": 16.5,
+     "unit": "Quaternary",
+     "name": "Quartair Pleistoceen"
+    }
+   ]
+  },
+  {
+   "id": "1411-GEO-23/022-B6bis",
+   "x": 151132.9,
+   "y": 211821.02,
+   "z": 8.27,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 10.5,
+     "unit": "Made ground",
+     "name": "geroerd/verstoord Group"
+    },
+    {
+     "from": 10.5,
+     "to": 13.5,
+     "unit": "Made ground",
+     "name": "geroerd/verstoord Group or Quartair Holoceen"
+    },
+    {
+     "from": 13.5,
+     "to": 17.5,
+     "unit": "Quaternary",
+     "name": "Quartair Pleistoceen"
+    }
+   ]
+  },
+  {
+   "id": "1411-GEO-23/022-B11",
+   "x": 151270.27,
+   "y": 212042.92,
+   "z": 8.12,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 7.5,
+     "unit": "Made ground",
+     "name": "geroerd/verstoord Group"
+    },
+    {
+     "from": 7.5,
+     "to": 14,
+     "unit": "Quaternary",
+     "name": "Quartair Holoceen"
+    },
+    {
+     "from": 14,
+     "to": 19,
+     "unit": "Quaternary",
+     "name": "Quartair Pleistoceen"
+    }
+   ]
+  },
+  {
+   "id": "1411-GEO-23/112-KB3",
+   "x": 152250.94,
+   "y": 213282.79,
+   "z": 7.41,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 22,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 22,
+     "to": 27,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 27,
+     "to": 29,
+     "unit": "Boom",
+     "name": "Putte Member (Boom Formation)"
+    }
+   ]
+  },
+  {
+   "id": "1411-GEO-23/112-KB4",
+   "x": 152273.46,
+   "y": 213363.36,
+   "z": 7.29,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 21.7,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    }
+   ]
+  },
+  {
+   "id": "1411-GEO-23/112-KB5",
+   "x": 152287.97,
+   "y": 213435.64,
+   "z": 7.25,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 22.5,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    }
+   ]
+  },
+  {
+   "id": "1411-GEO-23/112-KB7",
+   "x": 152300.15,
+   "y": 213584.33,
+   "z": 7.07,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 22.6,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    }
+   ]
+  },
+  {
+   "id": "1411-GEO-23/112-KB9",
+   "x": 152292.1,
+   "y": 213721.84,
+   "z": 7.01,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 22.4,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    }
+   ]
+  },
+  {
+   "id": "1411-GEO-23/112-KB1",
+   "x": 152262.4,
+   "y": 213215.32,
+   "z": 7.39,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 11.2,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 11.2,
+     "to": 19.5,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "1411-GEO-23/112-KB2",
+   "x": 152251.31,
+   "y": 213215.45,
+   "z": 7.35,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 17.2,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 17.2,
+     "to": 25.5,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    }
+   ]
+  },
+  {
+   "id": "1411-GEO-23/112-KB6",
+   "x": 152296.56,
+   "y": 213508.98,
+   "z": 7.17,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 22.7,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 22.7,
+     "to": 27.5,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 27.5,
+     "to": 31,
+     "unit": "Boom",
+     "name": "Putte Member (Boom Formation)"
+    }
+   ]
+  },
+  {
+   "id": "1411-GEO-23/112-KB8",
+   "x": 152298.85,
+   "y": 213648.12,
+   "z": 7.02,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 22.9,
+     "unit": "Made ground",
+     "name": "Made ground (anthropogenic)"
+    },
+    {
+     "from": 22.9,
+     "to": 27,
+     "unit": "Berchem",
+     "name": "Edegem Member (Berchem Formation)"
+    },
+    {
+     "from": 27,
+     "to": 31,
+     "unit": "Boom",
+     "name": "Putte Member (Boom Formation)"
+    }
+   ]
+  }
+ ]
+}

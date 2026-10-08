@@ -3,17 +3,20 @@ import {uniform,positionWorld,dot} from "three/tsl";
 import {OrbitControls} from "three/addons/controls/OrbitControls.js";
 import {CSS2DRenderer,CSS2DObject} from "three/addons/renderers/CSS2DRenderer.js";
 import pkg from "../package.json";
-import {GeoProject,UnitDef,UnitRule,sampleProjects,sakaeProject,boreholeDepth} from "./geology";
+import {GeoProject,UnitDef,UnitRule,sampleProjects,realSites,boreholeDepth} from "./geology";
 import {buildGeologicalModel,GeoModel,unitVolume,unitCubicMetres,modelBounds,footprintArea} from "./model";
 import {volumeGeometry} from "./volume";
-import {terrainOutside,convexHull} from "./terrain";
+import {terrainOutside,convexHull,TerrainGrid} from "./terrain";
 import {computeSection,offsetRange,principalAzimuth,Section} from "./section";
-import {sectionSvg,sectionCsv} from "./sectionSvg";
-import {importFiles,toProjectJson,toBoreholeCsv,decodeText,assignColors} from "./io";
+import {sectionSvg,sectionCsv,sectionFieldCsv} from "./sectionSvg";
+import {importFiles,toProjectJson,toBoreholeCsv,toTestsCsv,decodeText,assignColors} from "./io";
+import {SectionField,sectionField,availableFields,columnAt,stressAt,unitWeights,UnitWeight,withTheme,scaleLabel} from "./fields";
+import {formatValue,propertyDef} from "./properties";
 import {Crs,crsRegistry,projectCrs,findCrs,customCrs,searchCrs,suggestCrs,toProjected,toGeographic} from "./crs";
 import {fetchTerrain,elevationSources,mapSources,covers,tileUrl,parseGsiTile,decodeTerrarium,mapTiles,tileXY,ElevationSource,TileSource} from "./tiles";
 import {applyUnitRules} from "./rules";
 import {reportHtml} from "./report";
+import {openEditor} from "./editor";
 import "./style.css";
 
 const app=document.querySelector<HTMLDivElement>("#app")!;
@@ -69,7 +72,9 @@ let imported:GeoProject|null=null;
 let model:GeoModel;
 let section:Section;
 let origin={x:0,y:0,z:0},extent=1,sectionBuffer=1;
-const view={azimuth:0,offset:0,ve:1,cut:true,flip:false,exact:false,volumes:true,horizons:true,boreholes:true,labels:true,terrain:true,map:false,mapSource:"osm",panel:innerWidth>760,hidden:new Set<string>()};
+// `field` colours the section: "units", a stress (sv, u, s) or a measured property.
+const view={azimuth:0,offset:0,ve:1,cut:true,flip:false,exact:false,volumes:true,horizons:true,boreholes:true,labels:true,terrain:true,map:false,mapSource:"osm",panel:innerWidth>760,hidden:new Set<string>(),field:"units"};
+let field:SectionField|null=null,weights:UnitWeight[]=[];
 
 interface UnitMaterials { lit:THREE.MeshStandardNodeMaterial; flat:THREE.MeshBasicNodeMaterial }
 const volumeMeshes:Array<THREE.Mesh<THREE.BufferGeometry,THREE.Material>>=[];
@@ -185,13 +190,24 @@ function buildContent(){
 }
 function niceCeil(v:number){const p=10**Math.floor(Math.log10(v));return Math.ceil(v/p)*p}
 
-// The terrain grid around the model footprint: real data, clipped exactly at the footprint, drawn before the
-// model and translucent so it never veils it, and cut with it.
+// The terrain grid around the model footprint: real data, clipped exactly at the footprint, drawn before the model
+// and translucent so it never veils it, and cut with it. Without a terrain grid, a georeferenced model gets a flat
+// plane at its collars' median elevation instead, shown only to carry the map.
 function buildTerrain(){
   terrainMesh=null;
   const t=model.project.terrain,at=model.terrainAt;
-  if(!t||!at||!model.triangles.length)return;
-  const {positions,index}=terrainOutside(t,at,convexHull(model.boreholes),extent*0.25);
+  if(!model.triangles.length)return;
+  const hull=convexHull(model.boreholes);
+  let flat=false,surface:{positions:number[];index:number[]};
+  if(t&&at)surface=terrainOutside(t,at,hull,extent*0.25);
+  else if(projectCrs(model.project)){
+    const zs=model.boreholes.map(b=>b.z).sort((p,q)=>p-q),z=zs[Math.floor(zs.length/2)];
+    const b=modelBounds(model),m=extent*0.25,n=96;
+    const grid:TerrainGrid={x0:b.minX-m,y0:b.minY-m,dx:(b.maxX-b.minX+2*m)/n,dy:(b.maxY-b.minY+2*m)/n,ncols:n+1,nrows:n+1,z:[]};
+    surface=terrainOutside(grid,()=>z,hull,m);
+    flat=true;
+  }else return;
+  const {positions,index}=surface;
   if(!index.length)return;
   const pos=new Float32Array(positions.length);
   for(let i=0;i<positions.length;i+=3){pos[i]=positions[i]-origin.x;pos[i+1]=positions[i+1]-origin.y;pos[i+2]=positions[i+2]-origin.z}
@@ -203,6 +219,7 @@ function buildTerrain(){
   material.maskNode=keepFragment;
   terrainMesh=new THREE.Mesh(geo,material);
   terrainMesh.userData.plain=material;
+  terrainMesh.userData.flat=flat;
   terrainMesh.renderOrder=-1;
   content.add(terrainMesh);
 }
@@ -211,7 +228,9 @@ function buildTerrain(){
 
 // Bundled public datasets fetch their terrain and map when opened. Imported data may be confidential, so nothing is
 // requested from tile servers for them until the user asks.
-const publicSites=new Set<GeoProject>([sakaeProject]);
+const publicSites=new Set<GeoProject>(realSites);
+// Sites whose logs start partly at a harbour or river bed: fetched terrain, the water surface there, would be wrong.
+const loggedGround=new Set<GeoProject>(realSites.filter(p=>p.boreholes.some(b=>b.z<-10)&&!p.terrain));
 let geoStatus="";
 interface MapLayer { key:string; texture:THREE.CanvasTexture; z:number; x0:number; y0:number; nx:number; ny:number; source:TileSource; failed:number }
 let mapLayer:MapLayer|null=null;
@@ -283,7 +302,7 @@ async function updateMap(){
     setGeoStatus(failed===nx*ny?"Map tiles could not be loaded":failed?`${failed} of ${nx*ny} map tiles missing`:"");
   }
   applyMap(mapLayer);
-  renderCredits();
+  applyDisplay();
 }
 function applyMap(layer:MapLayer|null){
   const mesh=terrainMesh,crs=projectCrs(project);
@@ -359,28 +378,25 @@ const fence=new THREE.Mesh(new THREE.BufferGeometry(),new THREE.MeshBasicNodeMat
 const fenceLines=new THREE.LineSegments(new THREE.BufferGeometry(),new THREE.LineBasicNodeMaterial({color:0x0b1620,transparent:true,opacity:.75}));
 const outline=new THREE.Line(new THREE.BufferGeometry(),new THREE.LineBasicNodeMaterial({color:0x78c9df,transparent:true,opacity:.55}));
 const endLabels=["A","A′"].map(t=>{const el=document.createElement("div");el.className="end-label";el.textContent=t;const l=new CSS2DObject(el);l.center.set(0.5,1.2);return l});
-sectionGroup.add(fence,fenceLines,outline,...endLabels);
+const waterLine=new THREE.LineSegments(new THREE.BufferGeometry(),new THREE.LineBasicNodeMaterial({color:0x5aa9ff,transparent:true,opacity:.95}));
+sectionGroup.add(fence,fenceLines,outline,waterLine,...endLabels);
 
 function updateSection(){
   section=computeSection(model,{azimuth:view.azimuth,offset:view.offset},sectionBuffer);
-  const s=section,n=s.s.length,pos:number[]=[],col:number[]=[],lines:number[]=[],c=new THREE.Color();
+  field=view.field==="units"?null:sectionField(model,section,view.field);
+  const s=section,n=s.s.length,lines:number[]=[];
   const p=(j:number,z:number)=>[s.x[j]-origin.x,s.y[j]-origin.y,z-origin.z];
-  model.units.forEach((u,k)=>{
-    c.set(u.color);
-    for(let j=0;j<n-1;j++){
-      const t0=s.z[k][j],b0=s.z[k+1][j],t1=s.z[k][j+1],b1=s.z[k+1][j+1];
-      if(t0-b0<1e-9&&t1-b1<1e-9)continue;
-      for(const v of [p(j,t0),p(j,b0),p(j+1,b1),p(j,t0),p(j+1,b1),p(j+1,t1)]){pos.push(...v);col.push(c.r,c.g,c.b)}
-    }
-  });
-  s.z.forEach(z=>{for(let j=0;j<n-1;j++)lines.push(...p(j,z[j]),...p(j+1,z[j+1]))});
   fence.geometry.dispose();
-  fence.geometry=new THREE.BufferGeometry();
-  fence.geometry.setAttribute("position",new THREE.Float32BufferAttribute(pos,3));
-  fence.geometry.setAttribute("color",new THREE.Float32BufferAttribute(col,3));
+  fence.geometry=field?fieldFence(field):unitFence();
+  s.z.forEach(z=>{for(let j=0;j<n-1;j++)lines.push(...p(j,z[j]),...p(j+1,z[j+1]))});
   fenceLines.geometry.dispose();
   fenceLines.geometry=new THREE.BufferGeometry();
   fenceLines.geometry.setAttribute("position",new THREE.Float32BufferAttribute(lines,3));
+  const water:number[]=[];
+  if(s.water)for(let j=0;j<n-1;j++)if(Number.isFinite(s.water[j])&&Number.isFinite(s.water[j+1]))water.push(...p(j,s.water[j]),...p(j+1,s.water[j+1]));
+  waterLine.geometry.dispose();
+  waterLine.geometry=new THREE.BufferGeometry();
+  waterLine.geometry.setAttribute("position",new THREE.Float32BufferAttribute(water,3));
   outline.geometry.dispose();
   outline.geometry=new THREE.BufferGeometry();
   if(n>1){
@@ -390,10 +406,61 @@ function updateSection(){
     endLabels[1].position.set(...(p(n-1,top) as [number,number,number]));
   }
   endLabels.forEach(l=>l.visible=n>1);
+  renderFieldLegend();
   cutSide=0;
   updateCutSide();
   applyDisplay();
   renderSectionPanel();
+}
+// The section face in unit colours: one quad strip per unit between consecutive section samples.
+function unitFence(){
+  const s=section,n=s.s.length,pos:number[]=[],col:number[]=[],c=new THREE.Color();
+  const p=(j:number,z:number)=>[s.x[j]-origin.x,s.y[j]-origin.y,z-origin.z];
+  model.units.forEach((u,k)=>{
+    if(view.hidden.has(u.id))return;
+    c.set(u.color);
+    for(let j=0;j<n-1;j++){
+      const t0=s.z[k][j],b0=s.z[k+1][j],t1=s.z[k][j+1],b1=s.z[k+1][j+1];
+      if(t0-b0<1e-9&&t1-b1<1e-9)continue;
+      for(const v of [p(j,t0),p(j,b0),p(j+1,b1),p(j,t0),p(j+1,b1),p(j+1,t1)]){pos.push(...v);col.push(c.r,c.g,c.b)}
+    }
+  });
+  const g=new THREE.BufferGeometry();
+  g.setAttribute("position",new THREE.Float32BufferAttribute(pos,3));
+  g.setAttribute("color",new THREE.Float32BufferAttribute(col,3));
+  return g;
+}
+// The section face coloured by a field: a grid per unit that follows the unit's top and base, with the value at each
+// grid node taken just inside the unit, so properties change sharply at unit boundaries.
+function fieldFence(f:SectionField){
+  const s=section,K=model.units.length,scale=withTheme(f.scale,true),nodata=new THREE.Color(0x26343e),c=new THREE.Color();
+  const s0=s.s[0],s1=s.s[s.s.length-1],cols=[...new Set([...s.s,...Array.from({length:161},(_,i)=>s0+(s1-s0)*i/160)])].sort((a,b)=>a-b);
+  const columns=cols.map(d=>({d,c:columnAt(s,d)!})).filter(q=>q.c);
+  const zmax=Math.max(...s.z[0]),dz=Math.max((zmax-model.base)/90,1e-3),eps=dz*1e-3;
+  const pos:number[]=[],col:number[]=[],index:number[]=[];
+  model.units.forEach((u,k)=>{
+    if(view.hidden.has(u.id))return;
+    const thick=Math.max(...columns.map(q=>q.c.z[k]-q.c.z[k+1]));
+    if(thick<1e-9)return;
+    const rows=Math.max(1,Math.ceil(thick/dz)),first=pos.length/3;
+    for(const {d,c:col0} of columns)for(let r=0;r<=rows;r++){
+      const top=col0.z[k],bottom=col0.z[k+1],e=top-(top-bottom)*r/rows;
+      pos.push(col0.x-origin.x,col0.y-origin.y,e-origin.z);
+      const v=top-bottom<1e-9?NaN:f.at(d,Math.min(top-eps,Math.max(bottom+eps,e)));
+      const hex=scale.colorOf(v);
+      if(hex)c.set(hex);else c.copy(nodata);
+      col.push(c.r,c.g,c.b);
+    }
+    for(let i=0;i<columns.length-1;i++)for(let r=0;r<rows;r++){
+      const a=first+i*(rows+1)+r,b=a+1,a2=a+rows+1,b2=a2+1;
+      index.push(a,b,b2,a,b2,a2);
+    }
+  });
+  const g=new THREE.BufferGeometry();
+  g.setAttribute("position",new THREE.Float32BufferAttribute(pos,3));
+  g.setAttribute("color",new THREE.Float32BufferAttribute(col,3));
+  g.setIndex(index);
+  return g;
 }
 // The cut keeps the half beyond the section as seen from the camera, so the section face looks at the viewer.
 let cutSide=0;
@@ -430,7 +497,7 @@ function applyDisplay(){
   }
   for(const l of horizonLines)l.visible=view.horizons;
   if(holeMesh)holeMesh.visible=view.boreholes;
-  if(terrainMesh)terrainMesh.visible=view.terrain;
+  if(terrainMesh)terrainMesh.visible=terrainMesh.userData.flat?view.map&&!!mapLayer:view.terrain;
   for(const l of labels)l.visible=view.boreholes&&view.labels&&(!view.cut||clipPlane.distanceToPoint(l.position)>=0);
   renderCredits();
   invalidate();
@@ -459,12 +526,15 @@ const datasetSelect=ui.querySelector<HTMLSelectElement>(".dataset")!;
 const toolbar=document.createElement("div");
 toolbar.className="toolbar";
 toolbar.innerHTML=`<button class="import">Import data…</button>
+<button class="edit-data" title="Type in or paste boreholes, logs, water levels, SPT and laboratory results, and unit properties">Edit data…</button>
 <input class="file" type="file" multiple hidden accept=".csv,.tsv,.txt,.ags,.json,.xml,.asc,.xyz">
 <details class="menu"><summary>Export</summary><div>
   <button data-export="project">Project (JSON)</button>
   <button data-export="boreholes">Boreholes (CSV)</button>
+  <button data-export="tests">Tests (CSV)</button>
   <button data-export="svg">Section (SVG)</button>
   <button data-export="section">Section (CSV)</button>
+  <button data-export="field" title="The values of the field shown on the section, on a grid">Section field (CSV)</button>
   <button data-export="report-A3" title="Opens the print dialog: choose Save as PDF">Report (PDF, A3)</button>
   <button data-export="report-A4" title="Opens the print dialog: choose Save as PDF">Report (PDF, A4)</button>
 </div></details>
@@ -490,12 +560,14 @@ controlsBar.innerHTML=`<span class="tag">SECTION</span>
 <label>Azimuth<input type="range" class="azimuth" min="0" max="179" step="1"><output class="azimuth-out"></output></label>
 <label>Offset<input type="range" class="offset" step="1"><output class="offset-out"></output></label>
 <label>V.E.<input type="range" class="ve" min="1" max="10" step="0.5"><output class="ve-out"></output></label>
+<label class="field-pick" title="Colour the section by unit, by a stress, or by a measured property interpolated within each unit">Colour<select class="field-select" aria-label="Colour the section by"></select></label>
 <button class="panel-toggle" aria-pressed="false">2-D section</button>`;
 app.appendChild(controlsBar);
 const azimuthInput=controlsBar.querySelector<HTMLInputElement>(".azimuth")!;
 const offsetInput=controlsBar.querySelector<HTMLInputElement>(".offset")!;
 const veInput=controlsBar.querySelector<HTMLInputElement>(".ve")!;
 const panelToggle=controlsBar.querySelector<HTMLButtonElement>(".panel-toggle")!;
+const fieldSelect=controlsBar.querySelector<HTMLSelectElement>(".field-select")!;
 
 const sectionView=document.createElement("div");
 sectionView.className="section-view";
@@ -511,6 +583,10 @@ const credits=document.createElement("div");
 credits.className="credits";
 credits.hidden=true;
 app.appendChild(credits);
+const fieldLegend=document.createElement("div");
+fieldLegend.className="field-legend";
+fieldLegend.hidden=true;
+app.appendChild(fieldLegend);
 const tooltip=document.createElement("div");
 tooltip.className="tooltip";
 tooltip.hidden=true;
@@ -617,7 +693,24 @@ function syncControls(){
 function renderSectionPanel(){
   if(!view.panel||!section)return;
   sectionView.querySelector(".section-name")!.textContent=`Section A–A′ · ${String(view.azimuth).padStart(3,"0")}° · ${view.offset>=0?"+":""}${Math.round(view.offset)} m`;
-  sectionBody.innerHTML=sectionSvg(model,section,{width:sectionBody.clientWidth,height:sectionBody.clientHeight,theme:"dark",title:false,buffer:sectionBuffer});
+  sectionBody.innerHTML=sectionSvg(model,section,{width:sectionBody.clientWidth,height:sectionBody.clientHeight,theme:"dark",title:false,buffer:sectionBuffer,hidden:view.hidden,field:field??undefined});
+}
+
+// The fields offered for this model, and the colour key of the one shown.
+function renderFieldOptions(){
+  const fields=availableFields(model);
+  if(!fields.some(f=>f.key===view.field))view.field="units";
+  fieldSelect.innerHTML=`<option value="units">Units</option>`+fields.map(f=>`<option value="${esc(f.key)}"${f.key===view.field?" selected":""}>${esc(f.label)}</option>`).join("");
+  fieldSelect.value=view.field;
+}
+function renderFieldLegend(){
+  fieldLegend.hidden=!field;
+  if(!field)return;
+  const scale=withTheme(field.scale,true);
+  fieldLegend.innerHTML=`<div class="fl-title">${esc(field.name)} <b>${esc(field.symbol)}</b>${field.unit?` (${esc(field.unit)})`:""}</div>
+<div class="fl-bar">${scale.colors.map(c=>`<i style="background:${c}"></i>`).join("")}</div>
+<div class="fl-ticks">${[0,Math.round(scale.colors.length/2),scale.colors.length].map(i=>`<span>${esc(scaleLabel(scale,scale.edges[i]))}</span>`).join("")}</div>
+<div class="fl-notes">${field.notes.map(n=>`<div>${esc(n)}</div>`).join("")}</div>`;
 }
 
 function showNotice(title:string,lines:string[],error=false){
@@ -636,7 +729,9 @@ function loadProject(p:GeoProject,importWarnings:string[]=[],keepView=false){
   const before={...origin};
   project=p;
   model=buildGeologicalModel(p);
-  if(!keepView)view.hidden.clear();
+  weights=unitWeights(model);
+  if(!keepView){view.hidden.clear();view.field="units"}
+  renderFieldOptions();
   buildContent();
   if(keepView){
     const shift=new THREE.Vector3(before.x-origin.x,before.y-origin.y,(before.z-origin.z)*view.ve);
@@ -659,7 +754,7 @@ function loadProject(p:GeoProject,importWarnings:string[]=[],keepView=false){
   const warnings=[...importWarnings,...model.warnings];
   currentNotes=warnings;
   showNotice(`${p.name}: ${warnings.length} note${warnings.length===1?"":"s"}`,warnings);
-  if(publicSites.has(p)&&!p.terrain&&projectCrs(p)&&!keepView)void fetchSiteTerrain();
+  if(publicSites.has(p)&&!loggedGround.has(p)&&!p.terrain&&projectCrs(p)&&!keepView)void fetchSiteTerrain();
   void updateMap();
 }
 
@@ -688,8 +783,13 @@ function exportAs(kind:string){
   const tag=`${String(view.azimuth).padStart(3,"0")}-${view.offset>=0?"p":"m"}${Math.abs(Math.round(view.offset))}`;
   if(kind==="project")download(`${slug}.geomodel3d.json`,toProjectJson(project),"application/json");
   if(kind==="boreholes")download(`${slug}-boreholes.csv`,toBoreholeCsv(project),"text/csv");
-  if(kind==="svg")download(`${slug}-section-${tag}.svg`,sectionSvg(model,section,{width:1600,height:900,theme:"light",legend:true,buffer:sectionBuffer,roundVe:true}),"image/svg+xml");
+  if(kind==="tests")download(`${slug}-tests.csv`,toTestsCsv(project),"text/csv");
+  if(kind==="svg")download(`${slug}-section-${tag}.svg`,sectionSvg(model,section,{width:1600,height:900,theme:"light",legend:true,buffer:sectionBuffer,roundVe:true,hidden:view.hidden,field:field??undefined}),"image/svg+xml");
   if(kind==="section")download(`${slug}-section-${tag}.csv`,sectionCsv(model,section),"text/csv");
+  if(kind==="field"){
+    if(field)download(`${slug}-section-${tag}-${field.key}.csv`,sectionFieldCsv(model,section,field),"text/csv");
+    else showNotice("Section field",["Choose a field under Colour on the section bar first: a stress or a measured property."],true);
+  }
   if(kind.startsWith("report-"))void printReport(kind==="report-A4"?"A4":"A3");
 }
 
@@ -733,7 +833,7 @@ function cropToContent(source:HTMLCanvasElement,maxWidth=2400){
 // The report is printed from a hidden frame; the print dialog's "Save as PDF" makes the file.
 async function printReport(paper:"A3"|"A4"){
   const html=reportHtml(model,section,{paper,image:captureView(),date:new Date().toISOString().slice(0,10),version:pkg.version,
-    credits:creditTexts(),notes:currentNotes,sectionBuffer,ve:view.ve});
+    credits:creditTexts(),notes:currentNotes,sectionBuffer,ve:view.ve,hidden:view.hidden,field:field??undefined});
   const frame=document.createElement("iframe");
   frame.className="print-frame";
   frame.setAttribute("aria-hidden","true");
@@ -748,6 +848,7 @@ async function printReport(paper:"A3"|"A4"){
 
 datasetSelect.onchange=()=>{const i=Number(datasetSelect.value);loadProject(i<sampleProjects.length?sampleProjects[i]:imported!)};
 toolbar.querySelector<HTMLButtonElement>(".import")!.onclick=()=>fileInput.click();
+toolbar.querySelector<HTMLButtonElement>(".edit-data")!.onclick=()=>openEditor(project,{download,onApply:r=>{imported=r.project;loadProject(r.project,r.warnings)}});
 fileInput.onchange=()=>{if(fileInput.files?.length)importFileList(fileInput.files);fileInput.value=""};
 app.addEventListener("click",e=>{
   const kind=(e.target as HTMLElement).closest<HTMLElement>("[data-export]")?.dataset.export;
@@ -765,7 +866,7 @@ toolbar.querySelectorAll<HTMLInputElement>("[data-view]").forEach(input=>{
 ui.querySelector(".legend")!.addEventListener("change",e=>{
   const input=e.target as HTMLInputElement,id=input.dataset.unit!;
   if(input.checked)view.hidden.delete(id);else view.hidden.add(id);
-  applyDisplay();
+  updateSection();
 });
 toolbar.querySelector<HTMLSelectElement>(".map-source")!.onchange=e=>{view.mapSource=(e.target as HTMLSelectElement).value;void updateMap()};
 toolbar.querySelector<HTMLButtonElement>(".fetch-terrain")!.onclick=()=>void fetchSiteTerrain();
@@ -787,6 +888,7 @@ azimuthInput.oninput=()=>{view.azimuth=Number(azimuthInput.value);syncControls()
 offsetInput.oninput=()=>{view.offset=Number(offsetInput.value);syncControls();queueSection()};
 veInput.oninput=()=>{view.ve=Number(veInput.value);syncControls();applyDisplay()};
 panelToggle.onclick=()=>{view.panel=!view.panel;syncControls();renderSectionPanel()};
+fieldSelect.onchange=()=>{view.field=fieldSelect.value;updateSection()};
 sectionView.querySelector<HTMLButtonElement>(".close")!.onclick=()=>{view.panel=false;syncControls()};
 
 let dragDepth=0;
@@ -820,8 +922,15 @@ function updateTooltip(){
       html=`<b>${esc(bh.id)}</b> · ${what}${logged?`<span>${logged}</span>`:""}<span>collar E ${fmt(bh.x,1)} N ${fmt(bh.y,1)}${where} · ${fmt(bh.z,2)} m · final depth ${fmt(boreholeDepth(bh),1)} m${water}</span>`;
     }
   }
+  // The section face, or a unit volume in front of it.
+  const faceHit=sectionGroup.visible?raycaster.intersectObject(fence)[0]:undefined;
+  const volumeHit=view.volumes?raycaster.intersectObjects(volumeMeshes.filter(m=>m.visible)).find(kept):undefined;
+  if(!html&&faceHit&&(!volumeHit||faceHit.distance<=volumeHit.distance+1e-6)){
+    const along=(faceHit.point.x+origin.x-section.origin.x)*section.dir.x+(faceHit.point.y+origin.y-section.origin.y)*section.dir.y;
+    html=sectionReadout(along,faceHit.point.z/view.ve+origin.z);
+  }
   if(!html&&view.volumes){
-    const hit=raycaster.intersectObjects(volumeMeshes.filter(m=>m.visible)).find(kept);
+    const hit=volumeHit;
     if(hit){
       const u=model.units[hit.object.userData.unit],props=unitProperties(u);
       html=`<b>${esc(u.name)}</b>${u.erosive?" · erosive base":""}<span>${fmtVolume(unitCubicMetres(model,hit.object.userData.unit))} in the model · elevation ${fmt(hit.point.z/view.ve+origin.z,1)} m</span>${props?`<span>${esc(props)}</span>`:""}`;
@@ -829,7 +938,8 @@ function updateTooltip(){
   }
   if(!html&&terrainMesh?.visible){
     const hit=raycaster.intersectObject(terrainMesh).find(kept);
-    if(hit)html=`<b>Terrain</b> · ${fmt(hit.point.z/view.ve+origin.z,2)} m<span>${esc(project.terrain?.source??"terrain grid")}, outside the model</span>`;
+    if(hit)html=terrainMesh.userData.flat?`<b>Map</b><span>drawn at the collars' median elevation, ${fmt(hit.point.z/view.ve+origin.z,1)} m: there is no terrain grid</span>`
+      :`<b>Terrain</b> · ${fmt(hit.point.z/view.ve+origin.z,2)} m<span>${esc(project.terrain?.source??"terrain grid")}, outside the model</span>`;
   }
   tooltip.hidden=!html;
   if(html){
@@ -838,6 +948,36 @@ function updateTooltip(){
     tooltip.style.top=Math.min(pointer.y+14,innerHeight-tooltip.offsetHeight-8)+"px";
   }
 }
+
+// What the section shows at a point: the unit, its depth, the stresses there and the field's value.
+function sectionReadout(along:number,e:number){
+  const c=columnAt(section,along);
+  if(!c)return "";
+  let k=-1;
+  for(let i=0;i<model.units.length;i++)if(e<=c.z[i]+1e-6&&e>=c.z[i+1]-1e-6&&c.z[i]-c.z[i+1]>1e-9){k=i;break}
+  if(k<0)return "";
+  const st=stressAt(c.z,c.water,weights,e),assumed=weights.some(w=>w.source==="assumed");
+  let html=`<b>${esc(model.units[k].name)}</b> · ${fmt(c.z[0]-e,1)} m deep, elevation ${fmt(e,1)} m`;
+  if(st)html+=`<span>σv ${fmt(st.sv)} kPa · u ${fmt(st.u)} kPa · σ′v ${fmt(st.s)} kPa${assumed?" (some unit weights assumed)":""}</span>`;
+  if(field&&!["sv","u","s"].includes(field.key)){
+    const v=field.at(along,e),p=propertyDef(field.key);
+    html+=`<span>${esc(p.symbol)} ${Number.isFinite(v)?`${formatValue(field.key,field.log?10**v:v)}${p.unit?" "+esc(p.unit):""}, interpolated`:"not measured in this unit"}</span>`;
+  }
+  return html;
+}
+sectionBody.addEventListener("pointermove",e=>{
+  const svg=sectionBody.querySelector("svg"),frame=svg?.dataset.frame?.split(",").map(Number);
+  if(!svg||!frame){tooltip.hidden=true;return}
+  const [l,t,pw,ph,s0,s1,z0,z1]=frame,r=svg.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+  const html=x>=l&&x<=l+pw&&y>=t&&y<=t+ph?sectionReadout(s0+(x-l)/pw*(s1-s0),z1-(y-t)/ph*(z1-z0)):"";
+  tooltip.hidden=!html;
+  if(html){
+    tooltip.innerHTML=html;
+    tooltip.style.left=Math.min(e.clientX+14,innerWidth-tooltip.offsetWidth-8)+"px";
+    tooltip.style.top=Math.max(8,Math.min(e.clientY-tooltip.offsetHeight-10,innerHeight-tooltip.offsetHeight-8))+"px";
+  }
+});
+sectionBody.addEventListener("pointerleave",()=>{tooltip.hidden=true});
 
 addEventListener("resize",()=>{
   camera.aspect=innerWidth/innerHeight;

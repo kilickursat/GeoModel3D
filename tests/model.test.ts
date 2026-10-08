@@ -108,6 +108,28 @@ describe("reading a log",()=>{
   it("takes the recorded final depth when it is below the last interval",()=>{
     expect(boreholeContacts(hole([[0,9,"A"]],15),units).eoh).toBe(15);
   });
+
+  it("leaves the contacts above a log that begins below the collar unknown",()=>{
+    const c=boreholeContacts(hole([[8,10,"B"],[10,14,"C"]]),units);
+    expect(c.depth).toEqual([0,null,10,null]);
+    expect(c.start).toBe(8);
+    expect(c.notes).toEqual(["not logged above 8 m; the contacts above are inferred from the neighbouring boreholes"]);
+    // A log of the top unit that begins below the collar is that unit up to the ground.
+    expect(boreholeContacts(hole([[1,4,"A"],[4,9,"B"]]),units).depth).toEqual([0,4,null,null]);
+  });
+
+  it("infers those contacts from the neighbouring boreholes, never below the start of the log",()=>{
+    const full=(id:string,x:number,y:number,a:number)=>({id,x,y,z:100,intervals:[{from:0,to:a,unit:"A"},{from:a,to:10,unit:"B"},{from:10,to:20,unit:"C"}]});
+    const p:GeoProject={name:"t",units,boreholes:[full("1",0,0,3),full("2",100,0,3),full("3",0,100,3),full("4",100,100,3),
+      {id:"late",x:50,y:50,z:100,intervals:[{from:8,to:10,unit:"B"},{from:10,to:20,unit:"C"}]},
+      {id:"later",x:50,y:10,z:100,intervals:[{from:1,to:10,unit:"B"},{from:10,to:20,unit:"C"}]}]};
+    const m=buildGeologicalModel(p),late=m.boreholes.findIndex(b=>b.id==="late"),later=m.boreholes.findIndex(b=>b.id==="later");
+    expect(m.horizons[1].z[late]).toBeCloseTo(97,9);
+    expect(m.horizons[1].observed[late]).toBe(0);
+    // Logged from 1 m in B: the base of A is at most 1 m deep there.
+    expect(m.horizons[1].z[later]).toBeCloseTo(99,9);
+    expect(m.warnings.some(w=>/no log between/.test(w))).toBe(false);
+  });
 });
 
 describe("model warnings",()=>{

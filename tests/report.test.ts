@@ -3,6 +3,7 @@ import {reportHtml} from "../src/report";
 import {buildGeologicalModel} from "../src/model";
 import {computeSection} from "../src/section";
 import {sakaeProject,valleyProject,GeoProject} from "../src/geology";
+import {sectionField} from "../src/fields";
 
 const options={paper:"A3" as const,date:"2026-10-07",version:"0.6.1",credits:["Data KuniJiban"],notes:["A note <with> markup"],sectionBuffer:300,ve:5};
 
@@ -29,6 +30,22 @@ describe("printable report",()=>{
     expect(html).toContain("could not be captured");
     expect(html).toContain("Local grid (m) (not georeferenced)");
     expect(html).not.toContain("Units from logged descriptions");
+  });
+  it("tabulates the ground parameters and gives a shown field a page of its own",()=>{
+    const f=sectionField(m,s,"s")!;
+    const html=reportHtml(m,s,{...options,field:f});
+    expect(html.match(/class="page"/g)!.length).toBe(4);
+    expect(html.match(/<svg /g)!.length).toBe(2);
+    expect(html).toContain("Section A–A′ · 170° · +0 m · Vertical effective stress σ′v");
+    expect(html).toContain("<h2>Ground parameters</h2>");
+    expect(html).toContain("N measured");
+    expect(html).toMatch(/18 \/ 20 <span class="muted">assumed<\/span>/);
+    expect(html).toMatch(/<th>Groundwater<\/th><td>Water levels logged in \d+ of 75 boreholes/);
+    expect(html).toContain("Unit weights assumed (18 kN/m³ above and 20 kN/m³ below the water table)");
+  });
+  it("lists units hidden in the view in the notes",()=>{
+    const v=buildGeologicalModel(valleyProject),html=reportHtml(v,computeSection(v,{azimuth:80,offset:0}),{...options,hidden:new Set(["Made Ground","Alluvium"])});
+    expect(html).toContain("Hidden in the 3-D view and the section: Made Ground, Alluvium");
   });
   it("escapes names",()=>{
     const p:GeoProject={...valleyProject,name:"Site <b>&",units:valleyProject.units.map((u,k)=>k?u:{...u,name:"Fill <x>"})};
