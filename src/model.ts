@@ -26,6 +26,8 @@ export interface GeoModel {
   residuals:CollarResidual[];
   terrainAt?:(x:number,y:number)=>number;
   edges?:Array<[number,number]>;
+  // The water table at every node, where groundwater is known, and where it comes from.
+  water?:{z:Float64Array;source:string};
 }
 export interface BoreholeContacts { depth:Array<number|null>; eroded:Array<number|null>; deepest:number; eoh:number; notes:string[] }
 
@@ -337,12 +339,25 @@ export function buildGeologicalModel(project:GeoProject):GeoModel{
     terrainAt=(x,y)=>terrainZ(t,x,y)+field(x,y);
   }
 
+  // Groundwater: the water table through the shallowest water level logged in each borehole, interpolated by inverse
+  // distance and kept at or below the ground; where no borehole records one, the project's assumed depth below ground.
+  const readings:Array<{x:number;y:number;v:number}>=[];
+  for(const b of boreholes)if(b.water?.length)readings.push({x:b.x,y:b.y,v:b.z-Math.min(...b.water.map(w=>w.depth))});
+  let W:number[]|undefined,waterSource="";
+  if(readings.length){
+    W=mesh.nodes.map((p,n)=>Math.min(idw(readings,p),z[0][n]));
+    waterSource=`water levels logged in ${readings.length} of ${N} boreholes (the shallowest reading of each), interpolated between them`;
+  }else if(project.groundwaterDepth!==undefined&&Number.isFinite(project.groundwaterDepth)){
+    W=Array.from(z[0],g=>g-project.groundwaterDepth!);
+    waterSource=`assumed ${fmt(project.groundwaterDepth)} m below ground (no water level is logged)`;
+  }
+
   // Stratigraphic ordering: each horizon lies at or below the one above and at or above the model base. This
   // cuts older units at the ground (erosion by the present topography) and at erosive unit bases. The lines where a
   // horizon meets the one above or the base are first added to the mesh, so pinch-outs and outcrops run straight
   // across the triangles instead of stepping along their edges.
   const Z=z.map(a=>Array.from(a)),known01=known.map(a=>Array.from(a));
-  const cut=splittableMesh(mesh.nodes,mesh.triangles,mesh.edgeChains,Z,known01);
+  const cut=splittableMesh(mesh.nodes,mesh.triangles,mesh.edgeChains,W?[...Z,W]:Z,known01);
   for(let k=1;k<=K;k++){
     const zk=Z[k],above=Z[k-1];
     if(k===K)zk.fill(base);
@@ -357,7 +372,8 @@ export function buildGeologicalModel(project:GeoProject):GeoModel{
     name:k===0?"Ground surface":k===K?"Model base":"Base of "+units[k-1].name,
     z:Float64Array.from(zk),observed:Uint8Array.from(known01[k])
   }));
-  return {project,units,boreholes,nodes:cut.mesh.nodes,triangles:cut.mesh.triangles,horizons,base,warnings,edgeChains:cut.mesh.chains,spacing,meshNodes:M,residuals,terrainAt};
+  return {project,units,boreholes,nodes:cut.mesh.nodes,triangles:cut.mesh.triangles,horizons,base,warnings,edgeChains:cut.mesh.chains,spacing,meshNodes:M,residuals,terrainAt,
+    ...(W?{water:{z:Float64Array.from(W),source:waterSource}}:{})};
 }
 
 export function horizonSurface(model:GeoModel,k:number):TINSurface{

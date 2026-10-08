@@ -6,6 +6,8 @@ import {Section} from "./section";
 import {sectionSvg} from "./sectionSvg";
 import {projectCrs} from "./crs";
 import {boreholeDepth,sptN} from "./geology";
+import {SectionField,unitWeights} from "./fields";
+import {unitStatistics,measuredProperties,propertyDef,formatValue} from "./properties";
 
 export interface ReportOptions {
   paper:"A3"|"A4";
@@ -17,6 +19,7 @@ export interface ReportOptions {
   sectionBuffer:number;
   ve:number;
   hidden?:ReadonlySet<string>;  // units hidden in the view are left out of the 3-D image and the section
+  field?:SectionField;          // a field shown on the section gets a page of its own
 }
 
 const esc=(s:string)=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]!));
@@ -36,6 +39,7 @@ export function reportHtml(model:GeoModel,section:Section,o:ReportOptions){
     ["Footprint",model.triangles.length?`${fmt(footprintArea(model)/1e4,2)} ha`:"—"],
     ["Ground",p.terrain?`Terrain: ${p.terrain.source??"terrain grid"}, ${fmt(p.terrain.dx,1)} m cells`:"Surface through the collars"],
     ["Data",p.source??"—"],
+    ["Groundwater",model.water?model.water.source.replace(/^./,c=>c.toUpperCase()):"Not given"],
     ["3-D view","Vertical exaggeration ×"+fmt(o.ve,1)],
     ["Date",o.date],
     ["Software",`GeoModel3D ${o.version}`]
@@ -47,11 +51,21 @@ export function reportHtml(model:GeoModel,section:Section,o:ReportOptions){
   const rules=p.rules?.length?`<h2>Units from logged descriptions (interpretation)</h2><table><thead><tr><th>Description matches</th><th>SPT N</th><th>Top elevation</th><th>Unit</th></tr></thead><tbody>${
     p.rules.map(r=>`<tr><td class="code">${esc(r.match)}</td><td>${esc(range(r.minN,r.maxN))}</td><td>${esc(range(r.minZ,r.maxZ," m"))}</td><td>${esc(model.units.find(u=>u.id===r.unit)?.name??r.unit)}</td></tr>`).join("")
   }</tbody></table><p class="muted">The first rule that matches an interval's description, its median SPT N-value and the elevation of its top gives its unit.</p><br>`:"";
+  // Ground parameters: the unit weights the stresses use, the unit's design values, and what was measured in it.
+  const weights=unitWeights(model),stats=unitStatistics(model.boreholes,model.units),measured=measuredProperties(model.boreholes);
+  const designKeys=[...new Set(model.units.flatMap(u=>Object.keys(u.params??{})))];
+  const cell=(key:string,v?:{n:number;mean:number;min:number;max:number})=>v?`${formatValue(key,v.mean)}${v.n>1?` <span class="muted">(${formatValue(key,v.min)}–${formatValue(key,v.max)}, ${v.n})</span>`:` <span class="muted">(1)</span>`}`:"";
+  const head=(key:string)=>{const d=propertyDef(key);return `${esc(d.symbol)}${d.unit?` (${esc(d.unit)})`:""}`};
+  const params=model.units.length?`<h2>Ground parameters</h2><table><thead><tr><th>Unit</th><th>γ / γsat used (kN/m³)</th>${designKeys.map(k=>`<th>${head(k)} design</th>`).join("")}${measured.map(k=>`<th>${head(k)} measured</th>`).join("")}</tr></thead><tbody>${
+    model.units.map((u,k)=>`<tr><td><i class="swatch" style="background:${esc(u.color)}"></i>${esc(u.name)}</td><td class="num">${formatValue("gamma",weights[k].above)} / ${formatValue("gamma",weights[k].below)} <span class="muted">${weights[k].source==="declared"?"given":weights[k].source==="measured"?`mean of ${weights[k].n} tests`:"assumed"}</span></td>${
+      designKeys.map(key=>`<td class="num">${u.params?.[key]!==undefined?formatValue(key,u.params[key]):""}</td>`).join("")}${measured.map(key=>`<td class="num">${cell(key,stats.get(u.id)?.get(key))}</td>`).join("")}</tr>`).join("")
+  }</tbody></table><p class="muted">Measured values: mean (range, number of values), by the logged interval each test lies in; SPT N-values as converted to 300 mm. Unit weights are the unit's own, else the mean measured bulk unit weight, else assumed (18 kN/m³ above and 20 kN/m³ below the water table).</p><br>`:"";
   const holes=model.boreholes.map(b=>{
     const water=b.water?.length?Math.min(...b.water.map(x=>x.depth)):NaN,n=(b.spt??[]).map(sptN);
     return `<tr><td>${esc(b.id)}</td><td class="num">${fmt(b.x,1)}</td><td class="num">${fmt(b.y,1)}</td><td class="num">${fmt(b.z,2)}</td><td class="num">${fmt(boreholeDepth(b),2)}</td><td class="num">${b.lat===undefined?"":fmt(b.lat,6)}</td><td class="num">${b.lon===undefined?"":fmt(b.lon,6)}</td><td class="num">${fmt(water,2)}</td><td class="num">${n.length?`${n.length} (max ${fmt(Math.max(...n))})`:""}</td></tr>`;
   }).join("");
   const svg=sectionSvg(model,section,{width:1600,height:Math.round(1600*(h-60)/(w-24)),theme:"light",legend:true,buffer:o.sectionBuffer,title:false,roundVe:true,hidden:o.hidden});
+  const fieldSvg=o.field?sectionSvg(model,section,{width:1600,height:Math.round(1600*(h-60)/(w-24)),theme:"light",legend:true,buffer:o.sectionBuffer,title:false,roundVe:true,hidden:o.hidden,field:o.field}):"";
   const hidden=model.units.filter(u=>o.hidden?.has(u.id)).map(u=>u.name);
   const notes=hidden.length?[`Hidden in the 3-D view and the section: ${hidden.join(", ")}`,...o.notes]:o.notes;
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${esc(p.name)} — GeoModel3D report</title><style>
@@ -83,6 +97,7 @@ table.block th{width:32mm}
 .notes li{break-inside:avoid;margin-bottom:0.8mm}
 .foot{margin-top:auto;padding-top:3mm;border-top:0.4pt solid #c9d1d6;display:flex;justify-content:space-between;color:#5b6770;font-size:0.85em}
 .credits{color:#5b6770;font-size:0.85em;margin-top:3mm}
+.field-notes{margin:2mm 0 0;padding-left:4mm;font-size:0.9em}
 </style></head><body>
 <section class="page">
 <header><div><h1>${esc(p.name)}</h1><div class="desc">${esc(p.description??"")}</div></div>
@@ -94,9 +109,12 @@ ${foot("Overview")}</section>
 <section class="page"><h2>${esc(sectionName)}</h2><div class="section">${svg}</div>
 <p class="muted">From A (${fmt(section.x[0]??NaN,1)}, ${fmt(section.y[0]??NaN,1)}) to A′ (${fmt(section.x[section.x.length-1]??NaN,1)}, ${fmt(section.y[section.y.length-1]??NaN,1)}) in ${esc(crs?.name??p.crs??"project coordinates")}; boreholes within ${fmt(o.sectionBuffer)} m are projected onto it.</p>
 ${foot("Section")}</section>
-<section class="page">${rules}<h2>Boreholes</h2>
+${o.field?`<section class="page"><h2>${esc(sectionName)} · ${esc(o.field.name)} ${esc(o.field.symbol)}</h2><div class="section">${fieldSvg}</div>
+<ul class="muted field-notes">${o.field.notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul>
+${foot(`Section: ${o.field.name.toLowerCase()}`)}</section>`:""}
+<section class="page">${params}${rules}<h2>Boreholes</h2>
 <table><thead><tr><th>Borehole</th><th>Easting (m)</th><th>Northing (m)</th><th>Collar (m)</th><th>Depth (m)</th><th>Latitude</th><th>Longitude</th><th>Water (m deep)</th><th>SPT tests</th></tr></thead><tbody>${holes}</tbody></table>
 ${notes.length?`<h3>Notes on the model (${notes.length})</h3><ul class="notes">${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul>`:""}
-${foot(rules?"Interpretation, boreholes and notes":"Boreholes and notes")}</section>
+${foot(rules?"Ground parameters, interpretation, boreholes and notes":"Ground parameters, boreholes and notes")}</section>
 </body></html>`;
 }

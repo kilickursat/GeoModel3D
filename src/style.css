@@ -10,7 +10,7 @@ button,select,input{font:inherit}
 .title{font-size:27px;font-weight:700;letter-spacing:-.04em}
 .title span{font-size:12px;opacity:.55;margin-left:8px}
 .sub{margin-top:5px;font-size:13px;color:#9bb1bd;white-space:nowrap}
-.panel,.toolbar,.section-control,.section-view,.notice,.tooltip{background:rgba(7,16,24,.78);border:1px solid rgba(160,190,200,.16);border-radius:10px;backdrop-filter:blur(10px)}
+.panel,.toolbar,.section-control,.section-view,.notice,.tooltip,.field-legend{background:rgba(7,16,24,.78);border:1px solid rgba(160,190,200,.16);border-radius:10px;backdrop-filter:blur(10px)}
 .panel{margin-top:16px;padding:12px 14px;font-size:11px;line-height:1.6;pointer-events:auto;max-height:calc(100vh - 250px);overflow:auto}
 .dataset{width:100%;background:#0d1d29;color:#e8f2f7;border:1px solid rgba(160,190,200,.25);border-radius:6px;padding:5px 7px;font-size:12px;font-weight:600}
 .desc{margin-top:8px;color:#9bb1bd}
@@ -70,6 +70,15 @@ button,select,input{font:inherit}
 .section-control input{flex:1;min-width:60px;accent-color:#78c9df}
 .section-control output{min-width:46px;text-align:right;color:#d9edf5;letter-spacing:0;font-size:11px;font-variant-numeric:tabular-nums}
 .section-control button[aria-pressed="true"]{border-color:#78c9df;color:#78c9df}
+.section-control .field-pick{flex:0 1 auto}
+.section-control select{min-width:0;max-width:230px;background:#0d1d29;color:#e8f2f7;border:1px solid rgba(160,190,200,.25);border-radius:6px;padding:4px 6px;font-size:11px;letter-spacing:0;text-transform:none}
+.field-legend{position:fixed;left:24px;bottom:104px;width:min(330px,calc(100vw - 48px));padding:8px 11px;font-size:10.5px;color:#c4d2d9;pointer-events:none}
+.field-legend .fl-title{color:#e8f2f7}
+.field-legend .fl-bar{display:flex;height:10px;margin-top:6px;border-radius:2px;overflow:hidden}
+.field-legend .fl-bar i{flex:1}
+.field-legend .fl-ticks{display:flex;justify-content:space-between;margin-top:2px;color:#8aa2ae;font-variant-numeric:tabular-nums}
+.field-legend .fl-notes{margin-top:5px;color:#8aa2ae;line-height:1.4}
+body:has(.field-legend:not([hidden])) .panel{max-height:calc(100vh - 380px)}
 
 .section-view{position:fixed;right:24px;bottom:78px;width:min(640px,calc(100vw - 420px));height:min(330px,40vh);display:flex;flex-direction:column;overflow:hidden}
 .section-head{display:flex;align-items:center;gap:6px;padding:7px 8px 7px 12px;font-size:11px;color:#d9edf5;border-bottom:1px solid rgba(160,190,200,.12)}
@@ -103,5 +112,8 @@ button,select,input{font:inherit}
   .section-view{left:12px;right:12px;width:auto;bottom:auto;top:calc(30vh + 70px);height:34vh}
   .notice{right:12px;top:auto;bottom:220px}
   .credits{left:12px;right:12px;top:4px;bottom:auto;max-width:none;font-size:9px}
+  .field-legend{left:12px;bottom:206px;width:min(300px,calc(100vw - 24px))}
+  .field-legend .fl-notes{display:none}
+  .section-control .field-pick{flex:1 1 100%}
 }
 .legend .tag{font-size:9px;color:#d08a4c;border:1px solid rgba(208,138,76,.5);border-radius:3px;padding:0 3px;flex:none}
