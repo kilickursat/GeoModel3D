@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://kilickursat.github.io/GeoModel3D/sitemap.xml

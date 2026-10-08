@@ -1,0 +1,9 @@
+hole_id,depth,to,property,value
+BH-01,2.5,2.9,w,48.5
+BH-01,2.5,2.9,gamma,16.8
+BH-01,2.5,2.9,LL,62
+BH-01,2.5,2.9,PL,27
+BH-01,4.5,4.9,su,22
+BH-02,3.0,3.4,Water content,51
+BH-03,5.0,5.4,Undrained shear strength,35
+BH-03,14.0,,fines,8

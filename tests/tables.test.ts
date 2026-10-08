@@ -2,6 +2,8 @@ import {describe,it,expect} from "vitest";
 import {tablesFromProject,projectFromTables,emptyTables,fillUnits,crsFromText,tableCsv} from "../src/tables";
 import {importFiles} from "../src/io";
 import {sakaeProject,valleyProject,rotterdamProject} from "../src/geology";
+import {buildGeologicalModel} from "../src/model";
+import {readFileSync} from "node:fs";
 
 describe("data editor tables",()=>{
   it("round-trip real and synthetic projects, keeping what the tables do not show",()=>{
@@ -47,5 +49,27 @@ describe("data editor tables",()=>{
     const back=importFiles([{name:"b.csv",text:tableCsv(t,"boreholes")},{name:"l.csv",text:tableCsv(t,"logs")},{name:"u.csv",text:tableCsv(t,"units")}]).project;
     expect(back.boreholes).toEqual(valleyProject.boreholes);
     expect(back.units.map(u=>[u.id,u.color,u.gamma])).toEqual(valleyProject.units.map(u=>[u.id,u.color,u.gamma]));
+  });
+});
+
+describe("CSV templates in docs/templates",()=>{
+  const read=(f:string)=>({name:f,text:readFileSync(new URL(`../docs/templates/${f}`,import.meta.url),"utf8")});
+  it("import together into a model with units, water, SPT and tests",()=>{
+    const {project,warnings}=importFiles(["boreholes.csv","logs.csv","units.csv","water.csv","spt.csv","tests.csv"].map(read));
+    expect(warnings).toEqual([]);
+    expect(project.boreholes.map(b=>b.id)).toEqual(["BH-01","BH-02","BH-03"]);
+    expect(project.units.map(u=>u.id)).toEqual(["MG","CLAY","SAND","ROCK"]);
+    expect(project.units[1]).toMatchObject({gamma:16.5,gammaSat:17.5,params:{c:2,phi:24,su:20,E:4,k:1e-9}});
+    expect(project.boreholes[0].spt!.at(-1)).toEqual({depth:20,blows:50,penetration:120});
+    expect(project.boreholes[1].tests).toEqual([{depth:3,to:3.4,property:"w",value:51}]);
+    expect(buildGeologicalModel(project).warnings).toEqual([]);
+    const wide=importFiles(["boreholes.csv","logs.csv","tests-wide.csv"].map(read)).project;
+    expect(wide.boreholes[0].tests![1]).toEqual({depth:2.5,property:"gamma",value:expect.closeTo(16.77,2)});
+  });
+  it("include a single combined borehole table",()=>{
+    const {project,warnings}=importFiles([read("boreholes-combined.csv")]);
+    expect(warnings).toEqual([]);
+    expect(project.boreholes.length).toBe(3);
+    expect(project.boreholes[0].intervals[1]).toEqual({from:1.5,to:8.2,unit:"CLAY",name:"Soft grey silty CLAY"});
   });
 });

@@ -1,0 +1,12 @@
+hole_id,from,to,unit,description
+BH-01,0,1.5,MG,"Made ground: sandy gravel with brick fragments"
+BH-01,1.5,8.2,CLAY,"Soft grey silty CLAY"
+BH-01,8.2,19.0,SAND,"Medium dense brown SAND"
+BH-01,19.0,30,ROCK,"Weathered grey MUDSTONE"
+BH-02,0,0.8,MG,"Made ground"
+BH-02,0.8,6.5,CLAY,"Soft grey CLAY"
+BH-02,6.5,21.0,SAND,"Dense SAND with gravel"
+BH-02,21.0,25,ROCK,"MUDSTONE"
+BH-03,0,9.5,CLAY,"Firm grey CLAY"
+BH-03,9.5,20.5,SAND,"Medium dense SAND"
+BH-03,20.5,28,ROCK,"MUDSTONE"

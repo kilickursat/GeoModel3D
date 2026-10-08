@@ -1,7 +1,38 @@
 {
   "name": "geomodel3d",
   "private": true,
-  "version": "0.6.1",
+  "version": "0.7.0",
+  "description": "Browser-based 3D geological and geotechnical modelling from borehole logs: stratigraphy, cross-sections, groundwater, stresses and laboratory data on real maps",
+  "keywords": [
+    "geology",
+    "geological-modeling",
+    "3d-geological-model",
+    "geotechnical-engineering",
+    "geotechnics",
+    "borehole",
+    "borehole-logs",
+    "stratigraphy",
+    "cross-section",
+    "subsurface",
+    "groundwater",
+    "effective-stress",
+    "ags4",
+    "bro",
+    "dov",
+    "gis",
+    "coordinate-systems",
+    "threejs",
+    "webgpu",
+    "engineering-geology"
+  ],
+  "homepage": "https://kilickursat.github.io/GeoModel3D/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kilickursat/GeoModel3D.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kilickursat/GeoModel3D/issues"
+  },
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
