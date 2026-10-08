@@ -1,6 +1,8 @@
 import valleyDemo from "./data/valley-demo.json";
 import channelDemo from "./data/channel-demo.json";
 import sakaeSite from "./data/sakae-site.json";
+import antwerpSite from "./data/antwerp-site.json";
+import rotterdamSite from "./data/rotterdam-site.json";
 import {TerrainGrid} from "./terrain";
 
 // Geological units are listed in stratigraphic order, youngest (top) to oldest (bottom). An erosive unit's base
@@ -60,9 +62,13 @@ function fromJson(p:unknown):GeoProject{
   return project;
 }
 export const sakaeProject=fromJson(sakaeSite);
+export const antwerpProject=fromJson(antwerpSite);
+export const rotterdamProject=fromJson(rotterdamSite);
 export const valleyProject=fromJson(valleyDemo);
 export const channelProject=fromJson(channelDemo);
-export const sampleProjects:GeoProject[]=[sakaeProject,valleyProject,channelProject,referenceProject];
+// Real sites first (published data, each with its source), then the synthetic datasets.
+export const realSites:GeoProject[]=[sakaeProject,antwerpProject,rotterdamProject];
+export const sampleProjects:GeoProject[]=[...realSites,valleyProject,channelProject,referenceProject];
 
 export function boreholeDepth(b:Borehole){return Math.max(b.depth??0,...b.intervals.map(i=>i.to))}
 // SPT N-value; a test stopped short of 300 mm is scaled to 300 mm (a converted N-value).

@@ -3,10 +3,10 @@ import {uniform,positionWorld,dot} from "three/tsl";
 import {OrbitControls} from "three/addons/controls/OrbitControls.js";
 import {CSS2DRenderer,CSS2DObject} from "three/addons/renderers/CSS2DRenderer.js";
 import pkg from "../package.json";
-import {GeoProject,UnitDef,UnitRule,sampleProjects,sakaeProject,boreholeDepth} from "./geology";
+import {GeoProject,UnitDef,UnitRule,sampleProjects,realSites,boreholeDepth} from "./geology";
 import {buildGeologicalModel,GeoModel,unitVolume,unitCubicMetres,modelBounds,footprintArea} from "./model";
 import {volumeGeometry} from "./volume";
-import {terrainOutside,convexHull} from "./terrain";
+import {terrainOutside,convexHull,TerrainGrid} from "./terrain";
 import {computeSection,offsetRange,principalAzimuth,Section} from "./section";
 import {sectionSvg,sectionCsv,sectionFieldCsv} from "./sectionSvg";
 import {importFiles,toProjectJson,toBoreholeCsv,toTestsCsv,decodeText,assignColors} from "./io";
@@ -189,13 +189,24 @@ function buildContent(){
 }
 function niceCeil(v:number){const p=10**Math.floor(Math.log10(v));return Math.ceil(v/p)*p}
 
-// The terrain grid around the model footprint: real data, clipped exactly at the footprint, drawn before the
-// model and translucent so it never veils it, and cut with it.
+// The terrain grid around the model footprint: real data, clipped exactly at the footprint, drawn before the model
+// and translucent so it never veils it, and cut with it. Without a terrain grid, a georeferenced model gets a flat
+// plane at its collars' median elevation instead, shown only to carry the map.
 function buildTerrain(){
   terrainMesh=null;
   const t=model.project.terrain,at=model.terrainAt;
-  if(!t||!at||!model.triangles.length)return;
-  const {positions,index}=terrainOutside(t,at,convexHull(model.boreholes),extent*0.25);
+  if(!model.triangles.length)return;
+  const hull=convexHull(model.boreholes);
+  let flat=false,surface:{positions:number[];index:number[]};
+  if(t&&at)surface=terrainOutside(t,at,hull,extent*0.25);
+  else if(projectCrs(model.project)){
+    const zs=model.boreholes.map(b=>b.z).sort((p,q)=>p-q),z=zs[Math.floor(zs.length/2)];
+    const b=modelBounds(model),m=extent*0.25,n=96;
+    const grid:TerrainGrid={x0:b.minX-m,y0:b.minY-m,dx:(b.maxX-b.minX+2*m)/n,dy:(b.maxY-b.minY+2*m)/n,ncols:n+1,nrows:n+1,z:[]};
+    surface=terrainOutside(grid,()=>z,hull,m);
+    flat=true;
+  }else return;
+  const {positions,index}=surface;
   if(!index.length)return;
   const pos=new Float32Array(positions.length);
   for(let i=0;i<positions.length;i+=3){pos[i]=positions[i]-origin.x;pos[i+1]=positions[i+1]-origin.y;pos[i+2]=positions[i+2]-origin.z}
@@ -207,6 +218,7 @@ function buildTerrain(){
   material.maskNode=keepFragment;
   terrainMesh=new THREE.Mesh(geo,material);
   terrainMesh.userData.plain=material;
+  terrainMesh.userData.flat=flat;
   terrainMesh.renderOrder=-1;
   content.add(terrainMesh);
 }
@@ -215,7 +227,9 @@ function buildTerrain(){
 
 // Bundled public datasets fetch their terrain and map when opened. Imported data may be confidential, so nothing is
 // requested from tile servers for them until the user asks.
-const publicSites=new Set<GeoProject>([sakaeProject]);
+const publicSites=new Set<GeoProject>(realSites);
+// Sites whose logs start partly at a harbour or river bed: fetched terrain, the water surface there, would be wrong.
+const loggedGround=new Set<GeoProject>(realSites.filter(p=>p.boreholes.some(b=>b.z<-10)&&!p.terrain));
 let geoStatus="";
 interface MapLayer { key:string; texture:THREE.CanvasTexture; z:number; x0:number; y0:number; nx:number; ny:number; source:TileSource; failed:number }
 let mapLayer:MapLayer|null=null;
@@ -287,7 +301,7 @@ async function updateMap(){
     setGeoStatus(failed===nx*ny?"Map tiles could not be loaded":failed?`${failed} of ${nx*ny} map tiles missing`:"");
   }
   applyMap(mapLayer);
-  renderCredits();
+  applyDisplay();
 }
 function applyMap(layer:MapLayer|null){
   const mesh=terrainMesh,crs=projectCrs(project);
@@ -482,7 +496,7 @@ function applyDisplay(){
   }
   for(const l of horizonLines)l.visible=view.horizons;
   if(holeMesh)holeMesh.visible=view.boreholes;
-  if(terrainMesh)terrainMesh.visible=view.terrain;
+  if(terrainMesh)terrainMesh.visible=terrainMesh.userData.flat?view.map&&!!mapLayer:view.terrain;
   for(const l of labels)l.visible=view.boreholes&&view.labels&&(!view.cut||clipPlane.distanceToPoint(l.position)>=0);
   renderCredits();
   invalidate();
@@ -738,7 +752,7 @@ function loadProject(p:GeoProject,importWarnings:string[]=[],keepView=false){
   const warnings=[...importWarnings,...model.warnings];
   currentNotes=warnings;
   showNotice(`${p.name}: ${warnings.length} note${warnings.length===1?"":"s"}`,warnings);
-  if(publicSites.has(p)&&!p.terrain&&projectCrs(p)&&!keepView)void fetchSiteTerrain();
+  if(publicSites.has(p)&&!loggedGround.has(p)&&!p.terrain&&projectCrs(p)&&!keepView)void fetchSiteTerrain();
   void updateMap();
 }
 
@@ -921,7 +935,8 @@ function updateTooltip(){
   }
   if(!html&&terrainMesh?.visible){
     const hit=raycaster.intersectObject(terrainMesh).find(kept);
-    if(hit)html=`<b>Terrain</b> · ${fmt(hit.point.z/view.ve+origin.z,2)} m<span>${esc(project.terrain?.source??"terrain grid")}, outside the model</span>`;
+    if(hit)html=terrainMesh.userData.flat?`<b>Map</b><span>drawn at the collars' median elevation, ${fmt(hit.point.z/view.ve+origin.z,1)} m: there is no terrain grid</span>`
+      :`<b>Terrain</b> · ${fmt(hit.point.z/view.ve+origin.z,2)} m<span>${esc(project.terrain?.source??"terrain grid")}, outside the model</span>`;
   }
   tooltip.hidden=!html;
   if(html){

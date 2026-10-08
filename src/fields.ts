@@ -140,9 +140,10 @@ export function sectionField(model:GeoModel,section:Section,key:string):SectionF
   // The colours span the 2nd to 98th percentiles; SPT N-values stop at 50, beyond which refusals converted to 300 mm
   // would take most of the scale.
   const sorted=[...values].sort((a,b)=>a-b),q=(f:number)=>sorted[Math.min(sorted.length-1,Math.max(0,Math.round(f*(sorted.length-1))))];
-  const cap=key==="N"?50:Infinity,top=Math.min(q(0.98),cap);
-  if(sorted[sorted.length-1]>top)notes.push(`Values above ${scaleLabel(colourScale(q(0.02),top,info.log),top)} are in the top band`);
-  return {key,...info,at,unitAt:unitAtSZ,scale:colourScale(Math.min(q(0.02),top),top,info.log,false,sorted[sorted.length-1]>top),notes};
+  const cap=key==="N"?50:Infinity,top=Math.min(q(0.98),cap),open=sorted[sorted.length-1]>top;
+  const scale=colourScale(Math.min(q(0.02),top),top,info.log,false,open);
+  if(open)notes.push(`Values above ${scaleLabel({...scale,open:false},scale.edges[scale.edges.length-1])} are in the top band`);
+  return {key,...info,at,unitAt:unitAtSZ,scale,notes};
 }
 
 // ---------- colour ----------
