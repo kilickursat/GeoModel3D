@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.1 — 2026-10-09
+
+### Added
+- **Contributing:** a contribution guide (`CONTRIBUTING.md`) on setting up, testing and submitting a change, with the rules for adding data; a code of conduct; issue templates for bugs, feature requests and data sources; and a pull request template.
+- **Sponsoring:** a section in the README, with the project's Patreon page and an e-mail contact for sponsors.
+
+### Changed
+- **Notes on collars and the terrain grid.** When more than ten collars are more than 1 m off the terrain grid, after any consistent offset, one note now gives how many and their typical scatter (a robust standard deviation), and only the collars more than three times that scatter off are listed. With fetched terrain, Creswick opened with 121 notes and now has 5, Sakae has 46 instead of 61, and Antwerp 26 instead of 170. Every collar still keeps its surveyed height.
+
 ## 0.8.0 — 2026-10-09
 
 ### Added
