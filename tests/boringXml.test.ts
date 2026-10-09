@@ -141,3 +141,12 @@ describe("importing borehole logs into a project",()=>{
     expect(crsFromName("my site grid")).toBeUndefined();
   });
 });
+
+describe("KuniJiban fixtures",()=>{
+  it("carry no personal data: engineers' names, registration numbers and telephone numbers are empty",()=>{
+    for(const id of ["148301107","357875393","509132859"]){
+      const personal=[...fixture(id).matchAll(/<([^<>\s/]*(?:_氏名|登録番号|_TEL|_FAX))>([^<]*)<\/\1>/g)].filter(m=>m[2].trim());
+      expect(personal.map(m=>m[1])).toEqual([]);
+    }
+  });
+});
