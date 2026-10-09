@@ -217,6 +217,25 @@ function splittableMesh(nodes:XY[],triangles:Triangle[],chains:number[][],fields
   return {mesh,split};
 }
 
+// Nodes on a frame around the boreholes, for a model that extends `margin` beyond them: their outline pushed out by
+// the margin in `directions` directions (a circle around a single borehole).
+export function frameNodes(points:XY[],margin:number,directions=16):XY[]{
+  return Array.from({length:directions},(_,j)=>{
+    const a=2*Math.PI*j/directions,d={x:Math.cos(a),y:Math.sin(a)};
+    let best=points[0],reach=-Infinity;
+    for(const p of points){const v=p.x*d.x+p.y*d.y;if(v>reach){reach=v;best=p}}
+    return {x:best.x+margin*d.x,y:best.y+margin*d.y};
+  });
+}
+// The extent given to boreholes that enclose no area (fewer than three, or all on one line): the deepest log, a
+// quarter of their spread, and at least 10 m, rounded up.
+function defaultMargin(holes:Borehole[]){
+  const xs=holes.map(b=>b.x),ys=holes.map(b=>b.y);
+  const raw=Math.max(10,...holes.map(boreholeDepth),Math.max(Math.max(...xs)-Math.min(...xs),Math.max(...ys)-Math.min(...ys))/4);
+  const step=raw<50?5:raw<200?10:50;
+  return Math.ceil(raw/step)*step;
+}
+
 // Refine finely enough to follow the terrain grid, or to cut cleanly along erosion surfaces, within a budget of about
 // 80,000 triangles (refined triangles cover about 0.14 × spacing² each).
 function refinementSpacing(nodes:XY[],triangles:Triangle[],terrain?:TerrainGrid){
@@ -248,17 +267,27 @@ export function buildGeologicalModel(project:GeoProject):GeoModel{
     for(const n of c.notes)warnings.push(`${b.id}: ${n}`);
     boreholes.push(b);nodes.push({x:b.x,y:b.y});contacts.push(c);
   }
+  // The model covers the outline of the boreholes, or extends beyond it on a frame of nodes. Boreholes that enclose no
+  // area are given an extent, so that one or two boreholes still make a model.
+  const NB=nodes.length;
+  let margin=project.margin!==undefined&&Number.isFinite(project.margin)&&project.margin>0?project.margin:0;
+  if(!NB)warnings.push("No borehole could be placed: a model needs boreholes with collar coordinates and logged intervals");
+  else if(!margin&&(NB<3||!delaunay(nodes).length)){
+    margin=defaultMargin(boreholes);
+    warnings.push(NB===1?`One borehole: the model extends ${margin} m around it, with flat horizons; set the model extent in the project to change it`
+      :NB===2?`Two boreholes: the model extends ${margin} m around them; set the model extent in the project to change it`
+      :`All boreholes lie on one line: the model extends ${margin} m to either side; set the model extent in the project to change it`);
+  }
+  if(NB&&margin)nodes.push(...frameNodes(nodes.slice(),margin));
   const coarse=delaunay(nodes);
-  if(nodes.length<3)warnings.push("A TIN model needs at least three boreholes with collar coordinates");
-  else if(!coarse.length)warnings.push("All boreholes lie on one line: a TIN model needs three boreholes that are not collinear");
 
-  // Horizon elevations at the boreholes, before the stratigraphic ordering is enforced.
+  // Horizon elevations at the boreholes (and the frame), before the stratigraphic ordering is enforced.
   const N=nodes.length;
   const raw=Array.from({length:K+1},()=>new Float64Array(N));
   const observed=Array.from({length:K+1},()=>new Uint8Array(N));
   contacts.forEach((c,i)=>{for(let k=0;k<=c.deepest;k++)if(c.depth[k]!==null){raw[k][i]=boreholes[i].z-c.depth[k]!;observed[k][i]=1}});
   const eohZ=contacts.map((c,i)=>boreholes[i].z-c.eoh);
-  const base=project.base??(N?Math.min(...eohZ):0);
+  const base=project.base??(NB?Math.min(...eohZ):0);
 
   // Logs that begin below the collar: the contacts above their first unit come from the holes that logged them, kept
   // between the ground and the depth where the log begins (the first unit is there, so its top is no deeper).
@@ -293,12 +322,19 @@ export function buildGeologicalModel(project:GeoProject):GeoModel{
     return s;
   });
   // Below the deepest unit a hole entered, stack inverse-distance-weighted thicknesses; that unit's base must lie below the end of the hole.
-  for(let i=0;i<N;i++){
+  for(let i=0;i<NB;i++){
     for(let k=contacts[i].deepest+1;k<=K;k++){
       let v=k===K?base:raw[k-1][i]-idw(thickness[k-1],nodes[i]);
       if(k===contacts[i].deepest+1)v=Math.min(v,eohZ[i]);
       raw[k][i]=Math.max(v,base);
     }
+  }
+  // The frame takes every horizon from the boreholes with the same inverse-distance weights, so the horizons keep
+  // their order there; nothing on it counts as logged.
+  for(let n=NB;n<N;n++)for(let k=0;k<=K;k++){
+    const s:Array<{x:number;y:number;v:number}>=[];
+    for(let i=0;i<NB;i++)s.push({x:nodes[i].x,y:nodes[i].y,v:raw[k][i]});
+    raw[k][n]=idw(s,nodes[n]);
   }
 
   const erosive=units.some(u=>u.erosive);
@@ -325,7 +361,10 @@ export function buildGeologicalModel(project:GeoProject):GeoModel{
   if(project.terrain&&N){
     const t=project.terrain;
     residuals=boreholes.map(b=>{const tz=terrainZ(t,b.x,b.y);return {id:b.id,collar:b.z,terrain:tz,residual:b.z-tz}});
+    // The frame takes the collar residuals by inverse distance, as it takes the horizons.
     const r=residuals.map(q=>Number.isFinite(q.residual)?q.residual:0);
+    const atHoles=r.map((v,i)=>({x:nodes[i].x,y:nodes[i].y,v}));
+    for(let n=NB;n<N;n++)r.push(idw(atHoles,nodes[n]));
     const correction=spread(r);
     // Where the terrain rises above the surface through the collars, the extra height is made of what the top of the
     // surrounding boreholes is made of: each unit's share is its part of the top 5 m of the log, interpolated with the
@@ -344,7 +383,7 @@ export function buildGeologicalModel(project:GeoProject):GeoModel{
     }
     const shares=near.map(spread);
     let missing=0;
-    for(let n=N;n<M;n++){
+    for(let n=NB;n<M;n++){
       const tz=terrainZ(t,mesh.nodes[n].x,mesh.nodes[n].y);
       if(!Number.isFinite(tz)){missing++;known[0][n]=0;continue}
       const ground=tz+correction[n],rise=ground-z[0][n];
@@ -360,8 +399,8 @@ export function buildGeologicalModel(project:GeoProject):GeoModel{
     if(shift)warnings.push(`Collars lie ${fmt(Math.abs(shift))} m ${shift>0?"above":"below"} the terrain grid on average, as when the heights use another datum; the terrain is adjusted to the collars`);
     const off=residuals.filter(q=>Math.abs(q.residual-shift)>1);
     for(const q of off)warnings.push(`${q.id}: collar ${fmt(q.collar)} m, terrain ${fmt(q.terrain)} m (${q.residual>0?"+":""}${fmt(q.residual)} m); terrain adjusted to the collar`);
-    if(missing)warnings.push(`Terrain has no data under ${Math.round(missing/(M-N)*100)} % of the model; the surface between boreholes is used there`);
-    const field=boundaryResidual(convexHull(boreholes.map((b,i)=>({x:b.x,y:b.y,r:r[i]}))));
+    if(missing)warnings.push(`Terrain has no data under ${Math.round(missing/(M-NB)*100)} % of the model; the surface between boreholes is used there`);
+    const field=boundaryResidual(convexHull(nodes.map((p,i)=>({x:p.x,y:p.y,r:r[i]}))));
     terrainAt=(x,y)=>terrainZ(t,x,y)+field(x,y);
   }
 
@@ -372,7 +411,7 @@ export function buildGeologicalModel(project:GeoProject):GeoModel{
   let W:number[]|undefined,waterSource="";
   if(readings.length){
     W=mesh.nodes.map((p,n)=>Math.min(idw(readings,p),z[0][n]));
-    waterSource=`water levels logged in ${readings.length} of ${N} boreholes (the shallowest reading of each), interpolated between them`;
+    waterSource=`water levels logged in ${readings.length} of ${NB} boreholes (the shallowest reading of each), interpolated between them`;
   }else if(project.groundwaterDepth!==undefined&&Number.isFinite(project.groundwaterDepth)){
     W=Array.from(z[0],g=>g-project.groundwaterDepth!);
     waterSource=`assumed ${fmt(project.groundwaterDepth)} m below ground (no water level is logged)`;
@@ -417,13 +456,17 @@ export function unitCubicMetres(model:GeoModel,u:number){
   return v;
 }
 export function footprintArea(model:GeoModel){return model.triangles.reduce((s,t)=>s+triangleArea(model.nodes,t),0)}
+// The footprint's extent (the boreholes' when there is no model) and the elevations from the deepest end of hole or the
+// base up to the highest ground.
 export function modelBounds(model:GeoModel){
-  const xs=model.boreholes.map(b=>b.x),ys=model.boreholes.map(b=>b.y);
-  if(!xs.length)return {minX:0,maxX:1,minY:0,maxY:1,minZ:0,maxZ:1};
+  const points:XY[]=model.triangles.length?model.nodes:model.boreholes;
+  if(!points.length)return {minX:0,maxX:1,minY:0,maxY:1,minZ:0,maxZ:1};
+  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity,maxZ=-Infinity,minZ=model.base;
+  for(const p of points){minX=Math.min(minX,p.x);maxX=Math.max(maxX,p.x);minY=Math.min(minY,p.y);maxY=Math.max(maxY,p.y)}
   const ground=model.horizons[0].z;
-  let maxZ=-Infinity;
   for(let i=0;i<ground.length;i++)maxZ=Math.max(maxZ,ground[i]);
-  return {minX:Math.min(...xs),maxX:Math.max(...xs),minY:Math.min(...ys),maxY:Math.max(...ys),minZ:Math.min(model.base,...model.boreholes.map(b=>b.z-boreholeDepth(b))),maxZ};
+  for(const b of model.boreholes)minZ=Math.min(minZ,b.z-boreholeDepth(b));
+  return {minX,maxX,minY,maxY,minZ,maxZ};
 }
 // A grid of cells listing the triangles whose bounding box overlaps them, built once per model.
 const triangleIndex=new WeakMap<GeoModel,{x0:number;y0:number;size:number;nx:number;ny:number;cells:Triangle[][]}>();

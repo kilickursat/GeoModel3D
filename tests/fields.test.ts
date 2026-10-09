@@ -59,6 +59,18 @@ describe("stresses",()=>{
     expect(sv.scale.edges.at(-1)!).toBeGreaterThanOrEqual(2*17+2*18+16*20-1e-9);
     expect(sv.notes.join(" ")).toMatch(/Water table: water levels logged/);
   });
+
+  it("gives the horizontal effective stress where a unit's K0 is given, and only there",()=>{
+    const withK0:GeoProject={...layered,units:[layered.units[0],{...layered.units[1],params:{K0:0.5}}]};
+    const m=buildGeologicalModel(withK0),s=computeSection(m,{azimuth:90,offset:0});
+    expect(availableFields(m).map(f=>f.key)).toEqual(["sv","u","s","sh","su"]);
+    const sh=sectionField(m,s,"sh")!,eff=sectionField(m,s,"s")!;
+    const mid=(s.s[0]+s.s[s.s.length-1])/2;
+    expect(sh.at(mid,0)).toBeCloseTo(0.5*eff.at(mid,0),9);
+    expect(sh.at(mid,7)).toBeNaN();
+    expect(sh.notes.join(" ")).toMatch(/σ′h = K0 · σ′v with each unit's K0; not given for Clay, left uncoloured/);
+    expect(sh.scale.edges.at(-1)!).toBeGreaterThanOrEqual(0.5*eff.at(mid,-10+1e-6)-1e-9);
+  });
 });
 
 describe("measured properties",()=>{

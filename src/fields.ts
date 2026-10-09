@@ -12,7 +12,8 @@ export const ASSUMED_WEIGHT={above:18,below:20};
 export const STRESS_FIELDS=[
   {key:"sv",name:"Vertical total stress",symbol:"σv",unit:"kPa"},
   {key:"u",name:"Pore water pressure",symbol:"u",unit:"kPa"},
-  {key:"s",name:"Vertical effective stress",symbol:"σ′v",unit:"kPa"}
+  {key:"s",name:"Vertical effective stress",symbol:"σ′v",unit:"kPa"},
+  {key:"sh",name:"Horizontal effective stress",symbol:"σ′h",unit:"kPa"}
 ] as const;
 export type StressKey=typeof STRESS_FIELDS[number]["key"];
 export const isStressField=(key:string):key is StressKey=>STRESS_FIELDS.some(f=>f.key===key);
@@ -120,10 +121,27 @@ export function sectionField(model:GeoModel,section:Section,key:string):SectionF
     const measured=model.units.map((u,k)=>weights[k].source==="measured"?`${u.name} ${formatValue("gamma",weights[k].above)} kN/m³ (mean of ${weights[k].n})`:"").filter(Boolean);
     if(measured.length)notes.push(`Unit weights from tests: ${measured.join(", ")}`);
     notes.push(model.water?`Water table: ${model.water.source}`:"No water level in the data: pore pressure is zero and effective stress equals total stress");
-    const at=(s:number,e:number)=>{const c=columnAt(section,s);const r=c?stressAt(c.z,c.water,weights,e):null;return r?r[key]:NaN};
-    // The range from the ground to the model base along the section.
+    // σ′h only where the unit's earth pressure coefficient at rest is given.
+    const k0=model.units.map(u=>u.params?.K0);
+    if(key==="sh"){
+      const without=model.units.filter((_,k)=>k0[k]===undefined).map(u=>u.name);
+      notes.push(`σ′h = K0 · σ′v with each unit's K0${without.length?`; not given for ${without.join(", ")}, left uncoloured`:""}`);
+    }
+    const value=(z:number[],water:number|undefined,e:number)=>{
+      const r=stressAt(z,water,weights,e);
+      if(!r)return NaN;
+      if(key!=="sh")return r[key];
+      const k=unitOf(z,e),K=k<0?undefined:k0[k];
+      return K===undefined?NaN:K*r.s;
+    };
+    const at=(s:number,e:number)=>{const c=columnAt(section,s);return c?value(c.z,c.water,e):NaN};
+    // The range from the ground to the model base along the section: stresses grow with depth within a unit, so the
+    // largest value of each unit is at its base.
     let max=0;
-    for(let j=0;j<section.s.length;j++){const r=stressAt(section.z.map(z=>z[j]),section.water?.[j],weights,section.z[K][j]);if(r)max=Math.max(max,r[key])}
+    for(let j=0;j<section.s.length;j++){
+      const z=section.z.map(h=>h[j]);
+      for(let k=0;k<K;k++)if(z[k]-z[k+1]>1e-9){const v=value(z,section.water?.[j],z[k+1]+1e-9*(1+Math.abs(z[k+1])));if(Number.isFinite(v))max=Math.max(max,v)}
+    }
     return {key,...info,at,unitAt:unitAtSZ,scale:colourScale(0,max,false),notes};
   }
   const samples=propertySamples(model,key),values=samples.flat().map(p=>p.value);
@@ -192,6 +210,7 @@ function oklchHex(L:number,C:number,h:number){
 export const scaleLabel=(c:ColourScale,v:number)=>(c.log?`1e${Math.round(v)}`:String(Math.round(v*1000)/1000))+(c.open&&v===c.edges[c.edges.length-1]?"+":"");
 // The fields that can be shown for a model: the stresses, then each measured property.
 export function availableFields(model:GeoModel){
-  return [...STRESS_FIELDS.map(f=>({key:f.key as string,label:`${f.name} ${f.symbol} (${f.unit})`})),
+  const k0=model.units.some(u=>u.params?.K0!==undefined);
+  return [...STRESS_FIELDS.filter(f=>f.key!=="sh"||k0).map(f=>({key:f.key as string,label:`${f.name} ${f.symbol} (${f.unit})`})),
     ...measuredProperties(model.boreholes).map(k=>{const p=propertyDef(k);return {key:k,label:`${p.name}${p.symbol!==p.name?" "+p.symbol:""}${p.unit?` (${p.unit})`:""}`}})];
 }

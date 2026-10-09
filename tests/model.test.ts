@@ -153,9 +153,42 @@ describe("model warnings",()=>{
     expect(m.warnings.join("\n")).toMatch(/no logged intervals are not modelled: Z/);
   });
 
-  it("explains why boreholes on one line give no surfaces",()=>{
+  it("extends boreholes on one line to either side, and says so",()=>{
     const m=buildGeologicalModel(project([0,1,2,3].map(i=>({id:"L"+i,x:i*10,y:i*10,z:10,intervals:log}))));
-    expect(m.triangles).toEqual([]);
-    expect(m.warnings.join("\n")).toMatch(/one line/);
+    expect(m.warnings.join("\n")).toMatch(/one line: the model extends 10 m to either side/);
+    expect(footprintArea(m)).toBeGreaterThan(2*10*Math.hypot(30,30));
+    expect(unitCubicMetres(m,0)).toBeCloseTo(3*footprintArea(m),6);
+    expect(ordered(m)).toBe(true);
+  });
+});
+
+describe("model extent",()=>{
+  const units:UnitDef[]=[{id:"A",name:"A",color:"#888888"},{id:"B",name:"B",color:"#777777"}];
+  const hole=(id:string,x:number,y:number,z:number,a:number)=>({id,x,y,z,intervals:[{from:0,to:a,unit:"A"},{from:a,to:20,unit:"B"}]});
+
+  it("models a single borehole as flat layers around it",()=>{
+    const m=buildGeologicalModel({name:"one",units,boreholes:[hole("BH-1",100,200,12,4)]});
+    expect(m.warnings).toEqual([expect.stringMatching(/^One borehole: the model extends 20 m around it/)]);
+    // A 16-sided polygon of circumradius 20 m around the hole.
+    expect(footprintArea(m)).toBeCloseTo(8*20*20*Math.sin(Math.PI/8),6);
+    expect(m.horizons.map(h=>[Math.min(...h.z),Math.max(...h.z)])).toEqual([[12,12],[8,8],[-8,-8]]);
+    expect(unitCubicMetres(m,0)).toBeCloseTo(4*footprintArea(m),6);
+    // Only the borehole itself is logged.
+    expect(m.horizons[1].observed.reduce((s,o)=>s+o,0)).toBe(1);
+  });
+
+  it("extends a model beyond its boreholes by the margin given, keeping every borehole's log",()=>{
+    const boreholes=[hole("P1",0,0,10,2),hole("P2",100,0,11,5),hole("P3",0,100,9,3),hole("P4",100,100,10,4)];
+    const inner=buildGeologicalModel({name:"t",units,boreholes});
+    const m=buildGeologicalModel({name:"t",units,boreholes,margin:50});
+    expect(inner.warnings).toEqual([]);
+    expect(m.warnings).toEqual([]);
+    expect(footprintArea(inner)).toBeCloseTo(100*100,6);
+    expect(footprintArea(m)).toBeGreaterThan(200*200*0.9);
+    boreholes.forEach((b,i)=>{expect(m.horizons[0].z[i]).toBe(b.z);expect(m.horizons[1].z[i]).toBeCloseTo(b.z-b.intervals[0].to,9)});
+    // Beyond the boreholes the horizons stay within the range the boreholes give.
+    expect(Math.min(...m.horizons[1].z)).toBeGreaterThanOrEqual(6-1e-9);
+    expect(Math.max(...m.horizons[1].z)).toBeLessThanOrEqual(8+1e-9);
+    expect(ordered(m)).toBe(true);
   });
 });

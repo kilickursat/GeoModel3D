@@ -325,6 +325,7 @@ function readProjectJson(doc:any,file:string):ImportResult{
   if(doc.source)result.project.source=String(doc.source);
   if(Number.isFinite(doc.base))result.project.base=Number(doc.base);
   if(Number.isFinite(doc.groundwaterDepth))result.project.groundwaterDepth=Number(doc.groundwaterDepth);
+  if(Number.isFinite(doc.margin)&&doc.margin>0)result.project.margin=Number(doc.margin);
   const g=doc.terrain;
   if(g){
     const ok=["x0","y0","dx","dy","ncols","nrows"].every(k=>Number.isFinite(g[k]))&&Array.isArray(g.z)&&g.z.length===g.ncols*g.nrows;
@@ -336,7 +337,7 @@ function readProjectJson(doc:any,file:string):ImportResult{
 // JSON has no NaN, so terrain cells without data are written as null.
 export function toProjectJson(p:GeoProject){
   const doc={format:"geomodel3d-project",version:1,name:p.name,description:p.description,source:p.source,crs:p.crs,crsCode:p.crsCode,crsProj4:p.crsProj4,
-    base:p.base,groundwaterDepth:p.groundwaterDepth,units:p.units,rules:p.rules,boreholes:p.boreholes,terrain:p.terrain};
+    base:p.base,groundwaterDepth:p.groundwaterDepth,margin:p.margin,units:p.units,rules:p.rules,boreholes:p.boreholes,terrain:p.terrain};
   return JSON.stringify(doc,null,1).replace(/"z": \[[^\]]*\]/,m=>m.replace(/\s+/g,""))+"\n";
 }
 // One row per interval with the collar, the logged description where there is one, and the shallowest water level.
