@@ -5,11 +5,11 @@
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 [![three.js WebGPU](https://img.shields.io/badge/three.js-WebGPU%20%2B%20WebGL%202-black)](https://threejs.org)
 
-**Open-source 3D geological and geotechnical modelling for engineers, engineering geologists and hydrogeologists.** GeoModel3D turns borehole logs into a 3D stratigraphic model: TIN horizons, closed unit volumes and cross-sections at any angle. It places the model on a real map in the site's national coordinate system. On any section it shows the groundwater, the vertical total and effective stresses, and laboratory or in-situ test results.
+**Open-source 3D geological and geotechnical modelling for engineers, engineering geologists and hydrogeologists.** GeoModel3D turns borehole logs into a 3D stratigraphic model: TIN horizons, closed unit volumes and cross-sections at any angle. It places the model on a real map in the site's national coordinate system. On any section it shows the groundwater, the vertical total and effective stresses, the horizontal effective stress where K0 is given, and laboratory or in-situ test results.
 
 Data can come from:
 - CSV, AGS4, Japanese, Dutch (BRO) and Flemish (DOV) borehole files;
-- the data editor, where they are typed in or pasted from a spreadsheet.
+- the **Input data** tab, where your own case is typed in or pasted from a spreadsheet (boreholes, logs, groundwater, field and laboratory tests, unit weights and design values) and built into a model. One borehole is enough.
 
 Reports are exported as PDF. It runs entirely in the browser, with nothing to install and nothing uploaded. It uses WebGPU, falling back to WebGL 2, and also works offline from a single HTML file.
 
@@ -18,43 +18,33 @@ Reports are exported as PDF. It runs entirely in the browser, with nothing to in
 
 ![A real site: 75 KuniJiban boreholes at Sakae, Yokohama, modelled over GSI terrain with OpenStreetMap around it](docs/screenshot.png)
 
-## Real sites in three countries
+## Real sites in four countries
 
-Each site is published data, in its country's own coordinate system and height datum, with its source credited:
+Each site is published data, in its country's own coordinate system and height datum, with its source credited and its licence checked:
 
 | Site | Data | Coordinates and heights | Shows |
 |---|---|---|---|
 | **Sakae, Yokohama, Japan** | 75 borehole logs from MLIT road surveys (KuniJiban) | JGD2011 / Japan Plane Rectangular CS IX (EPSG:6677), T.P. | Fill, alluvium, Kanto Loam and Pleistocene sediments over the Kazusa Group, interpreted from soil names, SPT N-values and elevations; GSI 5 m terrain |
 | **Antwerp, Belgium** | 173 boreholes with the formal lithostratigraphy of DOV, the Flemish subsurface database | Belgian Lambert 72 (EPSG:31370), TAW | Made ground and Quaternary deposits over the Kattendijk and Berchem sands and the Boom Clay |
 | **Maasvlakte 2, Rotterdam, Netherlands** | 100 geotechnical boreholes from the Dutch Key Register of the Subsurface (BRO), with 3,188 laboratory results and 56 groundwater levels | RD New (EPSG:28992), NAP | Reclaimed land on Holocene clay and peat over Pleistocene sand and gravel, the harbour basins, and water content, unit weight, Atterberg limits, fines and undrained shear strength |
+| **Creswick deep leads, Victoria, Australia** | 150 groundwater bores with the hydrostratigraphic interpretation of the Victorian Department of Primary Industries, from the National Groundwater Information System (NGIS) | GDA94 / MGA zone 54 (EPSG:28354), AHD | Basalt lava flows that filled valleys cut into Palaeozoic bedrock and buried the sand and gravel of the old rivers, the deep leads |
 
 | Antwerp: formations along the Scheldt | Maasvlakte 2: water content in the section |
 |---|---|
 | ![Antwerp model from DOV formal stratigraphy](docs/antwerp.png) | ![Maasvlakte 2 model coloured by water content](docs/maasvlakte-water-content.png) |
+| **Creswick: basalt over the deep leads** | **Input data: a case typed in by hand** |
+| ![Creswick deep leads model from NGIS hydrostratigraphy](docs/creswick.png) | ![The Input data tab with the worked example and its stress profile](docs/input-data.png) |
 
-## Version 0.7
+## Version 0.8
 
-- **More real sites:** Antwerp (Belgium) and Maasvlakte 2 (Netherlands), next to Sakae (Japan). See [Reference datasets](#reference-datasets).
-- **Groundwater and stresses on sections:**
-  - the water table comes from the water levels in the logs, or from an assumed depth;
-  - a section can be coloured by vertical total stress σv, pore pressure u or vertical effective stress σ′v.
-  - Hovering over the section reads out the unit, depth and stresses.
-- **Laboratory and in-situ test results:**
-  - water content, unit weight, Atterberg limits, fines, organic content, su, qu, UCS, c′, φ′, E, k, qc, Vs, RQD, or any named property;
-  - read from CSV, AGS4 and BRO files, summarised per unit, and shown on sections, interpolated within each unit.
-- **Data editor:** type in or paste boreholes, logs, water levels, SPT and test results, and units with their unit weights and design values. See [Entering data by hand](#entering-data-by-hand).
-- **New formats:**
-  - Dutch BRO geotechnical boreholes (BHR-GT) and Flemish DOV boreholes with their interpretations;
-  - AGS4 test groups;
-  - test, SPT and water-level tables in CSV.
-- **Descriptions grouped by principal soil** in English, Dutch, French, German, Spanish, Portuguese, Italian and Japanese, when logs carry no unit codes.
-- **The PDF report** gains a ground-parameters table and a page for the field shown on the section.
-- **Fixes:**
-  - latitudes and longitudes in RD New (Netherlands) and Luxembourg TM were placed 170 m off;
-  - units hidden in the legend were still drawn on sections;
-  - a log starting below the collar gave the top unit invented thickness.
+- **Input data tab:** enter your own case and model it. Type in, or paste from a spreadsheet, the boreholes with their positions, the logs, water levels, SPT, laboratory and in-situ tests, and the units with their unit weights and design values. A preview follows every change: the boreholes in plan, the log of a borehole with σv, u, σ′v and σ′h down it, and the checks. **Build model** shows it in 3-D. See [Entering your own data](#entering-your-own-data). Open it directly at [kilickursat.github.io/GeoModel3D/#input](https://kilickursat.github.io/GeoModel3D/#input).
+- **One borehole is enough.** One or two boreholes, or boreholes in a line, are modelled over an extent around them, and any model can be extended beyond its outermost boreholes.
+- **Horizontal effective stress σ′h = K0 · σ′v** on sections, for the units given a K0.
+- **A fourth real site:** the Creswick deep leads in Victoria, Australia, from the National Groundwater Information System.
+- **Pinch-outs** stay at the borehole that lacks the unit; this is now the documented rule (see [How a model is built](#how-a-model-is-built)).
 
 Earlier versions:
+- **0.7:** real sites in Belgium and the Netherlands; groundwater, σv, u and σ′v on sections; laboratory and in-situ tests; Dutch BRO and Flemish DOV files; a data editor; descriptions grouped by principal soil in seven languages; the RD New and Luxembourg 170 m datum fix.
 - **0.6:** coordinate systems for 40 countries, fetched terrain and maps, Japanese borehole XML, unit rules, the Sakae site, adaptive refinement, PDF reports.
 - **0.5:** terrain grids, erosional units, unit weights, WebGPU rendering.
 - **0.4:** heterogeneous logs and pinch-outs; CSV, AGS4 and JSON import; sections at any orientation with export.
@@ -76,7 +66,7 @@ Use **Import data…** or drop files on the page. Files are read in the browser 
 | Flemish DOV boreholes | The XML of each borehole (`dov.vlaanderen.be/data/boring/…`) together with the XML of its interpretations (`…/data/interpretatie/…`). |
 | A project saved from GeoModel3D, or a Georeport3D extraction | The `.json` file. |
 | Terrain | An ESRI ASCII grid (`.asc`) or gridded `x y z` points (`.xyz`), with the boreholes or on its own. |
-| Nothing in a file yet | **Edit data…** ([Entering data by hand](#entering-data-by-hand)). |
+| Nothing in a file yet | The **Input data** tab ([Entering your own data](#entering-your-own-data)). |
 
 ### CSV tables
 
@@ -86,7 +76,7 @@ Each table is a CSV file with a header row. Headers are matched by name: case, s
 |---|---|---|
 | [boreholes.csv](docs/templates/boreholes.csv) | **Collars**, one row per borehole | **hole id** (`hole_id`, `Hole ID`, `BH`, `LOCA_ID`, `Name`); **x** (`x`, `Easting`, `E`) and **y** (`y`, `Northing`, `N`), *or* **latitude** and **longitude** (`lat`, `lon`); **ground level** (`z`, `Elevation`, `RL`, `Ground level`); optional **final depth** (`depth`, `Final depth`, `EOH`); optional **water depth** (`water_depth`, `Water level`, `GWL`) |
 | [logs.csv](docs/templates/logs.csv) | **Logs**, one row per interval | **hole id**; **from** and **to** (`from`/`to`, `Depth From`/`Depth To`, `Top`/`Base`), in metres below the collar; **unit** (`unit`, `Formation`, `Lithology`, `Stratum`, `GEOL_GEOL`) and/or **description** (`description`, `GEOL_DESC`) |
-| [units.csv](docs/templates/units.csv) | **Units**, top to bottom in stratigraphic order | **unit**; optional `name`, `colour` (`#rrggbb`), `erosive` (yes/no), unit weight `gamma` and saturated unit weight `gamma_sat` (kN/m³), design values `c` (kPa), `phi` (°), `su` (kPa), `E` (MPa), `k` (m/s) or any property of the catalogue below, and `source` |
+| [units.csv](docs/templates/units.csv) | **Units**, top to bottom in stratigraphic order | **unit**; optional `name`, `colour` (`#rrggbb`), `erosive` (yes/no), unit weight `gamma` and saturated unit weight `gamma_sat` (kN/m³), design values `c` (kPa), `phi` (°), `su` (kPa), `E` (MPa), `k` (m/s), `K0` or any property of the catalogue below, and `source` |
 | [water.csv](docs/templates/water.csv) | **Water levels** | **hole id**; **water depth** below the collar (m); optional `date` |
 | [spt.csv](docs/templates/spt.csv) | **SPT tests** | **hole id**; **depth** (m); `N`, or `blows` and `penetration` (mm, 300 for a complete test) |
 | [tests.csv](docs/templates/tests.csv) | **Test results**, long form: one value per row | **hole id**; **depth** (m), optional **to** for a sample over a depth range; **property** (key, name or symbol of the catalogue below, or any other name); **value**; optional `unit` |
@@ -117,7 +107,7 @@ How these tables are read:
 | `PI` | Plasticity index | % | | `k` | Hydraulic conductivity | m/s |
 | `fines` | Fines content (< 63 or 75 µm) | % | | `qc` | Cone resistance | MPa |
 | `organic` | Organic content | % | | `Vs` | Shear-wave velocity | m/s |
-| `RQD` | Rock quality designation | % | | | | |
+| `RQD` | Rock quality designation | % | | `K0` | Earth pressure coefficient at rest (gives σ′h) | – |
 
 ### AGS4
 
@@ -202,6 +192,7 @@ Fields of the project file:
 - **Depths and values:** depths are in metres below the collar. Unit weights are in kN/m³. `params` holds unit design values by catalogue key.
 - **Groundwater:** `groundwaterDepth` is an assumed water-table depth, used where no borehole has a water level.
 - **Model base:** `base` (optional) is the elevation of a flat model base.
+- **Model extent:** `margin` (optional, metres) extends the model beyond its outermost boreholes.
 - **Terrain:** cells run west to east from the south-west cell centre (`x0`, `y0`); `null` marks a cell without data.
 - **Coordinate system:** `crsCode` georeferences the project with a code from the registry. A system not in the registry can be given as a PROJ definition in `crsProj4`.
 - **Projects built from descriptions** also keep `rules` (`match`, `unit`, and optionally `minN`, `maxN`, `minZ`, `maxZ`), and each interval's logged description as `name`.
@@ -214,35 +205,47 @@ Fields of the project file:
 - **Section field (CSV)**: the stress or property shown, on a grid over the section;
 - **Report (PDF, A3 or A4)**.
 
-## Entering data by hand
+## Entering your own data
 
-**Edit data…** opens the project as tables:
+The **Input data** tab, next to **3-D model** at the top of the page, is where you enter your own case and model it. Open it there, with **Enter your own data…** in the toolbar or the dataset list, or directly at [kilickursat.github.io/GeoModel3D/#input](https://kilickursat.github.io/GeoModel3D/#input).
 
-| Tab | Holds |
+**Start** offers:
+- **New case:** empty tables to fill in;
+- **Worked example:** four boreholes with water levels, SPT, laboratory tests and unit parameters, to see the format and change it;
+- **Edit the dataset shown:** the tables of the model on screen, to change or add to;
+- **Import files…:** CSV, AGS4, borehole XML or project JSON, opened here for review before building;
+- **Continue the saved case:** what you typed before, if this browser kept it.
+
+Then fill in the steps:
+
+| Step | Holds |
 |---|---|
-| Project | Name, description, data source, coordinate system (EPSG code, name or PROJ definition; any other text names a local grid), assumed groundwater depth, model base |
+| Project | Name, description, data source, coordinate system (EPSG code, name or PROJ definition; empty or any other name for a local grid), assumed groundwater depth, model base, model extent beyond the boreholes |
 | Boreholes | Borehole, easting and northing *or* latitude and longitude, ground level, final depth |
 | Logs | Borehole, from, to, unit, description. **Fill units from descriptions** applies the project's unit rules, or the grouping by principal soil |
 | Water levels | Borehole, depth to water, date |
 | SPT | Borehole, depth, blows, penetration |
 | Tests | Borehole, depth, to, property, value: any laboratory or in-situ result |
-| Units | Unit, name, colour, erosive, γ, γsat, c′, φ′, su, E, k, source, in stratigraphic order (▲ ▼ to reorder) |
+| Units | Unit, name, colour, erosive, γ, γsat, c′, φ′, su, E, k, K0, source, in stratigraphic order (▲ ▼ to reorder) |
 
-How the editor works:
-- **Pasting:** cells copied from a spreadsheet paste into any table, starting at the cell pasted into, and add rows as needed.
-- **Large tables** are shown one borehole at a time.
-- **Apply** rebuilds the model through the same importer as CSV files, so typed data are checked the same way: rows that cannot be used, values outside plausible ranges, and units out of order are all reported.
-- **Download table (CSV)** saves a tab as a CSV that imports back.
-- **New empty project** starts from scratch.
-- Edits not yet applied are kept while the page is open.
+While you type, the preview shows:
+- **the boreholes in plan**, with the outline of the model; click a borehole to show it;
+- **the log of one borehole** as the model has it, with the vertical total stress σv, the pore pressure u, the vertical effective stress σ′v and, where K0 is given, the horizontal effective stress σ′h down it. Hover for the values at any depth; **Values at the contacts** lists them at the top and base of each unit;
+- **the checks** of the importer and the model: rows that cannot be used, values outside plausible ranges, units out of order.
 
-![The data editor with the laboratory results of a Maasvlakte borehole](docs/data-editor.png)
+**Build model** turns the tables into the model through the same importer as CSV files, and shows it in 3-D, where sections can be coloured by stresses or measured properties and a PDF report can be printed.
+
+Good to know:
+- **One borehole is enough.** A single borehole needs neither a position nor a ground level (0, 0 and 0 m are used, and said so). One or two boreholes, or boreholes in a line, are modelled over an extent around them; set **Model extent beyond the boreholes** to choose it, or to extend any model beyond its outermost boreholes.
+- **Unit weights** give the stresses: γ above the water table and γsat below it. A unit without them takes the mean measured unit weight, or else 18 and 20 kN/m³, which the preview and the report say. **K0** gives σ′h. The other values are design parameters, kept with the model and listed in the report.
+- **Pasting:** cells copied from a spreadsheet paste into any table, starting at the cell pasted into, and add rows as needed. Large tables are shown one borehole at a time.
+- **Nothing is uploaded.** What you type is kept in this browser, so a reload does not lose it, until you type in another case. **Save case (JSON)** keeps a copy you can import again, and **Download table (CSV)** saves a table as CSV.
 
 ## Groundwater, stresses and measured properties
 
 The **Colour** selector on the section bar colours the 3-D section face and the 2-D section by one of:
 - **Units** (the default);
-- **vertical total stress σv**, **pore water pressure u** or **vertical effective stress σ′v**;
+- **vertical total stress σv**, **pore water pressure u**, **vertical effective stress σ′v**, or, where the units are given a K0, **horizontal effective stress σ′h**;
 - **any measured property**.
 
 Colours are bands of one hue, with a legend that states what the field rests on.
@@ -252,13 +255,14 @@ How the fields are computed:
 - **Stresses:**
   - σv sums unit weight × thickness from the ground down, using γ above the water table and γsat below it.
   - u is hydrostatic below the water table, and σ′v = σv − u.
+  - σ′h = K0 · σ′v with each unit's own K0; units without a K0 are left uncoloured, and the legend names them.
   - Unit weights are, in order of preference: the unit's own values; the mean measured bulk unit weight in the unit; or an assumed 18 and 20 kN/m³. Assumed values are reported, because they suit few soils: peat or volcanic ash are much lighter, rock heavier.
   - Where the water table is at the ground, as under open water, stresses are counted from the ground.
 - **Measured properties** (SPT N, water content, su…):
   - they are interpolated within each unit only, by inverse distance with horizontal distances shortened ten times, since properties vary much more with depth than across a site;
   - units where a property was not measured stay grey;
   - SPT N-values are coloured up to 50, the usual refusal.
-- **Read-outs:** hovering over the section face (3-D) or the 2-D section shows the unit, the depth, σv, u and σ′v, and the field's value.
+- **Read-outs:** hovering over the section face (3-D) or the 2-D section shows the unit, the depth, σv, u and σ′v (and σ′h where K0 is given), and the field's value.
 
 ![Vertical effective stress on a section through the Sakae site](docs/sakae-effective-stress.png)
 
@@ -274,14 +278,15 @@ Boreholes → contacts → TIN horizons → closed unit volumes → sections
 1. **Units from descriptions.** Where logs give soil or rock descriptions (borehole XML, BRO, descriptions only), the project's unit rules assign each interval a unit. A unit is given by the first rule whose pattern matches the description, and whose N-value and elevation ranges contain the interval's median SPT N-value and top elevation. Descriptions that no rule matches become units of their own and are reported.
 2. **Stratigraphic column.** Units are ordered youngest (top) to oldest (bottom). A project can declare the order. Otherwise it is inferred from the logs: if unit A lies directly above unit B in any hole, A comes first. Logs that disagree are reported.
 3. **Reading a log.** Each borehole gives the elevation of every contact it shows:
-   - **Missing units:** a unit missing between two logged units has zero thickness at that hole, so it thins to zero towards it from the holes that logged it (it pinches out).
+   - **Missing units:** a unit missing between two logged units has zero thickness at that hole, so it thins to zero towards it from the holes that logged it: it pinches out at the borehole that lacks it. (Pinching out between boreholes instead was tried and not adopted: it moved the base of the units further from the logs on the test sites.)
    - **Out of order:** a unit logged below a younger one is modelled as the younger unit and reported.
    - **Gaps:** a contact inside an unlogged gap is placed at the middle of the gap and reported.
    - **Logs starting below the collar:** for a log that begins some metres down, the contacts above its first unit are interpolated from the holes that logged them, never below where the log begins.
 4. **Erosion.** If the unit directly above a contact is marked erosive, the units missing below it were eroded, not thinned. Their original surfaces at that hole are estimated from the holes that logged them, never below the erosion surface, and then cut by it.
 5. **End of hole.** The base of the last unit a hole enters is not observed. Below it, horizons are inferred by stacking unit thicknesses, interpolated by inverse-distance weighting from holes that logged those units completely. The base of that last unit is kept below the end of the hole.
 6. **Model base.** The lowest unit closes at a flat base at the deepest end of hole, or at the project's `base` elevation if one is given.
-7. **Horizons.** All horizons share one Delaunay triangulation of the borehole collars, and the model covers the convex hull of the boreholes without extrapolating beyond it. Between holes, horizons are linear.
+7. **Horizons.** All horizons share one Delaunay triangulation of the borehole collars, and the model covers the convex hull of the boreholes. Between holes, horizons are linear.
+   - **Extent:** with a model extent (`margin`), a frame of nodes is added around the boreholes at that distance, and every horizon there is interpolated from the boreholes with the same inverse-distance weights, so the units keep their order and nothing on the frame counts as logged. One or two boreholes, or boreholes in a line, which enclose no area, get an extent of their own: the deepest log, a quarter of their spread, and at least 10 m.
    - **Refinement:** with terrain or erosive units, the triangulation is refined by longest-edge bisection until no edge is longer than the terrain cell, or a fraction of the site, within about 80,000 triangles. The ground then follows the terrain, and erosion surfaces cut sharply everywhere, also between distant boreholes.
    - **Pinch-outs and outcrops:** where a horizon meets the one above it or the model base, that line is added to the triangulation, so pinch-outs and outcrops run straight across triangles instead of stepping along their edges.
 8. **Terrain.** The ground follows the terrain grid.
@@ -346,6 +351,14 @@ The viewer uses three.js's `WebGPURenderer` with TSL node materials, so one shad
   - **Pleistocene sand and gravel:** below it.
 
   In the basins the logs start at the bed, 17–21 m below NAP, so no terrain is fetched: the map lies on a plane at the collars' median level. `scripts/make-rotterdam-site.ts` pins and downloads the IMBRO XML.
+- **Creswick deep leads, Victoria, Australia (real site).** 150 groundwater bores in about 10 × 10 km of the basalt plains north-east of Creswick, from the National Groundwater Information System (NGIS v1.1, 2013) of the Bureau of Meteorology. Lava flows filled valleys cut into Palaeozoic bedrock and buried the sand and gravel of the old rivers, the deep leads, once mined for gold. The units are the hydrostratigraphic interpretation of each log by the Victorian Department of Primary Industries, as published in NGIS, from the surface down:
+  - **Surface alluvium.**
+  - **Basalt, upper flows**, then **interbasalt clay** and **basalt, lower flows**.
+  - **Sub-basaltic clay.**
+  - **Deep lead:** buried river sand and gravel.
+  - **Palaeozoic bedrock.**
+
+  Every log runs in this order, with no gaps to fill. Coordinates are in GDA94 / MGA zone 54, with ground elevations in metres AHD from LiDAR, a terrain model or GPS. Only bore IDs, positions, elevations, depths and the interpretation are kept: the licence and source fields of NGIS are not read. `scripts/extract-ngis-deepleads.py` reads the bores from the NGIS geodatabase on data.gov.au, and `scripts/make-deepleads-site.ts` builds the dataset.
 - **Synthetic valley, buried channel and layer-cake.** Generated by the scripts in `scripts/`; they exercise the modelling kernel and are not real sites. The channel generator also writes the true geometry the tests compare against.
 
 ## Architecture
@@ -365,7 +378,7 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 - `src/io.ts`: CSV, AGS4, borehole XML and JSON import and export
 - `src/boringXml.ts`, `src/broXml.ts`, `src/dovXml.ts`, `src/xml.ts`: Japanese, Dutch and Flemish borehole XML, and a small XML reader
 - `src/rules.ts`: units from logged descriptions
-- `src/tables.ts`, `src/editor.ts`: the data editor
+- `src/tables.ts`, `src/input.ts`: the Input data tab (tables, live preview, checks)
 - `src/crs.ts`: coordinate systems (registry, suggestion and conversion)
 - `src/tiles.ts`: map and elevation tiles, and terrain resampling
 - `src/main.ts`: three.js viewer and interface
@@ -392,21 +405,20 @@ Every push to `main` runs the tests, builds the site and publishes `dist/` to Gi
    - terrain contours and hillshade;
    - fading where the model is inferred rather than logged.
 2. **More physics:**
-   - horizontal stress where K0 is given;
    - settlement and bearing estimates from the unit parameters;
    - property models in 3-D, not only on sections.
-3. A choice, per unit, of where a missing unit pinches out (at the borehole that lacks it, or between boreholes).
-4. **More countries:** reference sites in the Americas and Oceania with clearly licensed public data, and CPT import (BRO, DOV, AGS4 `SCPT`).
-5. Faults; constrained TIN boundaries, pinch-out lines and geological map contacts.
-6. Fence diagrams for boreholes along an alignment (tunnels, roads).
-7. GeoJSON, DXF and LAS import; GeoTIFF terrain.
-8. Streaming and level of detail for large models.
+3. **More data:** CPT import (BRO, DOV, AGS4 `SCPT`), and a reference site in the Americas once clearly licensed public data are found.
+4. Faults; constrained TIN boundaries, pinch-out lines and geological map contacts.
+5. Fence diagrams for boreholes along an alignment (tunnels, roads).
+6. GeoJSON, DXF and LAS import; GeoTIFF terrain.
+7. Streaming and level of detail for large models.
 
 ## Data sources
 
 - **Borehole logs** of the Sakae site and the Japanese test fixtures: 国土地盤情報検索サイト「KuniJiban」の地盤情報 (KuniJiban; MLIT, PWRI and PARI). Under the KuniJiban terms of use, individual logs carry no copyright and may be copied and redistributed, provided their source is shown.
 - **Boreholes and interpretations** of the Antwerp site and the DOV test fixtures: Databank Ondergrond Vlaanderen (DOV), Flemish Government; consulted on 07/10/2026, on https://www.dov.vlaanderen.be. They may be reused free of charge, commercially or not, under the Flemish government's model licence for free reuse (Modellicentie Gratis Hergebruik), which asks for this attribution.
 - **Geotechnical boreholes** of the Maasvlakte site and the BRO test fixtures: BRO, Basisregistratie Ondergrond (Dutch Key Register of the Subsurface); open data in the public domain (CC0 1.0).
+- **Groundwater bores** of the Creswick site: National Groundwater Information System (NGIS) v1.1, © Commonwealth of Australia (Bureau of Meteorology), licensed under [CC BY 3.0 AU](https://creativecommons.org/licenses/by/3.0/au/), from [data.gov.au](https://data.gov.au/data/dataset/0ddc1f79-6ed3-4f4f-9195-52cf3eb59127); bore data © State of Victoria. Changes made: the bores of one area selected, multi-unit intervals split into their units, and the units named in English as above.
 - **Coordinate systems:** derived from the EPSG Geodetic Parameter Dataset (© IOGP), retrieved through epsg.io.
 - **Terrain and maps,** fetched in the browser and not stored here:
   - 地理院タイル (GSI tiles, Geospatial Information Authority of Japan);
@@ -421,4 +433,4 @@ Apache-2.0: see [LICENSE](LICENSE). The data listed under [Data sources](#data-s
 
 ## Keywords
 
-3D geological modelling · geological model software · geotechnical engineering · engineering geology · borehole logs · borehole data visualization · stratigraphy · subsurface modelling · cross-sections · groundwater · effective stress · ground investigation · AGS4 · BRO · DOV · KuniJiban · coordinate systems · GIS · three.js · WebGPU · open source
+3D geological modelling · geological model software · geotechnical engineering · engineering geology · hydrogeology · borehole logs · borehole data visualization · manual data entry · stratigraphy · subsurface modelling · cross-sections · groundwater · effective stress · horizontal stress K0 · ground investigation · AGS4 · BRO · DOV · KuniJiban · NGIS · Australia · coordinate systems · GIS · three.js · WebGPU · open source

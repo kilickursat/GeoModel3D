@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.8.0 — 2026-10-09
+
+### Added
+- **Input data tab.** A tab next to the 3-D model where your own case is entered and modelled, replacing the data editor dialog:
+  - start from a new case, a worked example, the dataset shown, imported files, or the case saved in this browser;
+  - steps for the project (with the coordinate system, assumed groundwater depth, model base and model extent), boreholes, logs, water levels, SPT, tests, and units with γ, γsat, c′, φ′, su, E, k and K0;
+  - a live preview: the boreholes in plan with the model outline, one borehole's log with σv, u, σ′v and σ′h down it (with a hover read-out and a table of values at the contacts), and the importer's and the model's checks;
+  - **Build model** shows the case in 3-D; **Save case (JSON)** and **Download table (CSV)** keep copies, and the case is kept in this browser between visits;
+  - reachable from the tabs, the toolbar (**Enter your own data…**), the dataset list, and the link `#input`.
+- **Model extent.** A project's `margin` extends the model beyond its outermost boreholes. One or two boreholes, or boreholes in a line, which enclose no area, now give a model over an extent of their own instead of none. A single borehole may be typed without a position or ground level.
+- **Horizontal effective stress** σ′h = K0 · σ′v on sections and in read-outs, for units given a K0 (new `K0` property; a `K0` column in the units table and template).
+- **A real site in Australia:** the Creswick deep leads, Victoria: 150 groundwater bores from the National Groundwater Information System (Bureau of Meteorology, CC BY 3.0 AU), with the hydrostratigraphic interpretation of the Victorian Department of Primary Industries, in GDA94 / MGA zone 54 with AHD heights.
+
+### Changed
+- **Pinch-outs** stay at the borehole that lacks the unit; the README now states the rule and why the alternative was not adopted.
+- The camera, terrain margin and map extent follow the model's footprint rather than the boreholes', so an extended model is framed whole.
+- Imported or typed datasets are listed as "Your data: …".
+
+### Removed
+- The **Edit data…** dialog, superseded by the Input data tab.
+
 ## 0.7.0 — 2026-10-08
 
 ### Added
