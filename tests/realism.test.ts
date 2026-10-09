@@ -143,6 +143,24 @@ describe("terrain",()=>{
     const i=m2.boreholes.findIndex(b=>b.id==="BH-07");
     expect(m2.horizons[0].z[i]).toBe(p.boreholes.find(b=>b.id==="BH-07")!.z);
   });
+
+  it("lists only the collars that stand out when many scatter about a coarse terrain grid",()=>{
+    // 30 collars 2 m above a flat grid on average, scattered by up to ±3 m, as with a coarse grid or heights read off a
+    // map; one of them is 15 m higher still.
+    const units:UnitDef[]=["A","B"].map(id=>({id,name:id,color:"#888888"}));
+    const log=[{from:0,to:5,unit:"A"},{from:5,to:20,unit:"B"}];
+    const holes=Array.from({length:30},(_,i)=>({id:"H"+i,x:(i%6)*50,y:Math.floor(i/6)*50,intervals:log,
+      z:102+(i===29?15:((i*7919)%13-6)/2)}));
+    const terrain:TerrainGrid={x0:-10,y0:-10,dx:10,dy:10,ncols:28,nrows:23,z:new Array(28*23).fill(100)};
+    const m=buildGeologicalModel({name:"scatter",units,boreholes:holes,terrain});
+    const notes=m.warnings.join("\n");
+    expect(notes).toMatch(/Collars lie 2 m above the terrain grid on average/);
+    expect(notes).toMatch(/(\d+) of 30 collars are more than 1 m off the terrain grid after the average offset, with a typical scatter of ±[\d.]+ m; the terrain is adjusted to every collar, and only those more than [\d.]+ m off are listed/);
+    expect(Number(notes.match(/(\d+) of 30 collars/)![1])).toBeGreaterThan(10);
+    expect(m.warnings.filter(w=>/: collar .* terrain adjusted to the collar/.test(w))).toEqual(["H29: collar 117 m, terrain 100 m (+17 m); terrain adjusted to the collar"]);
+    // Every collar keeps its height.
+    for(const h of holes)expect(m.horizons[0].z[m.boreholes.findIndex(b=>b.id===h.id)]).toBe(h.z);
+  });
 });
 
 describe("erosional units",()=>{

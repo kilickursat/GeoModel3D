@@ -290,7 +290,7 @@ Boreholes → contacts → TIN horizons → closed unit volumes → sections
    - **Refinement:** with terrain or erosive units, the triangulation is refined by longest-edge bisection until no edge is longer than the terrain cell, or a fraction of the site, within about 80,000 triangles. The ground then follows the terrain, and erosion surfaces cut sharply everywhere, also between distant boreholes.
    - **Pinch-outs and outcrops:** where a horizon meets the one above it or the model base, that line is added to the triangulation, so pinch-outs and outcrops run straight across triangles instead of stepping along their edges.
 8. **Terrain.** The ground follows the terrain grid.
-   - **Collars:** the grid is corrected by the difference between each surveyed collar and the grid, interpolated between boreholes, so collars keep their surveyed elevations. A consistent offset (another height datum) is reported once; other collars more than 1 m off are listed.
+   - **Collars:** the grid is corrected by the difference between each surveyed collar and the grid, interpolated between boreholes, so collars keep their surveyed elevations. A consistent offset (another height datum) is reported once; other collars more than 1 m off are listed. When more than ten are, as with a coarse terrain grid or collar heights read off a map, one line gives their typical scatter (a robust standard deviation), and only the collars more than three times that far off are listed.
    - **Ground above the collars:** where the ground lies above the surface through the collars, the extra height is made of what the top 5 m of the surrounding boreholes is made of.
    - **Ground below the collars:** where it lies below, every horizon is kept at or below the ground.
 9. **Volumes.** Each unit is a closed, outward-facing shell between its top and base horizons. Its volume is exact for this piecewise-linear model: triangle area × mean vertex thickness.
@@ -392,7 +392,7 @@ npm test         # unit tests (vitest)
 npm run build    # type-check, then build dist/ and dist/geomodel3d-offline.html
 ```
 
-`npm run dev` starts Vite's development server. Where a local server cannot be used, build and open `dist/geomodel3d-offline.html` instead.
+`npm run dev` starts Vite's development server. Where a local server cannot be used, build and open `dist/geomodel3d-offline.html` instead. [CONTRIBUTING.md](CONTRIBUTING.md) explains how to submit a change.
 
 ## Deployment
 
@@ -426,6 +426,14 @@ Every push to `main` runs the tests, builds the site and publishes `dist/` to Gi
   - map data © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors.
 
 No copyright is claimed here on the data above, and the Apache-2.0 licence does not apply to them.
+
+## Contributing
+
+Contributions are welcome: bug reports, ideas, documentation, code and openly licensed data. [CONTRIBUTING.md](CONTRIBUTING.md) explains how to set up the project, test a change and submit it, and the rules for adding data. Before starting on a larger change, please open an [issue](https://github.com/kilickursat/GeoModel3D/issues) so that the approach can be agreed; the [roadmap](#roadmap) lists what is planned. Everyone taking part follows the [code of conduct](CODE_OF_CONDUCT.md).
+
+## Sponsoring
+
+GeoModel3D is free and open source. You can support it on [Patreon](https://www.patreon.com/geotechCLI). If you or your organisation would like to sponsor its development, please contact Kursat Kilic by e-mail at [kilic_kursat@hotmail.com](mailto:kilic_kursat@hotmail.com).
 
 ## License
 
