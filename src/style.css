@@ -139,6 +139,13 @@ body[data-mode="input"] :is(.ui .panel,.ui .hint,.toolbar,.section-control,.sect
 .ws-card{border:1px solid rgba(160,190,200,.12);border-radius:8px;padding:8px 10px}
 .ws-card-head{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#d9edf5;font-weight:600;margin-bottom:6px}
 .ws-card-head select{min-width:0;max-width:170px;background:#0d1d29;color:#e8f2f7;border:1px solid rgba(160,190,200,.25);border-radius:6px;padding:3px 6px;font:inherit;font-weight:400}
+/* The earth pressure buttons wrap together, under Stresses, where the row is too narrow for both. */
+.ws-view{display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px;margin:0 0 6px;font-size:11px}
+.ws-view-group{display:flex;align-items:center;gap:3px}
+.ws-view span{color:#8aa2ae;margin-right:2px}
+.ws-view button{background:#0d1d29;color:#c4d2d9;border:1px solid rgba(160,190,200,.25);border-radius:6px;padding:2px 7px;font:inherit;cursor:pointer}
+.ws-view button:hover{border-color:rgba(160,190,200,.5)}
+.ws-view button[aria-pressed="true"]{background:#16384a;color:#e8f2f7;border-color:#78c9df}
 .ws-plan svg,.ws-column svg{display:block}
 .ws-pt{cursor:pointer}
 .ws-column{position:relative}

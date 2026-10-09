@@ -7,7 +7,7 @@ import {GeoProject} from "./geology";
 import {ImportResult,toProjectJson} from "./io";
 import {properties} from "./properties";
 import {buildGeologicalModel,GeoModel} from "./model";
-import {stressAt,unitWeights,UnitWeight,ASSUMED_WEIGHT} from "./fields";
+import {stressAt,unitWeights,UnitWeight,ASSUMED_WEIGHT,earthPressure,pressureProfile,earthPressureNotes,Drainage,ProfilePoint} from "./fields";
 import {convexHull} from "./terrain";
 import {COLUMNS,TABLE_NAMES,TableName,EditorTables,tablesFromProject,projectFromTables,emptyTables,exampleTables,fillUnits,tableCsv} from "./tables";
 
@@ -22,15 +22,26 @@ const copy=(t:EditorTables):EditorTables=>JSON.parse(JSON.stringify(t));
 const slug=(s:string)=>s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"case";
 const niceCeil=(v:number)=>{const p=10**Math.floor(Math.log10(v)),f=v/p;return (f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*p};
 
-// The stress profile's series in legend order. The colours were validated as a set on the panel surface; u is also
-// dashed, as the water table is, and every line is labelled at its end.
-const SERIES=[
-  {key:"sv",label:"σv",name:"Vertical total stress",color:"#199e70",dash:""},
-  {key:"u",label:"u",name:"Pore water pressure",color:"#3987e5",dash:"5 3"},
-  {key:"s",label:"σ′v",name:"Vertical effective stress",color:"#d95926",dash:""},
-  {key:"sh",label:"σ′h",name:"Horizontal effective stress, K0 · σ′v",color:"#9085e9",dash:""}
-] as const;
-type SeriesKey=typeof SERIES[number]["key"];
+// The profile shows the stresses, or the earth pressures on a wall, drained or undrained.
+type View="stress"|Drainage;
+// Its series in legend order. The colours of each view were validated as a set on the panel surface, and a quantity
+// keeps its colour in both views; u is also dashed, as the water table is, and every line is labelled at its end.
+// Undrained earth pressures are total pressures, water included.
+interface Series { key:string; label:string; name:string; color:string; dash:string; of(p:Pick<ProfilePoint,"stress"|"pressure">):number }
+const U:Series={key:"u",label:"u",name:"Pore water pressure",color:"#3987e5",dash:"5 3",of:p=>p.stress.u};
+const STRESS_SERIES:Series[]=[
+  {key:"sv",label:"σv",name:"Vertical total stress",color:"#199e70",dash:"",of:p=>p.stress.sv},
+  U,
+  {key:"s",label:"σ′v",name:"Vertical effective stress",color:"#d95926",dash:"",of:p=>p.stress.s},
+  {key:"h",label:"σ′h",name:"Horizontal effective stress, K0 · σ′v",color:"#9085e9",dash:"",of:p=>p.pressure.rest}
+];
+const pressureSeries=(drained:boolean):Series[]=>[
+  {key:"a",label:drained?"σ′a":"σa",name:`Active earth pressure${drained?", effective":", total"}`,color:"#c98500",dash:"",of:p=>p.pressure.active},
+  {key:"h",label:drained?"σ′h":"σh",name:drained?"Earth pressure at rest, K0 · σ′v":"Earth pressure at rest, total: K0 · σ′v + u",color:"#9085e9",dash:"",of:p=>p.pressure.rest},
+  {key:"p",label:drained?"σ′p":"σp",name:`Passive earth pressure${drained?", effective":", total"}`,color:"#d55181",dash:"",of:p=>p.pressure.passive},
+  U
+];
+const PRESSURE_SERIES:Record<Drainage,Series[]>={drained:pressureSeries(true),undrained:pressureSeries(false)};
 
 const HELP:Record<TableName,string>={
   boreholes:"One row per borehole: an easting and northing, or a latitude and longitude, and the ground level of the collar. The final depth is needed only where the hole went deeper than its log.",
@@ -38,7 +49,7 @@ const HELP:Record<TableName,string>={
   water:"Depths to water below the collar; the shallowest reading of each borehole sets the water table there.",
   spt:"N-values: the blows for 300 mm, or the blows and the penetration where the test stopped short.",
   tests:"One value per row, from the laboratory or in situ. Property: a key from the list (w, gamma, su, qu, c, phi, E, k, qc…) or any other name, in the units the list gives. Depths in metres.",
-  units:"Top to bottom in stratigraphic order (▲ ▼ reorder). γ and γsat give the stresses, or else the mean measured unit weight, or else 18 and 20 kN/m³ are assumed; K0 gives the horizontal effective stress; the other values are design parameters, kept with the model and reported."
+  units:"Top to bottom in stratigraphic order (▲ ▼ reorder). γ and γsat give the stresses, or else the mean measured unit weight, or else 18 and 20 kN/m³ are assumed; K0 gives the horizontal effective stress; c′, φ′ and su give the earth pressures; E and k are design parameters, kept with the model and reported."
 };
 
 interface Saved { tables:EditorTables; savedAt:string }
@@ -73,7 +84,8 @@ export function createInputWorkspace(o:InputOptions):InputWorkspace{
   let step:Step="start",filter="",selected="",message="";
   let preview:{result?:ImportResult;model?:GeoModel;error?:string}={};
   let timer:ReturnType<typeof setTimeout>|undefined;
-  let profile:{z:number[];water?:number;weights:UnitWeight[];k0:Array<number|undefined>;top:number;depth:number;max:number;frame:number[];units:string[]}|null=null;
+  let view:View="stress";
+  let profile:{z:number[];water?:number;weights:UnitWeight[];params:Array<Record<string,number>|undefined>;drainage:Drainage;series:Series[];top:number;depth:number;frame:number[];units:string[]}|null=null;
 
   const el=document.createElement("section");
   el.className="workspace";
@@ -84,7 +96,9 @@ export function createInputWorkspace(o:InputOptions):InputWorkspace{
 <div class="ws-body"></div>
 <aside class="ws-preview" aria-label="Preview">
   <div class="ws-card"><div class="ws-card-head"><span>Boreholes in plan</span></div><div class="ws-plan"></div></div>
-  <div class="ws-card"><div class="ws-card-head"><span>Log and stresses</span><select class="ws-hole" aria-label="Borehole shown"></select></div><div class="ws-column"></div></div>
+  <div class="ws-card"><div class="ws-card-head"><span class="ws-column-title">Log and stresses</span><select class="ws-hole" aria-label="Borehole shown"></select></div>
+    <div class="ws-view" role="group" aria-label="Down the borehole, show"><button data-view="stress" aria-pressed="true">Stresses</button><div class="ws-view-group"><span>Earth pressure:</span><button data-view="drained" aria-pressed="false" title="Long term: effective stresses, from c′ and φ′">Drained</button><button data-view="undrained" aria-pressed="false" title="Short term: total stresses, from su where it is given">Undrained</button></div></div>
+    <div class="ws-column"></div></div>
   <div class="ws-card"><div class="ws-card-head"><span>Checks</span></div><div class="ws-checks" aria-live="polite"></div></div>
 </aside></div>
 <footer class="ws-foot"><span class="ws-status" aria-live="polite"></span><button class="ws-csv">Download table (CSV)</button><button class="ws-json" title="A project file you can import again">Save case (JSON)</button><button class="ws-discard">Discard edits</button><button class="ws-build">Build model</button></footer>
@@ -206,6 +220,8 @@ ${field("margin","Model extent beyond the boreholes (m)","The model reaches this
     plan.innerHTML=planSvg(m,selected);
     holeSelect.innerHTML=ids.map(id=>`<option${id===selected?" selected":""}>${esc(id)}</option>`).join("");
     holeSelect.disabled=!ids.length;
+    el.querySelector(".ws-column-title")!.textContent=view==="stress"?"Log and stresses":"Log and earth pressure";
+    for(const b of el.querySelectorAll<HTMLButtonElement>(".ws-view button"))b.setAttribute("aria-pressed",String(b.dataset.view===view));
     column.innerHTML=m&&selected?columnView(m,ids.indexOf(selected)):`<p class="ws-empty">${t?"No borehole placed yet.":"Start a case to see its boreholes here."}</p>`;
     checks.innerHTML=checksView();
   }
@@ -237,50 +253,51 @@ ${holes.map(b=>{const on=b.id===sel,x=X(b.x),y=Y(b.y);return `<g class="ws-pt" d
 <text x="${W-12}" y="13" text-anchor="middle">N</text><path d="M${W-12} 16 l-3.5 8 h7 z" fill="#8aa2ae"/></g></svg>`;
   }
 
-  // The log of one borehole as the model has it there, and the stresses down it.
+  // The log of one borehole as the model has it there, and the stresses or the earth pressures down it.
   function columnView(m:GeoModel,i:number){
     const K=m.units.length,z=m.horizons.map(h=>h.z[i]),top=z[0],bottom=z[K],depth=Math.max(top-bottom,1e-6);
     const w=m.water?.z[i],water=w!==undefined&&Number.isFinite(w)?w:undefined;
-    const weights=unitWeights(m),k0=m.units.map(u=>u.params?.K0),withH=k0.some(v=>v!==undefined);
-    const series=SERIES.filter(s=>s.key!=="sh"||withH);
-    const value=(k:number,e:number):Record<SeriesKey,number>=>{
-      const r=stressAt(z,water,weights,e)!;
-      return {sv:r.sv,u:r.u,s:r.s,sh:k0[k]!==undefined?k0[k]!*r.s:NaN};
-    };
-    // Each unit from its top to its base, through the water table where it lies in the unit.
-    const segments:Array<{k:number;points:Array<{e:number;v:Record<SeriesKey,number>}>}>=[];
-    for(let k=0;k<K;k++){
-      const a=z[k],b=z[k+1];
-      if(a-b<1e-9)continue;
-      const es=[a,...(water!==undefined&&water<a&&water>b?[water]:[]),b];
-      segments.push({k,points:es.map(e=>({e,v:value(k,e)}))});
-    }
-    const all=segments.flatMap(s=>s.points.flatMap(p=>series.map(q=>p.v[q.key]))).filter(Number.isFinite);
+    const weights=unitWeights(m),params=m.units.map(u=>u.params),drainage:Drainage=view==="undrained"?"undrained":"drained";
+    // Each unit from its top to its base, through the water table where it lies in the unit and the depths where the
+    // soil starts or stops pulling on a wall: every line is straight between these points.
+    const {segments,tension}=pressureProfile(z,water,weights,params,drainage);
+    const withK0=params.some(q=>q?.K0!==undefined);
+    const series=(view==="stress"?STRESS_SERIES:PRESSURE_SERIES[drainage]).filter(s=>s.key!=="h"||withK0);
+    const points=segments.flatMap(s=>s.points);
+    const all=points.flatMap(p=>series.map(q=>q.of(p))).filter(Number.isFinite);
     const max=niceCeil(Math.max(10,...all));
     const W=316,H=296,band=12,l=34,r=14,tp=34,bt=22,px0=l+band+8,pw=W-px0-r,ph=H-tp-bt;
     const X=(v:number)=>px0+v/max*pw,Y=(e:number)=>tp+(top-e)/depth*ph;
-    profile={z,water,weights,k0,top,depth,max,frame:[px0,tp,pw,ph],units:m.units.map(u=>u.name)};
+    profile={z,water,weights,params,drainage,series,top,depth,frame:[px0,tp,pw,ph],units:m.units.map(u=>u.name)};
     const dStep=niceCeil(depth/5),ticks:number[]=[];
     for(let d=0;d<=depth+1e-9;d+=dStep)ticks.push(d);
+    // A line runs through the points where it has a value, stepping across at a contact where the value changes.
     const lines=series.map(q=>{
-      let path="";
-      if(q.key==="sh")for(const s of segments){const pts=s.points.filter(p=>Number.isFinite(p.v.sh));if(pts.length)path+=pts.map((p,j)=>`${j?"L":"M"}${X(p.v.sh).toFixed(1)} ${Y(p.e).toFixed(1)}`).join("")}
-      else path=segments.flatMap(s=>s.points).map((p,j)=>`${j?"L":"M"}${X(p.v[q.key]).toFixed(1)} ${Y(p.e).toFixed(1)}`).join("");
+      let path="",open=false;
+      for(const p of points){
+        const v=q.of(p);
+        if(!Number.isFinite(v)){open=false;continue}
+        path+=`${open?"L":"M"}${X(v).toFixed(1)} ${Y(p.e).toFixed(1)}`;open=true;
+      }
       return path?`<path d="${path}" fill="none" stroke="${q.color}" stroke-width="2" stroke-linejoin="round"${q.dash?` stroke-dasharray="${q.dash}"`:""}/>`:"";
     }).join("");
     // The values at the base of the log, in one row under the plot: each label starts under the end of its line, then
     // labels that would touch are pushed apart, and a leader joins each to its line.
     const ends=series.map(q=>{
-      const last=[...segments].reverse().flatMap(s=>[...s.points].reverse()).find(p=>Number.isFinite(p.v[q.key]));
-      return last?{q,text:`${q.label} ${fmt(last.v[q.key])}`,x:X(last.v[q.key])}:null;
+      const last=[...points].reverse().find(p=>Number.isFinite(q.of(p)));
+      return last?{q,text:`${q.label} ${fmt(q.of(last))}`,x:X(q.of(last))}:null;
     }).filter((e):e is NonNullable<typeof e>=>!!e).sort((a,b)=>a.x-b.x);
     const widths=ends.map(e=>e.text.length*5.4+6),lo=l,hi=W-2,at=ends.map((e,j)=>Math.min(Math.max(e.x,lo+widths[j]/2),hi-widths[j]/2));
     for(let j=1;j<at.length;j++)at[j]=Math.max(at[j],at[j-1]+(widths[j-1]+widths[j])/2);
     for(let j=at.length-1;j>=0;j--)at[j]=Math.min(at[j],j===at.length-1?hi-widths[j]/2:at[j+1]-(widths[j]+widths[j+1])/2);
     const labels=ends.map((e,j)=>`<path d="M${e.x.toFixed(1)} ${tp+ph}L${at[j].toFixed(1)} ${tp+ph+6}" fill="none" stroke="${e.q.color}"/><text x="${at[j].toFixed(1)}" y="${tp+ph+16}" text-anchor="middle">${e.text}</text>`).join("");
-    const assumed=m.units.filter((_,k)=>weights[k].source==="assumed").map(u=>u.name);
-    const rows=segments.flatMap(s=>[s.points[0],s.points[s.points.length-1]].map((p,j)=>({k:s.k,e:p.e,v:p.v,base:j===1})));
-    return `<svg class="ws-column-svg" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Log of ${esc(m.boreholes[i].id)} with the stresses down it">
+    const assumed=m.units.filter((_,k)=>weights[k].source==="assumed").map(u=>u.name),notes:string[]=[];
+    if(water===undefined)notes.push("No water table here: pore pressure is zero.");
+    if(assumed.length)notes.push(`Unit weights assumed (${ASSUMED_WEIGHT.above} and ${ASSUMED_WEIGHT.below} kN/m³) for ${assumed.join(", ")}.`);
+    if(view!=="stress")notes.push(...earthPressureNotes(m.units.map(u=>u.name),segments.map(s=>s.k),params,drainage,tension.map(t=>({from:top-t.top,to:top-t.bottom}))));
+    if(!withK0)notes.push(view==="stress"?"Give K0 in the Units table for the horizontal stress.":"Give K0 for the pressure at rest.");
+    const rows=segments.flatMap(s=>[s.points[0],s.points[s.points.length-1]].map((p,j)=>({p,base:j===1})));
+    return `<svg class="ws-column-svg" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Log of ${esc(m.boreholes[i].id)} with the ${view==="stress"?"stresses":"earth pressures"} down it">
 <g font-size="10" fill="#c4d2d9">${series.map((q,j)=>`<g transform="translate(${px0+j*62},12)"><line x1="0" x2="14" y1="-3" y2="-3" stroke="${q.color}" stroke-width="2"${q.dash?` stroke-dasharray="4 2"`:""}/><text x="18" y="0">${q.label}</text><title>${q.name}</title></g>`).join("")}</g>
 <g font-size="9" fill="#8aa2ae">${[0,max/2,max].map(v=>`<line x1="${X(v).toFixed(1)}" x2="${X(v).toFixed(1)}" y1="${tp}" y2="${tp+ph}" stroke="#8aa2ae" stroke-opacity=".18"/><text x="${X(v).toFixed(1)}" y="${tp-5}" text-anchor="${v===max?"end":v?"middle":"start"}">${fmt(v)}${v===max?" kPa":""}</text>`).join("")}
 ${ticks.map(d=>`<text x="${l-4}" y="${(Y(top-d)+3).toFixed(1)}" text-anchor="end">${fmt(d,1).replace(/\.0$/,"")}</text>`).join("")}<text x="${l-4}" y="${tp-5}" text-anchor="end">m</text></g>
@@ -290,9 +307,9 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
 <line class="ws-cross" x1="${l}" x2="${px0+pw}" y1="0" y2="0" stroke="#e8f2f7" stroke-opacity=".5" visibility="hidden"/>
 <rect class="ws-hit" x="${l}" y="${tp}" width="${px0+pw-l}" height="${ph}" fill="transparent"/></svg>
 <div class="ws-readout" hidden></div>
-<p class="ws-note">${water===undefined?"No water table here: pore pressure is zero. ":""}${assumed.length?`Unit weights assumed (${ASSUMED_WEIGHT.above} and ${ASSUMED_WEIGHT.below} kN/m³) for ${esc(assumed.join(", "))}. `:""}${withH?"":"Give K0 in the Units table for the horizontal stress."}</p>
+<p class="ws-note">${esc(notes.join(" "))}</p>
 <details class="ws-values"><summary>Values at the contacts</summary><table><thead><tr><th>Unit</th><th>Depth (m)</th>${series.map(q=>`<th>${q.label}</th>`).join("")}</tr></thead><tbody>${
-      rows.map(q=>`<tr><td>${q.base?"":esc(m.units[q.k].name)}</td><td>${fmt(top-q.e,2)}</td>${series.map(s=>`<td>${Number.isFinite(q.v[s.key])?fmt(q.v[s.key]):"–"}</td>`).join("")}</tr>`).join("")
+      rows.map(q=>`<tr><td>${q.base?"":esc(m.units[q.p.k].name)}</td><td>${fmt(top-q.p.e,2)}</td>${series.map(s=>{const v=s.of(q.p);return `<td>${Number.isFinite(v)?fmt(v):"–"}</td>`}).join("")}</tr>`).join("")
     }</tbody></table><p class="ws-note">kPa, at the top and base of each unit.</p></details>`;
   }
   // A crosshair and the values at the depth under the pointer.
@@ -306,8 +323,9 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
     for(let j=0;j<profile.units.length;j++)if(elevation<=profile.z[j]+1e-9&&elevation>=profile.z[j+1]-1e-9&&profile.z[j]-profile.z[j+1]>1e-9){u=j;break}
     if(!r||u<0){cross.setAttribute("visibility","hidden");out.hidden=true;return}
     cross.setAttribute("y1",y.toFixed(1));cross.setAttribute("y2",y.toFixed(1));cross.setAttribute("visibility","visible");
-    const K0=profile.k0[u];
-    out.innerHTML=`<b>${fmt(d,2)} m</b> · ${esc(profile.units[u])}<br>σv ${fmt(r.sv)} · u ${fmt(r.u)} · σ′v ${fmt(r.s)}${K0!==undefined?` · σ′h ${fmt(K0*r.s)}`:""} kPa`;
+    const p={stress:r,pressure:earthPressure(profile.params[u],r,profile.drainage)};
+    const values=profile.series.map(q=>{const v=q.of(p);return Number.isFinite(v)?`${q.label} ${fmt(v)}`:""}).filter(Boolean);
+    out.innerHTML=`<b>${fmt(d,2)} m</b> · ${esc(profile.units[u])}<br>${values.join(" · ")} kPa`;
     out.hidden=false;
     out.style.top=`${Math.min(y/k+8,b.height-out.offsetHeight)}px`;
   });
@@ -329,6 +347,7 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
     const target=e.target as Element,b=target.closest("button"),pt=target.closest<SVGGElement>(".ws-pt");
     if(pt){selected=pt.dataset.hole!;if(PER_HOLE.includes(step as TableName)){filter=selected;render()}renderPreview();return}
     if(!b)return;
+    if(b.dataset.view){view=b.dataset.view as View;renderPreview();return}
     if(b.dataset.start){choose(b.dataset.start);return}
     if(b.dataset.step){
       step=b.dataset.step as Step;

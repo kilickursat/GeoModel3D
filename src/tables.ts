@@ -78,9 +78,9 @@ export function exampleTables():EditorTables{
       water:holes.map(([id,,,,,,w])=>[id,String(w),"2026-09-15"]),
       spt:Object.entries(spt).flatMap(([id,list])=>list.map(([d,n])=>[id,String(d),String(n),"300"])),
       tests:tests.map(([id,d,p,v])=>[id,String(d),"",p,String(v)]),
-      units:[unit("Fill","Made ground (fill)","#9a5b4f",{gamma:18,gamma_sat:19,phi:30,E:8,K0:0.5}),
-        unit("Soft clay","Soft clay","#7d8a6a",{gamma:16,gamma_sat:16.5,su:25,E:3,k:1e-9,K0:0.6}),
-        unit("Sand","Medium dense sand","#d9b871",{gamma:18,gamma_sat:20,phi:34,E:30,k:2e-4,K0:0.45}),
+      units:[unit("Fill","Made ground (fill)","#9a5b4f",{gamma:18,gamma_sat:19,c:0,phi:30,E:8,K0:0.5}),
+        unit("Soft clay","Soft clay","#7d8a6a",{gamma:16,gamma_sat:16.5,c:0,phi:23,su:25,E:3,k:1e-9,K0:0.6}),
+        unit("Sand","Medium dense sand","#d9b871",{gamma:18,gamma_sat:20,c:0,phi:34,E:30,k:2e-4,K0:0.45}),
         unit("Stiff clay","Stiff clay","#6b7b90",{gamma:19.5,gamma_sat:20,c:10,phi:26,su:120,E:40,K0:0.7})]
     }};
 }

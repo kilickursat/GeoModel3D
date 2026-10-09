@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.9.0 — 2026-10-09
+
+### Added
+- **Earth pressures** in the Input data tab. **Earth pressure: Drained** or **Undrained** turns the profile of the borehole shown into the active, at-rest and passive pressures on a smooth vertical wall with level ground (Rankine):
+  - drained: effective pressures from c′ and φ′, with the water pressure u besides them;
+  - undrained: total pressures, σv ∓ 2su in the units given an su, and drained pressures plus u in the others;
+  - where the soil would pull on the wall, the active pressure is cut off (zero effective pressure), and the notes give the depths;
+  - units without the parameters are left out and named, and a c′ that is not given is taken as 0 and said so;
+  - the hover read-out and the table of values at the contacts follow the view.
+
+### Changed
+- c′, φ′ and su now give a result; E and k remain design values, kept with the model and reported.
+- The worked example gives the soft clay φ′ = 23°, and the made ground and sand c′ = 0.
+- On the stress profile, σ′h steps across a contact where K0 changes, instead of breaking off there.
+
 ## 0.8.1 — 2026-10-09
 
 ### Added

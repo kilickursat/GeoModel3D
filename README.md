@@ -5,7 +5,7 @@
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 [![three.js WebGPU](https://img.shields.io/badge/three.js-WebGPU%20%2B%20WebGL%202-black)](https://threejs.org)
 
-**Open-source 3D geological and geotechnical modelling for engineers, engineering geologists and hydrogeologists.** GeoModel3D turns borehole logs into a 3D stratigraphic model: TIN horizons, closed unit volumes and cross-sections at any angle. It places the model on a real map in the site's national coordinate system. On any section it shows the groundwater, the vertical total and effective stresses, the horizontal effective stress where K0 is given, and laboratory or in-situ test results.
+**Open-source 3D geological and geotechnical modelling for engineers, engineering geologists and hydrogeologists.** GeoModel3D turns borehole logs into a 3D stratigraphic model: TIN horizons, closed unit volumes and cross-sections at any angle. It places the model on a real map in the site's national coordinate system. On any section it shows the groundwater, the vertical total and effective stresses, the horizontal effective stress where K0 is given, and laboratory or in-situ test results. Down any borehole of your own case, it gives the active, at-rest and passive earth pressures on a wall, drained or undrained.
 
 Data can come from:
 - CSV, AGS4, Japanese, Dutch (BRO) and Flemish (DOV) borehole files;
@@ -33,17 +33,16 @@ Each site is published data, in its country's own coordinate system and height d
 |---|---|
 | ![Antwerp model from DOV formal stratigraphy](docs/antwerp.png) | ![Maasvlakte 2 model coloured by water content](docs/maasvlakte-water-content.png) |
 | **Creswick: basalt over the deep leads** | **Input data: a case typed in by hand** |
-| ![Creswick deep leads model from NGIS hydrostratigraphy](docs/creswick.png) | ![The Input data tab with the worked example and its stress profile](docs/input-data.png) |
+| ![Creswick deep leads model from NGIS hydrostratigraphy](docs/creswick.png) | ![The Input data tab with the worked example: its units, and the drained earth pressures down a borehole](docs/input-data.png) |
 
-## Version 0.8
+## Version 0.9
 
-- **Input data tab:** enter your own case and model it. Type in, or paste from a spreadsheet, the boreholes with their positions, the logs, water levels, SPT, laboratory and in-situ tests, and the units with their unit weights and design values. A preview follows every change: the boreholes in plan, the log of a borehole with σv, u, σ′v and σ′h down it, and the checks. **Build model** shows it in 3-D. See [Entering your own data](#entering-your-own-data). Open it directly at [kilickursat.github.io/GeoModel3D/#input](https://kilickursat.github.io/GeoModel3D/#input).
-- **One borehole is enough.** One or two boreholes, or boreholes in a line, are modelled over an extent around them, and any model can be extended beyond its outermost boreholes.
-- **Horizontal effective stress σ′h = K0 · σ′v** on sections, for the units given a K0.
-- **A fourth real site:** the Creswick deep leads in Victoria, Australia, from the National Groundwater Information System.
-- **Pinch-outs** stay at the borehole that lacks the unit; this is now the documented rule (see [How a model is built](#how-a-model-is-built)).
+- **Earth pressures** on a wall down any borehole in the Input data tab: active, at rest and passive (Rankine), drained from c′ and φ′ or undrained from su, with the depths where the soil would pull on the wall. See [Earth pressures](#earth-pressures).
+- **Contributing:** a [contribution guide](CONTRIBUTING.md) with the rules for adding data, issue templates, and a [Sponsoring](#sponsoring) section (0.8.1).
+- **Fewer notes on coarse terrain:** collars that scatter about a coarse terrain grid are summed up in one note, and only those that stand out are listed (0.8.1).
 
 Earlier versions:
+- **0.8:** the Input data tab, where your own case is entered and modelled, from one borehole up; σ′h = K0 · σ′v; the Creswick deep leads in Australia; pinch-outs at the borehole that lacks the unit, now the documented rule.
 - **0.7:** real sites in Belgium and the Netherlands; groundwater, σv, u and σ′v on sections; laboratory and in-situ tests; Dutch BRO and Flemish DOV files; a data editor; descriptions grouped by principal soil in seven languages; the RD New and Luxembourg 170 m datum fix.
 - **0.6:** coordinate systems for 40 countries, fetched terrain and maps, Japanese borehole XML, unit rules, the Sakae site, adaptive refinement, PDF reports.
 - **0.5:** terrain grids, erosional units, unit weights, WebGPU rendering.
@@ -230,14 +229,14 @@ Then fill in the steps:
 
 While you type, the preview shows:
 - **the boreholes in plan**, with the outline of the model; click a borehole to show it;
-- **the log of one borehole** as the model has it, with the vertical total stress σv, the pore pressure u, the vertical effective stress σ′v and, where K0 is given, the horizontal effective stress σ′h down it. Hover for the values at any depth; **Values at the contacts** lists them at the top and base of each unit;
+- **the log of one borehole** as the model has it, with the vertical total stress σv, the pore pressure u, the vertical effective stress σ′v and, where K0 is given, the horizontal effective stress σ′h down it. Hover for the values at any depth; **Values at the contacts** lists them at the top and base of each unit. **Earth pressure: Drained** or **Undrained** shows instead the active, at-rest and passive earth pressures on a wall down it (see [Earth pressures](#earth-pressures));
 - **the checks** of the importer and the model: rows that cannot be used, values outside plausible ranges, units out of order.
 
 **Build model** turns the tables into the model through the same importer as CSV files, and shows it in 3-D, where sections can be coloured by stresses or measured properties and a PDF report can be printed.
 
 Good to know:
 - **One borehole is enough.** A single borehole needs neither a position nor a ground level (0, 0 and 0 m are used, and said so). One or two boreholes, or boreholes in a line, are modelled over an extent around them; set **Model extent beyond the boreholes** to choose it, or to extend any model beyond its outermost boreholes.
-- **Unit weights** give the stresses: γ above the water table and γsat below it. A unit without them takes the mean measured unit weight, or else 18 and 20 kN/m³, which the preview and the report say. **K0** gives σ′h. The other values are design parameters, kept with the model and listed in the report.
+- **Unit weights** give the stresses: γ above the water table and γsat below it. A unit without them takes the mean measured unit weight, or else 18 and 20 kN/m³, which the preview and the report say. **K0** gives σ′h, and **c′, φ′ and su** the earth pressures. E and k are design parameters, kept with the model and listed in the report.
 - **Pasting:** cells copied from a spreadsheet paste into any table, starting at the cell pasted into, and add rows as needed. Large tables are shown one borehole at a time.
 - **Nothing is uploaded.** What you type is kept in this browser, so a reload does not lose it, until you type in another case. **Save case (JSON)** keeps a copy you can import again, and **Download table (CSV)** saves a table as CSV.
 
@@ -270,6 +269,26 @@ The report's ground-parameters table lists:
 - the unit weights used and where they come from;
 - the units' design values;
 - the mean, range and number of every measured property per unit.
+
+## Earth pressures
+
+In the **Input data** tab, **Earth pressure: Drained** or **Undrained** turns the profile of the borehole shown into the pressures on a wall down that borehole, by Rankine's theory, for a smooth vertical wall with level ground behind it:
+
+| | Drained (long term) | Undrained (short term) |
+|---|---|---|
+| Pressures | effective, from c′ and φ′; the water pressure u acts besides them | total, water included |
+| Active | σ′a = Ka · σ′v − 2c′√Ka | σa = σv − 2su |
+| Passive | σ′p = Kp · σ′v + 2c′√Kp | σp = σv + 2su |
+| At rest | σ′h = K0 · σ′v | σh = K0 · σ′v + u |
+
+Here Ka = tan²(45° − φ′/2) and Kp = tan²(45° + φ′/2) = 1/Ka. Undrained, the formulas with su apply to the units given an su; the other units drain, and take their drained pressures plus u.
+
+- **Missing values:** a unit without φ′ (drained), or without su and φ′ (undrained), has no active or passive pressure, and the at-rest pressure needs K0. A c′ that is not given is taken as 0. The notes under the chart name the units concerned.
+- **Tension cracks:** where the soil would pull on the wall, the effective active pressure is taken as zero: the drained pressure is 0, and the undrained total pressure equals the water pressure. The notes give the depths.
+- **Not included:** wall friction, sloping ground, surcharges and an excavation level. All pressures run from the ground surface down, so the passive pressure in front of an excavation, which starts at its floor, is not shown as such. su is one value per unit.
+- **Values:** hover over the chart for the values at any depth; **Values at the contacts** lists them at the top and base of each unit.
+
+![Undrained active, at-rest and passive earth pressures down a borehole of the worked example, with the depths where the clays would pull on the wall](docs/earth-pressure.png)
 
 ## How a model is built
 
@@ -369,7 +388,7 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 - `src/tin.ts`: Delaunay triangulation (Bowyer–Watson with a ghost vertex, so the convex hull is always covered)
 - `src/terrain.ts`: terrain grids (reading, interpolation and coarsening)
 - `src/model.ts`: log interpretation, erosion, terrain, water table and horizon assembly
-- `src/fields.ts`: stresses, measured properties on sections, and their colour scales
+- `src/fields.ts`: stresses, earth pressures, measured properties on sections, and their colour scales
 - `src/properties.ts`: the property catalogue and per-unit statistics
 - `src/volume.ts`: closed unit-volume meshes
 - `src/section.ts`: vertical sections
@@ -406,6 +425,7 @@ Every push to `main` runs the tests, builds the site and publishes `dist/` to Gi
    - fading where the model is inferred rather than logged.
 2. **More physics:**
    - settlement and bearing estimates from the unit parameters;
+   - earth pressures with surcharges, an excavation level and wall friction, and on sections;
    - property models in 3-D, not only on sections.
 3. **More data:** CPT import (BRO, DOV, AGS4 `SCPT`), and a reference site in the Americas once clearly licensed public data are found.
 4. Faults; constrained TIN boundaries, pinch-out lines and geological map contacts.
@@ -441,4 +461,4 @@ Apache-2.0: see [LICENSE](LICENSE). The data listed under [Data sources](#data-s
 
 ## Keywords
 
-3D geological modelling · geological model software · geotechnical engineering · engineering geology · hydrogeology · borehole logs · borehole data visualization · manual data entry · stratigraphy · subsurface modelling · cross-sections · groundwater · effective stress · horizontal stress K0 · ground investigation · AGS4 · BRO · DOV · KuniJiban · NGIS · Australia · coordinate systems · GIS · three.js · WebGPU · open source
+3D geological modelling · geological model software · geotechnical engineering · engineering geology · hydrogeology · borehole logs · borehole data visualization · manual data entry · stratigraphy · subsurface modelling · cross-sections · groundwater · effective stress · horizontal stress K0 · earth pressure · active and passive earth pressure · Rankine · retaining walls · ground investigation · AGS4 · BRO · DOV · KuniJiban · NGIS · Australia · coordinate systems · GIS · three.js · WebGPU · open source
