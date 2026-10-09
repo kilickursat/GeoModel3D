@@ -393,11 +393,21 @@ export function buildGeologicalModel(project:GeoProject):GeoModel{
     const outside=residuals.filter(q=>!Number.isFinite(q.terrain));
     if(outside.length)warnings.push(`Terrain grid does not cover ${outside.map(q=>q.id).join(", ")}`);
     // A consistent offset, as when the collars are in another height datum than the terrain grid, is reported once;
-    // collars that differ from it by more than 1 m are listed.
+    // collars that differ from it by more than 1 m are listed. When more than ten do, the collars and the grid scatter,
+    // as with a coarse grid or heights read off a map: the scatter is reported once, as a robust standard deviation
+    // (1.4826 times the median absolute deviation), and only the collars more than three times as far off are listed.
     const sorted=residuals.map(q=>q.residual).filter(Number.isFinite).sort((a,b)=>a-b);
     const median=sorted.length?sorted[Math.floor(sorted.length/2)]:0,shift=Math.abs(median)>0.5?median:0;
     if(shift)warnings.push(`Collars lie ${fmt(Math.abs(shift))} m ${shift>0?"above":"below"} the terrain grid on average, as when the heights use another datum; the terrain is adjusted to the collars`);
-    const off=residuals.filter(q=>Math.abs(q.residual-shift)>1);
+    let off=residuals.filter(q=>Math.abs(q.residual-shift)>1);
+    if(off.length>10){
+      const deviations=sorted.map(v=>Math.abs(v-median)).sort((a,b)=>a-b);
+      const scatter=1.4826*deviations[Math.floor(deviations.length/2)],limit=Math.max(1,3*scatter);
+      if(limit>1){
+        warnings.push(`${off.length} of ${sorted.length} collars are more than 1 m off the terrain grid${shift?" after the average offset":""}, with a typical scatter of ±${fmt(scatter)} m; the terrain is adjusted to every collar, and only those more than ${fmt(limit)} m off are listed`);
+        off=off.filter(q=>Math.abs(q.residual-shift)>limit);
+      }
+    }
     for(const q of off)warnings.push(`${q.id}: collar ${fmt(q.collar)} m, terrain ${fmt(q.terrain)} m (${q.residual>0?"+":""}${fmt(q.residual)} m); terrain adjusted to the collar`);
     if(missing)warnings.push(`Terrain has no data under ${Math.round(missing/(M-NB)*100)} % of the model; the surface between boreholes is used there`);
     const field=boundaryResidual(convexHull(nodes.map((p,i)=>({x:p.x,y:p.y,r:r[i]}))));
