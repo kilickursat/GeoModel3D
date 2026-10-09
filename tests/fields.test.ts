@@ -1,5 +1,5 @@
 import {describe,it,expect} from "vitest";
-import {stressAt,unitWeights,sectionField,colourScale,sequentialRamp,interpolate,availableFields,GAMMA_W,ASSUMED_WEIGHT} from "../src/fields";
+import {stressAt,unitWeights,sectionField,colourScale,sequentialRamp,interpolate,availableFields,GAMMA_W,ASSUMED_WEIGHT,rankine,earthPressure,pressureProfile,earthPressureNotes} from "../src/fields";
 import {buildGeologicalModel} from "../src/model";
 import {computeSection} from "../src/section";
 import {sectionSvg} from "../src/sectionSvg";
@@ -70,6 +70,87 @@ describe("stresses",()=>{
     expect(sh.at(mid,7)).toBeNaN();
     expect(sh.notes.join(" ")).toMatch(/σ′h = K0 · σ′v with each unit's K0; not given for Clay, left uncoloured/);
     expect(sh.scale.edges.at(-1)!).toBeGreaterThanOrEqual(0.5*eff.at(mid,-10+1e-6)-1e-9);
+  });
+});
+
+describe("earth pressures",()=>{
+  const r={sv:80,u:20,s:60};
+  it("take Rankine's coefficients",()=>{
+    const {Ka,Kp}=rankine(30);
+    expect(Ka).toBeCloseTo(1/3,12);
+    expect(Kp).toBeCloseTo(3,12);
+    expect(rankine(0)).toEqual({Ka:1,Kp:1});
+  });
+
+  it("are drained from c′ and φ′, and never pull on the wall",()=>{
+    // Sand, φ′ = 30°: σ′a = 60/3, σ′p = 3 · 60, and at rest 0.5 · 60.
+    const sand=earthPressure({phi:30,K0:0.5},r,"drained");
+    expect(sand.active).toBeCloseTo(20,9);
+    expect(sand.passive).toBeCloseTo(180,9);
+    expect(sand.rest).toBeCloseTo(30,9);
+    // c′ = 10 kPa lowers the active pressure by 2c′√Ka and raises the passive one by 2c′√Kp.
+    const clay=earthPressure({c:10,phi:30},r,"drained");
+    expect(clay.active).toBeCloseTo(20-20/Math.sqrt(3),9);
+    expect(clay.passive).toBeCloseTo(180+20*Math.sqrt(3),9);
+    expect(clay.rest).toBeNaN();
+    // At the ground the cohesion would pull on the wall: the pressure is zero.
+    const ground=earthPressure({c:10,phi:30},{sv:0,u:0,s:0},"drained");
+    expect(ground.active).toBe(0);
+    expect(ground.pull).toBeCloseTo(20/Math.sqrt(3),9);
+    // Without φ′ there is no drained pressure.
+    expect(earthPressure({su:30},r,"drained").active).toBeNaN();
+  });
+
+  it("are undrained total pressures from su, the units without one draining",()=>{
+    const clay=earthPressure({su:25,phi:24,K0:0.6},r,"undrained");
+    expect(clay.active).toBeCloseTo(80-50,9);
+    expect(clay.passive).toBeCloseTo(80+50,9);
+    expect(clay.rest).toBeCloseTo(0.6*60+20,9);
+    // A stiffer clay would pull on the wall: the pressure is the water pressure.
+    const stiff=earthPressure({su:40},r,"undrained");
+    expect(stiff.active).toBeCloseTo(20,9);
+    expect(stiff.pull).toBeCloseTo(20+80-80,9);
+    // Sand drains: its effective pressures plus u.
+    const sand=earthPressure({phi:30},r,"undrained");
+    expect(sand.active).toBeCloseTo(20+20,9);
+    expect(sand.passive).toBeCloseTo(180+20,9);
+    expect(earthPressure(undefined,r,"undrained").active).toBeNaN();
+  });
+
+  it("follow a borehole exactly, with the depths where the soil would pull on the wall",()=>{
+    // Clay with c′ = 10 kPa and φ′ = 30° from 0 to 4 m over sand with φ′ = 30°, water at 2 m: the clay pulls on the wall
+    // down to where σ′v = 2c′/√Ka = 20√3 kPa, just below the water table.
+    const z=[10,6,-10],w=[{above:17,below:18,source:"declared" as const},{above:19,below:20,source:"declared" as const}];
+    const drained=pressureProfile(z,8,w,[{c:10,phi:30},{phi:30}],"drained");
+    const crack=2+(20*Math.sqrt(3)-34)/(18-GAMMA_W);
+    expect(drained.tension).toHaveLength(1);
+    expect(drained.tension[0].top).toBe(10);
+    expect(10-drained.tension[0].bottom).toBeCloseTo(crack,9);
+    const clay=drained.segments[0].points;
+    expect(clay.map(p=>10-p.e)).toEqual([0,2,expect.closeTo(crack,9),4]);
+    expect(clay[2].pressure.active).toBeCloseTo(0,9);
+    // At the base of the sand, 20 m down: σ′v = 2 · 17 + 2 · 18 + 16 · 20 − 18 γw.
+    const base=drained.segments[1].points.at(-1)!,s=34+36+320-18*GAMMA_W;
+    expect(base.pressure.active).toBeCloseTo(s/3,9);
+    expect(base.pressure.passive).toBeCloseTo(3*s,9);
+    // Undrained, with su = 30 kPa, the clay pulls on the wall all the way down, and the sand does not.
+    const undrained=pressureProfile(z,8,w,[{c:10,phi:30,su:30},{phi:30}],"undrained");
+    expect(undrained.tension).toEqual([{top:10,bottom:6}]);
+    expect(undrained.segments[1].points.at(-1)!.pressure.active).toBeCloseTo(s/3+18*GAMMA_W,9);
+  });
+
+  it("say what they rest on",()=>{
+    const names=["Fill","Clay","Sand","Rock"],params:Array<Record<string,number>|undefined>=[{phi:30},{su:25,phi:24,c:5},{phi:34,c:0},undefined];
+    expect(earthPressureNotes(names,[0,1,2,3],params,"drained",[{from:0,to:1.234}])).toEqual([
+      "Rankine, for a smooth vertical wall with level ground, from the ground surface down.",
+      "Drained: effective pressures from c′ and φ′; the water pressure u acts besides them.",
+      "No φ′ for Rock: no active or passive pressure there.",
+      "c′ not given for Fill: taken as 0.",
+      "The soil would pull on the wall at 0–1.23 m: the active pressure there is taken as zero."]);
+    expect(earthPressureNotes(names,[1,2],params,"undrained",[{from:1.2,to:4.61},{from:11.5,to:22.2}])).toEqual([
+      "Rankine, for a smooth vertical wall with level ground, from the ground surface down.",
+      "Undrained: total pressures, water included; σv ∓ 2su in Clay; Sand drained, from c′ and φ′, with u added.",
+      "The soil would pull on the wall at 1.2–4.61 and 11.5–22.2 m: the active pressure there is taken as the water pressure."]);
   });
 });
 

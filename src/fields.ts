@@ -57,6 +57,81 @@ export function stressAt(horizons:ArrayLike<number>,water:number|undefined,weigh
   return {sv,u,s:sv-u};
 }
 
+// ---------- earth pressures ----------
+
+// Rankine's coefficients of active and passive earth pressure for an effective friction angle φ′ in degrees:
+// Ka = tan²(45° − φ′/2) and Kp = tan²(45° + φ′/2) = 1/Ka.
+export function rankine(phi:number){const s=Math.sin(phi*Math.PI/180);return {Ka:(1-s)/(1+s),Kp:(1+s)/(1-s)}}
+export type Drainage="drained"|"undrained";
+// `pull`: how far the active pressure falls short of zero effective pressure, positive where the soil would pull on the
+// wall. Pressures are NaN where the unit lacks the parameters they need.
+export interface EarthPressure { active:number; rest:number; passive:number; pull:number }
+// Earth pressures on a smooth vertical wall with level ground behind it (Rankine), where the stresses are r, in a unit
+// with the parameters `params` (keys of src/properties.ts).
+// - Drained (long term): effective pressures from c′ and φ′, σ′a = Ka·σ′v − 2c′√Ka and σ′p = Kp·σ′v + 2c′√Kp, with c′
+//   taken as 0 where it is not given; the water pressure u acts on the wall besides them.
+// - Undrained (short term): total pressures. A unit given an su: σa = σv − 2su and σp = σv + 2su. A unit without one
+//   drains, and takes its effective pressures plus u.
+// Where the soil would pull on the wall, it cracks: the effective pressure is taken as zero, and the total pressure as
+// the water pressure. At rest, K0·σ′v where K0 is given (plus u when undrained).
+export function earthPressure(params:Record<string,number>|undefined,r:Stress,drainage:Drainage):EarthPressure{
+  const K0=params?.K0,su=params?.su,phi=params?.phi,c=params?.c??0;
+  const water=drainage==="undrained"?r.u:0,rest=K0!==undefined?K0*r.s+water:NaN;
+  if(drainage==="undrained"&&su!==undefined){
+    const active=r.sv-2*su-r.u;
+    return {active:Math.max(active,0)+r.u,rest,passive:r.sv+2*su,pull:-active};
+  }
+  if(phi===undefined)return {active:NaN,rest,passive:NaN,pull:NaN};
+  const {Ka,Kp}=rankine(phi),active=Ka*r.s-2*c*Math.sqrt(Ka);
+  return {active:Math.max(active,0)+water,rest,passive:Kp*r.s+2*c*Math.sqrt(Kp)+water,pull:-active};
+}
+export interface ProfilePoint { k:number; e:number; stress:Stress; pressure:EarthPressure }
+// The stresses and earth pressures down a vertical where the horizons (ground first, model base last) and the water
+// table lie at the given elevations: for each unit, points at its top, at the water table within it and at its base,
+// between which all of them vary linearly, and where the soil starts or stops pulling on the wall, so that straight
+// lines through the points are exact. `tension` lists the elevations between which the soil would pull on the wall.
+export function pressureProfile(z:ArrayLike<number>,water:number|undefined,weights:UnitWeight[],params:Array<Record<string,number>|undefined>,drainage:Drainage){
+  const segments:Array<{k:number;points:ProfilePoint[]}>=[],tension:Array<{top:number;bottom:number}>=[];
+  for(let k=0;k<weights.length;k++){
+    const a=z[k],b=z[k+1];
+    if(a-b<1e-9)continue;
+    const at=(e:number):ProfilePoint=>{const stress=stressAt(z,water,weights,e)!;return {k,e,stress,pressure:earthPressure(params[k],stress,drainage)}};
+    const points=[at(a)];
+    for(const e of [...(water!==undefined&&water<a&&water>b?[water]:[]),b]){
+      const q=points[points.length-1],p=at(e),f=q.pressure.pull,g=p.pressure.pull;
+      if(f*g<0)points.push(at(q.e+(p.e-q.e)*f/(f-g)));
+      points.push(p);
+    }
+    segments.push({k,points});
+  }
+  // The pull keeps its sign between neighbouring points, so a stretch pulls where its ends add up to a pull; stretches
+  // that meet, also across units, make one range.
+  for(const s of segments)for(let j=1;j<s.points.length;j++){
+    const p=s.points[j-1],q=s.points[j],last=tension[tension.length-1];
+    if(!(p.pressure.pull+q.pressure.pull>1e-9))continue;
+    if(last&&Math.abs(last.bottom-p.e)<1e-9)last.bottom=q.e;else tension.push({top:p.e,bottom:q.e});
+  }
+  return {segments,tension};
+}
+// What the earth pressures down a borehole rest on: the method, the units that lack the parameters they need, the c′
+// taken as 0, and where the soil would pull on the wall. `names` are the model's unit names, `shown` the indices of the
+// units in the borehole, and `tension` the depths below the ground between which the soil would pull.
+export function earthPressureNotes(names:string[],shown:number[],params:Array<Record<string,number>|undefined>,drainage:Drainage,tension:Array<{from:number;to:number}>){
+  const list=(f:(k:number)=>boolean)=>[...new Set(shown.filter(f).map(k=>names[k]))].join(", ");
+  const bySu=(k:number)=>drainage==="undrained"&&params[k]?.su!==undefined;
+  const byPhi=(k:number)=>!bySu(k)&&params[k]?.phi!==undefined;
+  const su=list(bySu),phi=list(byPhi),none=list(k=>!bySu(k)&&!byPhi(k)),noC=list(k=>byPhi(k)&&params[k]?.c===undefined);
+  const metres=(v:number)=>String(Math.round(v*100)/100);
+  const notes=["Rankine, for a smooth vertical wall with level ground, from the ground surface down.",
+    drainage==="drained"?"Drained: effective pressures from c′ and φ′; the water pressure u acts besides them."
+      :`Undrained: total pressures, water included${su?`; σv ∓ 2su in ${su}`:""}${phi?`; ${phi} drained, from c′ and φ′, with u added`:""}.`];
+  if(none)notes.push(`No ${drainage==="drained"?"φ′":"su or φ′"} for ${none}: no active or passive pressure there.`);
+  if(noC)notes.push(`c′ not given for ${noC}: taken as 0.`);
+  const ranges=tension.map(t=>`${metres(t.from)}–${metres(t.to)}`);
+  if(ranges.length)notes.push(`The soil would pull on the wall at ${ranges.length>1?`${ranges.slice(0,-1).join(", ")} and ${ranges[ranges.length-1]}`:ranges[0]} m: the active pressure there is taken as ${drainage==="drained"?"zero":"the water pressure"}.`);
+  return notes;
+}
+
 // ---------- measured properties ----------
 
 export interface PropertySample { x:number; y:number; z:number; value:number }
