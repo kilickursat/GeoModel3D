@@ -5,7 +5,7 @@ import {readDovXml,isDovXml,stratigraphicName,formationOf} from "../src/dovXml";
 import {importFiles} from "../src/io";
 import {buildGeologicalModel} from "../src/model";
 import {toGeographic,findCrs} from "../src/crs";
-import {antwerpProject,rotterdamProject} from "../src/geology";
+import {antwerpProject,rotterdamProject,deepleadsProject} from "../src/geology";
 
 const fixture=(dir:string,name:string)=>({name,text:readFileSync(new URL(`./fixtures/${dir}/${name}`,import.meta.url),"utf8")});
 const all=(dir:string)=>readdirSync(new URL(`./fixtures/${dir}/`,import.meta.url)).filter(f=>f.endsWith(".xml")).map(f=>fixture(dir,f));
@@ -102,5 +102,23 @@ describe("reference sites in Belgium and the Netherlands",()=>{
     expect(rotterdamProject.boreholes.reduce((n,b)=>n+(b.tests?.length??0),0)).toBeGreaterThan(3000);
     expect(m.water!.source).toMatch(/water levels logged in \d+ of 100 boreholes/);
     expect(m.warnings.length).toBeLessThan(5);
+  });
+});
+
+describe("reference site in Australia",()=>{
+  it("models the Creswick deep leads in MGA zone 54 from NGIS hydrostratigraphy, every log in order",()=>{
+    const m=buildGeologicalModel(deepleadsProject);
+    expect(deepleadsProject.crsCode).toBe("EPSG:28354");
+    expect(m.boreholes.length).toBe(150);
+    expect(m.units.map(u=>u.id)).toEqual(["Alluvium","Upper basalt","Interbasalt clay","Lower basalt","Clay","Deep lead","Bedrock"]);
+    expect(m.warnings).toEqual([]);
+    // Positions: the collars carry their geographic position, inside the MGA zone 54 area of use.
+    for(const b of deepleadsProject.boreholes){
+      expect(b.lon!).toBeGreaterThan(143.85);expect(b.lon!).toBeLessThan(143.98);
+      expect(b.lat!).toBeGreaterThan(-37.41);expect(b.lat!).toBeLessThan(-37.3);
+    }
+    // No source or licence fields of NGIS are carried: intervals hold only depths, units and names.
+    expect(deepleadsProject.boreholes.every(b=>b.intervals.every(i=>Object.keys(i).every(k=>["from","to","unit","name"].includes(k))))).toBe(true);
+    expect(deepleadsProject.source).toMatch(/Bureau of Meteorology.*CC BY 3\.0 AU/);
   });
 });

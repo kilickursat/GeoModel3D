@@ -3,6 +3,7 @@ import channelDemo from "./data/channel-demo.json";
 import sakaeSite from "./data/sakae-site.json";
 import antwerpSite from "./data/antwerp-site.json";
 import rotterdamSite from "./data/rotterdam-site.json";
+import deepleadsSite from "./data/deepleads-site.json";
 import {TerrainGrid} from "./terrain";
 
 // Geological units are listed in stratigraphic order, youngest (top) to oldest (bottom). An erosive unit's base
@@ -28,10 +29,11 @@ export interface Borehole { id:string; x:number; y:number; z:number; depth?:numb
 export interface UnitRule { match:string; unit:string; minN?:number; maxN?:number; minZ?:number; maxZ?:number }
 // x, y are in the system named by `crs`; `crsCode` (e.g. EPSG:6677) or the PROJ definition `crsProj4` georeferences it.
 // `source` credits where the data come from. `groundwaterDepth` is an assumed depth of the water table below ground,
-// used where no borehole records a water level.
+// used where no borehole records a water level. `margin` extends the model that many metres beyond the outline of the
+// boreholes (by default it ends at the outermost boreholes).
 export interface GeoProject {
   name:string; description?:string; source?:string; crs?:string; crsCode?:string; crsProj4?:string; base?:number;
-  groundwaterDepth?:number;
+  groundwaterDepth?:number; margin?:number;
   units:UnitDef[]; rules?:UnitRule[]; boreholes:Borehole[]; terrain?:TerrainGrid;
 }
 
@@ -64,10 +66,11 @@ function fromJson(p:unknown):GeoProject{
 export const sakaeProject=fromJson(sakaeSite);
 export const antwerpProject=fromJson(antwerpSite);
 export const rotterdamProject=fromJson(rotterdamSite);
+export const deepleadsProject=fromJson(deepleadsSite);
 export const valleyProject=fromJson(valleyDemo);
 export const channelProject=fromJson(channelDemo);
 // Real sites first (published data, each with its source), then the synthetic datasets.
-export const realSites:GeoProject[]=[sakaeProject,antwerpProject,rotterdamProject];
+export const realSites:GeoProject[]=[sakaeProject,antwerpProject,rotterdamProject,deepleadsProject];
 export const sampleProjects:GeoProject[]=[...realSites,valleyProject,channelProject,referenceProject];
 
 export function boreholeDepth(b:Borehole){return Math.max(b.depth??0,...b.intervals.map(i=>i.to))}
