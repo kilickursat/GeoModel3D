@@ -1,5 +1,5 @@
-unit,name,colour,erosive,gamma,gamma_sat,c,phi,su,E,k,source
-MG,Made ground,#9a5b4f,,18,19,0,28,,10,,Assumed from the site investigation report
-CLAY,Alluvial clay,#9c7a5b,,16.5,17.5,2,24,20,4,1e-9,Laboratory tests (report table 5)
-SAND,Terrace sand,#d9b871,yes,18,20,0,34,,40,1e-5,SPT correlations
-ROCK,Mudstone,#6f7686,,,22,,,,500,,
+unit,name,colour,erosive,gamma,gamma_sat,c,phi,su,E,k,K0,source
+MG,Made ground,#9a5b4f,,18,19,0,28,,10,,0.5,Assumed from the site investigation report
+CLAY,Alluvial clay,#9c7a5b,,16.5,17.5,2,24,20,4,1e-9,0.6,Laboratory tests (report table 5)
+SAND,Terrace sand,#d9b871,yes,18,20,0,34,,40,1e-5,0.45,SPT correlations
+ROCK,Mudstone,#6f7686,,,22,,,,500,,,

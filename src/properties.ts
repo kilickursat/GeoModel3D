@@ -26,6 +26,7 @@ export const properties:PropertyDef[]=[
   {key:"c",name:"Effective cohesion",symbol:"c′",unit:"kPa",decimals:0,range:[0,1000],aliases:["c","ceff","cprime","cohesion","effectivecohesion","tregcoh","shbgpcoh"]},
   {key:"phi",name:"Effective friction angle",symbol:"φ′",unit:"°",decimals:1,range:[0,60],aliases:["phi","φ","phieff","phiprime","frictionangle","effectivefrictionangle","tregphi","shbgphi"]},
   {key:"E",name:"Young's modulus",symbol:"E",unit:"MPa",decimals:0,range:[0,200000],aliases:["e","emod","modulus","emodulus","youngsmodulus","e50"]},
+  {key:"K0",name:"Earth pressure coefficient at rest",symbol:"K0",unit:"",decimals:2,range:[0.1,4],aliases:["k0","ko","kzero","earthpressurecoefficientatrest","coefficientofearthpressureatrest"]},
   {key:"k",name:"Hydraulic conductivity",symbol:"k",unit:"m/s",decimals:2,range:[1e-14,1],log:true,aliases:["k","ksat","permeability","hydraulicconductivity","ptstk"]},
   {key:"qc",name:"Cone resistance",symbol:"qc",unit:"MPa",decimals:2,range:[0,200],aliases:["qc","qt","coneresistance","conetipresistance","scptres"]},
   {key:"Vs",name:"Shear-wave velocity",symbol:"Vs",unit:"m/s",decimals:0,range:[0,5000],aliases:["vs","shearwavevelocity"]},

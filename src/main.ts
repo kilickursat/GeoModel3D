@@ -16,7 +16,7 @@ import {Crs,crsRegistry,projectCrs,findCrs,customCrs,searchCrs,suggestCrs,toProj
 import {fetchTerrain,elevationSources,mapSources,covers,tileUrl,parseGsiTile,decodeTerrarium,mapTiles,tileXY,ElevationSource,TileSource} from "./tiles";
 import {applyUnitRules} from "./rules";
 import {reportHtml} from "./report";
-import {openEditor} from "./editor";
+import {createInputWorkspace} from "./input";
 import "./style.css";
 
 const app=document.querySelector<HTMLDivElement>("#app")!;
@@ -197,7 +197,7 @@ function buildTerrain(){
   terrainMesh=null;
   const t=model.project.terrain,at=model.terrainAt;
   if(!model.triangles.length)return;
-  const hull=convexHull(model.boreholes);
+  const hull=convexHull(model.nodes);
   let flat=false,surface:{positions:number[];index:number[]};
   if(t&&at)surface=terrainOutside(t,at,hull,extent*0.25);
   else if(projectCrs(model.project)){
@@ -525,8 +525,8 @@ const datasetSelect=ui.querySelector<HTMLSelectElement>(".dataset")!;
 
 const toolbar=document.createElement("div");
 toolbar.className="toolbar";
-toolbar.innerHTML=`<button class="import">Import data…</button>
-<button class="edit-data" title="Type in or paste boreholes, logs, water levels, SPT and laboratory results, and unit properties">Edit data…</button>
+toolbar.innerHTML=`<button class="input-data" title="Type in or paste your own boreholes, logs, groundwater, field and laboratory tests and unit parameters, then build the model">Enter your own data…</button>
+<button class="import">Import data…</button>
 <input class="file" type="file" multiple hidden accept=".csv,.tsv,.txt,.ags,.json,.xml,.asc,.xyz">
 <details class="menu"><summary>Export</summary><div>
   <button data-export="project">Project (JSON)</button>
@@ -569,6 +569,14 @@ const veInput=controlsBar.querySelector<HTMLInputElement>(".ve")!;
 const panelToggle=controlsBar.querySelector<HTMLButtonElement>(".panel-toggle")!;
 const fieldSelect=controlsBar.querySelector<HTMLSelectElement>(".field-select")!;
 
+// The two tabs: the model, and the input workspace where a case is typed in.
+const modes=document.createElement("nav");
+modes.className="modes";
+modes.setAttribute("role","tablist");
+modes.setAttribute("aria-label","View");
+modes.innerHTML=`<button role="tab" data-mode="model" aria-selected="true">3-D model</button><button role="tab" data-mode="input" aria-selected="false">Input data</button>`;
+app.appendChild(modes);
+
 const sectionView=document.createElement("div");
 sectionView.className="section-view";
 sectionView.innerHTML=`<div class="section-head"><span class="section-name"></span><button data-export="svg">SVG</button><button data-export="section">CSV</button><button class="close" aria-label="Close section view">×</button></div><div class="section-body"></div>`;
@@ -599,7 +607,8 @@ app.appendChild(dropZone);
 
 function renderPanel(){
   const projects=[...sampleProjects,...(imported?[imported]:[])];
-  datasetSelect.innerHTML=projects.map((p,i)=>`<option value="${i}"${p===project?" selected":""}>${esc(i>=sampleProjects.length?"Imported: "+p.name:p.name)}</option>`).join("");
+  datasetSelect.innerHTML=projects.map((p,i)=>`<option value="${i}"${p===project?" selected":""}>${esc(i>=sampleProjects.length?"Your data: "+p.name:p.name)}</option>`).join("")+
+    `<option value="input">✎ Enter your own data…</option>`;
   ui.querySelector(".desc")!.textContent=project.description??"";
   const count=(n:number,what:string)=>`${n} ${what}${n===1?"":"s"}`;
   const stats=[count(model.boreholes.length,"borehole"),count(model.units.length,"unit"),count(model.horizons.length,"horizon")];
@@ -691,7 +700,8 @@ function syncControls(){
 }
 
 function renderSectionPanel(){
-  if(!view.panel||!section)return;
+  // Behind the input tab the panel has no size; it is drawn when the model tab is shown again.
+  if(!view.panel||!section||document.body.dataset.mode==="input")return;
   sectionView.querySelector(".section-name")!.textContent=`Section A–A′ · ${String(view.azimuth).padStart(3,"0")}° · ${view.offset>=0?"+":""}${Math.round(view.offset)} m`;
   sectionBody.innerHTML=sectionSvg(model,section,{width:sectionBody.clientWidth,height:sectionBody.clientHeight,theme:"dark",title:false,buffer:sectionBuffer,hidden:view.hidden,field:field??undefined});
 }
@@ -764,6 +774,8 @@ async function importFileList(list:FileList|File[]){
     const result=importFiles(files,project);
     imported=result.project;
     loadProject(result.project,result.warnings);
+    // Files picked from the input tab open there, for review before building.
+    if(document.body.dataset.mode==="input")workspace.edit(result.project,`Imported ${files.map(f=>f.name).join(", ")}: check the tables, then build the model.${result.warnings.length?` ${result.warnings.length} note${result.warnings.length===1?"":"s"} under Checks.`:""}`);
   }catch(err){
     showNotice("Import failed",[(err as Error).message],true);
   }
@@ -846,9 +858,30 @@ async function printReport(paper:"A3"|"A4"){
   setTimeout(()=>frame.remove(),60_000);
 }
 
-datasetSelect.onchange=()=>{const i=Number(datasetSelect.value);loadProject(i<sampleProjects.length?sampleProjects[i]:imported!)};
+datasetSelect.onchange=()=>{
+  if(datasetSelect.value==="input"){datasetSelect.value=String([...sampleProjects,...(imported?[imported]:[])].indexOf(project));setMode("input");return}
+  const i=Number(datasetSelect.value);loadProject(i<sampleProjects.length?sampleProjects[i]:imported!);
+};
 toolbar.querySelector<HTMLButtonElement>(".import")!.onclick=()=>fileInput.click();
-toolbar.querySelector<HTMLButtonElement>(".edit-data")!.onclick=()=>openEditor(project,{download,onApply:r=>{imported=r.project;loadProject(r.project,r.warnings)}});
+toolbar.querySelector<HTMLButtonElement>(".input-data")!.onclick=()=>setMode("input");
+
+const workspace=createInputWorkspace({
+  current:()=>project,
+  download,
+  onImport:()=>fileInput.click(),
+  onBuild:r=>{imported=r.project;setMode("model");loadProject(r.project,r.warnings)}
+});
+app.appendChild(workspace.element);
+function setMode(mode:"model"|"input"){
+  document.body.dataset.mode=mode;
+  workspace.element.hidden=mode!=="input";
+  modes.querySelectorAll<HTMLButtonElement>("button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.mode===mode)));
+  tooltip.hidden=true;
+  history.replaceState(null,"",mode==="input"?"#input":location.pathname+location.search);
+  if(mode==="input")workspace.show();
+  else{renderSectionPanel();invalidate()}
+}
+modes.addEventListener("click",e=>{const b=(e.target as HTMLElement).closest<HTMLButtonElement>("[data-mode]");if(b)setMode(b.dataset.mode as "model"|"input")});
 fileInput.onchange=()=>{if(fileInput.files?.length)importFileList(fileInput.files);fileInput.value=""};
 app.addEventListener("click",e=>{
   const kind=(e.target as HTMLElement).closest<HTMLElement>("[data-export]")?.dataset.export;
@@ -958,8 +991,9 @@ function sectionReadout(along:number,e:number){
   if(k<0)return "";
   const st=stressAt(c.z,c.water,weights,e),assumed=weights.some(w=>w.source==="assumed");
   let html=`<b>${esc(model.units[k].name)}</b> · ${fmt(c.z[0]-e,1)} m deep, elevation ${fmt(e,1)} m`;
-  if(st)html+=`<span>σv ${fmt(st.sv)} kPa · u ${fmt(st.u)} kPa · σ′v ${fmt(st.s)} kPa${assumed?" (some unit weights assumed)":""}</span>`;
-  if(field&&!["sv","u","s"].includes(field.key)){
+  const K0=model.units[k].params?.K0;
+  if(st)html+=`<span>σv ${fmt(st.sv)} kPa · u ${fmt(st.u)} kPa · σ′v ${fmt(st.s)} kPa${K0!==undefined?` · σ′h ${fmt(K0*st.s)} kPa`:""}${assumed?" (some unit weights assumed)":""}</span>`;
+  if(field&&!["sv","u","s","sh"].includes(field.key)){
     const v=field.at(along,e),p=propertyDef(field.key);
     html+=`<span>${esc(p.symbol)} ${Number.isFinite(v)?`${formatValue(field.key,field.log?10**v:v)}${p.unit?" "+esc(p.unit):""}, interpolated`:"not measured in this unit"}</span>`;
   }
@@ -989,8 +1023,12 @@ addEventListener("resize",()=>{
 });
 
 controls.addEventListener("change",invalidate);
+document.body.dataset.mode="model";
 loadProject(project);
+if(location.hash==="#input")setMode("input");
 renderer.setAnimationLoop(()=>{
+  // The 3-D view is not drawn behind the input tab.
+  if(document.body.dataset.mode==="input")return;
   controls.update();
   updateTooltip();
   if(!dirty)return;

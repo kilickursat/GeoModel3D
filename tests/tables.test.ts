@@ -1,5 +1,5 @@
 import {describe,it,expect} from "vitest";
-import {tablesFromProject,projectFromTables,emptyTables,fillUnits,crsFromText,tableCsv} from "../src/tables";
+import {tablesFromProject,projectFromTables,emptyTables,exampleTables,fillUnits,crsFromText,tableCsv} from "../src/tables";
 import {importFiles} from "../src/io";
 import {sakaeProject,valleyProject,rotterdamProject} from "../src/geology";
 import {buildGeologicalModel} from "../src/model";
@@ -50,6 +50,50 @@ describe("data editor tables",()=>{
     expect(back.boreholes).toEqual(valleyProject.boreholes);
     expect(back.units.map(u=>[u.id,u.color,u.gamma])).toEqual(valleyProject.units.map(u=>[u.id,u.color,u.gamma]));
   });
+
+  it("model a single borehole typed without a position or ground level, with the extent and K0 given",()=>{
+    const t=emptyTables();
+    t.project={...t.project,name:"One log",groundwaterDepth:"1.5",margin:"25"};
+    t.rows.logs=[["BH-01","0","4.5","Soft clay",""],["BH-01","4.5","15","Dense sand",""]];
+    t.rows.units=[["Soft clay","","","","16","16.5","","","25","","","0.6",""]];
+    const {project,warnings}=projectFromTables(t);
+    expect(warnings).toEqual(["Units logged but not in the unit table were appended at the bottom of the column: Dense sand",
+      "BH-01: no position given; placed at 0, 0 on a local grid","BH-01: no ground level given; 0 m used, so elevations are minus depths"]);
+    expect(project.boreholes[0]).toMatchObject({id:"BH-01",x:0,y:0,z:0});
+    expect(project).toMatchObject({margin:25,groundwaterDepth:1.5});
+    expect(project.units.map(u=>u.id)).toEqual(["Soft clay","Dense sand"]);
+    expect(project.units[0]).toMatchObject({gamma:16,gammaSat:16.5,params:{su:25,K0:0.6}});
+    const m=buildGeologicalModel(project);
+    expect(m.warnings).toEqual([]);
+    expect(m.horizons.map(h=>Math.max(...h.z))).toEqual([0,-4.5,-15]);
+    expect(Math.max(...m.nodes.map(p=>Math.hypot(p.x,p.y)))).toBeCloseTo(25,9);
+    // The Units table keeps K0 and the extent on the way back.
+    const back=tablesFromProject(project);
+    expect(back.project.margin).toBe("25");
+    expect(back.rows.units[0][11]).toBe("0.6");
+  });
+
+  it("include a worked example that builds without warnings",()=>{
+    const {project,warnings}=projectFromTables(exampleTables());
+    expect(warnings).toEqual([]);
+    expect(project.boreholes.length).toBe(4);
+    expect(project.units.map(u=>u.id)).toEqual(["Fill","Soft clay","Sand","Stiff clay"]);
+    expect(project.units.every(u=>u.params?.K0!==undefined&&u.gamma!==undefined)).toBe(true);
+    const m=buildGeologicalModel(project);
+    expect(m.warnings).toEqual([]);
+    expect(m.water?.source).toMatch(/water levels logged in 4 of 4 boreholes/);
+    // BH-04 logs no soft clay: it pinches out at that borehole.
+    expect(m.horizons[1].z[3]).toBeCloseTo(m.horizons[2].z[3],9);
+  });
+
+  it("report project values that are not numbers",()=>{
+    const t=exampleTables();
+    t.project={...t.project,groundwaterDepth:"about 2",margin:"10"};
+    const {project,warnings}=projectFromTables(t);
+    expect(warnings).toEqual(["Assumed groundwater depth: “about 2” is not a number and was ignored"]);
+    expect(project.groundwaterDepth).toBeUndefined();
+    expect(project.margin).toBe(10);
+  });
 });
 
 describe("CSV templates in docs/templates",()=>{
@@ -59,7 +103,7 @@ describe("CSV templates in docs/templates",()=>{
     expect(warnings).toEqual([]);
     expect(project.boreholes.map(b=>b.id)).toEqual(["BH-01","BH-02","BH-03"]);
     expect(project.units.map(u=>u.id)).toEqual(["MG","CLAY","SAND","ROCK"]);
-    expect(project.units[1]).toMatchObject({gamma:16.5,gammaSat:17.5,params:{c:2,phi:24,su:20,E:4,k:1e-9}});
+    expect(project.units[1]).toMatchObject({gamma:16.5,gammaSat:17.5,params:{c:2,phi:24,su:20,E:4,k:1e-9,K0:0.6}});
     expect(project.boreholes[0].spt!.at(-1)).toEqual({depth:20,blows:50,penetration:120});
     expect(project.boreholes[1].tests).toEqual([{depth:3,to:3.4,property:"w",value:51}]);
     expect(buildGeologicalModel(project).warnings).toEqual([]);

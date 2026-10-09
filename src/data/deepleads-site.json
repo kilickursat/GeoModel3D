@@ -1,0 +1,5465 @@
+{
+ "format": "geomodel3d-project",
+ "version": 1,
+ "name": "Creswick deep leads, Victoria (NGIS)",
+ "description": "150 groundwater bores on the basalt plains north-east of Creswick, central Victoria, from the National Groundwater Information System (NGIS v1.1, 2013). Basalt lava flows filled valleys cut into Palaeozoic bedrock and buried the sand and gravel of the old rivers, the deep leads, once mined for gold. The units are the hydrostratigraphic interpretation of each log by the Victorian Department of Primary Industries, as published in NGIS; each interval keeps its name. Ground elevations in metres AHD, from LiDAR (36), a terrain model (109) or GPS (3). Terrain from Terrain Tiles, fetched when the project opens.",
+ "source": "National Groundwater Information System v1.1, © Commonwealth of Australia (Bureau of Meteorology), CC BY 3.0 AU, via data.gov.au; bore data © State of Victoria",
+ "crs": "GDA94 / MGA zone 54",
+ "crsCode": "EPSG:28354",
+ "units": [
+  {
+   "id": "Alluvium",
+   "name": "Surface alluvium",
+   "color": "#d8c48c"
+  },
+  {
+   "id": "Upper basalt",
+   "name": "Basalt, upper flows",
+   "color": "#4d5561"
+  },
+  {
+   "id": "Interbasalt clay",
+   "name": "Interbasalt clay",
+   "color": "#b08458"
+  },
+  {
+   "id": "Lower basalt",
+   "name": "Basalt, lower flows",
+   "color": "#68709a"
+  },
+  {
+   "id": "Clay",
+   "name": "Sub-basaltic clay",
+   "color": "#a7a582"
+  },
+  {
+   "id": "Deep lead",
+   "name": "Deep lead: buried river sand and gravel",
+   "color": "#dfa43a"
+  },
+  {
+   "id": "Bedrock",
+   "name": "Palaeozoic bedrock",
+   "color": "#7f8c78"
+  }
+ ],
+ "boreholes": [
+  {
+   "id": "327378",
+   "x": 756743.76,
+   "y": 5860852.97,
+   "z": 442.43,
+   "lon": 143.8990707227694,
+   "lat": -37.36354867535409,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 4,
+     "to": 72,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 72,
+     "to": 79,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 79,
+     "to": 90,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 90,
+     "to": 95,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327379",
+   "x": 756536.43,
+   "y": 5861207.23,
+   "z": 441.19,
+   "lon": 143.89660966745586,
+   "lat": -37.360416769037435,
+   "depth": 114.25,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 6,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 6,
+     "to": 13,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 13,
+     "to": 18,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 18,
+     "to": 75,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 75,
+     "to": 114,
+     "unit": "Clay",
+     "name": "Clay"
+    }
+   ]
+  },
+  {
+   "id": "327380",
+   "x": 758345.12,
+   "y": 5862203.26,
+   "z": 497.20557,
+   "lon": 143.9166606017369,
+   "lat": -37.35094867625087,
+   "depth": 137.31,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 6,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 6,
+     "to": 57,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 57,
+     "to": 59,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 59,
+     "to": 119,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 119,
+     "to": 137,
+     "unit": "Clay",
+     "name": "Clay"
+    }
+   ]
+  },
+  {
+   "id": "327381",
+   "x": 758094.73,
+   "y": 5862249.9,
+   "z": 479.98,
+   "lon": 143.9138208297607,
+   "lat": -37.35059840847012,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 52,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 52,
+     "to": 54,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 54,
+     "to": 116,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 116,
+     "to": 127,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 127,
+     "to": 131,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327382",
+   "x": 758068.31,
+   "y": 5862501.38,
+   "z": 467.27,
+   "lon": 143.91343540853444,
+   "lat": -37.34834187714377,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 49,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 49,
+     "to": 108,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 108,
+     "to": 126,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 126,
+     "to": 127,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327384",
+   "x": 755975.93,
+   "y": 5860220.5,
+   "z": 428.41,
+   "lon": 143.89062937823903,
+   "lat": -37.36945446452323,
+   "depth": 69.49,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 11,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 11,
+     "to": 14,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 14,
+     "to": 62,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 62,
+     "to": 66,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 66,
+     "to": 69,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327385",
+   "x": 755801.13,
+   "y": 5860302.01,
+   "z": 426.26,
+   "lon": 143.88862950315647,
+   "lat": -37.36876895470712,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 12,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 12,
+     "to": 15,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 15,
+     "to": 62,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 62,
+     "to": 77,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 77,
+     "to": 87,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327386",
+   "x": 755608.67,
+   "y": 5860274.1,
+   "z": 424.94,
+   "lon": 143.88646836954734,
+   "lat": -37.36907323225393,
+   "depth": 99.36,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 4,
+     "to": 14,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 14,
+     "to": 21,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 21,
+     "to": 75,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 75,
+     "to": 84,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 84,
+     "to": 96,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    },
+    {
+     "from": 96,
+     "to": 99,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327387",
+   "x": 755208.7,
+   "y": 5859791.31,
+   "z": 419.89,
+   "lon": 143.88212330956122,
+   "lat": -37.37352960571625,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 8,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 8,
+     "to": 12,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 12,
+     "to": 53,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 53,
+     "to": 62,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 62,
+     "to": 75,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327388",
+   "x": 754960.06,
+   "y": 5859831.87,
+   "z": 416.14,
+   "lon": 143.8793046366796,
+   "lat": -37.373232794721474,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 5,
+     "to": 6,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 6,
+     "to": 9,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 9,
+     "to": 53,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 53,
+     "to": 62,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 62,
+     "to": 76,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327389",
+   "x": 755088.9,
+   "y": 5860036.72,
+   "z": 420,
+   "lon": 143.88068738721654,
+   "lat": -37.37135324597635,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 4,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 4,
+     "to": 14,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 14,
+     "to": 56,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 56,
+     "to": 59,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 59,
+     "to": 79,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327390",
+   "x": 754909.81,
+   "y": 5860064.33,
+   "z": 417.28,
+   "lon": 143.8786577899052,
+   "lat": -37.37115394151743,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 4,
+     "to": 14,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 14,
+     "to": 74,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 74,
+     "to": 80,
+     "unit": "Clay",
+     "name": "Clay"
+    }
+   ]
+  },
+  {
+   "id": "327391",
+   "x": 755258.42,
+   "y": 5860019.53,
+   "z": 421.17,
+   "lon": 143.88260541689507,
+   "lat": -37.3714613500957,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 3,
+     "to": 17,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 17,
+     "to": 23,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 23,
+     "to": 63,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 63,
+     "to": 73,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 73,
+     "to": 87,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327392",
+   "x": 759546.85,
+   "y": 5862818.39,
+   "z": 446.97632,
+   "lon": 143.92999632665837,
+   "lat": -37.34507606130659,
+   "depth": 76.2,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 68,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 68,
+     "to": 76,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    }
+   ]
+  },
+  {
+   "id": "327393",
+   "x": 759807.63,
+   "y": 5862662.14,
+   "z": 432.38239,
+   "lon": 143.93299147579418,
+   "lat": -37.34640965149903,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 59,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    }
+   ]
+  },
+  {
+   "id": "327394",
+   "x": 759222.79,
+   "y": 5863159.57,
+   "z": 460.05,
+   "lon": 143.9262231262111,
+   "lat": -37.34209519116057,
+   "depth": 113.39,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 91,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 91,
+     "to": 113,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    }
+   ]
+  },
+  {
+   "id": "327395",
+   "x": 758961.94,
+   "y": 5863266.75,
+   "z": 453.63,
+   "lon": 143.9232445825017,
+   "lat": -37.34120316917363,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 95,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 95,
+     "to": 134,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327396",
+   "x": 758862.59,
+   "y": 5863333.04,
+   "z": 447.44,
+   "lon": 143.9221013437957,
+   "lat": -37.3406340895074,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 95,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 95,
+     "to": 110,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 110,
+     "to": 143,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    },
+    {
+     "from": 143,
+     "to": 150,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327397",
+   "x": 758671.82,
+   "y": 5863345.11,
+   "z": 445.23,
+   "lon": 143.91994626602556,
+   "lat": -37.34057853849094,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 92,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 92,
+     "to": 132,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 132,
+     "to": 143,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    },
+    {
+     "from": 143,
+     "to": 153,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327398",
+   "x": 757329.08,
+   "y": 5863941.69,
+   "z": 423.34,
+   "lon": 143.90459988379,
+   "lat": -37.335581001456966,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 4,
+     "to": 20,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 20,
+     "to": 23,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 23,
+     "to": 79,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 79,
+     "to": 108,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 108,
+     "to": 111,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327399",
+   "x": 757025.01,
+   "y": 5863950.54,
+   "z": 418.34,
+   "lon": 143.90116871193666,
+   "lat": -37.335585474951166,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 3,
+     "to": 79,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 79,
+     "to": 110,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 110,
+     "to": 144,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327400",
+   "x": 756747.21,
+   "y": 5863988.33,
+   "z": 413,
+   "lon": 143.89802358452775,
+   "lat": -37.335322130071745,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 6,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 6,
+     "to": 16,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 16,
+     "to": 20,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 20,
+     "to": 75,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 75,
+     "to": 106,
+     "unit": "Clay",
+     "name": "Clay"
+    }
+   ]
+  },
+  {
+   "id": "327401",
+   "x": 757471.59,
+   "y": 5863972.71,
+   "z": 428.62,
+   "lon": 143.90619587239627,
+   "lat": -37.33526220620228,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 5,
+     "to": 26,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 26,
+     "to": 29,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 29,
+     "to": 82,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 82,
+     "to": 109,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 109,
+     "to": 110,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327402",
+   "x": 757747.28,
+   "y": 5864145.32,
+   "z": 421.87,
+   "lon": 143.90924404407122,
+   "lat": -37.333631902837865,
+   "depth": 134.26,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 5,
+     "to": 21,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 21,
+     "to": 25,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 25,
+     "to": 83,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 83,
+     "to": 126,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 126,
+     "to": 134,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327403",
+   "x": 755586.98,
+   "y": 5866106.36,
+   "z": 378.79,
+   "lon": 143.88421320903964,
+   "lat": -37.316574535617164,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 15,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 15,
+     "to": 65,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 65,
+     "to": 83,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 83,
+     "to": 86,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327404",
+   "x": 755574.55,
+   "y": 5866357.25,
+   "z": 360.19351,
+   "lon": 143.88398678494093,
+   "lat": -37.31431936703671,
+   "depth": 89.48,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 11,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 11,
+     "to": 42,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 42,
+     "to": 44,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 44,
+     "to": 72,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 72,
+     "to": 87,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 87,
+     "to": 89,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327405",
+   "x": 755676.15,
+   "y": 5866581.28,
+   "z": 367.36209,
+   "lon": 143.88505484256552,
+   "lat": -37.31227458178278,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 55,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 55,
+     "to": 58,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 58,
+     "to": 71,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327406",
+   "x": 755622.29,
+   "y": 5866775.83,
+   "z": 373.02777,
+   "lon": 143.88438077076174,
+   "lat": -37.31053793083327,
+   "depth": 82.32,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 4,
+     "to": 37,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 37,
+     "to": 40,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 40,
+     "to": 64,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 64,
+     "to": 76,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 76,
+     "to": 82,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327407",
+   "x": 756405.18,
+   "y": 5861134.68,
+   "z": 440,
+   "lon": 143.89515449252266,
+   "lat": -37.36110623854649,
+   "depth": 124.36,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 5,
+     "to": 16,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 16,
+     "to": 19,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 19,
+     "to": 80,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 80,
+     "to": 121,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 121,
+     "to": 123,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    },
+    {
+     "from": 123,
+     "to": 124,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327408",
+   "x": 756241.67,
+   "y": 5861175.64,
+   "z": 443.94,
+   "lon": 143.89329630009811,
+   "lat": -37.36078259916508,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 5,
+     "to": 15,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 15,
+     "to": 23,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 23,
+     "to": 81,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 81,
+     "to": 106,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 106,
+     "to": 126,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327409",
+   "x": 756257.16,
+   "y": 5860973.7,
+   "z": 440.52,
+   "lon": 143.89354085747252,
+   "lat": -37.36259629461635,
+   "depth": 125.4,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 17,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 17,
+     "to": 24,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 24,
+     "to": 32,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 32,
+     "to": 94,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 94,
+     "to": 113,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 113,
+     "to": 125,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327410",
+   "x": 757628.64,
+   "y": 5864063.21,
+   "z": 425.95,
+   "lon": 143.90793503451673,
+   "lat": -37.33440397391667,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 4,
+     "to": 23,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 23,
+     "to": 29,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 29,
+     "to": 80,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 80,
+     "to": 123,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 123,
+     "to": 134,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    },
+    {
+     "from": 134,
+     "to": 135,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327411",
+   "x": 756552.98,
+   "y": 5864652.49,
+   "z": 406.3,
+   "lon": 143.89560406990918,
+   "lat": -37.32939678887167,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 20,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 20,
+     "to": 69,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 69,
+     "to": 78,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 78,
+     "to": 82,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327412",
+   "x": 756980.49,
+   "y": 5864555.29,
+   "z": 411.39,
+   "lon": 143.9004572276668,
+   "lat": -37.33015361010306,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 20,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 20,
+     "to": 70,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 70,
+     "to": 98,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 98,
+     "to": 102,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327413",
+   "x": 757165.87,
+   "y": 5864463.33,
+   "z": 413.86,
+   "lon": 143.90257902033534,
+   "lat": -37.330930181019305,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 19,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 19,
+     "to": 45,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 45,
+     "to": 104,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327414",
+   "x": 756766.15,
+   "y": 5864578.38,
+   "z": 409.25,
+   "lon": 143.89803294790158,
+   "lat": -37.330005055255015,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 20,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 20,
+     "to": 67,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 67,
+     "to": 75,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 75,
+     "to": 84,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327415",
+   "x": 757898.69,
+   "y": 5861711.41,
+   "z": 480.42,
+   "lon": 143.9117976815828,
+   "lat": -37.355500554551874,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 52,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 52,
+     "to": 57,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 57,
+     "to": 107,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 107,
+     "to": 123,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 123,
+     "to": 132,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327416",
+   "x": 758050.63,
+   "y": 5861680.94,
+   "z": 480.23,
+   "lon": 143.91352165522105,
+   "lat": -37.35573256321545,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 114,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 114,
+     "to": 133,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 133,
+     "to": 135,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327417",
+   "x": 758264.54,
+   "y": 5861647.86,
+   "z": 484.45,
+   "lon": 143.9159455005018,
+   "lat": -37.355970910974754,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 6,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 6,
+     "to": 10,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 10,
+     "to": 110,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 110,
+     "to": 137,
+     "unit": "Clay",
+     "name": "Clay"
+    }
+   ]
+  },
+  {
+   "id": "327418",
+   "x": 757735.3,
+   "y": 5861731.34,
+   "z": 479.52,
+   "lon": 143.9099481289934,
+   "lat": -37.355366505799466,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 5,
+     "to": 51,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 51,
+     "to": 55,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 55,
+     "to": 93,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 93,
+     "to": 112,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 112,
+     "to": 113,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327419",
+   "x": 757595.9,
+   "y": 5861750.26,
+   "z": 476.48,
+   "lon": 143.9083694940539,
+   "lat": -37.35523490857742,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 85,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 85,
+     "to": 87,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    }
+   ]
+  },
+  {
+   "id": "327420",
+   "x": 757382.79,
+   "y": 5863246.42,
+   "z": 441.44,
+   "lon": 143.90544675219812,
+   "lat": -37.34182516310093,
+   "depth": 119.35,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 26,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 26,
+     "to": 27,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 27,
+     "to": 90,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 90,
+     "to": 113,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 113,
+     "to": 115,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    },
+    {
+     "from": 115,
+     "to": 119,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327421",
+   "x": 757688.7,
+   "y": 5863257.51,
+   "z": 448.97,
+   "lon": 143.90889207856566,
+   "lat": -37.3416404513727,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 37,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 37,
+     "to": 97,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 97,
+     "to": 128,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 128,
+     "to": 139,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 139,
+     "to": 143,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    }
+   ]
+  },
+  {
+   "id": "327422",
+   "x": 761511.73,
+   "y": 5858795.48,
+   "z": 533.01,
+   "lon": 143.95357110516295,
+   "lat": -37.38073850737134,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 29,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 29,
+     "to": 32,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 32,
+     "to": 42,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 42,
+     "to": 47,
+     "unit": "Clay",
+     "name": "Clay"
+    }
+   ]
+  },
+  {
+   "id": "327423",
+   "x": 760178.28,
+   "y": 5859091.28,
+   "z": 496.02,
+   "lon": 143.93842502930255,
+   "lat": -37.37845082338297,
+   "depth": 60.17,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 38,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 38,
+     "to": 60,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    }
+   ]
+  },
+  {
+   "id": "327424",
+   "x": 760574.51,
+   "y": 5859366.93,
+   "z": 493.3,
+   "lon": 143.94279756578368,
+   "lat": -37.37585815720155,
+   "depth": 33.07,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 22,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 22,
+     "to": 27,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 27,
+     "to": 33,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    }
+   ]
+  },
+  {
+   "id": "327425",
+   "x": 760693.58,
+   "y": 5859459.03,
+   "z": 494.33,
+   "lon": 143.94410818756504,
+   "lat": -37.37499560351571,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 22,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 22,
+     "to": 32,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 32,
+     "to": 41,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 41,
+     "to": 45,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 45,
+     "to": 58,
+     "unit": "Clay",
+     "name": "Clay"
+    }
+   ]
+  },
+  {
+   "id": "327426",
+   "x": 760851.63,
+   "y": 5859549.49,
+   "z": 501.45,
+   "lon": 143.9458591216344,
+   "lat": -37.374136927478396,
+   "depth": 65.23,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 3,
+     "to": 58,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 58,
+     "to": 59,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    },
+    {
+     "from": 59,
+     "to": 65,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327427",
+   "x": 758740.02,
+   "y": 5864152.41,
+   "z": 424.78,
+   "lon": 143.92043352422667,
+   "lat": -37.33329215992796,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 14,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 14,
+     "to": 18,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 18,
+     "to": 77,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 77,
+     "to": 93,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 93,
+     "to": 117,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    },
+    {
+     "from": 117,
+     "to": 134,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327428",
+   "x": 758877.31,
+   "y": 5864083.51,
+   "z": 411.4483,
+   "lon": 143.9220053349644,
+   "lat": -37.33387414594851,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 10,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 10,
+     "to": 17,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 17,
+     "to": 71,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 71,
+     "to": 96,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 96,
+     "to": 122,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    },
+    {
+     "from": 122,
+     "to": 125,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327429",
+   "x": 759166.96,
+   "y": 5863804.87,
+   "z": 419.26694,
+   "lon": 143.92536817850672,
+   "lat": -37.336301725273096,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 9,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 9,
+     "to": 12,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 12,
+     "to": 71,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 71,
+     "to": 93,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 93,
+     "to": 126,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    },
+    {
+     "from": 126,
+     "to": 129,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327430",
+   "x": 759026.6,
+   "y": 5864014.1,
+   "z": 416.99,
+   "lon": 143.9237125885583,
+   "lat": -37.33445733376759,
+   "depth": 126.19,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 11,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 11,
+     "to": 12,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 12,
+     "to": 73,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 73,
+     "to": 82,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 82,
+     "to": 124,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    },
+    {
+     "from": 124,
+     "to": 126,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327431",
+   "x": 759383.26,
+   "y": 5863780.7,
+   "z": 430.54,
+   "lon": 143.92781515569501,
+   "lat": -37.33645893793364,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 3,
+     "to": 11,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 11,
+     "to": 15,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 15,
+     "to": 76,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 76,
+     "to": 103,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 103,
+     "to": 110,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    },
+    {
+     "from": 110,
+     "to": 119,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327432",
+   "x": 757205.12,
+   "y": 5864941.37,
+   "z": 396.92,
+   "lon": 143.90285571859198,
+   "lat": -37.32661591180089,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 19,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 19,
+     "to": 94,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 94,
+     "to": 110,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327433",
+   "x": 756836.64,
+   "y": 5863261.51,
+   "z": 426.39,
+   "lon": 143.89928357405222,
+   "lat": -37.341840521893026,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 18,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 18,
+     "to": 76,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 76,
+     "to": 80,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 80,
+     "to": 86,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327434",
+   "x": 756618.66,
+   "y": 5863245.69,
+   "z": 421.84,
+   "lon": 143.89683125130023,
+   "lat": -37.34204316016299,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 18,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 18,
+     "to": 22,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 22,
+     "to": 75,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 75,
+     "to": 94,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 94,
+     "to": 97,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327435",
+   "x": 756328.28,
+   "y": 5863294.02,
+   "z": 417.53,
+   "lon": 143.89354046619243,
+   "lat": -37.34168823084002,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 4,
+     "to": 76,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 76,
+     "to": 112,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 112,
+     "to": 121,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 121,
+     "to": 127,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    },
+    {
+     "from": 127,
+     "to": 128,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327436",
+   "x": 756090.27,
+   "y": 5863349.16,
+   "z": 411.66,
+   "lon": 143.8908377608049,
+   "lat": -37.34125757345123,
+   "depth": 141.68,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 3,
+     "to": 71,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 71,
+     "to": 114,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 114,
+     "to": 140,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327437",
+   "x": 755926.34,
+   "y": 5863380.12,
+   "z": 410.7,
+   "lon": 143.88897875483892,
+   "lat": -37.34102397405022,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 16,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 16,
+     "to": 19,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 19,
+     "to": 71,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 71,
+     "to": 110,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 110,
+     "to": 127,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    }
+   ]
+  },
+  {
+   "id": "327438",
+   "x": 755787.05,
+   "y": 5863378,
+   "z": 406.08,
+   "lon": 143.8874089699887,
+   "lat": -37.3410814329195,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 10,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 10,
+     "to": 13,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 13,
+     "to": 67,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 67,
+     "to": 119,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 119,
+     "to": 122,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    },
+    {
+     "from": 122,
+     "to": 124,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327439",
+   "x": 756771.29,
+   "y": 5862994.88,
+   "z": 434.81,
+   "lon": 143.8986390082354,
+   "lat": -37.34425882771554,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 3,
+     "to": 20,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 20,
+     "to": 21,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 21,
+     "to": 75,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 75,
+     "to": 79,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 79,
+     "to": 86,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327440",
+   "x": 757176.41,
+   "y": 5863931.12,
+   "z": 422.01,
+   "lon": 143.90288234703834,
+   "lat": -37.335718414474336,
+   "depth": 114.45,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 4,
+     "to": 19,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 19,
+     "to": 22,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 22,
+     "to": 78,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 78,
+     "to": 103,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 103,
+     "to": 114,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327441",
+   "x": 757692.69,
+   "y": 5864298.85,
+   "z": 417.61,
+   "lon": 143.90857521034854,
+   "lat": -37.332264950624214,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 79,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 79,
+     "to": 90,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 90,
+     "to": 98,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 98,
+     "to": 114,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 114,
+     "to": 122,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    },
+    {
+     "from": 122,
+     "to": 137,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327442",
+   "x": 757334.89,
+   "y": 5861877.47,
+   "z": 469.04,
+   "lon": 143.9053819530336,
+   "lat": -37.354162122514865,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 31,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 31,
+     "to": 96,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327443",
+   "x": 757158.55,
+   "y": 5861898.95,
+   "z": 462.8,
+   "lon": 143.90338583325834,
+   "lat": -37.35401761400075,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 24,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 24,
+     "to": 72,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 72,
+     "to": 116,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    }
+   ]
+  },
+  {
+   "id": "327444",
+   "x": 756933.33,
+   "y": 5861972.57,
+   "z": 453.21,
+   "lon": 143.9008205624648,
+   "lat": -37.35341722307836,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 100,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 100,
+     "to": 118,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 118,
+     "to": 123,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327445",
+   "x": 756744.26,
+   "y": 5862024.63,
+   "z": 446.46,
+   "lon": 143.89867036134413,
+   "lat": -37.35300085239287,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 29,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 29,
+     "to": 30,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 30,
+     "to": 93,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 93,
+     "to": 118,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 118,
+     "to": 128,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    },
+    {
+     "from": 128,
+     "to": 135,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327446",
+   "x": 758379.21,
+   "y": 5863553.78,
+   "z": 435.99,
+   "lon": 143.9165744156656,
+   "lat": -37.33878157460822,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 5,
+     "to": 16,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 16,
+     "to": 32,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 32,
+     "to": 82,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 82,
+     "to": 110,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 110,
+     "to": 111,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    },
+    {
+     "from": 111,
+     "to": 119,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327447",
+   "x": 758207.37,
+   "y": 5863444.88,
+   "z": 434.71,
+   "lon": 143.91467480706498,
+   "lat": -37.339809701432756,
+   "depth": 125.3,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 18,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 18,
+     "to": 83,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 83,
+     "to": 104,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 104,
+     "to": 125,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327448",
+   "x": 759649.91,
+   "y": 5863763.41,
+   "z": 419.41,
+   "lon": 143.93082754519295,
+   "lat": -37.33654006332415,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 49,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 49,
+     "to": 70,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 70,
+     "to": 77,
+     "unit": "Clay",
+     "name": "Clay"
+    }
+   ]
+  },
+  {
+   "id": "327449",
+   "x": 759642.04,
+   "y": 5863624.54,
+   "z": 418.23178,
+   "lon": 143.93078735621705,
+   "lat": -37.33779238363564,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 3,
+     "to": 10,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 10,
+     "to": 13,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 13,
+     "to": 61,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 61,
+     "to": 74,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 74,
+     "to": 78,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327462",
+   "x": 755317.22,
+   "y": 5863397.88,
+   "z": 389.17,
+   "lon": 143.88210463182747,
+   "lat": -37.341031817339264,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 65,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    }
+   ]
+  },
+  {
+   "id": "327471",
+   "x": 755329.22,
+   "y": 5863397.37,
+   "z": 389.39,
+   "lon": 143.88224006165174,
+   "lat": -37.34103308705552,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 62,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 62,
+     "to": 72,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 72,
+     "to": 82,
+     "unit": "Clay",
+     "name": "Clay"
+    }
+   ]
+  },
+  {
+   "id": "327473",
+   "x": 755642.2,
+   "y": 5861634.63,
+   "z": 429.49,
+   "lon": 143.88637702920633,
+   "lat": -37.35681595636423,
+   "depth": 117.43,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 3,
+     "to": 70,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 70,
+     "to": 76,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 76,
+     "to": 107,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 107,
+     "to": 109,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    }
+   ]
+  },
+  {
+   "id": "327474",
+   "x": 755466.44,
+   "y": 5861646.07,
+   "z": 428.91,
+   "lon": 143.88439084118048,
+   "lat": -37.35676134401228,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 3,
+     "to": 71,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 71,
+     "to": 75,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 75,
+     "to": 84,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327475",
+   "x": 755806.18,
+   "y": 5864730.13,
+   "z": 397.11,
+   "lon": 143.88715834824328,
+   "lat": -37.328903687162246,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 90,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327476",
+   "x": 755660.01,
+   "y": 5864849.48,
+   "z": 395.24,
+   "lon": 143.88546938934408,
+   "lat": -37.32786953418238,
+   "depth": 92.11,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 92,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327477",
+   "x": 755632.25,
+   "y": 5865021.9,
+   "z": 394.02,
+   "lon": 143.88509705214105,
+   "lat": -37.326324972122954,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 83,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    }
+   ]
+  },
+  {
+   "id": "327478",
+   "x": 755636.97,
+   "y": 5863428.42,
+   "z": 401.41,
+   "lon": 143.88569933630808,
+   "lat": -37.34066893338683,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 121,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327479",
+   "x": 755480.37,
+   "y": 5864319.3,
+   "z": 391.4,
+   "lon": 143.88362676241402,
+   "lat": -37.332691822093835,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 7,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 7,
+     "to": 52,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 52,
+     "to": 82,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 82,
+     "to": 100,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327480",
+   "x": 755604.27,
+   "y": 5864502.33,
+   "z": 391.58,
+   "lon": 143.88496062361622,
+   "lat": -37.331010020308,
+   "depth": 88.23,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 3,
+     "to": 12,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 12,
+     "to": 14,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 14,
+     "to": 64,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 64,
+     "to": 78,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 78,
+     "to": 80,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    },
+    {
+     "from": 80,
+     "to": 88,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327481",
+   "x": 756124.48,
+   "y": 5859660.42,
+   "z": 428.12155,
+   "lon": 143.89249863231512,
+   "lat": -37.3744554973259,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 30,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 30,
+     "to": 32,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 32,
+     "to": 34,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 34,
+     "to": 42,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 42,
+     "to": 59,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327488",
+   "x": 756136.43,
+   "y": 5859658.92,
+   "z": 428.54214,
+   "lon": 143.89263399055045,
+   "lat": -37.37446576604515,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 4,
+     "to": 40,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 40,
+     "to": 56,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 56,
+     "to": 58,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 58,
+     "to": 70,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327489",
+   "x": 761116.38,
+   "y": 5857097.71,
+   "z": 559.84,
+   "lon": 143.94971056779258,
+   "lat": -37.39613302656026,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 43,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 43,
+     "to": 44,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 44,
+     "to": 89,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 89,
+     "to": 92,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 92,
+     "to": 98,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327491",
+   "x": 761447.15,
+   "y": 5857577.43,
+   "z": 570.11,
+   "lon": 143.95327296203504,
+   "lat": -37.3917214522323,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 45,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 45,
+     "to": 46,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 46,
+     "to": 49,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327492",
+   "x": 761225.61,
+   "y": 5857241.3,
+   "z": 561.03,
+   "lon": 143.9508922809813,
+   "lat": -37.39480965802685,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 44,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 44,
+     "to": 45,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 45,
+     "to": 91,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 91,
+     "to": 103,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 103,
+     "to": 112,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327493",
+   "x": 760581.38,
+   "y": 5860688.57,
+   "z": 477.35,
+   "lon": 143.942409882936,
+   "lat": -37.36395888359886,
+   "depth": 32.3,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 12,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 12,
+     "to": 30,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 30,
+     "to": 32,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327494",
+   "x": 760612.02,
+   "y": 5860797.44,
+   "z": 476.95,
+   "lon": 143.9427171970308,
+   "lat": -37.36297028678929,
+   "depth": 17.37,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 15,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 15,
+     "to": 16,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    },
+    {
+     "from": 16,
+     "to": 17,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327495",
+   "x": 760518.55,
+   "y": 5860481.93,
+   "z": 478.82,
+   "lon": 143.94177403204063,
+   "lat": -37.3658367538433,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 10,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 10,
+     "to": 13,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327496",
+   "x": 761322.85,
+   "y": 5857385.4,
+   "z": 563.67,
+   "lon": 143.95193842851455,
+   "lat": -37.393485086905216,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 60,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 60,
+     "to": 61,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 61,
+     "to": 64,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327497",
+   "x": 760507.67,
+   "y": 5860272.08,
+   "z": 481.87,
+   "lon": 143.94172509706027,
+   "lat": -37.36772884099568,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 34,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 34,
+     "to": 45,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 45,
+     "to": 47,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    },
+    {
+     "from": 47,
+     "to": 49,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327498",
+   "x": 760445.62,
+   "y": 5860036.36,
+   "z": 479.39,
+   "lon": 143.94110813606238,
+   "lat": -37.36986822172252,
+   "depth": 40.23,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 32,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 32,
+     "to": 37,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 37,
+     "to": 38,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    },
+    {
+     "from": 38,
+     "to": 40,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327501",
+   "x": 757496.48,
+   "y": 5862288.23,
+   "z": 465.68,
+   "lon": 143.90706143759922,
+   "lat": -37.3504194896732,
+   "depth": 91.44,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 87,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 87,
+     "to": 88,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 88,
+     "to": 91,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327502",
+   "x": 758625.42,
+   "y": 5863668.54,
+   "z": 430.6,
+   "lon": 143.91931024422945,
+   "lat": -37.3376798914939,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 85,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 85,
+     "to": 110,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 110,
+     "to": 115,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    }
+   ]
+  },
+  {
+   "id": "327503",
+   "x": 760200.23,
+   "y": 5862165.83,
+   "z": 450.03,
+   "lon": 143.93759254407667,
+   "lat": -37.35076751048108,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 24,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 24,
+     "to": 25,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 25,
+     "to": 29,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327504",
+   "x": 760152.68,
+   "y": 5861728.21,
+   "z": 456.81,
+   "lon": 143.93720989095263,
+   "lat": -37.354720388991936,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 12,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 12,
+     "to": 16,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327505",
+   "x": 760160.44,
+   "y": 5861888.11,
+   "z": 451.54,
+   "lon": 143.9372413416239,
+   "lat": -37.35327874237186,
+   "depth": 12.19,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 6,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 6,
+     "to": 7,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 7,
+     "to": 12,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327506",
+   "x": 760194.16,
+   "y": 5862045.92,
+   "z": 452.74,
+   "lon": 143.93756614008598,
+   "lat": -37.351848721178094,
+   "depth": 28.34,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 23,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 23,
+     "to": 24,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 24,
+     "to": 28,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327507",
+   "x": 760208.16,
+   "y": 5862305.7,
+   "z": 443.26,
+   "lon": 143.93763275374317,
+   "lat": -37.349506181387305,
+   "depth": 27.43,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 19,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 19,
+     "to": 25,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 25,
+     "to": 27,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327508",
+   "x": 757496.9,
+   "y": 5862298.23,
+   "z": 465.16,
+   "lon": 143.90706273348033,
+   "lat": -37.350329380705205,
+   "depth": 104.24,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 98,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 98,
+     "to": 99,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 99,
+     "to": 104,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327509",
+   "x": 758623.19,
+   "y": 5861935.12,
+   "z": 496.12,
+   "lon": 143.91988985836812,
+   "lat": -37.3532850591603,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 57,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 57,
+     "to": 58,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 58,
+     "to": 123,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 123,
+     "to": 141,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 141,
+     "to": 142,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    },
+    {
+     "from": 142,
+     "to": 144,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327510",
+   "x": 758819.03,
+   "y": 5861782.63,
+   "z": 495.11,
+   "lon": 143.92215156856457,
+   "lat": -37.35460325990395,
+   "depth": 124.35,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 117,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 117,
+     "to": 118,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 118,
+     "to": 124,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327511",
+   "x": 761333.95,
+   "y": 5860250.13,
+   "z": 496.84,
+   "lon": 143.9510521525883,
+   "lat": -37.367694076930135,
+   "depth": 95.4,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 7,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 7,
+     "to": 11,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 11,
+     "to": 75,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 75,
+     "to": 91,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 91,
+     "to": 95,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327513",
+   "x": 761546.71,
+   "y": 5860426.4,
+   "z": 497.85,
+   "lon": 143.9533895397891,
+   "lat": -37.366047391406745,
+   "depth": 105.46,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 81,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 81,
+     "to": 94,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 94,
+     "to": 98,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 98,
+     "to": 105,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    }
+   ]
+  },
+  {
+   "id": "327515",
+   "x": 761264.72,
+   "y": 5860625.61,
+   "z": 489.71,
+   "lon": 143.9501388309973,
+   "lat": -37.36433357736227,
+   "depth": 95.4,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 77,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 77,
+     "to": 86,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 86,
+     "to": 91,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 91,
+     "to": 95,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "327516",
+   "x": 761251.72,
+   "y": 5860626.16,
+   "z": 489.71,
+   "lon": 143.94999206917387,
+   "lat": -37.36433228538592,
+   "depth": 98.45,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 76,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 76,
+     "to": 81,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 81,
+     "to": 90,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 90,
+     "to": 98,
+     "unit": "Clay",
+     "name": "Clay"
+    }
+   ]
+  },
+  {
+   "id": "327517",
+   "x": 761265.14,
+   "y": 5860635.6,
+   "z": 489.7,
+   "lon": 143.95014007603223,
+   "lat": -37.364243468283206,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 4,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 4,
+     "to": 68,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 68,
+     "to": 77,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 77,
+     "to": 81,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 81,
+     "to": 87,
+     "unit": "Clay",
+     "name": "Clay"
+    }
+   ]
+  },
+  {
+   "id": "327519",
+   "x": 761270.95,
+   "y": 5860985.87,
+   "z": 485.62,
+   "lon": 143.95008205039198,
+   "lat": -37.36108875469129,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 3,
+     "to": 5,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 5,
+     "to": 6,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 6,
+     "to": 60,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 60,
+     "to": 67,
+     "unit": "Clay",
+     "name": "Clay"
+    }
+   ]
+  },
+  {
+   "id": "327523",
+   "x": 759755.63,
+   "y": 5860249.83,
+   "z": 469.94,
+   "lon": 143.93325087533844,
+   "lat": -37.368139998925436,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 36,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 36,
+     "to": 45,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    }
+   ]
+  },
+  {
+   "id": "327524",
+   "x": 758678.18,
+   "y": 5859116.72,
+   "z": 462.36,
+   "lon": 143.9214943129478,
+   "lat": -37.37864140881891,
+   "depth": 32.61,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 6,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 6,
+     "to": 27,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "57530",
+   "x": 755468.4,
+   "y": 5856936.26,
+   "z": 436.88,
+   "lon": 143.88603853343918,
+   "lat": -37.3991603607768,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 19,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 19,
+     "to": 20,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 20,
+     "to": 27,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 27,
+     "to": 35,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 35,
+     "to": 38,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    },
+    {
+     "from": 38,
+     "to": 43,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "57531",
+   "x": 755823.35,
+   "y": 5857041.41,
+   "z": 439.82,
+   "lon": 143.89000740023417,
+   "lat": -37.39811590939194,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 5,
+     "to": 9,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "57532",
+   "x": 755917.13,
+   "y": 5857127.56,
+   "z": 440.02,
+   "lon": 143.89103572978917,
+   "lat": -37.397314392754986,
+   "depth": 20.42,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 16,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 16,
+     "to": 20,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "57539",
+   "x": 753983.76,
+   "y": 5857349.61,
+   "z": 423.76,
+   "lon": 143.86914383612063,
+   "lat": -37.39584723780892,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 36,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 36,
+     "to": 50,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 50,
+     "to": 70,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "57549",
+   "x": 753540.01,
+   "y": 5857748.93,
+   "z": 413.45,
+   "lon": 143.86399983894484,
+   "lat": -37.39237380531932,
+   "depth": 20.42,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 3,
+     "to": 20,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    }
+   ]
+  },
+  {
+   "id": "57550",
+   "x": 753473.79,
+   "y": 5857130.86,
+   "z": 421.68,
+   "lon": 143.86346450647324,
+   "lat": -37.3979561588146,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 31,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 31,
+     "to": 49,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "57552",
+   "x": 753556.36,
+   "y": 5857898.45,
+   "z": 410.87,
+   "lon": 143.8641329860187,
+   "lat": -37.39102326889578,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 26,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 26,
+     "to": 30,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    }
+   ]
+  },
+  {
+   "id": "57553",
+   "x": 755064.47,
+   "y": 5857093.56,
+   "z": 432.05,
+   "lon": 143.88142638666332,
+   "lat": -37.39785553524809,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 27,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 27,
+     "to": 28,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "57554",
+   "x": 753654.47,
+   "y": 5857613.9,
+   "z": 416.65,
+   "lon": 143.86533755050908,
+   "lat": -37.393558097522785,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 28,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 28,
+     "to": 30,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "57555",
+   "x": 755479.4,
+   "y": 5857196.17,
+   "z": 436.38,
+   "lon": 143.88607289542787,
+   "lat": -37.396817565126184,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 15,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 15,
+     "to": 36,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "57561",
+   "x": 755409.69,
+   "y": 5856968.79,
+   "z": 436.06,
+   "lon": 143.88536483317392,
+   "lat": -37.39888370985992,
+   "depth": 38.1,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 35,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 35,
+     "to": 37,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    }
+   ]
+  },
+  {
+   "id": "57563",
+   "x": 753526.47,
+   "y": 5857429.05,
+   "z": 417.58,
+   "lon": 143.8639567114901,
+   "lat": -37.39525724169867,
+   "depth": 30.48,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 4,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 4,
+     "to": 27,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 27,
+     "to": 30,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "57564",
+   "x": 753872.96,
+   "y": 5857334.27,
+   "z": 422.07,
+   "lon": 143.86789881611207,
+   "lat": -37.396015671559944,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 36,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 36,
+     "to": 38,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "57566",
+   "x": 753420.74,
+   "y": 5857533.67,
+   "z": 414.93,
+   "lon": 143.86272788059105,
+   "lat": -37.39434433321766,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 4,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 4,
+     "to": 18,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 18,
+     "to": 30,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 30,
+     "to": 32,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "57567",
+   "x": 754223.83,
+   "y": 5857579.79,
+   "z": 424.01,
+   "lon": 143.8717735688631,
+   "lat": -37.39370925023702,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 11,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 11,
+     "to": 18,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 18,
+     "to": 27,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    }
+   ]
+  },
+  {
+   "id": "57570",
+   "x": 754421.48,
+   "y": 5857281.01,
+   "z": 429.82,
+   "lon": 143.8741064962888,
+   "lat": -37.3963447696711,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 39,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 39,
+     "to": 40,
+     "unit": "Clay",
+     "name": "Clay"
+    }
+   ]
+  },
+  {
+   "id": "57571",
+   "x": 754169.62,
+   "y": 5857481.94,
+   "z": 425.24,
+   "lon": 143.8711954956638,
+   "lat": -37.39460498387578,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 3,
+     "to": 30,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 30,
+     "to": 33,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    }
+   ]
+  },
+  {
+   "id": "57572",
+   "x": 757102.21,
+   "y": 5857207.58,
+   "z": 450,
+   "lon": 143.90437979845075,
+   "lat": -37.3962661112099,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 54,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "57573",
+   "x": 756169.42,
+   "y": 5858829.33,
+   "z": 430.44,
+   "lon": 143.89329321113595,
+   "lat": -37.38192483250994,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 31,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 31,
+     "to": 33,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "57582",
+   "x": 753820.44,
+   "y": 5857276.41,
+   "z": 421.89,
+   "lon": 143.8673260549285,
+   "lat": -37.39655095643386,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 35,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 35,
+     "to": 38,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    }
+   ]
+  },
+  {
+   "id": "91785",
+   "x": 761415.19,
+   "y": 5864442.85,
+   "z": 451.34,
+   "lon": 143.95048984388833,
+   "lat": -37.3299286743725,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 7,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 7,
+     "to": 58,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    }
+   ]
+  },
+  {
+   "id": "91788",
+   "x": 761597.35,
+   "y": 5864511.26,
+   "z": 453.11,
+   "lon": 143.95251916389307,
+   "lat": -37.329261604055006,
+   "depth": 31.08,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 3,
+     "to": 29,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 29,
+     "to": 31,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    }
+   ]
+  },
+  {
+   "id": "91820",
+   "x": 759982.34,
+   "y": 5865135.38,
+   "z": 425.42,
+   "lon": 143.93409457840315,
+   "lat": -37.32409656403427,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 22,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 22,
+     "to": 23,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 23,
+     "to": 60,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    }
+   ]
+  },
+  {
+   "id": "91824",
+   "x": 761444.76,
+   "y": 5866515.65,
+   "z": 433.7,
+   "lon": 143.9500930982709,
+   "lat": -37.31126109831973,
+   "depth": 65,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 6,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 6,
+     "to": 48,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 48,
+     "to": 51,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 51,
+     "to": 54,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 54,
+     "to": 57,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 57,
+     "to": 60,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    },
+    {
+     "from": 60,
+     "to": 63,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "91828",
+   "x": 761227.12,
+   "y": 5866318.55,
+   "z": 434.19,
+   "lon": 143.94770957800623,
+   "lat": -37.313096577025355,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 5,
+     "to": 63,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 63,
+     "to": 65,
+     "unit": "Clay",
+     "name": "Clay"
+    }
+   ]
+  },
+  {
+   "id": "91829",
+   "x": 761545.21,
+   "y": 5865456.85,
+   "z": 443.9,
+   "lon": 143.9515980861121,
+   "lat": -37.3207641097726,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 5,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 5,
+     "to": 36,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 36,
+     "to": 61,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "91866",
+   "x": 761116.34,
+   "y": 5859982.93,
+   "z": 499.48,
+   "lon": 143.94869202777082,
+   "lat": -37.370160607602024,
+   "depth": 83.21,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 6,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 6,
+     "to": 11,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 11,
+     "to": 12,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 12,
+     "to": 70,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 70,
+     "to": 71,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 71,
+     "to": 81,
+     "unit": "Deep lead",
+     "name": "Deep lead"
+    },
+    {
+     "from": 81,
+     "to": 83,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "91867",
+   "x": 761336.06,
+   "y": 5860039.73,
+   "z": 500.95,
+   "lon": 143.95115021944514,
+   "lat": -37.36958745762391,
+   "depth": 95.09,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 13,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 13,
+     "to": 14,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 14,
+     "to": 75,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 75,
+     "to": 94,
+     "unit": "Clay",
+     "name": "Clay"
+    },
+    {
+     "from": 94,
+     "to": 95,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "91870",
+   "x": 757184.19,
+   "y": 5861416.17,
+   "z": 461.72,
+   "lon": 143.90384255251075,
+   "lat": -37.35835662046527,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 72,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    }
+   ]
+  },
+  {
+   "id": "91874",
+   "x": 759295.22,
+   "y": 5861652.32,
+   "z": 485.41,
+   "lon": 143.9275670584677,
+   "lat": -37.35564341018991,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 33,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    }
+   ]
+  },
+  {
+   "id": "91875",
+   "x": 759055.22,
+   "y": 5861471.2,
+   "z": 488.72,
+   "lon": 143.92492388306113,
+   "lat": -37.35734091258716,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 70,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 70,
+     "to": 75,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 75,
+     "to": 91,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    }
+   ]
+  },
+  {
+   "id": "91876",
+   "x": 755688.54,
+   "y": 5862374.73,
+   "z": 414.65,
+   "lon": 143.8866441786446,
+   "lat": -37.35014048523909,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 15,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 15,
+     "to": 23,
+     "unit": "Interbasalt clay",
+     "name": "Interbasalt clay"
+    },
+    {
+     "from": 23,
+     "to": 67,
+     "unit": "Lower basalt",
+     "name": "Tertiary basalt (lower)"
+    },
+    {
+     "from": 67,
+     "to": 87,
+     "unit": "Clay",
+     "name": "Clay"
+    }
+   ]
+  },
+  {
+   "id": "91877",
+   "x": 759933.76,
+   "y": 5860719.98,
+   "z": 467.34,
+   "lon": 143.9350949244371,
+   "lat": -37.363857746071226,
+   "depth": 21.34,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 20,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 20,
+     "to": 21,
+     "unit": "Clay",
+     "name": "Clay"
+    }
+   ]
+  },
+  {
+   "id": "91898",
+   "x": 760729.47,
+   "y": 5858745.47,
+   "z": 514.74,
+   "lon": 143.9447644024463,
+   "lat": -37.38140892408101,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 14,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 14,
+     "to": 62,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    }
+   ]
+  },
+  {
+   "id": "91900",
+   "x": 759954.54,
+   "y": 5857993.13,
+   "z": 509.08,
+   "lon": 143.93628689879847,
+   "lat": -37.38839901520141,
+   "depth": 15.24,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 13,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 13,
+     "to": 15,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "91908",
+   "x": 758718.52,
+   "y": 5856828.7,
+   "z": 511.52,
+   "lon": 143.92274953124212,
+   "lat": -37.399227077832805,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 3,
+     "to": 37,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    }
+   ]
+  },
+  {
+   "id": "91911",
+   "x": 759575.69,
+   "y": 5856732.32,
+   "z": 644.76,
+   "lon": 143.93245523136352,
+   "lat": -37.39985502229041,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 2,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 2,
+     "to": 80,
+     "unit": "Bedrock",
+     "name": "Bedrock"
+    }
+   ]
+  },
+  {
+   "id": "91925",
+   "x": 760494.55,
+   "y": 5859701.8,
+   "z": 490,
+   "lon": 143.94177775014214,
+   "lat": -37.37286614669723,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 1,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 1,
+     "to": 103,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    }
+   ]
+  },
+  {
+   "id": "WRK006714",
+   "x": 760293.57,
+   "y": 5864253.94,
+   "z": 434.25,
+   "lon": 143.9379120508029,
+   "lat": -37.33194413469833,
+   "depth": 81,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 3,
+     "to": 73,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    },
+    {
+     "from": 73,
+     "to": 75,
+     "unit": "Clay",
+     "name": "Clay"
+    }
+   ]
+  },
+  {
+   "id": "WRK006833",
+   "x": 761113.13,
+   "y": 5860427.72,
+   "z": 486.94,
+   "lon": 143.94849901280648,
+   "lat": -37.36615758006763,
+   "intervals": [
+    {
+     "from": 0,
+     "to": 3,
+     "unit": "Alluvium",
+     "name": "Surface alluvium"
+    },
+    {
+     "from": 3,
+     "to": 60,
+     "unit": "Upper basalt",
+     "name": "Tertiary basalt (upper)"
+    }
+   ]
+  }
+ ]
+}
