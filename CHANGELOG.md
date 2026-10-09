@@ -20,6 +20,7 @@
 
 ### Removed
 - The **Edit data…** dialog, superseded by the Input data tab.
+- Personal data from the Japanese test fixtures: the survey engineers' names and registration numbers and the contractor's telephone number are now empty, and a test keeps them so.
 
 ## 0.7.0 — 2026-10-08
 
