@@ -392,7 +392,7 @@ npm test         # unit tests (vitest)
 npm run build    # type-check, then build dist/ and dist/geomodel3d-offline.html
 ```
 
-`npm run dev` starts Vite's development server. Where a local server cannot be used, build and open `dist/geomodel3d-offline.html` instead.
+`npm run dev` starts Vite's development server. Where a local server cannot be used, build and open `dist/geomodel3d-offline.html` instead. [CONTRIBUTING.md](CONTRIBUTING.md) explains how to submit a change.
 
 ## Deployment
 
@@ -426,6 +426,14 @@ Every push to `main` runs the tests, builds the site and publishes `dist/` to Gi
   - map data © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors.
 
 No copyright is claimed here on the data above, and the Apache-2.0 licence does not apply to them.
+
+## Contributing
+
+Contributions are welcome: bug reports, ideas, documentation, code and openly licensed data. [CONTRIBUTING.md](CONTRIBUTING.md) explains how to set up the project, test a change and submit it, and the rules for adding data. Before starting on a larger change, please open an [issue](https://github.com/kilickursat/GeoModel3D/issues) so that the approach can be agreed; the [roadmap](#roadmap) lists what is planned. Everyone taking part follows the [code of conduct](CODE_OF_CONDUCT.md).
+
+## Sponsoring
+
+GeoModel3D is free and open source. You can support it on [Patreon](https://www.patreon.com/geotechCLI). If you or your organisation would like to sponsor its development, please contact Kursat Kilic by e-mail at [kilic_kursat@hotmail.com](mailto:kilic_kursat@hotmail.com).
 
 ## License
 
