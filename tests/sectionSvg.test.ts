@@ -54,6 +54,17 @@ describe("section drawing",()=>{
     expect(Number(round)).toBeLessThanOrEqual(Number(fill));
   });
 
+  it("names the ends without coordinates and shortens the axis title when drawn as narrow as a phone",()=>{
+    const m=buildGeologicalModel(sakaeProject),s=computeSection(m,{azimuth:170,offset:0},300);
+    const wide=sectionSvg(m,s,{width:640,height:330}),narrow=sectionSvg(m,s,{width:374,height:220});
+    expect(wide).toMatch(/>A′ {2}\(-?[\d.]+, -?[\d.]+\)<\/text>/);
+    expect(wide).toContain("Distance along section (m)");
+    expect(wide).toContain("blue = water table");
+    expect(narrow).toContain(">A′</text>");
+    expect(narrow).not.toContain("Distance along section");
+    expect(narrow).toMatch(/Distance \(m\) · V\.E\. ×[\d.]+ · dashed = inferred · blue = water</);
+  });
+
   it("explains an empty section",()=>{
     const off=computeSection(m,{azimuth:90,offset:10000});
     expect(sectionSvg(m,off,{width:400,height:200})).toContain("does not cross the model footprint");
