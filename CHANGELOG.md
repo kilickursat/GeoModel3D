@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.12.0 — 2026-10-13
+
+### Added
+- **A layout for phones and tablets.** On a phone, held either way, and on a tablet held upright, the model fills the screen and the panels no longer cover it.
+  - A bar at the bottom opens **Site**, **Section**, **View** and **Files** one at a time, as sheets, and the model moves into the part of the screen the sheet leaves free. A sheet closes with its ×, with its button in the bar, or when pulled down. Held sideways, the sheets open from the left.
+  - The name of the site shown sits under the title, and opens the Site sheet.
+  - The notes fold to one line under the title and open when tapped; an error still opens in full.
+  - The 2-D section opens across the top, or on the right when the phone is on its side; its button sits in the title row of the Section sheet.
+  - The credits keep to one line, and open in full when tapped.
+- **Tap for details on touch screens.** A tap on the model shows what a mouse shows on hover: the logged interval of a borehole, or the unit, its depth and the stresses there. A tap within a finger's width of a borehole picks it. A finger moved along the 2-D section reads it, and the read-out stays when the finger lifts.
+- On a touch screen, the tip in the panel describes the gestures: one finger orbits, two fingers pinch to zoom and pan.
+
+### Changed
+- On a phone the model is framed in the room between the title bar and the bar at the bottom, by its width when the phone is upright, and borehole labels are shown for up to 20 boreholes.
+- When a panel opens or closes, the view moves to the free part of the screen over a fifth of a second.
+- Clicking the title of the notes folds them.
+- On screens up to 1,260 pixels across, the notes open below the tabs instead of over them; up to 1,180 pixels, the section bar packs closer, so its values no longer overlap.
+- On a touch screen, text fields in the Input data tab use 16 px type, so the page does not zoom into a field when it is tapped.
+- A section drawn narrower than about 500 pixels, as on a phone, names its ends A and A′ without their coordinates and shortens its axis title, so the labels no longer run into each other.
+
 ## 0.11.0 — 2026-10-13
 
 ### Added
