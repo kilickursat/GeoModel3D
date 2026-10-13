@@ -35,13 +35,12 @@ Each site is published data, in its country's own coordinate system and height d
 | **Creswick: basalt over the deep leads** | **Input data: a case typed in by hand** |
 | ![Creswick deep leads model from NGIS hydrostratigraphy](docs/creswick.png) | ![The Input data tab with the worked example: its units, and the drained earth pressures down a borehole](docs/input-data.png) |
 
-## Version 0.10
+## Version 0.11
 
-- **Check the model:** leave-one-out cross-validation. Each borehole in turn is predicted from the others: the share of the logs predicted right, the errors of every surface, and the logs furthest from their prediction, marked on the model. See [Checking the model](#checking-the-model).
-- **Lengths in feet, centimetres or millimetres** in CSV and AGS4 files are converted to metres, and the notes say so (0.9.1).
-- **Antwerp:** three boreholes with doubtful collar heights are left out.
+- **Models for augmented reality:** the model as the viewer shows it, 30 cm across, to set on a desk and walk around with a phone or tablet. USDZ opens in AR Quick Look on iPhone and iPad; GLB serves Android, web viewers and 3-D software such as Blender. The four bundled sites are ready at [kilickursat.github.io/GeoModel3D/ar/](https://kilickursat.github.io/GeoModel3D/ar/). See [Models for augmented reality](#models-for-augmented-reality).
 
 Earlier versions:
+- **0.10:** Check the model, a leave-one-out cross-validation that predicts each borehole from the others; lengths in feet, centimetres or millimetres converted to metres (0.9.1); three Antwerp boreholes with doubtful collar heights left out.
 - **0.9:** earth pressures down a borehole in the Input data tab (Rankine, drained and undrained); a contribution guide and a Sponsoring section; collars that scatter about a coarse terrain grid summed up in one note.
 - **0.8:** the Input data tab, where your own case is entered and modelled, from one borehole up; σ′h = K0 · σ′v; the Creswick deep leads in Australia; pinch-outs at the borehole that lacks the unit, now the documented rule.
 - **0.7:** real sites in Belgium and the Netherlands; groundwater, σv, u and σ′v on sections; laboratory and in-situ tests; Dutch BRO and Flemish DOV files; a data editor; descriptions grouped by principal soil in seven languages; the RD New and Luxembourg 170 m datum fix.
@@ -319,6 +318,14 @@ The bundled sites, without the terrain the app downloads:
 
 With its 5 m terrain grid, Sakae reaches 62.8 %, and the mean error of the ground falls from 3.8 to 2.0 m. `scripts/check-sites.ts` prints these results.
 
+## Models for augmented reality
+
+**Export → 3-D model for AR (USDZ)** turns the model, as the viewer shows it, into one about 30 cm across to set on a desk and walk around with a phone or tablet. It keeps the vertical exaggeration, leaves out the hidden units, and puts a pin at each borehole. On an iPhone or iPad it opens straight in AR Quick Look; elsewhere it downloads. **Export → 3-D model (GLB)** gives the same model as binary glTF 2.0, for Android, web viewers and 3-D software such as Blender.
+
+- **Size.** Phones draw a few tens of thousands of triangles smoothly, so the model is built on a coarser mesh and only the outside of the visible units is kept: about 20,000 triangles for Sakae or Antwerp. A hidden unit leaves a gap that stays closed.
+- **Credits.** Each file carries the credits of its data: in the copyright field of the glTF, and as the documentation string of the USDZ.
+- **The bundled sites** are published as GLB and USDZ at [kilickursat.github.io/GeoModel3D/ar/](https://kilickursat.github.io/GeoModel3D/ar/). That page opens them in AR Quick Look on iPhone and iPad and in Scene Viewer on Android, and its links can be shared. They are built from the bundled data, without the terrain the app downloads, by `scripts/make-ar-models.ts` during the build.
+
 ## How a model is built
 
 Boreholes → contacts → TIN horizons → closed unit volumes → sections
@@ -420,6 +427,7 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 - `src/model.ts`: log interpretation, erosion, terrain, water table and horizon assembly
 - `src/fields.ts`: stresses, earth pressures, measured properties on sections, and their colour scales
 - `src/validation.ts`: leave-one-out cross-validation
+- `src/ar.ts`: models for augmented reality (USDZ and GLB)
 - `src/properties.ts`: the property catalogue and per-unit statistics
 - `src/volume.ts`: closed unit-volume meshes
 - `src/section.ts`: vertical sections
@@ -432,7 +440,7 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 - `src/crs.ts`: coordinate systems (registry, suggestion and conversion)
 - `src/tiles.ts`: map and elevation tiles, and terrain resampling
 - `src/main.ts`: three.js viewer and interface
-- `scripts/`: the generators of the synthetic datasets, of the real sites (Sakae, Antwerp, Maasvlakte, Creswick) and of the coordinate system registry and DOV code list, the cross-validation of the real sites, and the offline single-file build
+- `scripts/`: the generators of the synthetic datasets, of the real sites (Sakae, Antwerp, Maasvlakte, Creswick) and of the coordinate system registry and DOV code list, the cross-validation of the real sites, their models for augmented reality, and the offline single-file build
 
 ## Development
 
@@ -492,4 +500,4 @@ Apache-2.0: see [LICENSE](LICENSE). The data listed under [Data sources](#data-s
 
 ## Keywords
 
-3D geological modelling · geological model software · geotechnical engineering · engineering geology · hydrogeology · borehole logs · borehole data visualization · manual data entry · stratigraphy · subsurface modelling · cross-sections · groundwater · effective stress · horizontal stress K0 · earth pressure · active and passive earth pressure · Rankine · retaining walls · cross-validation · model uncertainty · ground investigation · AGS4 · BRO · DOV · KuniJiban · NGIS · Australia · coordinate systems · GIS · three.js · WebGPU · open source
+3D geological modelling · geological model software · geotechnical engineering · engineering geology · hydrogeology · borehole logs · borehole data visualization · manual data entry · stratigraphy · subsurface modelling · cross-sections · groundwater · effective stress · horizontal stress K0 · earth pressure · active and passive earth pressure · Rankine · retaining walls · cross-validation · model uncertainty · augmented reality · AR · USDZ · glTF · ground investigation · AGS4 · BRO · DOV · KuniJiban · NGIS · Australia · coordinate systems · GIS · three.js · WebGPU · open source

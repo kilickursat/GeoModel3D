@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.11.0 — 2026-10-13
+
+### Added
+- **Models for augmented reality** ([#14](https://github.com/kilickursat/GeoModel3D/issues/14)). **Export → 3-D model for AR (USDZ)** and **Export → 3-D model (GLB)** give the model as the viewer shows it: the same vertical exaggeration, without the hidden units, 30 cm across and standing on its base, with a pin at each borehole.
+  - On an iPhone or iPad the USDZ opens in AR Quick Look, anchored to a horizontal surface; elsewhere it downloads. The GLB serves Android, web viewers and 3-D software such as Blender.
+  - The model is built on a coarser mesh and keeps only the outside of the visible units, about 20,000 triangles for the larger sites; a hidden unit leaves a closed gap.
+  - Each file carries the credits of its data.
+- **The bundled sites in AR** at `ar/` on the site: GLB and USDZ for the four real sites, written by `scripts/make-ar-models.ts` during the build, with a page that opens them in AR Quick Look on iPhone and iPad and in Scene Viewer on Android. The GLBs pass the Khronos glTF validator with no errors or warnings.
+
+### Changed
+- The model builder takes the number of triangles its mesh is refined to.
+
 ## 0.10.0 — 2026-10-13
 
 ### Added
