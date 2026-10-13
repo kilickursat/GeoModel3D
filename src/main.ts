@@ -18,6 +18,7 @@ import {applyUnitRules} from "./rules";
 import {reportHtml} from "./report";
 import {createInputWorkspace} from "./input";
 import {crossValidation,CrossValidation} from "./validation";
+import {arModel,toGlb,toUsdz,quickLookAvailable} from "./ar";
 import "./style.css";
 
 const app=document.querySelector<HTMLDivElement>("#app")!;
@@ -549,6 +550,8 @@ toolbar.innerHTML=`<button class="input-data" title="Type in or paste your own b
   <button data-export="field" title="The values of the field shown on the section, on a grid">Section field (CSV)</button>
   <button data-export="report-A3" title="Opens the print dialog: choose Save as PDF">Report (PDF, A3)</button>
   <button data-export="report-A4" title="Opens the print dialog: choose Save as PDF">Report (PDF, A4)</button>
+  <button data-export="usdz" title="The model as shown, 30 cm across, to set on a desk: opens in AR Quick Look on iPhone and iPad, downloads elsewhere">3-D model for AR (USDZ)</button>
+  <button data-export="glb" title="The model as shown, 30 cm across, for Android, web viewers and 3-D software such as Blender">3-D model (GLB)</button>
 </div></details>
 <div class="toggles">
   <label><input type="checkbox" data-view="volumes" checked>Volumes</label>
@@ -897,9 +900,9 @@ async function importFileList(list:FileList|File[]){
   }
 }
 
-function download(name:string,text:string,type:string){
+function download(name:string,data:string|ArrayBuffer|Uint8Array<ArrayBuffer>,type:string){
   const a=document.createElement("a");
-  a.href=URL.createObjectURL(new Blob([text],{type}));
+  a.href=URL.createObjectURL(new Blob([data],{type}));
   a.download=name;
   document.body.appendChild(a);
   a.click();
@@ -919,6 +922,29 @@ function exportAs(kind:string){
     else showNotice("Section field",["Choose a field under Colour on the section bar first: a stress or a measured property."],true);
   }
   if(kind.startsWith("report-"))void printReport(kind==="report-A4"?"A4":"A3");
+  if(kind==="usdz"||kind==="glb")void exportModel(kind,slug);
+}
+// The model as shown, for augmented reality: 30 cm across, with the view's exaggeration and without the hidden units,
+// carrying the credits of its data. Where Safari offers AR Quick Look, the USDZ opens in it.
+async function exportModel(format:"usdz"|"glb",slug:string){
+  try{
+    const {scene,triangles}=arModel(project,{ve:view.ve,hidden:view.hidden});
+    const credit=[project.terrain?.source?`Terrain: ${project.terrain.source}`:"",project.source?`Data: ${project.source}`:"",
+      `Model: GeoModel3D ${pkg.version}, ${pkg.homepage}, vertical exaggeration ×${view.ve}`].filter(Boolean).join(". ");
+    const data=format==="usdz"?await toUsdz(scene,credit):await toGlb(scene,credit);
+    const name=`${slug}.${format}`,type=format==="usdz"?"model/vnd.usdz+zip":"model/gltf-binary";
+    if(format==="usdz"&&quickLookAvailable()){
+      // AR Quick Look opens a link marked rel="ar" that holds an image.
+      const a=document.createElement("a"),img=document.createElement("img");
+      img.src="data:image/gif;base64,R0lGODlhAQABAAAAACw=";
+      a.rel="ar";a.href=URL.createObjectURL(new Blob([data],{type}));a.appendChild(img);
+      document.body.appendChild(a);a.click();a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href),60_000);
+    }else download(name,data,type);
+    showNotice("3-D model",[`${name}: ${triangles.toLocaleString("en-US")} triangles, 30 cm across, vertical exaggeration ×${fmt(view.ve,1)}${view.hidden.size?", without the hidden units":""}.`,
+      format==="usdz"?"It opens in AR Quick Look on iPhone and iPad.":"It opens in web viewers and 3-D software such as Blender.",
+      "The four bundled sites can be opened in AR on a phone from kilickursat.github.io/GeoModel3D/ar/."]);
+  }catch(err){showNotice("3-D model could not be made",[(err as Error).message],true)}
 }
 
 // The 3-D view as a PNG: rendered on white without the grid or the room kept for the section panel, and cropped
