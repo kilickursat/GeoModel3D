@@ -1,6 +1,6 @@
 // Ground properties measured in boreholes (laboratory tests on samples, in-situ tests) or given per unit, and their
 // statistics per unit. Values are stored in the unit given here; readers convert to it.
-import {Borehole,UnitDef,TestResult,sptN} from "./geology";
+import {Borehole,UnitDef,TestResult,sptN} from "./schema";
 
 export interface PropertyDef {
   key:string; name:string; symbol:string; unit:string; decimals:number;

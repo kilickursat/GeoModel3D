@@ -2,7 +2,7 @@
 // Ondergrond), as IMBRO XML from the BRO web service or BROloket: position, surface level, the described layers, the
 // groundwater level and laboratory determinations.
 import {parseXml,withoutPrefixes,XmlNode,descendants,childNodes,textOf} from "./xml";
-import {TestResult} from "./geology";
+import {TestResult} from "./schema";
 
 export interface BroLog {
   id:string; file:string;
