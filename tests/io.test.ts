@@ -55,6 +55,52 @@ describe("CSV import",()=>{
   });
 });
 
+describe("lengths in other units",()=>{
+  it("converts lengths in feet to metres, and says so",()=>{
+    const feet=`Hole ID,Easting,Northing,Elevation (ft),Depth From (ft),Depth To (ft),Lithology
+BH1,1000,2000,164,0,10,Alluvium
+BH1,1000,2000,164,10,33,Sandstone
+BH2,1100,2000,157,0,16,Alluvium
+BH2,1100,2000,157,16,59,Sandstone
+BH3,1050,2090,170,0,7,Alluvium
+BH3,1050,2090,170,7,30,Sandstone
+`;
+    const {project,warnings}=importFiles([{name:"site.csv",text:feet}]);
+    expect(warnings).toEqual(["site.csv: Elevation (ft), Depth From (ft), Depth To (ft) converted from feet to metres"]);
+    const bh1=project.boreholes.find(b=>b.id==="BH1")!;
+    expect([bh1.x,bh1.y,bh1.z]).toEqual([1000,2000,49.987]);
+    expect(bh1.intervals.map(i=>[i.from,i.to])).toEqual([[0,3.048],[3.048,10.058]]);
+    expect(buildGeologicalModel(project).warnings).toEqual([]);
+  });
+
+  it("reads US survey feet, centimetres and millimetres, and any other unit as metres",()=>{
+    const {project,warnings}=importFiles([
+      {name:"collars.csv",text:"Hole,Easting (US ft),Northing (US ft),Ground level (mAOD),Final depth (m)\nA,1000000,500000,12.5,25\nB,1000100,500000,12,18\nC,1000000,500100,13,15"},
+      {name:"intervals.csv",text:"Hole,From (cm),To (cm),Unit\nA,0,250,clay\nA,250,2000,rock\nB,0,300,clay\nB,300,1800,rock\nC,0,200,clay\nC,200,1500,rock"},
+      {name:"water.csv",text:"Hole,Water depth (mm)\nA,1500"},
+      {name:"spt.csv",text:"Hole,Depth (ft),Blows,Penetration (mm)\nA,10,12,300"}
+    ]);
+    const a=project.boreholes.find(b=>b.id==="A")!;
+    // 1,000,000 US survey feet are 1,000,000 × 1200/3937 m.
+    expect([a.x,a.y,a.z,a.depth]).toEqual([304800.61,152400.305,12.5,25]);
+    expect(a.intervals.map(i=>[i.from,i.to])).toEqual([[0,2.5],[2.5,20]]);
+    expect(a.water).toEqual([{depth:1.5}]);
+    expect(a.spt).toEqual([{depth:3.048,blows:12,penetration:300}]);
+    expect(warnings).toEqual(expect.arrayContaining([
+      "collars.csv: Easting (US ft), Northing (US ft) converted from US survey feet to metres",
+      "collars.csv: the eastings and northings are now in metres, so choose the metric version of their coordinate system, such as the State Plane zone in metres",
+      "intervals.csv: From (cm), To (cm) converted from centimetres to metres",
+      "water.csv: Water depth (mm) converted from millimetres to metres",
+      "spt.csv: Depth (ft) converted from feet to metres"]));
+    expect(warnings.join("\n")).not.toMatch(/Ground level|Final depth|Penetration/);
+    // Plain "ft" on eastings is the international foot.
+    const intl=importFiles([{name:"c.csv",text:"Hole,Easting (ft),Northing (ft),Elevation\nA,1000,2000,5\nB,1100,2000,5\nC,1000,2100,5"},
+      {name:"i.csv",text:"Hole,From,To,Unit\nA,0,2,clay\nB,0,2,clay\nC,0,2,clay"}]);
+    expect(intl.project.boreholes.find(b=>b.id==="B")!.x).toBe(335.28);
+    expect(intl.warnings).toContain("c.csv: the eastings and northings are now in metres, so choose the metric version of their coordinate system, such as the State Plane zone in metres. “ft” is read as the international foot; write “US ft” for US survey feet");
+  });
+});
+
 describe("AGS4 import",()=>{
   const ags=[
     '"GROUP","PROJ"','"HEADING","PROJ_ID","PROJ_NAME"','"UNIT","",""','"TYPE","ID","X"','"DATA","P1","Riverside test"','',
@@ -79,6 +125,14 @@ describe("AGS4 import",()=>{
     expect(warnings).toEqual([expect.stringMatching(/^BH3: no collar position and elevation/)]);
     expect(project.boreholes[0]).toMatchObject({x:523145,y:178456,z:21.5});
     expect(buildGeologicalModel(project).warnings).toEqual([]);
+  });
+
+  it("converts the lengths its UNIT rows give in feet",()=>{
+    const feet=ags.replace('"UNIT","","","m","m","","m","m"','"UNIT","","","m","m","","ft","ft"').replace('"UNIT","","m","m","","",""','"UNIT","","ft","ft","","",""');
+    const {project,warnings}=importFiles([{name:"site.ags",text:feet}]);
+    expect(warnings).toContain("site.ags: LOCA_GL (ft), LOCA_FDEP (ft), GEOL_TOP (ft), GEOL_BASE (ft) converted from feet to metres");
+    expect(project.boreholes[0]).toMatchObject({x:523145,y:178456,z:6.553});
+    expect(project.boreholes[0].intervals.map(i=>[i.from,i.to])).toEqual([[0,0.366],[0.366,2.896],[2.896,4.572]]);
   });
 
   it("refuses AGS 3",()=>{

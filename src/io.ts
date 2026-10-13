@@ -62,6 +62,43 @@ export function toCsv(rows:Array<Array<string|number|undefined>>){return rows.ma
 
 // Header names are matched without case, punctuation or a unit in brackets: "Depth From (m)" is "depthfrom".
 const norm=(h:string)=>h.toLowerCase().replace(/\([^)]*\)|\[[^\]]*\]/g,"").replace(/[^a-z0-9]/g,"");
+// A length is in metres unless its unit names feet (the international foot, or the US survey foot written "US ft"),
+// centimetres or millimetres; any other unit, such as m, mbgl, mAOD or m NAP, is read as metres.
+const LENGTH_UNITS:Array<[RegExp,number,string]>=[
+  [/^(us(survey)?(ft|feet|foot)|ftus|survey(ft|feet|foot))$/,1200/3937,"US survey feet"],
+  [/^(international)?(ft|feet|foot)$/,0.3048,"feet"],
+  [/^cm$/,0.01,"centimetres"],
+  [/^mm$/,0.001,"millimetres"]
+];
+export function lengthUnit(unit:string){
+  const u=unit.toLowerCase().replace(/[\s._-]/g,""),hit=LENGTH_UNITS.find(([re])=>re.test(u));
+  return hit?{scale:hit[1],name:hit[2]}:undefined;
+}
+const bracketed=(h:string)=>h.match(/\(([^)]*)\)|\[([^\]]*)\]/)?.slice(1).find(v=>v!==undefined)??"";
+// Converted lengths are kept to the millimetre.
+const toMetres=(v:number,scale:number)=>Math.round(v*scale*1000)/1000;
+// Lengths converted while reading a file, by column header and the unit converted from.
+class Conversions {
+  private found=new Map<string,{name:string;order:number}>();
+  // The value in metres; `header` and `unit` say where it came from, and `order` places its column in the notes.
+  metres(v:number,header:string,unit:string,order=this.found.size){
+    const u=lengthUnit(unit);
+    if(!u||!Number.isFinite(v))return v;
+    if(!this.found.has(header))this.found.set(header,{name:u.name,order});
+    return toMetres(v,u.scale);
+  }
+  // The notes naming the columns converted, and asking for a metric coordinate system where eastings and northings
+  // were in feet.
+  notes(file:string,coordinates:string[]){
+    if(!this.found.size)return [];
+    const by=new Map<string,string[]>();
+    for(const [header,{name}] of [...this.found].sort((a,b)=>a[1].order-b[1].order))by.set(name,[...(by.get(name)??[]),header]);
+    const notes=[`${file}: ${[...by].map(([name,headers])=>`${headers.join(", ")} converted from ${name} to metres`).join("; ")}`];
+    const xy=coordinates.filter(h=>this.found.has(h));
+    if(xy.length)notes.push(`${file}: the eastings and northings are now in metres, so choose the metric version of their coordinate system, such as the State Plane zone in metres${xy.some(h=>this.found.get(h)!.name==="feet")?". “ft” is read as the international foot; write “US ft” for US survey feet":""}`);
+    return notes;
+  }
+}
 const round=(v:number)=>Math.round(v*100)/100;
 const ALIASES={
   id:["holeid","boreholeid","bhid","hole","borehole","bh","boreholename","boreholeno","holeno","locaid","locationid","location","pointid","name","id"],
@@ -129,11 +166,14 @@ function readCsvTable(file:TextFile,t:Tables){
   const c=columns(rows[0]),has=(...f:Field[])=>f.every(k=>c[k]!==undefined);
   const data=rows.slice(1);
   const cell=(r:string[],f:Field)=>c[f]===undefined?undefined:r[c[f]!]?.trim();
+  // Lengths in metres: converted where the header names another unit in brackets, such as "Depth From (ft)".
+  const lengths=new Conversions(),header=(f:Field)=>rows[0][c[f]!].trim();
+  const len=(r:string[],f:Field)=>c[f]===undefined?NaN:lengths.metres(num(cell(r,f)),header(f),bracketed(rows[0][c[f]!]),c[f]);
   const water=(r:string[])=>{
-    const d=num(cell(r,"water")),date=cell(r,"date");
+    const d=len(r,"water"),date=cell(r,"date");
     return Number.isFinite(d)?[{depth:d,...(date?{date}:{})}]:undefined;
   };
-  const collar=(r:string[]):Collar=>({x:num(cell(r,"x")),y:num(cell(r,"y")),z:num(cell(r,"z")),depth:num(cell(r,"depth")),lon:num(cell(r,"lon")),lat:num(cell(r,"lat")),water:water(r)});
+  const collar=(r:string[]):Collar=>({x:len(r,"x"),y:len(r,"y"),z:len(r,"z"),depth:len(r,"depth"),lon:num(cell(r,"lon")),lat:num(cell(r,"lat")),water:water(r)});
   // Property columns are the columns not taken by an identifying field; in a table of located boreholes, "E" and "N"
   // are eastings and northings, elsewhere a modulus and SPT N-values.
   const located=has("x","y")||has("lat","lon");
@@ -145,7 +185,7 @@ function readCsvTable(file:TextFile,t:Tables){
     for(const r of data){
       const id=cell(r,"id");
       if(!id){t.warnings.push(`${file.name}: row without a borehole id skipped`);continue}
-      const from=num(cell(r,"from")),to=num(cell(r,"to")),unit=cell(r,"unit")??"",name=described?cell(r,"description"):undefined;
+      const from=len(r,"from"),to=len(r,"to"),unit=cell(r,"unit")??"",name=described?cell(r,"description"):undefined;
       if(!t.intervals.has(id))t.intervals.set(id,[]);
       t.intervals.get(id)!.push({from,to,unit,...(name?{name}:{})});
       if(combined&&!t.collars.has(id))t.collars.set(id,collar(r));
@@ -162,8 +202,8 @@ function readCsvTable(file:TextFile,t:Tables){
     for(const r of data){
       const id=cell(r,"id"),name=cell(r,"property");
       if(!id||!name)continue;
-      const unit=c.unit!==undefined?cell(r,"unit"):"",header=propertyFromHeader(unit?`${name} (${unit})`:name);
-      addTest(measuredOf(t,id),num(cell(r,"testDepth")),num(cell(r,"testTo")),header?.key??propertyKey(name),converted(num(cell(r,"value")),header?.scale??1));
+      const unit=c.unit!==undefined?cell(r,"unit"):"",property=propertyFromHeader(unit?`${name} (${unit})`:name);
+      addTest(measuredOf(t,id),len(r,"testDepth"),len(r,"testTo"),property?.key??propertyKey(name),converted(num(cell(r,"value")),property?.scale??1));
     }
   }else if(c.unit!==undefined&&(props.length||(["color","name","erosive","gamma","gammaSat","source"] as Field[]).some(f=>c[f]!==undefined))){
     for(const r of data){
@@ -177,7 +217,7 @@ function readCsvTable(file:TextFile,t:Tables){
     for(const r of data){
       const id=cell(r,"id");
       if(!id)continue;
-      const m=measuredOf(t,id),depth=num(cell(r,"testDepth")),to=num(cell(r,"testTo"));
+      const m=measuredOf(t,id),depth=len(r,"testDepth"),to=len(r,"testTo");
       for(const {i,p} of props)addTest(m,depth,to,p.key,converted(num(r[i]),p.scale));
       if(has("blows")){
         const blows=num(cell(r,"blows")),pen=num(cell(r,"penetration"));
@@ -192,20 +232,24 @@ function readCsvTable(file:TextFile,t:Tables){
   }else{
     throw new Error(`${file.name}: unrecognised columns (${rows[0].join(", ")}). Expected ${TABLES}.`);
   }
+  t.warnings.push(...lengths.notes(file.name,(["x","y"] as Field[]).filter(f=>c[f]!==undefined).map(header)));
 }
 
 // ---------- AGS4 ----------
 
+// The groups' rows, by heading; `units` holds each group's UNIT row.
 export function parseAgs4(text:string){
   if(/^\s*"\*\*/.test(text))throw new Error("AGS 3 files are not supported; export the data as AGS4");
-  const groups=new Map<string,Array<Record<string,string>>>();
+  const groups=new Map<string,Array<Record<string,string>>>(),units=new Map<string,Record<string,string>>();
   let group="",heading:string[]=[];
+  const record=(r:string[])=>Object.fromEntries(heading.slice(1).map((h,i)=>[h,r[i+1]??""]));
   for(const r of parseCsv(text,",")){
     if(r[0]==="GROUP"){group=r[1];heading=[];if(!groups.has(group))groups.set(group,[])}
     else if(r[0]==="HEADING")heading=r;
-    else if(r[0]==="DATA"&&group)groups.get(group)!.push(Object.fromEntries(heading.slice(1).map((h,i)=>[h,r[i+1]??""])));
+    else if(r[0]==="UNIT"&&group)units.set(group,record(r));
+    else if(r[0]==="DATA"&&group)groups.get(group)!.push(record(r));
   }
-  return groups;
+  return Object.assign(groups,{units});
 }
 // Laboratory and in-situ results read from AGS4: group, heading, property and the factor to the catalogue unit.
 // Laboratory groups give the specimen depth (SPEC_DPTH) or the sample top (SAMP_TOP).
@@ -225,12 +269,15 @@ function readAgs4(file:TextFile):ImportResult{
   if(!key&&!geol.some(r=>r.GEOL_DESC?.trim()))throw new Error(`${file.name}: GEOL rows carry no GEOL_GEOL, GEOL_GEO2 or GEOL_LEG unit codes and no GEOL_DESC descriptions`);
   const names=new Map((g.get("ABBR")??[]).filter(r=>r.ABBR_HDNG===key).map(r=>[r.ABBR_CODE,r.ABBR_DESC]));
   const t:Tables={collars:new Map(),intervals:new Map(),units:[],warnings};
+  // Lengths in metres, converted where the group's UNIT row gives feet, centimetres or millimetres.
+  const lengths=new Conversions();
+  const len=(group:string,r:Record<string,string>,heading:string)=>{const unit=g.units.get(group)?.[heading]??"";return lengths.metres(num(r[heading]),`${heading} (${unit})`,unit)};
   let local=false;
   for(const r of loca){
-    let x=num(r.LOCA_NATE),y=num(r.LOCA_NATN),z=num(r.LOCA_GL);
+    let x=len("LOCA",r,"LOCA_NATE"),y=len("LOCA",r,"LOCA_NATN"),z=len("LOCA",r,"LOCA_GL");
     const lon=num(r.LOCA_LON),lat=num(r.LOCA_LAT);
-    if((!Number.isFinite(x)||!Number.isFinite(y))&&!(Number.isFinite(lon)&&Number.isFinite(lat))){x=num(r.LOCA_LOCX);y=num(r.LOCA_LOCY);z=Number.isFinite(z)?z:num(r.LOCA_LOCZ);local=local||Number.isFinite(x)}
-    t.collars.set(r.LOCA_ID,{x,y,z,depth:num(r.LOCA_FDEP),lon,lat});
+    if((!Number.isFinite(x)||!Number.isFinite(y))&&!(Number.isFinite(lon)&&Number.isFinite(lat))){x=len("LOCA",r,"LOCA_LOCX");y=len("LOCA",r,"LOCA_LOCY");z=Number.isFinite(z)?z:len("LOCA",r,"LOCA_LOCZ");local=local||Number.isFinite(x)}
+    t.collars.set(r.LOCA_ID,{x,y,z,depth:len("LOCA",r,"LOCA_FDEP"),lon,lat});
   }
   if(local)warnings.push("Some locations have no national grid coordinates; local LOCA_LOCX/LOCA_LOCY were used for them");
   // Without unit codes, the descriptions are grouped by their principal soil or rock.
@@ -238,18 +285,19 @@ function readAgs4(file:TextFile):ImportResult{
     const code=key?r[key]?.trim():"",desc=r.GEOL_DESC?.trim();
     if(key&&!code){warnings.push(`${r.LOCA_ID}: GEOL ${r.GEOL_TOP}–${r.GEOL_BASE} m has no ${key}; skipped`);continue}
     if(!t.intervals.has(r.LOCA_ID))t.intervals.set(r.LOCA_ID,[]);
-    t.intervals.get(r.LOCA_ID)!.push({from:num(r.GEOL_TOP),to:num(r.GEOL_BASE),unit:code??"",...(desc?{name:desc}:{})});
+    t.intervals.get(r.LOCA_ID)!.push({from:len("GEOL",r,"GEOL_TOP"),to:len("GEOL",r,"GEOL_BASE"),unit:code??"",...(desc?{name:desc}:{})});
   }
   if(key)t.units=[...new Set(geol.map(r=>r[key]?.trim()).filter(Boolean))].filter(c=>names.has(c)).map(c=>({id:c,name:names.get(c)!,color:""}));
-  for(const r of g.get("ISPT")??[])addTest(measuredOf(t,r.LOCA_ID),num(r.ISPT_TOP),NaN,"N",num(r.ISPT_NVAL));
+  for(const r of g.get("ISPT")??[])addTest(measuredOf(t,r.LOCA_ID),len("ISPT",r,"ISPT_TOP"),NaN,"N",num(r.ISPT_NVAL));
   // Water: the level a strike rose to (WSTD_POST) where recorded, else the depth of the strike.
   const rose=new Set((g.get("WSTD")??[]).filter(r=>Number.isFinite(num(r.WSTD_POST))).map(r=>r.LOCA_ID));
-  for(const r of g.get("WSTD")??[])if(Number.isFinite(num(r.WSTD_POST)))measuredOf(t,r.LOCA_ID).water.push({depth:num(r.WSTD_POST)});
-  for(const r of g.get("WSTG")??[])if(!rose.has(r.LOCA_ID)&&Number.isFinite(num(r.WSTG_DPTH)))measuredOf(t,r.LOCA_ID).water.push({depth:num(r.WSTG_DPTH),...(r.WSTG_DTIM?{date:r.WSTG_DTIM.slice(0,10)}:{})});
+  for(const r of g.get("WSTD")??[])if(Number.isFinite(num(r.WSTD_POST)))measuredOf(t,r.LOCA_ID).water.push({depth:len("WSTD",r,"WSTD_POST")});
+  for(const r of g.get("WSTG")??[])if(!rose.has(r.LOCA_ID)&&Number.isFinite(num(r.WSTG_DPTH)))measuredOf(t,r.LOCA_ID).water.push({depth:len("WSTG",r,"WSTG_DPTH"),...(r.WSTG_DTIM?{date:r.WSTG_DTIM.slice(0,10)}:{})});
   for(const [group,heading,property,scale] of AGS_TESTS)for(const r of g.get(group)??[]){
-    const depth=group==="IVAN"?num(r.IVAN_DPTH):Number.isFinite(num(r.SPEC_DPTH))?num(r.SPEC_DPTH):num(r.SAMP_TOP);
-    addTest(measuredOf(t,r.LOCA_ID),depth,num(r.SPEC_BASE),property,converted(num(r[heading]),scale));
+    const depth=group==="IVAN"?len(group,r,"IVAN_DPTH"):Number.isFinite(num(r.SPEC_DPTH))?len(group,r,"SPEC_DPTH"):len(group,r,"SAMP_TOP");
+    addTest(measuredOf(t,r.LOCA_ID),depth,len(group,r,"SPEC_BASE"),property,converted(num(r[heading]),scale));
   }
+  warnings.push(...lengths.notes(file.name,["LOCA_NATE","LOCA_NATN"].map(h=>`${h} (${g.units.get("LOCA")?.[h]??""})`)));
   const proj=g.get("PROJ")?.[0];
   const grefs=[...new Set(loca.map(r=>r.LOCA_GREF).filter(Boolean))];
   const named=grefs.length===1?crsFromName(grefs[0]):undefined;
