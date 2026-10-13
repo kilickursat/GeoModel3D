@@ -11,7 +11,7 @@ Data can come from:
 - CSV, AGS4, Japanese, Dutch (BRO) and Flemish (DOV) borehole files;
 - the **Input data** tab, where your own case is typed in or pasted from a spreadsheet (boreholes, logs, groundwater, field and laboratory tests, unit weights and design values) and built into a model. One borehole is enough.
 
-Reports are exported as PDF. It runs entirely in the browser, with nothing to install and nothing uploaded. It uses WebGPU, falling back to WebGL 2, and also works offline from a single HTML file.
+Reports are exported as PDF. It runs entirely in the browser, on computers, tablets and phones, with nothing to install and nothing uploaded. It uses WebGPU, falling back to WebGL 2, and also works offline from a single HTML file.
 
 - **Live:** https://kilickursat.github.io/GeoModel3D/
 - **Offline:** [geomodel3d-offline.html](https://kilickursat.github.io/GeoModel3D/geomodel3d-offline.html) is one self-contained file that opens from disk, for networks where hosted pages or local servers are not an option.
@@ -35,11 +35,12 @@ Each site is published data, in its country's own coordinate system and height d
 | **Creswick: basalt over the deep leads** | **Input data: a case typed in by hand** |
 | ![Creswick deep leads model from NGIS hydrostratigraphy](docs/creswick.png) | ![The Input data tab with the worked example: its units, and the drained earth pressures down a borehole](docs/input-data.png) |
 
-## Version 0.11
+## Version 0.12
 
-- **Models for augmented reality:** the model as the viewer shows it, 30 cm across, to set on a desk and walk around with a phone or tablet. USDZ opens in AR Quick Look on iPhone and iPad; GLB serves Android, web viewers and 3-D software such as Blender. The four bundled sites are ready at [kilickursat.github.io/GeoModel3D/ar/](https://kilickursat.github.io/GeoModel3D/ar/). See [Models for augmented reality](#models-for-augmented-reality).
+- **On phones and tablets:** the model fills the screen, and the panels open one at a time from a bar at the bottom; tap a borehole or a unit for its details. See [On phones and tablets](#on-phones-and-tablets).
 
 Earlier versions:
+- **0.11:** models for augmented reality, USDZ for iPhone and iPad and GLB for Android and 3-D software, with the four bundled sites ready at [kilickursat.github.io/GeoModel3D/ar/](https://kilickursat.github.io/GeoModel3D/ar/).
 - **0.10:** Check the model, a leave-one-out cross-validation that predicts each borehole from the others; lengths in feet, centimetres or millimetres converted to metres (0.9.1); three Antwerp boreholes with doubtful collar heights left out.
 - **0.9:** earth pressures down a borehole in the Input data tab (Rankine, drained and undrained); a contribution guide and a Sponsoring section; collars that scatter about a coarse terrain grid summed up in one note.
 - **0.8:** the Input data tab, where your own case is entered and modelled, from one borehole up; σ′h = K0 · σ′v; the Creswick deep leads in Australia; pinch-outs at the borehole that lacks the unit, now the documented rule.
@@ -326,6 +327,25 @@ With its 5 m terrain grid, Sakae reaches 62.8 %, and the mean error of the groun
 - **Credits.** Each file carries the credits of its data: in the copyright field of the glTF, and as the documentation string of the USDZ.
 - **The bundled sites** are published as GLB and USDZ at [kilickursat.github.io/GeoModel3D/ar/](https://kilickursat.github.io/GeoModel3D/ar/). That page opens them in AR Quick Look on iPhone and iPad and in Scene Viewer on Android, and its links can be shared. They are built from the bundled data, without the terrain the app downloads, by `scripts/make-ar-models.ts` during the build.
 
+## On phones and tablets
+
+On a phone, held either way, and on a tablet held upright, the model fills the screen:
+
+![GeoModel3D on a phone: the Sakae site with its notes folded to one line, and with the Section sheet open below the 2-D section](docs/phone.png)
+
+- **A bar at the bottom** opens the panels one at a time, as sheets:
+  - **Site:** the dataset, its description, the units to show or hide, the unit rules and Check the model;
+  - **Section:** azimuth, offset, vertical exaggeration, colour and the 2-D section;
+  - **View:** what is drawn, the map and the terrain;
+  - **Files:** your own data, import and export.
+
+  The model moves into the part of the screen the sheet leaves free. Close a sheet with its ×, with its button in the bar, or by pulling it down. Held sideways, the sheets open from the left.
+- **The notes** fold to one line under the title; tap it to read them. Errors open in full.
+- **The 2-D section** opens across the top, or on the right when the phone is on its side.
+- **Tap a borehole or a unit** for what a mouse shows on hover: the logged interval, or the unit, its depth and the stresses. A tap within a finger's width of a borehole picks it. Drag a finger along the 2-D section to read it. One finger orbits; two fingers pinch to zoom and pan.
+
+Tablets held sideways, laptops and desktops keep the panels around the model. The [models for augmented reality](#models-for-augmented-reality) set the model on a desk in front of the phone.
+
 ## How a model is built
 
 Boreholes → contacts → TIN horizons → closed unit volumes → sections
@@ -428,6 +448,7 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 - `src/fields.ts`: stresses, earth pressures, measured properties on sections, and their colour scales
 - `src/validation.ts`: leave-one-out cross-validation
 - `src/ar.ts`: models for augmented reality (USDZ and GLB)
+- `src/layout.ts`: the layout for phones and tablets (where the view is drawn, how the model is framed, how near a tap is to a borehole)
 - `src/properties.ts`: the property catalogue and per-unit statistics
 - `src/volume.ts`: closed unit-volume meshes
 - `src/section.ts`: vertical sections

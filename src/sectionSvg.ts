@@ -144,11 +144,12 @@ export function sectionSvg(model:GeoModel,s:Section,o:SectionSvgOptions){
     out.push(`${named.has(p.index)?`<text x="${x.toFixed(2)}" y="${(Y(p.top)-5).toFixed(2)}" text-anchor="middle" font-size="9.5" fill="${t.text}">${esc(b.id)}</text>`:""}</g>`);
   }
 
-  const a={x:s.x[0],y:s.y[0]},b={x:s.x[s.x.length-1],y:s.y[s.y.length-1]};
-  out.push(`<text x="${X(s.s[0])}" y="${m.t-8}" font-size="10" fill="${t.muted}">A  (${r2(a.x)}, ${r2(a.y)})</text>`);
-  out.push(`<text x="${X(s.s[s.s.length-1])}" y="${m.t-8}" text-anchor="end" font-size="10" fill="${t.muted}">A′  (${r2(b.x)}, ${r2(b.y)})</text>`);
+  // A narrow drawing, as on a phone, names the ends without their coordinates and shortens the axis title, so they fit.
+  const a={x:s.x[0],y:s.y[0]},b={x:s.x[s.x.length-1],y:s.y[s.y.length-1]},narrow=pw<420;
+  out.push(`<text x="${X(s.s[0])}" y="${m.t-8}" font-size="10" fill="${t.muted}">A${narrow?"":`  (${r2(a.x)}, ${r2(a.y)})`}</text>`);
+  out.push(`<text x="${X(s.s[s.s.length-1])}" y="${m.t-8}" text-anchor="end" font-size="10" fill="${t.muted}">A′${narrow?"":`  (${r2(b.x)}, ${r2(b.y)})`}</text>`);
   out.push(`<rect x="${m.l}" y="${m.t}" width="${pw}" height="${ph}" fill="none" stroke="${t.muted}" stroke-opacity="0.5"/>`);
-  out.push(`<text x="${m.l+pw/2}" y="${m.t+ph+30}" text-anchor="middle" font-size="10.5" fill="${t.muted}">Distance along section (m) · V.E. ×${ve<10?ve.toFixed(1):Math.round(ve)} · dashed = inferred${s.water?" · blue = water table":""}</text>`);
+  out.push(`<text x="${m.l+pw/2}" y="${m.t+ph+30}" text-anchor="middle" font-size="10.5" fill="${t.muted}">${narrow?"Distance (m)":"Distance along section (m)"} · V.E. ×${ve<10?ve.toFixed(1):Math.round(ve)} · dashed = inferred${s.water?narrow?" · blue = water":" · blue = water table":""}</text>`);
   if(field&&scale){
     // Colour bar: one swatch per band, with the band edges below.
     const n=scale.colors.length,bw=Math.min(36,Math.max(16,(pw*0.55)/n)),bx=m.l+pw-n*bw,by=m.t+ph+44;
