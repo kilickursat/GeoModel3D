@@ -77,11 +77,12 @@ export interface InputOptions {
   onImport():void;
   download(name:string,text:string,type:string):void;
 }
-export interface InputWorkspace { element:HTMLElement; show():void; edit(project:GeoProject,message:string):void }
+// edit() opens a project for review, with the notes of the files it was imported from.
+export interface InputWorkspace { element:HTMLElement; show():void; edit(project:GeoProject,message:string,notes?:string[]):void }
 
 export function createInputWorkspace(o:InputOptions):InputWorkspace{
   let t:EditorTables|null=null,origin:EditorTables|null=null,base:GeoProject|undefined;
-  let step:Step="start",filter="",selected="",message="";
+  let step:Step="start",filter="",selected="",message="",imported:string[]=[];
   let preview:{result?:ImportResult;model?:GeoModel;error?:string}={};
   let timer:ReturnType<typeof setTimeout>|undefined;
   let view:View="stress";
@@ -112,8 +113,8 @@ export function createInputWorkspace(o:InputOptions):InputWorkspace{
   const count=(name:TableName)=>t?t.rows[name].filter(r=>r.some(c=>c.trim())).length:0;
   const edited=()=>!!t&&!!origin&&JSON.stringify(t)!==JSON.stringify(origin);
 
-  function begin(tables:EditorTables,from:GeoProject|undefined,first:Step,text:string){
-    t=tables;origin=copy(tables);base=from;step=first;filter="";selected="";message=text;
+  function begin(tables:EditorTables,from:GeoProject|undefined,first:Step,text:string,notes:string[]=[]){
+    t=tables;origin=copy(tables);base=from;step=first;filter="";selected="";message=text;imported=notes;
     render();refresh(true);
   }
 
@@ -228,7 +229,9 @@ ${field("margin","Model extent beyond the boreholes (m)","The model reaches this
   function checksView(){
     if(!t)return `<p class="ws-empty">Start a case: the importer and the model check it here as you type.</p>`;
     if(preview.error)return `<p class="ws-error">${esc(preview.error)}</p>`;
-    const m=preview.model,notes=[...new Set([...(preview.result?.warnings??[]),...(m?.warnings??[])])];
+    // The notes of the files the case was imported from stay while it is open: the tables no longer show what they
+    // were converted from.
+    const m=preview.model,notes=[...new Set([...imported,...(preview.result?.warnings??[]),...(m?.warnings??[])])];
     const summary=m?`${m.boreholes.length} borehole${m.boreholes.length===1?"":"s"} and ${m.units.length} unit${m.units.length===1?"":"s"} modelled${m.water?", with a water table":""}.`:"No borehole placed yet.";
     if(!notes.length)return `<p class="ws-ok"><span aria-hidden="true">✓</span> ${summary} No problems found.</p>`;
     const list=(a:string[])=>`<ul>${a.map(w=>`<li>${esc(w)}</li>`).join("")}</ul>`;
@@ -418,6 +421,6 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
   return {
     element:el,
     show(){if(!t&&step!=="start")step="start";render();refresh(true)},
-    edit(project,text){begin(tablesFromProject(project),project,"boreholes",text)}
+    edit(project,text,notes){begin(tablesFromProject(project),project,"boreholes",text,notes)}
   };
 }

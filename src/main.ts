@@ -775,7 +775,7 @@ async function importFileList(list:FileList|File[]){
     imported=result.project;
     loadProject(result.project,result.warnings);
     // Files picked from the input tab open there, for review before building.
-    if(document.body.dataset.mode==="input")workspace.edit(result.project,`Imported ${files.map(f=>f.name).join(", ")}: check the tables, then build the model.${result.warnings.length?` ${result.warnings.length} note${result.warnings.length===1?"":"s"} under Checks.`:""}`);
+    if(document.body.dataset.mode==="input")workspace.edit(result.project,`Imported ${files.map(f=>f.name).join(", ")}: check the tables, then build the model.${result.warnings.length?` ${result.warnings.length} note${result.warnings.length===1?"":"s"} under Checks.`:""}`,result.warnings);
   }catch(err){
     showNotice("Import failed",[(err as Error).message],true);
   }

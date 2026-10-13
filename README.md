@@ -83,8 +83,9 @@ Each table is a CSV file with a header row. Headers are matched by name: case, s
 | [boreholes-combined.csv](docs/templates/boreholes-combined.csv) | **One combined table** | The collar columns and the log columns on every row |
 
 How these tables are read:
+- **Lengths** are in metres, unless their header names another unit in brackets: `ft` or `feet` (the international foot), `US ft` (the US survey foot), `cm` or `mm`. These are converted to metres, to the millimetre, and the notes name the columns converted: `Depth From (ft)` reads 10 as 3.048 m. Any other unit there, such as `m`, `mbgl`, `mAOD` or `m NAP`, is read as metres. This applies to eastings and northings, ground level, final depth, from and to, water depths and test depths; SPT penetration stays in millimetres.
 - **Coordinates:**
-  - x and y are eastings and northings in metres in one projected coordinate system.
+  - x and y are eastings and northings in metres in one projected coordinate system. Eastings and northings converted from feet need the metric version of their coordinate system, such as the State Plane zone in metres.
   - Latitude and longitude (WGS 84, or a national realisation within a metre or two of it: JGD2011, ETRS89, GDA2020, NAD83) are converted to the project's system, or to the one suggested for the site.
 - **Units:** a unit not in the units table is added at the bottom of the column. Without a units table, the order is inferred from the logs (a unit directly above another in any hole is younger).
 - **Descriptions without units:** intervals that carry only descriptions are grouped by principal soil or rock: Made ground, Peat, Clay, Silt, Sand, Gravel and rock types. These [unit rules](#how-a-model-is-built) can then be edited.
@@ -122,6 +123,8 @@ How these tables are read:
 | `RUCS`, `PTST` | Rock uniaxial compressive strength and Young's modulus; permeability |
 
 Laboratory results are placed at the specimen depth (`SPEC_DPTH`) or the top of the sample (`SAMP_TOP`).
+
+Lengths whose `UNIT` row gives `ft`, `US ft`, `cm` or `mm` are converted to metres, as in CSV tables, and the notes say so.
 
 ### Japanese borehole XML
 

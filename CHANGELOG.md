@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.9.1 — 2026-10-13
+
+### Fixed
+- **Lengths in feet, centimetres or millimetres** ([#12](https://github.com/kilickursat/GeoModel3D/issues/12)). A CSV header such as `Elevation (ft)` or `Depth From (cm)` was read as metres, with no note. Such lengths are now converted to metres, to the millimetre, and the notes name the columns converted:
+  - `ft` and `feet` are the international foot, `US ft` the US survey foot;
+  - any other unit, such as `m`, `mbgl` or `mAOD`, is read as metres, as before; SPT penetration stays in millimetres;
+  - AGS4 lengths whose UNIT row gives these units are converted too;
+  - eastings and northings converted from feet come with a note to choose the metric version of their coordinate system.
+- **Import notes in the Input data tab.** Files imported there had their notes counted in the status line but not shown; they are now listed under Checks while the case is open.
+
 ## 0.9.0 — 2026-10-09
 
 ### Added
