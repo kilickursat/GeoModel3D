@@ -99,19 +99,26 @@ button,select,input{font:inherit}
 .field-legend .fl-bar i{flex:1}
 .field-legend .fl-ticks{display:flex;justify-content:space-between;margin-top:2px;color:#8aa2ae;font-variant-numeric:tabular-nums}
 .field-legend .fl-notes{margin-top:5px;color:#8aa2ae;line-height:1.4}
-body:has(.field-legend:not([hidden])) .panel{max-height:calc(100vh - 380px)}
+/* Wide screens only: the complement of the compact layout's queries below. */
+@media (min-width:901px) and (min-height:521px),(min-width:901px) and (pointer:fine),(min-width:901px) and (pointer:none){
+  body:has(.field-legend:not([hidden])) .panel{max-height:calc(100vh - 380px)}
+}
 
 .section-view{position:fixed;right:24px;bottom:78px;width:min(640px,calc(100vw - 420px));height:min(330px,40vh);display:flex;flex-direction:column;overflow:hidden}
 .section-head{display:flex;align-items:center;gap:6px;padding:7px 8px 7px 12px;font-size:11px;color:#d9edf5;border-bottom:1px solid rgba(160,190,200,.12)}
-.section-head .section-name{flex:1}
+.section-head .section-name{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .section-head button{padding:3px 8px}
 .section-body{flex:1;min-height:0}
 .section-body svg{display:block}
 
 .notice{position:fixed;right:228px;top:22px;width:min(420px,calc(100vw - 48px));max-height:40vh;overflow:auto;padding:10px 12px;font-size:11px;color:#c4d2d9}
 .notice.error{border-color:rgba(255,140,120,.5)}
-.notice-head{display:flex;justify-content:space-between;align-items:center;color:#e8f2f7}
-.notice-head button{border:0;background:none;color:#9bb1bd;font-size:16px;cursor:pointer;line-height:1}
+.notice-head{display:flex;justify-content:space-between;align-items:center;gap:8px;color:#e8f2f7}
+.notice-fold{flex:1;min-width:0;display:flex;align-items:baseline;gap:6px;border:0;background:none;color:inherit;padding:0;font:inherit;text-align:left;cursor:pointer}
+.notice-fold::after{content:"▾";color:#78c9df}
+.notice.folded .notice-fold::after{content:"▸"}
+.notice.folded .notice-body{display:none}
+.notice-close{border:0;background:none;color:#9bb1bd;font-size:16px;cursor:pointer;line-height:1}
 .notice ul{margin:6px 0 0;padding-left:16px;line-height:1.5}
 .tooltip{position:fixed;pointer-events:none;padding:7px 10px;font-size:11px;color:#e8f2f7;max-width:340px}
 .tooltip span{display:block;color:#9bb1bd;margin-top:2px}
@@ -120,24 +127,17 @@ body:has(.field-legend:not([hidden])) .panel{max-height:calc(100vh - 380px)}
 [hidden]{display:none!important}
 .print-frame{position:fixed;right:0;bottom:0;width:0;height:0;border:0;opacity:0;pointer-events:none}
 
-@media (max-width:760px){
-  .ui{left:12px;top:12px;width:calc(100vw - 24px)}
-  .title{font-size:21px}
-  .sub,.hint{display:none}
-  .panel{max-height:30vh;margin-top:8px}
-  .toolbar{left:12px;right:12px;top:auto;bottom:118px;width:auto;flex-direction:row;flex-wrap:wrap;align-items:flex-start}
-  .toggles{grid-template-columns:repeat(3,auto);gap:4px 10px}
-  .section-control{left:12px;right:12px;bottom:12px;flex-wrap:wrap;gap:6px 12px}
-  .section-control label{flex:1 1 100%}
-  .section-control .tag{display:none}
-  .section-view{left:12px;right:12px;width:auto;bottom:auto;top:calc(30vh + 70px);height:34vh}
-  .notice{right:12px;top:auto;bottom:220px}
-  .credits{left:12px;right:12px;top:4px;bottom:auto;max-width:none;font-size:9px}
-  .field-legend{left:12px;bottom:206px;width:min(300px,calc(100vw - 24px))}
-  .field-legend .fl-notes{display:none}
-  .section-control .field-pick{flex:1 1 100%}
-}
 .legend .tag{font-size:9px;color:#d08a4c;border:1px solid rgba(208,138,76,.5);border-radius:3px;padding:0 3px;flex:none}
+button,select,summary,label,a{touch-action:manipulation}
+.section-body{touch-action:none}
+/* Mid-size screens: the notes open below the tabs, which they would cover, and the section bar packs closer. */
+@media (max-width:1260px){.notice{top:72px}}
+@media (max-width:1180px){
+  .section-control{gap:12px}
+  .section-control .tag{display:none}
+  .section-control label:nth-of-type(3){flex:.7}
+  .section-control select{max-width:150px}
+}
 
 /* Tabs and the input workspace */
 .modes{position:fixed;left:384px;top:22px;z-index:4;display:flex;gap:2px;padding:3px;background:rgba(7,16,24,.78);border:1px solid rgba(160,190,200,.16);border-radius:10px;backdrop-filter:blur(10px)}
@@ -145,7 +145,7 @@ body:has(.field-legend:not([hidden])) .panel{max-height:calc(100vh - 380px)}
 .modes button:hover{color:#e8f2f7}
 .modes button[aria-selected="true"]{background:#78c9df;color:#071018}
 .toolbar .input-data{border-color:#78c9df;color:#78c9df;font-weight:600}
-body[data-mode="input"] :is(.ui .panel,.ui .hint,.toolbar,.section-control,.section-view,.notice,.credits,.field-legend,.tooltip,.labels){display:none!important}
+body[data-mode="input"] :is(.ui .panel,.ui .hint,.ui .site-name,.toolbar,.section-control,.section-view,.notice,.credits,.field-legend,.tooltip,.labels,.dock){display:none!important}
 .workspace{position:fixed;inset:72px 24px 22px;z-index:3;display:flex;flex-direction:column;background:#0a1620;border:1px solid rgba(160,190,200,.2);border-radius:12px;overflow:hidden;font-size:12px;color:#e8f2f7}
 .ws-main{flex:1;min-height:0;display:grid;grid-template-columns:178px minmax(0,1fr) 352px}
 .ws-steps{display:flex;flex-direction:column;gap:2px;padding:12px 8px;border-right:1px solid rgba(160,190,200,.12);overflow:auto}
@@ -230,8 +230,6 @@ body[data-mode="input"] :is(.ui .panel,.ui .hint,.toolbar,.section-control,.sect
   .ws-card{flex:1 1 300px}
 }
 @media (max-width:760px){
-  .modes{left:auto;right:12px;top:12px}
-  .modes button{padding:6px 10px}
   .workspace{inset:52px 8px 8px}
   .ws-main{display:flex;flex-direction:column;overflow:auto}
   .ws-steps{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid rgba(160,190,200,.12);padding:6px;flex:none}
@@ -243,4 +241,115 @@ body[data-mode="input"] :is(.ui .panel,.ui .hint,.toolbar,.section-control,.sect
   .ed-form small{grid-column:1}
   .ws-foot{flex-wrap:wrap}
   .ws-status{flex:1 1 100%}
+}
+
+/* Phones, held either way, and small tablets held upright (the queries of layout.ts): the model fills the screen under
+   a title bar, and the panels open one at a time, as sheets, from the bar at the bottom; the notes fold to one line
+   and the 2-D section opens across the top. The page measures --top-h (the title bar), --dock-h (the bar at the
+   bottom), --sheet-h or --sheet-w (the sheet open), --notice-h (the notes) and, on its side, --pip-w (the 2-D section). */
+.dock,.sheet-head,.site-name,.panel-hint{display:none}
+@media (max-width:900px),(max-height:520px) and (pointer:coarse){
+  body::before{content:"";position:fixed;left:0;right:0;top:0;height:calc(var(--top-h,56px) + 14px);background:linear-gradient(rgba(7,16,24,.92) 55%,rgba(7,16,24,0));pointer-events:none}
+  body[data-mode="input"]::before{display:none}
+  .ui{left:12px;right:12px;top:8px;width:auto;max-width:none;z-index:5}
+  .title{font-size:20px;line-height:1.25}
+  .title span{font-size:11px;margin-left:6px}
+  .sub,.hint{display:none}
+  .site-name{display:block;max-width:calc(100% - 196px);margin:0;padding:2px 0;border:0;background:none;color:#9bb1bd;font-size:12px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:auto;cursor:pointer}
+  .site-name::after{content:" ▾";color:#78c9df}
+  .modes{left:auto;right:8px;top:8px;z-index:6}
+  .modes button{padding:7px 11px}
+
+  /* The sheets: the site panel, the section controls, and the toolbar as View or Files. */
+  .ui .panel,.toolbar,.section-control{display:none;position:fixed;left:max(0px,calc(50% - 280px));right:max(0px,calc(50% - 280px));top:auto;bottom:var(--dock-h,58px);width:auto;max-width:none;max-height:58vh;max-height:min(58dvh,calc(100dvh - var(--top-h,56px) - var(--dock-h,58px) - 90px));margin:0;padding:0 16px 16px;overflow:auto;overscroll-behavior:contain;border-radius:16px 16px 0 0;border-bottom:0;background:rgba(9,20,29,.97);backdrop-filter:none;box-shadow:0 -10px 30px rgba(0,0,0,.4);font-size:13px;line-height:1.5;z-index:5;transition:transform .2s ease}
+  body[data-sheet="site"] .ui .panel{display:block}
+  body[data-sheet="view"] .toolbar,body[data-sheet="files"] .toolbar,body[data-sheet="section"] .section-control{display:flex}
+  .sheet-head{display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:2;margin:0 -16px 4px;padding:18px 16px 8px;background:rgb(9,20,29);color:#e8f2f7;font-size:15px;letter-spacing:0;touch-action:none;cursor:grab}
+  .sheet-head::before{content:"";position:absolute;left:50%;top:7px;width:36px;height:4px;margin-left:-18px;border-radius:2px;background:rgba(160,190,200,.35)}
+  .sheet-head b{flex:1}
+  .sheet-head .sheet-close{width:40px;height:40px;margin:-10px -12px -10px 0;padding:0;border:0;background:none;color:#9bb1bd;font-size:24px;line-height:1;text-align:center;cursor:pointer}
+  .sheet-head .panel-toggle{margin:-6px 8px -6px 0;padding:7px 12px;font-size:13px;letter-spacing:0}
+
+  .dataset{font-size:16px;padding:9px 10px}
+  .crs{flex-wrap:wrap;margin-top:10px}
+  .crs input{flex:1 1 200px;font-size:16px;padding:7px 8px}
+  .legend{gap:0;margin-top:8px}
+  .legend label{min-height:42px;gap:10px}
+  .legend input,.check-colour input{width:20px;height:20px}
+  .legend i{width:14px;height:14px}
+  .rules summary,.check summary{padding:10px 0;font-size:14px}
+  .rule-main input,.rule-if input{font-size:16px}
+  .rule-if{flex-wrap:wrap;font-size:12px}
+  .rule-if input{width:72px}
+  .rule-actions button,.check-actions button{padding:9px 14px;font-size:13px}
+  .check-worst button{padding:5px 9px;font-size:12px}
+  .check-table{font-size:12px}
+  .panel-hint{display:block;margin:12px 0 0;color:#708792;font-size:12px}
+
+  .toolbar{flex-direction:column;gap:10px;font-size:14px}
+  body[data-sheet="view"] .toolbar>:is(.input-data,.import,.menu),body[data-sheet="files"] .toolbar>:is(.toggles,.geo,.backend){display:none}
+  .toolbar button,.menu summary{padding:12px 14px;font-size:14px}
+  .menu>div{gap:6px;margin-top:6px}
+  .toggles{grid-template-columns:1fr 1fr;gap:0 14px}
+  .toggles label{min-height:44px;gap:10px}
+  .toggles input{width:20px;height:20px}
+  .geo{gap:8px}
+  .geo select{font-size:16px;padding:9px 10px}
+  .backend{font-size:12px}
+
+  .section-control{flex-direction:column;align-items:stretch;gap:2px;font-size:12px;letter-spacing:.04em}
+  .section-control .tag{display:none}
+  .section-control label,.section-control label:nth-of-type(3),.section-control .field-pick{flex:none;min-height:46px;gap:12px}
+  .section-control label>span{flex:none;width:64px}
+  .section-control input{min-width:0;height:30px}
+  .section-control output{min-width:54px;font-size:14px}
+  .section-control select{flex:1;max-width:none;font-size:16px;padding:8px 10px}
+  .section-control>.panel-toggle{display:none}
+
+  .dock{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:6;justify-content:center;gap:4px;padding:5px 8px calc(5px + env(safe-area-inset-bottom,0px));background:rgba(7,16,24,.97);border-top:1px solid rgba(160,190,200,.16)}
+  .dock button{flex:1;max-width:120px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px 5px;border:0;border-radius:10px;background:none;color:#9bb1bd;font-size:11px;font-weight:600;cursor:pointer}
+  .dock button:hover{color:#e8f2f7}
+  .dock button[aria-expanded="true"]{color:#78c9df;background:rgba(120,201,223,.12)}
+  .dock svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+  .notice{left:8px;right:8px;top:var(--top-h,56px);width:auto;max-height:45vh;max-height:min(45dvh,calc(100dvh - var(--top-h,56px) - var(--dock-h,58px) - var(--sheet-h,0px) - 44px));padding:8px 6px 8px 12px;font-size:12px;z-index:4}
+  .notice.folded{padding:2px 6px 2px 12px}
+  .notice.folded .notice-fold b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .notice-close{width:36px;height:36px;flex:none;font-size:20px}
+  .credits{left:8px;right:8px;top:auto;bottom:calc(var(--dock-h,58px) + var(--sheet-h,0px) + 6px);max-width:none;background:rgba(7,16,24,.9);font-size:10px;z-index:4;cursor:pointer}
+  .credits.open{white-space:normal}
+  .field-legend{left:8px;bottom:calc(var(--dock-h,58px) + var(--sheet-h,0px) + 30px);width:min(300px,calc(100vw - 16px));z-index:4}
+  .field-legend .fl-notes{display:none}
+  .section-view{left:8px;right:8px;top:calc(var(--top-h,56px) + var(--notice-h,0px));bottom:auto;width:auto;height:clamp(150px,27vh,320px);z-index:4}
+  .section-head{padding:3px 4px 3px 12px}
+  .section-head button{padding:6px 10px}
+  .tooltip{max-width:min(340px,calc(100vw - 16px));z-index:8;font-size:12px}
+  .drop{z-index:9}
+}
+/* The smallest phones: the title gives up the version number. */
+@media (max-width:360px){
+  .title{font-size:18px}
+  .title span{display:none}
+  .modes button{padding:6px 9px}
+  .site-name{max-width:calc(100% - 172px)}
+}
+/* The compact layout on its side: the sheets open from the left, the notes and the 2-D section take the right. */
+@media (max-width:900px) and (orientation:landscape),(max-height:520px) and (pointer:coarse) and (orientation:landscape){
+  .ui{display:flex;align-items:baseline;gap:12px}
+  .title{font-size:18px}
+  .site-name{max-width:calc(100% - 340px)}
+  .ui .panel,.toolbar,.section-control{left:0;right:auto;top:var(--top-h,48px);bottom:var(--dock-h,46px);width:min(360px,46vw);max-height:none;border-radius:0 16px 16px 0;border-bottom:1px solid rgba(160,190,200,.16);box-shadow:10px 0 30px rgba(0,0,0,.35)}
+  .sheet-head{padding-top:10px;cursor:default}
+  .sheet-head::before{display:none}
+  .notice{left:auto;right:8px;width:min(440px,calc(50vw - 16px))}
+  .section-view{left:auto;right:8px;bottom:calc(var(--dock-h,46px) + 8px);width:max(300px,min(600px,calc(100vw - var(--sheet-w,0px) - 200px)));height:auto}
+  .credits{left:calc(var(--sheet-w,0px) + 8px);right:calc(var(--pip-w,0px) + 16px);bottom:calc(var(--dock-h,46px) + 6px)}
+  .field-legend{left:calc(var(--sheet-w,0px) + 8px);bottom:calc(var(--dock-h,46px) + 28px)}
+  .dock{padding-top:3px;padding-bottom:calc(3px + env(safe-area-inset-bottom,0px))}
+  .dock button{flex-direction:row;justify-content:center;gap:8px;max-width:150px;padding:8px 6px;font-size:12px}
+  .dock svg{width:20px;height:20px}
+}
+/* Touch screens: text fields at 16 px, below which phones zoom the page into a field when it is tapped. */
+@media (pointer:coarse){
+  .workspace :is(input:not([type=checkbox]):not([type=color]),select,textarea){font-size:16px}
 }

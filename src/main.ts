@@ -19,6 +19,7 @@ import {reportHtml} from "./report";
 import {createInputWorkspace} from "./input";
 import {crossValidation,CrossValidation} from "./validation";
 import {arModel,toGlb,toUsdz,quickLookAvailable} from "./ar";
+import {COMPACT,COMPACT_SIDE,Rect,viewShift,fitAngle,segmentDistance} from "./layout";
 import "./style.css";
 
 const app=document.querySelector<HTMLDivElement>("#app")!;
@@ -26,6 +27,10 @@ const esc=(s:string)=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"
 const fmt=(v:number,d=0)=>v.toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:d});
 const fmtVolume=(v:number)=>v>=1e6?fmt(v/1e6,2)+" M m³":fmt(v)+" m³";
 const fmtArea=(v:number)=>v>=1e4?fmt(v/1e4,2)+" ha":fmt(v)+" m²";
+// Phones and small tablets get the compact layout (see layout.ts); on its side, its sheets open from the left.
+const compactQuery=matchMedia(COMPACT),sideQuery=matchMedia(COMPACT_SIDE),touchQuery=matchMedia("(pointer: coarse)");
+const compact=()=>compactQuery.matches;
+const calm=matchMedia("(prefers-reduced-motion: reduce)");
 
 // ---------- scene ----------
 
@@ -75,7 +80,7 @@ let model:GeoModel;
 let section:Section;
 let origin={x:0,y:0,z:0},extent=1,sectionBuffer=1;
 // `field` colours the section: "units", a stress (sv, u, s) or a measured property.
-const view={azimuth:0,offset:0,ve:1,cut:true,flip:false,exact:false,volumes:true,horizons:true,boreholes:true,labels:true,terrain:true,map:false,mapSource:"osm",panel:innerWidth>760,hidden:new Set<string>(),field:"units"};
+const view={azimuth:0,offset:0,ve:1,cut:true,flip:false,exact:false,volumes:true,horizons:true,boreholes:true,labels:true,terrain:true,map:false,mapSource:"osm",panel:!compact(),hidden:new Set<string>(),field:"units"};
 let field:SectionField|null=null,weights:UnitWeight[]=[];
 
 interface UnitMaterials { lit:THREE.MeshStandardNodeMaterial; flat:THREE.MeshBasicNodeMaterial }
@@ -359,22 +364,61 @@ function renderCredits(){
   credits.innerHTML=parts.join(" · ");
   credits.hidden=!parts.length;
 }
-// Shift the projection centre away from the open section view so the model sits in the free part of the screen.
-function updateViewOffset(){
-  const open=view.panel&&innerWidth>760;
-  camera.setViewOffset(innerWidth,innerHeight,open?sectionView.offsetWidth*0.14:0,open?sectionView.offsetHeight*0.32:0,innerWidth,innerHeight);
+// The view is drawn shifted, and on small screens shrunk, so that the model sits in the part of the screen the panels
+// leave free. When a panel opens or closes it glides there for a moment, timed by the clock, so a slow device takes
+// fewer, longer steps rather than more frames; a new model, a new window size and the report capture place it at once.
+interface Shift { x:number; y:number; k:number }
+const shift:Shift={x:0,y:0,k:1},GLIDE=220;
+let glide:{from:Shift;to:Shift;t0:number}|null=null;
+function updateViewOffset(now=false){
+  const to=targetShift(),aim=glide?.to??shift;
+  if(now||calm.matches){glide=null;Object.assign(shift,to);applyShift();return}
+  if(Math.abs(to.x-aim.x)<0.5&&Math.abs(to.y-aim.y)<0.5&&Math.abs(to.k-aim.k)<1e-3)return;
+  glide={from:{...shift},to,t0:performance.now()};
+  invalidate();
 }
+function applyShift(){
+  camera.setViewOffset(innerWidth*shift.k,innerHeight*shift.k,shift.x,shift.y,innerWidth,innerHeight);
+  invalidate();
+}
+// One step of the glide, run every frame while it lasts.
+function stepShift(){
+  if(!glide)return;
+  const t=Math.min(1,(performance.now()-glide.t0)/GLIDE),e=1-(1-t)**3,{from,to}=glide;
+  shift.x=from.x+(to.x-from.x)*e;shift.y=from.y+(to.y-from.y)*e;shift.k=from.k+(to.k-from.k)*e;
+  if(t>=1)glide=null;
+  applyShift();
+}
+function targetShift(){
+  // Wide screens: away from the section view at the bottom right.
+  if(!compact()){
+    const open=view.panel;
+    return {x:open?sectionView.offsetWidth*0.14:0,y:open?sectionView.offsetHeight*0.32:0,k:1};
+  }
+  const room=compactRoom(),free={...room};
+  free.y0+=bars.notice;
+  if(sideQuery.matches)free.x0+=bars.sheetW;else free.y1-=bars.sheetH;
+  const r=sectionView.getBoundingClientRect();
+  if(view.panel&&r.width>0){
+    if(sideQuery.matches)free.x1=Math.min(free.x1,r.left-8);else free.y0=Math.max(free.y0,r.bottom+6);
+  }
+  return viewShift(innerWidth,innerHeight,free,room);
+}
+// The room the model has on a small screen with no panel open: between the title bar and the bar at the bottom.
+function compactRoom():Rect{return {x0:0,y0:bars.top,x1:innerWidth,y1:innerHeight-bars.dock}}
 
 function fitCamera(){
   const b=modelBounds(model),ve=view.ve;
   const box=new THREE.Box3(new THREE.Vector3(b.minX-origin.x,b.minY-origin.y,(b.minZ-origin.z)*ve),new THREE.Vector3(b.maxX-origin.x,b.maxY-origin.y,(b.maxZ-origin.z)*ve));
   const sphere=box.getBoundingSphere(new THREE.Sphere());
-  const dist=Math.max(sphere.radius,extent/2)/Math.sin(THREE.MathUtils.degToRad(camera.fov/2))*(innerWidth<760?1.35:1.1);
+  // On a small screen the model fits the room between the bars, by its width where that is the narrower side.
+  const fov=THREE.MathUtils.degToRad(camera.fov),radius=Math.max(sphere.radius,extent/2),room=compactRoom();
+  const dist=compact()?radius/Math.sin(fitAngle(fov,room.x1-room.x0,room.y1-room.y0,innerHeight))*1.02:radius/Math.sin(fov/2)*1.1;
   controls.target.copy(sphere.center);
   camera.position.copy(sphere.center).addScaledVector(new THREE.Vector3(0.62,-1.1,0.72).normalize(),dist);
   camera.near=dist/500;
   camera.far=dist*30;
-  updateViewOffset();
+  updateViewOffset(true);
   sun.position.copy(sphere.center).add(new THREE.Vector3(0.45,-0.7,1).multiplyScalar(dist));
   controls.update();
   invalidate();
@@ -516,9 +560,13 @@ function applyDisplay(){
 
 const ui=document.createElement("div");
 ui.className="ui";
+// On a small screen each panel opens as a sheet, with a title, buttons of its own and a close button.
+const sheetHead=(title:string,buttons="")=>`<div class="sheet-head"><b>${title}</b>${buttons}<button class="sheet-close" aria-label="Close">×</button></div>`;
 ui.innerHTML=`<div class="title">GeoModel3D <span>${pkg.version.split(".").slice(0,2).join(".")}</span></div>
+<button class="site-name" aria-controls="sheet-site" title="The dataset, its units and the check of the model"></button>
 <div class="sub">Project-agnostic browser geological modelling engine</div>
-<div class="panel">
+<div class="panel" id="sheet-site">
+  ${sheetHead("Site")}
   <select class="dataset" aria-label="Dataset"></select>
   <div class="desc"></div>
   <div class="stats"></div>
@@ -531,14 +579,27 @@ ui.innerHTML=`<div class="title">GeoModel3D <span>${pkg.version.split(".").slice
     <p class="check-note">Each borehole in turn is left out and predicted from the others: how far the model can be trusted between boreholes, and which logs to check.</p>
     <div class="check-actions"><button class="run-check">Cross-validate</button><span class="check-status" aria-live="polite"></span></div>
     <div class="check-results"></div></details>
+  <p class="panel-hint"></p>
 </div>
-<div class="hint">Drag to orbit · wheel to zoom · right-drag to pan · drop CSV, AGS4, borehole XML or JSON files to import</div>`;
+<div class="hint"></div>`;
 app.appendChild(ui);
 const datasetSelect=ui.querySelector<HTMLSelectElement>(".dataset")!;
+const panel=ui.querySelector<HTMLDivElement>(".panel")!,siteName=ui.querySelector<HTMLButtonElement>(".site-name")!;
+// How to move about the model, with a mouse or with fingers.
+function renderHint(){
+  const text=touchQuery.matches?"One finger orbits · pinch to zoom · two fingers pan · tap a borehole or a unit for its details"
+    :"Drag to orbit · wheel to zoom · right-drag to pan · drop CSV, AGS4, borehole XML or JSON files to import";
+  ui.querySelector(".hint")!.textContent=text;
+  ui.querySelector(".panel-hint")!.textContent=text;
+}
+renderHint();
+touchQuery.addEventListener("change",renderHint);
 
 const toolbar=document.createElement("div");
 toolbar.className="toolbar";
-toolbar.innerHTML=`<button class="input-data" title="Type in or paste your own boreholes, logs, groundwater, field and laboratory tests and unit parameters, then build the model">Enter your own data…</button>
+toolbar.id="sheet-tools";
+toolbar.innerHTML=`${sheetHead("View")}
+<button class="input-data" title="Type in or paste your own boreholes, logs, groundwater, field and laboratory tests and unit parameters, then build the model">Enter your own data…</button>
 <button class="import">Import data…</button>
 <input class="file" type="file" multiple hidden accept=".csv,.tsv,.txt,.ags,.json,.xml,.asc,.xyz">
 <details class="menu"><summary>Export</summary><div>
@@ -571,17 +632,19 @@ const fileInput=toolbar.querySelector<HTMLInputElement>(".file")!;
 
 const controlsBar=document.createElement("div");
 controlsBar.className="section-control";
-controlsBar.innerHTML=`<span class="tag">SECTION</span>
-<label>Azimuth<input type="range" class="azimuth" min="0" max="179" step="1"><output class="azimuth-out"></output></label>
-<label>Offset<input type="range" class="offset" step="1"><output class="offset-out"></output></label>
-<label>V.E.<input type="range" class="ve" min="1" max="10" step="0.5"><output class="ve-out"></output></label>
-<label class="field-pick" title="Colour the section by unit, by a stress, or by a measured property interpolated within each unit">Colour<select class="field-select" aria-label="Colour the section by"></select></label>
+controlsBar.id="sheet-section";
+// The section sheet carries the 2-D section button in its title row, where it takes no height from the model.
+controlsBar.innerHTML=`${sheetHead("Section",'<button class="panel-toggle" aria-pressed="false">2-D section</button>')}<span class="tag">SECTION</span>
+<label><span>Azimuth</span><input type="range" class="azimuth" min="0" max="179" step="1"><output class="azimuth-out"></output></label>
+<label><span>Offset</span><input type="range" class="offset" step="1"><output class="offset-out"></output></label>
+<label><span>V.E.</span><input type="range" class="ve" min="1" max="10" step="0.5"><output class="ve-out"></output></label>
+<label class="field-pick" title="Colour the section by unit, by a stress, or by a measured property interpolated within each unit"><span>Colour</span><select class="field-select" aria-label="Colour the section by"></select></label>
 <button class="panel-toggle" aria-pressed="false">2-D section</button>`;
 app.appendChild(controlsBar);
 const azimuthInput=controlsBar.querySelector<HTMLInputElement>(".azimuth")!;
 const offsetInput=controlsBar.querySelector<HTMLInputElement>(".offset")!;
 const veInput=controlsBar.querySelector<HTMLInputElement>(".ve")!;
-const panelToggle=controlsBar.querySelector<HTMLButtonElement>(".panel-toggle")!;
+const panelToggles=controlsBar.querySelectorAll<HTMLButtonElement>(".panel-toggle");
 const fieldSelect=controlsBar.querySelector<HTMLSelectElement>(".field-select")!;
 
 // The two tabs: the model, and the input workspace where a case is typed in.
@@ -606,6 +669,8 @@ const credits=document.createElement("div");
 credits.className="credits";
 credits.hidden=true;
 app.appendChild(credits);
+// On a small screen the credits keep to one line, and open in full when tapped.
+credits.addEventListener("click",e=>{if(compact()&&!(e.target as Element).closest("a"))credits.classList.toggle("open")});
 const fieldLegend=document.createElement("div");
 fieldLegend.className="field-legend";
 fieldLegend.hidden=true;
@@ -620,10 +685,85 @@ dropZone.hidden=true;
 dropZone.innerHTML="<div>Drop borehole or terrain files<br><span>CSV tables · AGS4 · Japanese borehole XML (電子納品, KuniJiban) · GeoModel3D or Georeport3D JSON · terrain grid (.asc, .xyz)</span></div>";
 app.appendChild(dropZone);
 
+// ---------- small screens: the bar at the bottom and its sheets ----------
+
+type SheetName=""|"site"|"section"|"view"|"files";
+const icon=(paths:string)=>`<svg viewBox="0 0 24 24" aria-hidden="true">${paths}</svg>`;
+const dock=document.createElement("nav");
+dock.className="dock";
+dock.setAttribute("aria-label","Panels");
+dock.innerHTML=([
+  ["site","Site","sheet-site",icon('<path d="M12 3.5 3 8l9 4.5L21 8z"/><path d="m3 12.5 9 4.5 9-4.5"/><path d="m3 16.5 9 4.5 9-4.5"/>')],
+  ["section","Section","sheet-section",icon('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10.5c3-1.6 6 .6 9-.4s5.5-1.4 9 .2M3 15c3.5-1.2 6.5.6 9.5-.3s5-1 8.5 0"/>')],
+  ["view","View","sheet-tools",icon('<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>')],
+  ["files","Files","sheet-tools",icon('<path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h5l2 2.5h8A1.5 1.5 0 0 1 21 9v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18z"/>')]
+] as const).map(([key,label,id,svg])=>`<button data-sheet="${key}" aria-controls="${id}" aria-expanded="false">${svg}<span>${label}</span></button>`).join("");
+app.appendChild(dock);
+
+// The sizes the compact layout is drawn with, measured from the page: the title bar, the bar at the bottom, the sheet
+// open (its height, or its width when it opens from the left) and the notes under the title bar.
+const bars={top:0,dock:0,sheetH:0,sheetW:0,notice:0};
+const sheetOpen=()=>(document.body.dataset.sheet??"") as SheetName;
+const sheetElement=()=>({site:panel,section:controlsBar,view:toolbar,files:toolbar,"":null})[sheetOpen()];
+function setSheet(name:SheetName){
+  document.body.dataset.sheet=name;
+  dock.querySelectorAll<HTMLButtonElement>("[data-sheet]").forEach(b=>b.setAttribute("aria-expanded",String(b.dataset.sheet===name)));
+  siteName.setAttribute("aria-expanded",String(name==="site"));
+  toolbar.querySelector(".sheet-head b")!.textContent=name==="files"?"Files":"View";
+  hideTooltip();
+  layoutCompact();
+}
+function layoutCompact(){
+  const style=document.body.style;
+  if(compact()){
+    const sheet=sheetElement(),side=sideQuery.matches;
+    bars.top=Math.ceil(Math.max(ui.querySelector(".title")!.getBoundingClientRect().bottom,siteName.getBoundingClientRect().bottom,modes.getBoundingClientRect().bottom))+6;
+    bars.dock=dock.offsetHeight;
+    bars.sheetH=sheet&&!side?sheet.offsetHeight:0;
+    bars.sheetW=sheet&&side?sheet.offsetWidth:0;
+    bars.notice=notice.hidden?0:notice.offsetHeight+6;
+    // On its side the 2-D section takes the right of the screen, and the credits stop short of it.
+    const pip=side&&view.panel?sectionView.offsetWidth:0;
+    for(const [key,v] of Object.entries({"--top-h":bars.top,"--dock-h":bars.dock,"--sheet-h":bars.sheetH,"--sheet-w":bars.sheetW,"--notice-h":bars.notice,"--pip-w":pip}))style.setProperty(key,v+"px");
+  }
+  updateViewOffset();
+}
+// Measured again whenever one of them changes size, once per frame at most.
+let layoutQueued=false;
+const layoutSoon=()=>{if(!layoutQueued){layoutQueued=true;requestAnimationFrame(()=>{layoutQueued=false;layoutCompact()})}};
+const sizes=new ResizeObserver(layoutSoon);
+for(const el of [ui,modes,dock,panel,toolbar,controlsBar,notice,sectionView])sizes.observe(el);
+compactQuery.addEventListener("change",()=>{layoutCompact();renderSectionPanel()});
+
+dock.addEventListener("click",e=>{
+  const b=(e.target as Element).closest<HTMLButtonElement>("[data-sheet]");
+  if(b)setSheet(sheetOpen()===b.dataset.sheet?"":b.dataset.sheet as SheetName);
+});
+siteName.onclick=()=>setSheet(sheetOpen()==="site"?"":"site");
+app.addEventListener("click",e=>{if((e.target as Element).closest(".sheet-close"))setSheet("")});
+addEventListener("keydown",e=>{if(e.key==="Escape"&&compact()&&sheetOpen())setSheet("")});
+// A sheet from the bottom follows a finger that pulls its title down, and closes when let go far enough down.
+app.addEventListener("pointerdown",e=>{
+  const head=(e.target as Element).closest(".sheet-head"),sheet=sheetElement();
+  if(!head||!sheet||!compact()||sideQuery.matches||(e.target as Element).closest("button"))return;
+  const y0=e.clientY,id=e.pointerId;
+  let dy=0;
+  sheet.style.transition="none";
+  const move=(m:PointerEvent)=>{if(m.pointerId===id){dy=Math.max(0,m.clientY-y0);sheet.style.transform=dy?`translateY(${dy}px)`:""}};
+  const end=(u:PointerEvent)=>{
+    if(u.pointerId!==id)return;
+    removeEventListener("pointermove",move);removeEventListener("pointerup",end);removeEventListener("pointercancel",end);
+    sheet.style.transition="";sheet.style.transform="";
+    if(u.type==="pointerup"&&dy>Math.min(80,sheet.offsetHeight/3))setSheet("");
+  };
+  addEventListener("pointermove",move);addEventListener("pointerup",end);addEventListener("pointercancel",end);
+});
+
 function renderPanel(){
   const projects=[...sampleProjects,...(imported?[imported]:[])];
   datasetSelect.innerHTML=projects.map((p,i)=>`<option value="${i}"${p===project?" selected":""}>${esc(i>=sampleProjects.length?"Your data: "+p.name:p.name)}</option>`).join("")+
     `<option value="input">✎ Enter your own data…</option>`;
+  siteName.textContent=project.name;
   ui.querySelector(".desc")!.textContent=project.description??"";
   const count=(n:number,what:string)=>`${n} ${what}${n===1?"":"s"}`;
   const stats=[count(model.boreholes.length,"borehole"),count(model.units.length,"unit"),count(model.horizons.length,"horizon")];
@@ -707,7 +847,7 @@ function syncControls(){
   controlsBar.querySelector(".azimuth-out")!.textContent=String(view.azimuth).padStart(3,"0")+"°";
   controlsBar.querySelector(".offset-out")!.textContent=(view.offset>=0?"+":"")+Math.round(view.offset)+" m";
   controlsBar.querySelector(".ve-out")!.textContent="×"+view.ve;
-  panelToggle.setAttribute("aria-pressed",String(view.panel));
+  panelToggles.forEach(b=>b.setAttribute("aria-pressed",String(view.panel)));
   sectionView.hidden=!view.panel;
   updateViewOffset();
   toolbar.querySelector<HTMLInputElement>('[data-view="flip"]')!.disabled=!view.cut;
@@ -840,14 +980,19 @@ checkResults.addEventListener("change",e=>{
   if(input.classList.contains("colour-errors")){showErrors=input.checked;buildErrorMarkers()}
 });
 
+// The notes of the model, or an error. On a small screen notes open folded to their title, one line under the title
+// bar, so they do not cover the model; an error opens in full.
 function showNotice(title:string,lines:string[],error=false){
   if(!lines.length&&!error){notice.hidden=true;return}
   const shown=lines.length>12?lines.slice(0,10):lines,rest=lines.slice(shown.length);
   const list=(l:string[])=>`<ul>${l.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
-  notice.className="notice"+(error?" error":"");
-  notice.innerHTML=`<div class="notice-head"><b>${esc(title)}</b><button aria-label="Dismiss">×</button></div>${list(shown)}${rest.length?`<details><summary>${rest.length} more</summary>${list(rest)}</details>`:""}`;
+  const folded=compact()&&!error;
+  notice.className="notice"+(error?" error":"")+(folded?" folded":"");
+  notice.innerHTML=`<div class="notice-head"><button class="notice-fold" aria-expanded="${!folded}"><b>${esc(title)}</b></button><button class="notice-close" aria-label="Dismiss">×</button></div><div class="notice-body">${list(shown)}${rest.length?`<details><summary>${rest.length} more</summary>${list(rest)}</details>`:""}</div>`;
   notice.hidden=false;
-  notice.querySelector("button")!.onclick=()=>{notice.hidden=true};
+  notice.querySelector<HTMLButtonElement>(".notice-close")!.onclick=()=>{notice.hidden=true};
+  const fold=notice.querySelector<HTMLButtonElement>(".notice-fold")!;
+  fold.onclick=()=>fold.setAttribute("aria-expanded",String(!notice.classList.toggle("folded")));
 }
 
 let currentNotes:string[]=[];
@@ -869,7 +1014,7 @@ function loadProject(p:GeoProject,importWarnings:string[]=[],keepView=false){
     view.ve=Math.min(5,Math.max(1,Math.round(extent/(height*3)*2)/2));
     view.azimuth=model.nodes.length>1?principalAzimuth(model):0;
     view.offset=0;
-    view.labels=model.boreholes.length<=40;
+    view.labels=model.boreholes.length<=(compact()?20:40);
     toolbar.querySelector<HTMLInputElement>('[data-view="labels"]')!.checked=view.labels;
     view.map=publicSites.has(p)&&!!projectCrs(p);
   }
@@ -961,7 +1106,7 @@ function captureView(){
   }catch{url=undefined}
   if(gridHelper)gridHelper.visible=true;
   scene.background=background;
-  updateViewOffset();
+  updateViewOffset(true);
   invalidate();
   return url;
 }
@@ -1018,16 +1163,17 @@ function setMode(mode:"model"|"input"){
   document.body.dataset.mode=mode;
   workspace.element.hidden=mode!=="input";
   modes.querySelectorAll<HTMLButtonElement>("button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.mode===mode)));
-  tooltip.hidden=true;
+  hideTooltip();
   history.replaceState(null,"",mode==="input"?"#input":location.pathname+location.search);
-  if(mode==="input")workspace.show();
-  else{renderSectionPanel();invalidate()}
+  if(mode==="input"){setSheet("");workspace.show()}
+  else{renderSectionPanel();layoutCompact();invalidate()}
 }
 modes.addEventListener("click",e=>{const b=(e.target as HTMLElement).closest<HTMLButtonElement>("[data-mode]");if(b)setMode(b.dataset.mode as "model"|"input")});
-fileInput.onchange=()=>{if(fileInput.files?.length)importFileList(fileInput.files);fileInput.value=""};
+// What the Files sheet starts (an import, an export) closes it, so the result is seen.
+fileInput.onchange=()=>{if(fileInput.files?.length){importFileList(fileInput.files);if(compact())setSheet("")}fileInput.value=""};
 app.addEventListener("click",e=>{
   const kind=(e.target as HTMLElement).closest<HTMLElement>("[data-export]")?.dataset.export;
-  if(kind){exportAs(kind);toolbar.querySelector("details")!.open=false}
+  if(kind){exportAs(kind);toolbar.querySelector("details")!.open=false;if(compact()&&sheetOpen()==="files")setSheet("")}
 });
 toolbar.querySelectorAll<HTMLInputElement>("[data-view]").forEach(input=>{
   input.onchange=()=>{
@@ -1062,7 +1208,7 @@ const queueSection=()=>{if(!sectionQueued){sectionQueued=true;requestAnimationFr
 azimuthInput.oninput=()=>{view.azimuth=Number(azimuthInput.value);syncControls();queueSection()};
 offsetInput.oninput=()=>{view.offset=Number(offsetInput.value);syncControls();queueSection()};
 veInput.oninput=()=>{view.ve=Number(veInput.value);syncControls();applyDisplay()};
-panelToggle.onclick=()=>{view.panel=!view.panel;syncControls();renderSectionPanel()};
+panelToggles.forEach(b=>b.onclick=()=>{view.panel=!view.panel;syncControls();renderSectionPanel()});
 fieldSelect.onchange=()=>{view.field=fieldSelect.value;updateSection()};
 sectionView.querySelector<HTMLButtonElement>(".close")!.onclick=()=>{view.panel=false;syncControls()};
 
@@ -1075,9 +1221,56 @@ addEventListener("drop",e=>{e.preventDefault();dragDepth=0;dropZone.hidden=true;
 // ---------- hover ----------
 
 const raycaster=new THREE.Raycaster();
-let pointer:{x:number;y:number}|null=null,pointerMoved=false;
-renderer.domElement.addEventListener("pointermove",e=>{pointer={x:e.clientX,y:e.clientY};pointerMoved=true});
-renderer.domElement.addEventListener("pointerleave",()=>{pointer=null;tooltip.hidden=true});
+// With a mouse the read-out follows the pointer. On a touch screen a tap shows it, above the finger, until the next
+// touch; dragging to orbit shows nothing.
+let pointer:{x:number;y:number;touch:boolean}|null=null,pointerMoved=false;
+let tap:{x:number;y:number;t:number;id:number}|null=null;
+function hideTooltip(){tooltip.hidden=true;pointer=null}
+renderer.domElement.addEventListener("pointermove",e=>{
+  if(e.pointerType!=="mouse"){if(tap&&Math.hypot(e.clientX-tap.x,e.clientY-tap.y)>10)tap=null;return}
+  pointer={x:e.clientX,y:e.clientY,touch:false};pointerMoved=true;
+});
+renderer.domElement.addEventListener("pointerleave",e=>{if(e.pointerType==="mouse")hideTooltip()});
+renderer.domElement.addEventListener("pointerdown",e=>{
+  if(e.pointerType==="mouse")return;
+  // A second finger makes it a pinch, not a tap.
+  tap=e.isPrimary?{x:e.clientX,y:e.clientY,t:performance.now(),id:e.pointerId}:null;
+  hideTooltip();
+});
+renderer.domElement.addEventListener("pointerup",e=>{
+  if(e.pointerType==="mouse"||!tap||tap.id!==e.pointerId)return;
+  if(performance.now()-tap.t<600&&Math.hypot(e.clientX-tap.x,e.clientY-tap.y)<=10){pointer={x:e.clientX,y:e.clientY,touch:true};pointerMoved=true}
+  tap=null;
+});
+// What the read-out says about a stretch of a borehole: an interval of its log, or (-1) below the log.
+function holeHtml(hole:number,interval:number){
+  const bh=model.boreholes[hole],iv=bh.intervals[interval];
+  const what=iv?`${esc(model.units.find(u=>u.id===iv.unit)?.name??iv.unit)} ${fmt(iv.from,2)}–${fmt(iv.to,2)} m`:"not logged";
+  const spt=iv?(bh.spt??[]).filter(t=>t.depth>=iv.from&&t.depth<iv.to).map(t=>t.penetration>=300?String(t.blows):`${t.blows}/${fmt(t.penetration/10)} cm`):[];
+  const logged=[iv?.name&&iv.name!==iv.unit?esc(iv.name):"",spt.length?`N ${spt.join(", ")}`:""].filter(Boolean).join(" · ");
+  const water=bh.water?.length?` · water ${fmt(Math.min(...bh.water.map(w=>w.depth)),2)} m deep`:"";
+  const where=bh.lat!==undefined&&bh.lon!==undefined?` (${fmt(bh.lat,5)}°, ${fmt(bh.lon,5)}°)`:"";
+  return `<b>${esc(bh.id)}</b> · ${what}${logged?`<span>${logged}</span>`:""}<span>collar E ${fmt(bh.x,1)} N ${fmt(bh.y,1)}${where} · ${fmt(bh.z,2)} m · final depth ${fmt(boreholeDepth(bh),1)} m${water}</span>${validationLine(bh.id)}`;
+}
+// A borehole is a few pixels wide, too thin to hit exactly with a finger: a tap within `radius` pixels of one picks the
+// nearest, at the depth nearest the tap. Boreholes cut away are left out, as when hovering.
+function holeNear(px:number,py:number,radius:number){
+  let best:{hole:number;interval:number;d:number}|null=null;
+  const top=new THREE.Vector3(),bottom=new THREE.Vector3(),at=new THREE.Vector3(),dir=camera.getWorldDirection(new THREE.Vector3());
+  const screen=(v:THREE.Vector3)=>{const p=v.clone().project(camera);return [(p.x+1)/2*innerWidth,(1-p.y)/2*innerHeight]};
+  for(const [hole,bh] of model.boreholes.entries()){
+    top.copy(local(bh.x,bh.y,bh.z)).multiply(world.scale);
+    bottom.copy(local(bh.x,bh.y,bh.z-boreholeDepth(bh))).multiply(world.scale);
+    if(view.cut&&clipPlane.distanceToPoint(top)<-1e-6)continue;
+    if(at.copy(top).sub(camera.position).dot(dir)<=0||at.copy(bottom).sub(camera.position).dot(dir)<=0)continue;
+    const [ax,ay]=screen(top),[bx,by]=screen(bottom),{d}=segmentDistance(px,py,ax,ay,bx,by);
+    if(d>radius||(best&&d>=best.d))continue;
+    raycaster.ray.distanceSqToSegment(top,bottom,undefined,at);
+    const below=bh.z-(at.z/view.ve+origin.z);
+    best={hole,interval:bh.intervals.findIndex(iv=>below>=iv.from-1e-6&&below<=iv.to+1e-6),d};
+  }
+  return best;
+}
 function updateTooltip(){
   if(!pointerMoved)return;
   pointerMoved=false;
@@ -1087,14 +1280,10 @@ function updateTooltip(){
   let html="";
   if(holeMesh?.visible){
     const hit=raycaster.intersectObject(holeMesh).find(kept);
-    if(hit&&hit.instanceId!==undefined){
-      const info=holeInfo[hit.instanceId],bh=model.boreholes[info.hole],iv=bh.intervals[info.interval];
-      const what=iv?`${esc(model.units.find(u=>u.id===iv.unit)?.name??iv.unit)} ${fmt(iv.from,2)}–${fmt(iv.to,2)} m`:"not logged";
-      const spt=iv?(bh.spt??[]).filter(t=>t.depth>=iv.from&&t.depth<iv.to).map(t=>t.penetration>=300?String(t.blows):`${t.blows}/${fmt(t.penetration/10)} cm`):[];
-      const logged=[iv?.name&&iv.name!==iv.unit?esc(iv.name):"",spt.length?`N ${spt.join(", ")}`:""].filter(Boolean).join(" · ");
-      const water=bh.water?.length?` · water ${fmt(Math.min(...bh.water.map(w=>w.depth)),2)} m deep`:"";
-      const where=bh.lat!==undefined&&bh.lon!==undefined?` (${fmt(bh.lat,5)}°, ${fmt(bh.lon,5)}°)`:"";
-      html=`<b>${esc(bh.id)}</b> · ${what}${logged?`<span>${logged}</span>`:""}<span>collar E ${fmt(bh.x,1)} N ${fmt(bh.y,1)}${where} · ${fmt(bh.z,2)} m · final depth ${fmt(boreholeDepth(bh),1)} m${water}</span>${validationLine(bh.id)}`;
+    if(hit&&hit.instanceId!==undefined)html=holeHtml(holeInfo[hit.instanceId].hole,holeInfo[hit.instanceId].interval);
+    else if(pointer.touch){
+      const near=holeNear(pointer.x,pointer.y,12);
+      if(near)html=holeHtml(near.hole,near.interval);
     }
   }
   if(!html&&errorMarkers?.visible){
@@ -1120,12 +1309,17 @@ function updateTooltip(){
     if(hit)html=terrainMesh.userData.flat?`<b>Map</b><span>drawn at the collars' median elevation, ${fmt(hit.point.z/view.ve+origin.z,1)} m: there is no terrain grid</span>`
       :`<b>Terrain</b> · ${fmt(hit.point.z/view.ve+origin.z,2)} m<span>${esc(project.terrain?.source??"terrain grid")}, outside the model</span>`;
   }
+  showTooltip(html,pointer.x,pointer.y,pointer.touch);
+}
+// Beside the mouse, or centred above a finger so that the finger does not cover it.
+function showTooltip(html:string,x:number,y:number,touch:boolean,above=false){
   tooltip.hidden=!html;
-  if(html){
-    tooltip.innerHTML=html;
-    tooltip.style.left=Math.min(pointer.x+14,innerWidth-tooltip.offsetWidth-8)+"px";
-    tooltip.style.top=Math.min(pointer.y+14,innerHeight-tooltip.offsetHeight-8)+"px";
-  }
+  if(!html)return;
+  tooltip.innerHTML=html;
+  const w=tooltip.offsetWidth,h=tooltip.offsetHeight,gap=touch?28:10;
+  tooltip.style.left=(touch?Math.max(8,Math.min(x-w/2,innerWidth-w-8)):Math.min(x+14,innerWidth-w-8))+"px";
+  // Above the point where there is room for it, else below.
+  tooltip.style.top=(touch||above?(y-h-gap>=8?y-h-gap:Math.min(y+gap,innerHeight-h-8)):Math.min(y+14,innerHeight-h-8))+"px";
 }
 
 // What the section shows at a point: the unit, its depth, the stresses there and the field's value.
@@ -1145,37 +1339,46 @@ function sectionReadout(along:number,e:number){
   }
   return html;
 }
-sectionBody.addEventListener("pointermove",e=>{
+// The section read-out follows the mouse, or a finger moved along the section, and stays when the finger lifts.
+function sectionTooltip(e:PointerEvent){
   const svg=sectionBody.querySelector("svg"),frame=svg?.dataset.frame?.split(",").map(Number);
   if(!svg||!frame){tooltip.hidden=true;return}
   const [l,t,pw,ph,s0,s1,z0,z1]=frame,r=svg.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
   const html=x>=l&&x<=l+pw&&y>=t&&y<=t+ph?sectionReadout(s0+(x-l)/pw*(s1-s0),z1-(y-t)/ph*(z1-z0)):"";
-  tooltip.hidden=!html;
-  if(html){
-    tooltip.innerHTML=html;
-    tooltip.style.left=Math.min(e.clientX+14,innerWidth-tooltip.offsetWidth-8)+"px";
-    tooltip.style.top=Math.max(8,Math.min(e.clientY-tooltip.offsetHeight-10,innerHeight-tooltip.offsetHeight-8))+"px";
-  }
-});
-sectionBody.addEventListener("pointerleave",()=>{tooltip.hidden=true});
+  showTooltip(html,e.clientX,e.clientY,e.pointerType!=="mouse",true);
+}
+sectionBody.addEventListener("pointermove",e=>{if(e.pointerType==="mouse"||e.buttons)sectionTooltip(e)});
+sectionBody.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse")sectionTooltip(e)});
+sectionBody.addEventListener("pointerleave",e=>{if(e.pointerType==="mouse")tooltip.hidden=true});
+// The section drawing is redrawn at the size its panel takes, as panels open and close around it.
+let sectionSize="";
+new ResizeObserver(()=>{
+  const size=sectionBody.clientWidth?`${sectionBody.clientWidth}×${sectionBody.clientHeight}`:"";
+  if(size&&size!==sectionSize)renderSectionPanel();
+  sectionSize=size;
+}).observe(sectionBody);
 
 addEventListener("resize",()=>{
   camera.aspect=innerWidth/innerHeight;
-  updateViewOffset();
   renderer.setSize(innerWidth,innerHeight);
   labelRenderer.setSize(innerWidth,innerHeight);
-  renderSectionPanel();
+  layoutCompact();
+  updateViewOffset(true);
   invalidate();
 });
 
 controls.addEventListener("change",invalidate);
 document.body.dataset.mode="model";
+document.body.dataset.sheet="";
+// The bars are measured before the first model is framed between them.
+layoutCompact();
 loadProject(project);
 if(location.hash==="#input")setMode("input");
 renderer.setAnimationLoop(()=>{
   // The 3-D view is not drawn behind the input tab.
   if(document.body.dataset.mode==="input")return;
   controls.update();
+  stepShift();
   updateTooltip();
   if(!dirty)return;
   dirty--;
