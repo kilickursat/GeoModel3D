@@ -255,16 +255,18 @@ function defaultMargin(holes:Borehole[]){
 
 // Refine finely enough to follow the terrain grid, or to cut cleanly along erosion surfaces, within a budget of about
 // 80,000 triangles (refined triangles cover about 0.14 × spacing² each).
-function refinementSpacing(nodes:XY[],triangles:Triangle[],terrain?:TerrainGrid){
+function refinementSpacing(nodes:XY[],triangles:Triangle[],terrain?:TerrainGrid,budget=80_000){
   const xs=nodes.map(p=>p.x),ys=nodes.map(p=>p.y);
   const extent=Math.max(Math.max(...xs)-Math.min(...xs),Math.max(...ys)-Math.min(...ys));
   const area=triangles.reduce((s,t)=>s+triangleArea(nodes,t),0);
-  return Math.max(terrain?Math.min(terrain.dx,terrain.dy):0,extent/(terrain?300:150),Math.sqrt(area/(0.14*80_000)));
+  return Math.max(terrain?Math.min(terrain.dx,terrain.dy):0,extent/(terrain?300:150),Math.sqrt(area/(0.14*budget)));
 }
 
 // `probe` builds the model only to read it at one point: the borehole triangulation gets a node there instead of being
 // refined, and the horizons at that node are those the refined model would have at a node there, terrain included.
-export function buildGeologicalModel(project:GeoProject,options:{probe?:XY}={}):GeoModel{
+// `triangles` sets the size the triangulation is refined to, where terrain or erosive units ask for refinement (about
+// 80,000 triangles).
+export function buildGeologicalModel(project:GeoProject,options:{probe?:XY;triangles?:number}={}):GeoModel{
   const warnings:string[]=[];
   const declared=new Set(project.units.map(u=>u.id)),used=new Set<string>(),unknown=new Set<string>();
   for(const b of project.boreholes)for(const i of b.intervals)(declared.has(i.unit)?used:unknown).add(i.unit);
@@ -357,7 +359,7 @@ export function buildGeologicalModel(project:GeoProject,options:{probe?:XY}={}):
   }
 
   const erosive=units.some(u=>u.erosive);
-  const spacing=coarse.length&&!options.probe&&(project.terrain||erosive)?refinementSpacing(nodes,coarse,project.terrain):0;
+  const spacing=coarse.length&&!options.probe&&(project.terrain||erosive)?refinementSpacing(nodes,coarse,project.terrain,options.triangles):0;
   const mesh=options.probe?probeMesh(nodes,coarse,options.probe):spacing?refine(nodes,coarse,spacing):{nodes,triangles:coarse,parents:[],edgeChains:uniqueEdges(coarse).map(([a,b])=>[Math.min(a,b),Math.max(a,b)])};
   const M=mesh.nodes.length;
   const spread=(values:ArrayLike<number>)=>{
