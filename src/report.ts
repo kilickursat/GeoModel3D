@@ -5,9 +5,10 @@ import {GeoModel,unitCubicMetres,footprintArea} from "./model";
 import {Section} from "./section";
 import {sectionSvg} from "./sectionSvg";
 import {projectCrs} from "./crs";
-import {boreholeDepth,sptN} from "./geology";
+import {boreholeDepth,sptN} from "./schema";
 import {SectionField,unitWeights} from "./fields";
 import {unitStatistics,measuredProperties,propertyDef,formatValue} from "./properties";
+import {CrossValidation} from "./validation";
 
 export interface ReportOptions {
   paper:"A3"|"A4";
@@ -20,6 +21,7 @@ export interface ReportOptions {
   ve:number;
   hidden?:ReadonlySet<string>;  // units hidden in the view are left out of the 3-D image and the section
   field?:SectionField;          // a field shown on the section gets a page of its own
+  validation?:CrossValidation;  // a cross-validation of the model, run in the app, gets a page of its own
 }
 
 const esc=(s:string)=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]!));
@@ -112,9 +114,28 @@ ${foot("Section")}</section>
 ${o.field?`<section class="page"><h2>${esc(sectionName)} · ${esc(o.field.name)} ${esc(o.field.symbol)}</h2><div class="section">${fieldSvg}</div>
 <ul class="muted field-notes">${o.field.notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul>
 ${foot(`Section: ${o.field.name.toLowerCase()}`)}</section>`:""}
+${o.validation?validationPage(o.validation,foot):""}
 <section class="page">${params}${rules}<h2>Boreholes</h2>
 <table><thead><tr><th>Borehole</th><th>Easting (m)</th><th>Northing (m)</th><th>Collar (m)</th><th>Depth (m)</th><th>Latitude</th><th>Longitude</th><th>Water (m deep)</th><th>SPT tests</th></tr></thead><tbody>${holes}</tbody></table>
 ${notes.length?`<h3>Notes on the model (${notes.length})</h3><ul class="notes">${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul>`:""}
 ${foot(rules?"Ground parameters, interpretation, boreholes and notes":"Ground parameters, boreholes and notes")}</section>
 </body></html>`;
+}
+
+// The cross-validation: what share of the logs the model predicts from the other boreholes, the errors of each
+// surface, and the boreholes furthest from their prediction.
+function validationPage(v:CrossValidation,foot:(part:string)=>string){
+  const inside=v.boreholes.filter(b=>!b.outside),outside=v.boreholes.length-inside.length;
+  const pct=(x:number)=>Number.isFinite(x)?`${fmt(100*x,1)} %`:"–",signed=(x:number)=>(x>0?"+":"")+fmt(x,2);
+  const table=(list:CrossValidation["inside"])=>`<table><thead><tr><th>Surface</th><th>Boreholes</th><th>Bias (m)</th><th>Mean absolute (m)</th><th>RMS (m)</th><th>Largest (m)</th><th>at</th></tr></thead><tbody>${
+    list.map(q=>`<tr><td>${esc(q.name)}</td><td class="num">${q.n}</td><td class="num">${signed(q.bias)}</td><td class="num">${fmt(q.mae,2)}</td><td class="num">${fmt(q.rms,2)}</td><td class="num">${signed(q.max)}</td><td>${esc(q.at)}</td></tr>`).join("")}</tbody></table>`;
+  const worst=[...inside].filter(b=>Number.isFinite(b.mae)).sort((a,b)=>b.mae-a.mae).slice(0,12);
+  return `<section class="page"><h2>Cross-validation</h2>
+<p>Each borehole in turn was left out, the model was built from the others, and its log was compared with what that model predicts at its collar (leave-one-out cross-validation). ${inside.length} borehole${inside.length===1?"":"s"} lie inside the outline of the others: <b>${pct(v.share.inside)}</b> of their logged metres are predicted in the unit logged.${outside?` ${outside} lie outside it, where the prediction extrapolates: ${pct(v.share.outside)}.`:""}${v.terrain?" The ground between boreholes is the terrain grid.":""}</p>
+<h3>Errors at the boreholes inside the others, predicted minus logged</h3>${table(v.inside)}
+${v.outside.length?`<h3>Outside the others</h3>${table(v.outside)}`:""}
+${worst.length?`<h3>Furthest from their prediction</h3><table><thead><tr><th>Borehole</th><th>Mean absolute error (m)</th><th>Largest error</th><th>Logged (m)</th><th>Predicted (m)</th></tr></thead><tbody>${
+  worst.map(b=>`<tr><td>${esc(b.id)}</td><td class="num">${fmt(b.mae,2)}</td><td>${b.worst?`${esc(v.surfaces[b.worst.k])} ${signed(b.worst.error)} m`:""}</td><td class="num">${b.worst?fmt(b.worst.logged,2):""}</td><td class="num">${b.worst?fmt(b.worst.predicted,2):""}</td></tr>`).join("")}</tbody></table>`:""}
+${v.notes.length?`<ul class="notes">${v.notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul>`:""}
+${foot("Cross-validation")}</section>`;
 }

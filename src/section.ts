@@ -1,6 +1,6 @@
 import {GeoModel} from "./model";
 import {XY,uniqueEdges} from "./tin";
-import {boreholeDepth} from "./geology";
+import {boreholeDepth} from "./schema";
 
 // A vertical section: azimuth in degrees clockwise from north (+y), offset in metres from the model centre,
 // measured to the right of the section direction.
@@ -31,6 +31,11 @@ export function offsetRange(model:GeoModel,azimuth:number):[number,number]{
   const {origin,normal}=sectionFrame(model,{azimuth,offset:0});
   const f=model.nodes.map(p=>(p.x-origin.x)*normal.x+(p.y-origin.y)*normal.y);
   return f.length?[Math.min(...f),Math.max(...f)]:[0,0];
+}
+// The offset of the section at this azimuth that passes through p.
+export function offsetThrough(model:GeoModel,azimuth:number,p:XY){
+  const {origin,normal}=sectionFrame(model,{azimuth,offset:0});
+  return (p.x-origin.x)*normal.x+(p.y-origin.y)*normal.y;
 }
 // Azimuth of the long axis of the borehole layout (principal component), the most informative default section. It
 // uses the boreholes, not the mesh, so subdividing the mesh never turns the default section.
