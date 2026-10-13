@@ -1,4 +1,4 @@
-import {Borehole,GeoProject,UnitDef,boreholeDepth} from "./geology";
+import {Borehole,GeoProject,UnitDef,boreholeDepth} from "./schema";
 import {delaunay,Triangle,XY,triangleArea,uniqueEdges} from "./tin";
 import {TINSurface,GeologicalVolume} from "./volume";
 import {TerrainGrid,terrainZ,convexHull,boundaryResidual} from "./terrain";
@@ -86,6 +86,23 @@ function idw(samples:Array<{x:number;y:number;v:number}>,p:XY){
 }
 
 interface Subdivision { nodes:XY[]; triangles:Triangle[]; parents:Array<{i:number[];w:number[]}>; edgeChains:number[][] }
+
+// The triangulation with one more node, at p, splitting the triangles it lies in (two where it lies on an edge); its
+// parents are its barycentric weights. Unchanged where p is outside the triangulation or on a node.
+export function probeMesh(nodes:XY[],triangles:Triangle[],p:XY):Subdivision{
+  const N=nodes.length,out:Triangle[]=[];
+  let parents:Array<{i:number[];w:number[]}>=[];
+  for(const t of triangles){
+    const [a,b,c]=[nodes[t.a],nodes[t.b],nodes[t.c]],d=(b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x);
+    const wb=((p.x-a.x)*(c.y-a.y)-(p.y-a.y)*(c.x-a.x))/d,wc=((b.x-a.x)*(p.y-a.y)-(b.y-a.y)*(p.x-a.x))/d,wa=1-wb-wc,e=1e-9;
+    if(wa<-e||wb<-e||wc<-e){out.push(t);continue}
+    if(Math.max(wa,wb,wc)>1-e)return {nodes,triangles,parents:[],edgeChains:uniqueEdges(triangles).map(([u,v])=>[Math.min(u,v),Math.max(u,v)])};
+    if(!parents.length)parents=[{i:[t.a,t.b,t.c],w:[wa,wb,wc]}];
+    for(const [u,v,w] of [[t.a,t.b,wc],[t.b,t.c,wa],[t.c,t.a,wb]])if(w>e)out.push({a:u,b:v,c:N});
+  }
+  if(!parents.length)return {nodes,triangles,parents:[],edgeChains:uniqueEdges(triangles).map(([u,v])=>[Math.min(u,v),Math.max(u,v)])};
+  return {nodes:[...nodes,{x:p.x,y:p.y}],triangles:out,parents,edgeChains:uniqueEdges(out).map(([u,v])=>[Math.min(u,v),Math.max(u,v)])};
+}
 
 // Refines a triangulation by longest-edge bisection until no edge is longer than `spacing`. Each step halves the
 // longest edge of a triangle and of the neighbour across it; when that edge is not the neighbour's own longest, the
@@ -245,7 +262,9 @@ function refinementSpacing(nodes:XY[],triangles:Triangle[],terrain?:TerrainGrid)
   return Math.max(terrain?Math.min(terrain.dx,terrain.dy):0,extent/(terrain?300:150),Math.sqrt(area/(0.14*80_000)));
 }
 
-export function buildGeologicalModel(project:GeoProject):GeoModel{
+// `probe` builds the model only to read it at one point: the borehole triangulation gets a node there instead of being
+// refined, and the horizons at that node are those the refined model would have at a node there, terrain included.
+export function buildGeologicalModel(project:GeoProject,options:{probe?:XY}={}):GeoModel{
   const warnings:string[]=[];
   const declared=new Set(project.units.map(u=>u.id)),used=new Set<string>(),unknown=new Set<string>();
   for(const b of project.boreholes)for(const i of b.intervals)(declared.has(i.unit)?used:unknown).add(i.unit);
@@ -338,8 +357,8 @@ export function buildGeologicalModel(project:GeoProject):GeoModel{
   }
 
   const erosive=units.some(u=>u.erosive);
-  const spacing=coarse.length&&(project.terrain||erosive)?refinementSpacing(nodes,coarse,project.terrain):0;
-  const mesh=spacing?refine(nodes,coarse,spacing):{nodes,triangles:coarse,parents:[],edgeChains:uniqueEdges(coarse).map(([a,b])=>[Math.min(a,b),Math.max(a,b)])};
+  const spacing=coarse.length&&!options.probe&&(project.terrain||erosive)?refinementSpacing(nodes,coarse,project.terrain):0;
+  const mesh=options.probe?probeMesh(nodes,coarse,options.probe):spacing?refine(nodes,coarse,spacing):{nodes,triangles:coarse,parents:[],edgeChains:uniqueEdges(coarse).map(([a,b])=>[Math.min(a,b),Math.max(a,b)])};
   const M=mesh.nodes.length;
   const spread=(values:ArrayLike<number>)=>{
     const out=new Float64Array(M);
