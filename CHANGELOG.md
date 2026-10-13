@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.10.0 — 2026-10-13
+
+### Added
+- **Check the model: leave-one-out cross-validation** ([#13](https://github.com/kilickursat/GeoModel3D/issues/13)). Each borehole in turn is left out, the model is built from the others, and the borehole's log is compared with what that model predicts at its collar. The panel reports:
+  - the share of the logged metres predicted in the unit logged;
+  - for each surface (the ground and every unit top), the bias, mean absolute and RMS errors and the largest error;
+  - the boreholes outside the outline of the others apart, as extrapolations;
+  - the boreholes furthest from their prediction, as logs to check; a click moves the section through one.
+  Markers over the collars show each borehole's mean error, the read-out gives its result, **Errors (CSV)** saves every contact, and the PDF report gets a page with the results. On the bundled sites, 51.7 % (Creswick) to 87.5 % (Maasvlakte 2) of the logged metres are predicted in the unit logged.
+- `crossValidate` and `crossValidation` in `src/validation.ts`, and `scripts/check-sites.ts`, which prints the results for the real sites.
+
+### Changed
+- **Antwerp:** three boreholes of 1987, GEO-87/185-B1, B2 and B3, are left out, now 170 boreholes. DOV records their collar heights with an unknown method, 20 m above the surveyed collar of the borehole nine metres away, and their logs put the top of the Boom Formation 20 m above the boreholes around them; the cross-validation and the collar check against the terrain both pointed to them.
+- The Antwerp description says that its terrain is fetched with **Fetch terrain**, not when the project opens.
+- The model builder can be given a probe point: the borehole triangulation gets a node there instead of being refined, and the horizons there are those of the refined model. Cross-validation builds each model this way, a few milliseconds per borehole instead of a second or more.
+- The project schema is in `src/schema.ts`, without the datasets, which `src/geology.ts` keeps.
+
 ## 0.9.1 — 2026-10-13
 
 ### Fixed

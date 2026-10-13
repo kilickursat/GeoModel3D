@@ -39,6 +39,27 @@ button,select,input{font:inherit}
 .rule-actions{display:flex;gap:6px;margin-top:8px}
 .rule-actions button{border:1px solid rgba(160,190,200,.22);background:#0d1d29;color:#d9edf5;border-radius:6px;padding:4px 9px;font-size:11px;cursor:pointer}
 .rule-note{margin-top:6px;color:#8aa2ae}
+.check{margin-top:10px;color:#c4d2d9}
+.check summary{cursor:pointer;color:#d9edf5}
+.check p{margin:6px 0}
+.check-note{color:#8aa2ae}
+.check-actions{display:flex;align-items:center;gap:8px;margin-top:6px}
+.check-actions button,.check-worst button{border:1px solid rgba(160,190,200,.22);background:#0d1d29;color:#d9edf5;border-radius:6px;padding:4px 9px;font-size:11px;cursor:pointer}
+.check-actions button:hover,.check-worst button:hover{background:#15293a}
+.check-worst button{padding:0 5px;font-size:10.5px}
+.check-status{color:#8aa2ae;font-variant-numeric:tabular-nums}
+.check-table{width:100%;border-collapse:collapse;margin-top:6px;font-size:10.5px;font-variant-numeric:tabular-nums}
+.check-table th,.check-table td{padding:1px 3px;text-align:right;border-bottom:1px solid rgba(160,190,200,.08)}
+.check-table th{color:#8aa2ae;font-weight:400}
+.check-table th:first-child,.check-table td:first-child{text-align:left}
+.check-worst{margin:4px 0;padding-left:18px}
+.check-worst li{margin:2px 0}
+.check-colour{display:flex;align-items:center;gap:6px;margin-top:6px;cursor:pointer}
+.check-colour input{margin:0;accent-color:#78c9df}
+.check-legend .fl-bar{display:flex;height:9px;margin-top:4px;border-radius:2px;overflow:hidden}
+.check-legend .fl-bar i{flex:1}
+.check-legend .fl-ticks{display:flex;justify-content:space-between;margin-top:2px;color:#8aa2ae;font-variant-numeric:tabular-nums}
+.check-notes{margin:6px 0 0;padding-left:16px;color:#8aa2ae}
 
 .toolbar{position:fixed;right:24px;top:22px;padding:10px;display:flex;flex-direction:column;gap:8px;width:190px;font-size:11px}
 .toolbar button,.menu summary,.section-control button,.section-head button{border:1px solid rgba(160,190,200,.22);background:#0d1d29;color:#d9edf5;border-radius:7px;padding:7px 10px;font-size:11px;cursor:pointer;text-align:left}

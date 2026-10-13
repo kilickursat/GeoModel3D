@@ -1,5 +1,5 @@
 import proj4 from "proj4";
-import {Borehole,GeoProject,Interval,UnitDef,UnitRule,SptTest,WaterLevel,TestResult,boreholeDepth,sptN} from "./geology";
+import {Borehole,GeoProject,Interval,UnitDef,UnitRule,SptTest,WaterLevel,TestResult,boreholeDepth,sptN} from "./schema";
 import {TerrainGrid,isTerrainFile,readTerrain} from "./terrain";
 import {Crs,findCrs,projectCrs,suggestCrs,toProjected,searchCrs} from "./crs";
 import {isBoringXml,readBoringXml} from "./boringXml";

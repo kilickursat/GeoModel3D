@@ -1,7 +1,7 @@
 // Borehole logs in the Japanese electronic-delivery format (地質・土質調査成果電子納品要領, ボーリング交換用データ),
 // versions 2 to 4, as delivered with public-works site investigations and served by KuniJiban.
 import {parseXml,XmlNode,descendants,textOf} from "./xml";
-import {SptTest,WaterLevel} from "./geology";
+import {SptTest,WaterLevel} from "./schema";
 
 export type Datum="JGD2011"|"JGD2000"|"Tokyo"|"unknown";
 export interface BoringLog {

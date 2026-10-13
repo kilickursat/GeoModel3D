@@ -3,7 +3,7 @@
 // weights and design values) and then built into the model. A preview follows every change: where the boreholes are,
 // the log of one borehole with the stresses down it, and what the importer and the model report. The tables become CSV
 // and go through the importer, so typed data are checked exactly as imported files are.
-import {GeoProject} from "./geology";
+import {GeoProject} from "./schema";
 import {ImportResult,toProjectJson} from "./io";
 import {properties} from "./properties";
 import {buildGeologicalModel,GeoModel} from "./model";

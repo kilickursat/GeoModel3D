@@ -7,16 +7,17 @@ import {GeoProject,UnitDef,UnitRule,sampleProjects,realSites,boreholeDepth} from
 import {buildGeologicalModel,GeoModel,unitVolume,unitCubicMetres,modelBounds,footprintArea} from "./model";
 import {volumeGeometry} from "./volume";
 import {terrainOutside,convexHull,TerrainGrid} from "./terrain";
-import {computeSection,offsetRange,principalAzimuth,Section} from "./section";
+import {computeSection,offsetRange,offsetThrough,principalAzimuth,Section} from "./section";
 import {sectionSvg,sectionCsv,sectionFieldCsv} from "./sectionSvg";
-import {importFiles,toProjectJson,toBoreholeCsv,toTestsCsv,decodeText,assignColors} from "./io";
-import {SectionField,sectionField,availableFields,columnAt,stressAt,unitWeights,UnitWeight,withTheme,scaleLabel} from "./fields";
+import {importFiles,toProjectJson,toBoreholeCsv,toTestsCsv,toCsv,decodeText,assignColors} from "./io";
+import {SectionField,sectionField,availableFields,columnAt,stressAt,unitWeights,UnitWeight,withTheme,scaleLabel,colourScale,ColourScale} from "./fields";
 import {formatValue,propertyDef} from "./properties";
 import {Crs,crsRegistry,projectCrs,findCrs,customCrs,searchCrs,suggestCrs,toProjected,toGeographic} from "./crs";
 import {fetchTerrain,elevationSources,mapSources,covers,tileUrl,parseGsiTile,decodeTerrarium,mapTiles,tileXY,ElevationSource,TileSource} from "./tiles";
 import {applyUnitRules} from "./rules";
 import {reportHtml} from "./report";
 import {createInputWorkspace} from "./input";
+import {crossValidation,CrossValidation} from "./validation";
 import "./style.css";
 
 const app=document.querySelector<HTMLDivElement>("#app")!;
@@ -83,6 +84,9 @@ let holeMesh:THREE.InstancedMesh|null=null;
 let terrainMesh:THREE.Mesh|null=null;
 let gridHelper:THREE.Object3D|null=null;
 let holeInfo:Array<{hole:number;interval:number}>=[];
+// The cross-validation of the model shown, the run in progress (a new model or Stop ends it), and its markers.
+let validation:CrossValidation|null=null,validationRun=0,errorMarkers:THREE.InstancedMesh|null=null,errorRims:THREE.InstancedMesh|null=null,errorMarked:string[]=[],showErrors=true;
+const lowerFirst=(s:string)=>s.charAt(0).toLowerCase()+s.slice(1);
 let labels:CSS2DObject[]=[];
 
 function local(x:number,y:number,z:number){return new THREE.Vector3(x-origin.x,y-origin.y,z-origin.z)}
@@ -106,6 +110,9 @@ function disposeContent(){
   holeMesh?.dispose();
   holeMesh=null;
   holeInfo=[];
+  errorMarkers?.dispose();
+  errorRims?.dispose();
+  errorMarkers=errorRims=null;
 }
 
 function buildContent(){
@@ -497,6 +504,7 @@ function applyDisplay(){
   }
   for(const l of horizonLines)l.visible=view.horizons;
   if(holeMesh)holeMesh.visible=view.boreholes;
+  placeErrorMarkers();
   if(terrainMesh)terrainMesh.visible=terrainMesh.userData.flat?view.map&&!!mapLayer:view.terrain;
   for(const l of labels)l.visible=view.boreholes&&view.labels&&(!view.cut||clipPlane.distanceToPoint(l.position)>=0);
   renderCredits();
@@ -518,6 +526,10 @@ ui.innerHTML=`<div class="title">GeoModel3D <span>${pkg.version.split(".").slice
   <div class="legend"></div>
   <details class="rules"><summary>Unit rules</summary><div class="rule-list"></div>
     <div class="rule-actions"><button class="add-rule">Add rule</button><button class="apply-rules">Apply</button></div><div class="rule-note"></div></details>
+  <details class="check"><summary>Check the model</summary>
+    <p class="check-note">Each borehole in turn is left out and predicted from the others: how far the model can be trusted between boreholes, and which logs to check.</p>
+    <div class="check-actions"><button class="run-check">Cross-validate</button><span class="check-status" aria-live="polite"></span></div>
+    <div class="check-results"></div></details>
 </div>
 <div class="hint">Drag to orbit · wheel to zoom · right-drag to pan · drop CSV, AGS4, borehole XML or JSON files to import</div>`;
 app.appendChild(ui);
@@ -723,6 +735,108 @@ function renderFieldLegend(){
 <div class="fl-notes">${field.notes.map(n=>`<div>${esc(n)}</div>`).join("")}</div>`;
 }
 
+// ---------- cross-validation ----------
+
+const checkButton=ui.querySelector<HTMLButtonElement>(".run-check")!,checkStatus=ui.querySelector<HTMLSpanElement>(".check-status")!;
+const checkResults=ui.querySelector<HTMLDivElement>(".check-results")!;
+// One borehole at a time, letting the page draw between them; a new model or Stop ends the run.
+async function runValidation(){
+  const run=++validationRun,target=model,steps=crossValidation(project,model);
+  checkButton.textContent="Stop";
+  for(;;){
+    const r=steps.next();
+    if(run!==validationRun)return;
+    if(r.done){validation=r.value;break}
+    checkStatus.textContent=`${r.value.done} of ${r.value.total} boreholes`;
+    await new Promise(resolve=>setTimeout(resolve,0));
+    if(run!==validationRun||model!==target)return;
+  }
+  renderValidation();
+  buildErrorMarkers();
+}
+// Mean absolute errors coloured up to the 90th percentile; larger ones fall in the top band.
+function errorScale(v:CrossValidation):ColourScale{
+  const e=v.boreholes.map(b=>b.mae).filter(Number.isFinite).sort((a,b)=>a-b);
+  const top=Math.max(e[Math.min(e.length-1,Math.floor(e.length*0.9))]??1,0.1);
+  return withTheme(colourScale(0,top,false,false,e[e.length-1]>top),true);
+}
+function renderValidation(){
+  checkButton.textContent="Cross-validate";
+  checkStatus.textContent="";
+  const v=validation;
+  if(!v){checkResults.innerHTML="";return}
+  const inside=v.boreholes.filter(b=>!b.outside),outside=v.boreholes.length-inside.length;
+  const pct=(x:number)=>Number.isFinite(x)?`${fmt(100*x,1)} %`:"–",m=(x:number)=>(x>0?"+":"")+fmt(x,1);
+  const worst=[...inside].filter(b=>Number.isFinite(b.mae)).sort((a,b)=>b.mae-a.mae).slice(0,8);
+  const scale=errorScale(v);
+  checkResults.innerHTML=`<p>${inside.length} borehole${inside.length===1?"":"s"} inside the others: <b>${pct(v.share.inside)}</b> of the logged metres predicted in the unit logged${outside?`. ${outside} outside them, by extrapolation: ${pct(v.share.outside)}`:""}.${v.terrain?" The ground between boreholes is the terrain grid.":""}</p>
+${v.inside.length?`<table class="check-table"><thead><tr><th>Surface</th><th>n</th><th>Bias</th><th>Mean</th><th>RMS</th><th>Largest</th></tr></thead><tbody>${v.inside.map(q=>`<tr><td>${esc(q.name)}</td><td>${q.n}</td><td>${m(q.bias)}</td><td>${fmt(q.mae,1)}</td><td>${fmt(q.rms,1)}</td><td title="${esc(q.at)}">${m(q.max)}</td></tr>`).join("")}</tbody></table>
+<p class="check-note">Metres, predicted minus logged, at the boreholes inside the others: bias is the mean error, mean the mean absolute error.</p>`:""}
+${worst.length?`<p>Furthest from their prediction:</p><ol class="check-worst">${worst.map(b=>`<li><button data-hole="${esc(b.id)}" title="Move the section through it">${esc(b.id)}</button> ${fmt(b.mae,1)} m${b.worst?`; ${esc(lowerFirst(v.surfaces[b.worst.k]))} ${m(b.worst.error)} m`:""}</li>`).join("")}</ol>`:""}
+<label class="check-colour"><input type="checkbox" class="colour-errors"${showErrors?" checked":""}>Mark the boreholes by their mean error (m)</label>
+<div class="check-legend"><div class="fl-bar">${scale.colors.map(c=>`<i style="background:${c}"></i>`).join("")}</div><div class="fl-ticks">${[0,Math.round(scale.colors.length/2),scale.colors.length].map(i=>`<span>${esc(scaleLabel(scale,scale.edges[i]))}</span>`).join("")}</div></div>
+${v.notes.length?`<ul class="check-notes">${v.notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul>`:""}
+<div class="check-actions"><button class="check-csv">Errors (CSV)</button></div>`;
+}
+// A marker over each collar, coloured by the borehole's mean error, with a dark rim that keeps it apart from the units
+// behind it; kept round whatever the exaggeration.
+function buildErrorMarkers(){
+  for(const mesh of [errorMarkers,errorRims])if(mesh){content.remove(mesh);mesh.dispose()}
+  errorMarkers=errorRims=null;
+  errorMarked=[];
+  const v=validation;
+  if(v&&showErrors){
+    const list=v.boreholes.filter(b=>Number.isFinite(b.mae)),scale=errorScale(v),c=new THREE.Color();
+    const fill=new THREE.MeshBasicNodeMaterial(),rim=new THREE.MeshBasicNodeMaterial({color:0x071018,side:THREE.BackSide});
+    fill.maskNode=rim.maskNode=keepFragment;
+    const sphere=new THREE.SphereGeometry(1,14,10);
+    errorMarkers=new THREE.InstancedMesh(sphere,fill,list.length);
+    errorRims=new THREE.InstancedMesh(sphere,rim,list.length);
+    list.forEach((b,i)=>errorMarkers!.setColorAt(i,c.set(scale.colorOf(b.mae)??"#888888")));
+    errorMarked=list.map(b=>b.id);
+    content.add(errorRims,errorMarkers);
+  }
+  placeErrorMarkers();
+}
+function placeErrorMarkers(){
+  if(!errorMarkers||!errorRims)return;
+  const r=extent*0.011,m=new THREE.Matrix4(),q=new THREE.Quaternion(),scale=new THREE.Vector3(r,r,r/view.ve),rim=scale.clone().multiplyScalar(1.3);
+  errorMarked.forEach((id,i)=>{
+    const bh=model.boreholes.find(b=>b.id===id)!,at=local(bh.x,bh.y,bh.z+2.2*r/view.ve);
+    errorMarkers!.setMatrixAt(i,m.compose(at,q,scale));
+    errorRims!.setMatrixAt(i,m.compose(at,q,rim));
+  });
+  errorMarkers.instanceMatrix.needsUpdate=errorRims.instanceMatrix.needsUpdate=true;
+  errorMarkers.visible=errorRims.visible=view.boreholes;
+  invalidate();
+}
+function validationCsv(v:CrossValidation){
+  const rows:Array<Array<string|number>>=[["borehole","x","y","outside the others","surface","logged elevation (m)","predicted elevation (m)","error (m)"]];
+  for(const b of v.boreholes)for(const q of b.contacts)rows.push([b.id,b.x,b.y,b.outside?"yes":"no",v.surfaces[q.k],Number(q.logged.toFixed(3)),Number(q.predicted.toFixed(3)),Number(q.error.toFixed(3))]);
+  return toCsv(rows);
+}
+// The result of one borehole, for the read-out.
+function validationLine(id:string){
+  const b=validation?.boreholes.find(q=>q.id===id);
+  if(!b)return "";
+  return `<span>Predicted from the other boreholes${b.outside?", outside them":""}: mean error ${fmt(b.mae,2)} m${b.worst?`, largest at the ${esc(lowerFirst(validation!.surfaces[b.worst.k]))}, ${b.worst.error>0?"+":""}${fmt(b.worst.error,2)} m`:""}</span>`;
+}
+checkButton.onclick=()=>{
+  if(checkButton.textContent==="Stop"){validationRun++;renderValidation();checkStatus.textContent="Stopped";return}
+  void runValidation();
+};
+checkResults.addEventListener("click",e=>{
+  const b=(e.target as Element).closest<HTMLButtonElement>("button");
+  if(!b||!validation)return;
+  if(b.classList.contains("check-csv")){download(`${project.name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"geomodel3d"}-cross-validation.csv`,validationCsv(validation),"text/csv");return}
+  const bh=model.boreholes.find(h=>h.id===b.dataset.hole);
+  if(bh){view.offset=offsetThrough(model,view.azimuth,bh);syncControls();queueSection()}
+});
+checkResults.addEventListener("change",e=>{
+  const input=e.target as HTMLInputElement;
+  if(input.classList.contains("colour-errors")){showErrors=input.checked;buildErrorMarkers()}
+});
+
 function showNotice(title:string,lines:string[],error=false){
   if(!lines.length&&!error){notice.hidden=true;return}
   const shown=lines.length>12?lines.slice(0,10):lines,rest=lines.slice(shown.length);
@@ -757,6 +871,8 @@ function loadProject(p:GeoProject,importWarnings:string[]=[],keepView=false){
     view.map=publicSites.has(p)&&!!projectCrs(p);
   }
   sectionBuffer=Math.max(extent*0.12,1);
+  validation=null;validationRun++;
+  renderValidation();
   renderPanel();
   syncControls();
   updateSection();
@@ -845,7 +961,7 @@ function cropToContent(source:HTMLCanvasElement,maxWidth=2400){
 // The report is printed from a hidden frame; the print dialog's "Save as PDF" makes the file.
 async function printReport(paper:"A3"|"A4"){
   const html=reportHtml(model,section,{paper,image:captureView(),date:new Date().toISOString().slice(0,10),version:pkg.version,
-    credits:creditTexts(),notes:currentNotes,sectionBuffer,ve:view.ve,hidden:view.hidden,field:field??undefined});
+    credits:creditTexts(),notes:currentNotes,sectionBuffer,ve:view.ve,hidden:view.hidden,field:field??undefined,validation:validation??undefined});
   const frame=document.createElement("iframe");
   frame.className="print-frame";
   frame.setAttribute("aria-hidden","true");
@@ -952,8 +1068,12 @@ function updateTooltip(){
       const logged=[iv?.name&&iv.name!==iv.unit?esc(iv.name):"",spt.length?`N ${spt.join(", ")}`:""].filter(Boolean).join(" · ");
       const water=bh.water?.length?` · water ${fmt(Math.min(...bh.water.map(w=>w.depth)),2)} m deep`:"";
       const where=bh.lat!==undefined&&bh.lon!==undefined?` (${fmt(bh.lat,5)}°, ${fmt(bh.lon,5)}°)`:"";
-      html=`<b>${esc(bh.id)}</b> · ${what}${logged?`<span>${logged}</span>`:""}<span>collar E ${fmt(bh.x,1)} N ${fmt(bh.y,1)}${where} · ${fmt(bh.z,2)} m · final depth ${fmt(boreholeDepth(bh),1)} m${water}</span>`;
+      html=`<b>${esc(bh.id)}</b> · ${what}${logged?`<span>${logged}</span>`:""}<span>collar E ${fmt(bh.x,1)} N ${fmt(bh.y,1)}${where} · ${fmt(bh.z,2)} m · final depth ${fmt(boreholeDepth(bh),1)} m${water}</span>${validationLine(bh.id)}`;
     }
+  }
+  if(!html&&errorMarkers?.visible){
+    const hit=raycaster.intersectObject(errorMarkers).find(kept);
+    if(hit&&hit.instanceId!==undefined)html=`<b>${esc(errorMarked[hit.instanceId])}</b>${validationLine(errorMarked[hit.instanceId])}`;
   }
   // The section face, or a unit volume in front of it.
   const faceHit=sectionGroup.visible?raycaster.intersectObject(fence)[0]:undefined;

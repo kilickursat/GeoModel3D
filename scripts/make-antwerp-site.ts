@@ -68,14 +68,20 @@ const unknown=new Set(imported.boreholes.flatMap(b=>b.intervals.map(i=>i.unit)).
 if(unknown.size)throw new Error(`Units not grouped: ${[...unknown].join(", ")}`);
 // Below the deepest interpreted layer nothing is known: the holes end there, so the model base is the deepest
 // interpreted contact rather than the bottom of the few holes drilled 170 m deep.
-const boreholes=imported.boreholes.map(b=>{
+// Left out: three boreholes of 1987 whose collar heights DOV records with an unknown method ("methode onbekend"),
+// 20 m above the surveyed collar of GEO-78/136-BLO6 nine metres away. Their logs put the top of the Boom Formation at
+// +3.3 to +3.7 m TAW, where it lies at −16.5 to −16.9 m in the boreholes around them, and the cross-validation and the
+// check of the collars against the terrain both single them out.
+const LEFT_OUT=new Set(["GEO-87/185-B1","GEO-87/185-B2","GEO-87/185-B3"]);
+const boreholes=imported.boreholes.filter(b=>!LEFT_OUT.has(b.id)).map(b=>{
   const {depth:_,...hole}=b;
   return {...hole,intervals:b.intervals.filter(i=>!GAPS.has(i.unit)).map(i=>({...i,unit:GROUP[i.unit]}))};
 }).filter(b=>b.intervals.length);
+if(imported.boreholes.filter(b=>LEFT_OUT.has(b.id)).length!==LEFT_OUT.size)throw new Error("A borehole to leave out is not in the data");
 const dates=files.filter(f=>f.name.startsWith("interpretatie-")).map(f=>f.text.match(/<datum>(\d{4}-\d\d-\d\d)<\/datum>/)?.[1]).filter(Boolean).sort();
 const project:GeoProject={
   name:"Antwerp, Belgium (DOV)",
-  description:`${boreholes.length} boreholes in the centre of Antwerp, 15 m deep or more, with DOV's formal lithostratigraphic interpretation of each (${dates[0]?.slice(0,4)}–${dates.at(-1)?.slice(0,4)}): made ground and Quaternary deposits over the Pliocene Kattendijk and Miocene Berchem sands and the Oligocene Boom Clay. The thin Quaternary formations are one unit here; each interval keeps DOV's name. Heights in metres TAW. Terrain from Terrain Tiles, fetched when the project opens.`,
+  description:`${boreholes.length} boreholes in the centre of Antwerp, 15 m deep or more, with DOV's formal lithostratigraphic interpretation of each (${dates[0]?.slice(0,4)}–${dates.at(-1)?.slice(0,4)}): made ground and Quaternary deposits over the Pliocene Kattendijk and Miocene Berchem sands and the Oligocene Boom Clay. The thin Quaternary formations are one unit here; each interval keeps DOV's name. Heights in metres TAW. Terrain from Terrain Tiles with Fetch terrain: it is not fetched when the project opens, as some logs start under water, below the water surface the tiles give.`,
   source:"Databank Ondergrond Vlaanderen (DOV): formal stratigraphy, Flemish Government (VPO); consulted on 07/10/2026, on https://www.dov.vlaanderen.be. Free reuse under the Flemish model licence for free reuse.",
   crs:imported.crs,crsCode:imported.crsCode,
   units,boreholes

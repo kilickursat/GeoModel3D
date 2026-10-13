@@ -4,6 +4,7 @@ import {buildGeologicalModel} from "../src/model";
 import {computeSection} from "../src/section";
 import {sakaeProject,valleyProject,GeoProject} from "../src/geology";
 import {sectionField} from "../src/fields";
+import {crossValidate} from "../src/validation";
 
 const options={paper:"A3" as const,date:"2026-10-07",version:"0.6.1",credits:["Data KuniJiban"],notes:["A note <with> markup"],sectionBuffer:300,ve:5};
 
@@ -46,6 +47,15 @@ describe("printable report",()=>{
   it("lists units hidden in the view in the notes",()=>{
     const v=buildGeologicalModel(valleyProject),html=reportHtml(v,computeSection(v,{azimuth:80,offset:0}),{...options,hidden:new Set(["Made Ground","Alluvium"])});
     expect(html).toContain("Hidden in the 3-D view and the section: Made Ground, Alluvium");
+  });
+  it("gives a cross-validation run in the app a page of its own",()=>{
+    const v=buildGeologicalModel(valleyProject),cv=crossValidate(valleyProject);
+    const html=reportHtml(v,computeSection(v,{azimuth:80,offset:0}),{...options,validation:cv});
+    expect(html).toContain("<h2>Cross-validation</h2>");
+    expect(html).toMatch(/lie inside the outline of the others: <b>[\d.]+ %<\/b> of their logged metres are predicted in the unit logged/);
+    expect(html).toContain("<h3>Errors at the boreholes inside the others, predicted minus logged</h3>");
+    expect(html).toContain("<h3>Furthest from their prediction</h3>");
+    expect(html.match(/class="page"/g)!.length).toBe(4);
   });
   it("escapes names",()=>{
     const p:GeoProject={...valleyProject,name:"Site <b>&",units:valleyProject.units.map((u,k)=>k?u:{...u,name:"Fill <x>"})};

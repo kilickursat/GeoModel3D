@@ -25,7 +25,7 @@ Each site is published data, in its country's own coordinate system and height d
 | Site | Data | Coordinates and heights | Shows |
 |---|---|---|---|
 | **Sakae, Yokohama, Japan** | 75 borehole logs from MLIT road surveys (KuniJiban) | JGD2011 / Japan Plane Rectangular CS IX (EPSG:6677), T.P. | Fill, alluvium, Kanto Loam and Pleistocene sediments over the Kazusa Group, interpreted from soil names, SPT N-values and elevations; GSI 5 m terrain |
-| **Antwerp, Belgium** | 173 boreholes with the formal lithostratigraphy of DOV, the Flemish subsurface database | Belgian Lambert 72 (EPSG:31370), TAW | Made ground and Quaternary deposits over the Kattendijk and Berchem sands and the Boom Clay |
+| **Antwerp, Belgium** | 170 boreholes with the formal lithostratigraphy of DOV, the Flemish subsurface database | Belgian Lambert 72 (EPSG:31370), TAW | Made ground and Quaternary deposits over the Kattendijk and Berchem sands and the Boom Clay |
 | **Maasvlakte 2, Rotterdam, Netherlands** | 100 geotechnical boreholes from the Dutch Key Register of the Subsurface (BRO), with 3,188 laboratory results and 56 groundwater levels | RD New (EPSG:28992), NAP | Reclaimed land on Holocene clay and peat over Pleistocene sand and gravel, the harbour basins, and water content, unit weight, Atterberg limits, fines and undrained shear strength |
 | **Creswick deep leads, Victoria, Australia** | 150 groundwater bores with the hydrostratigraphic interpretation of the Victorian Department of Primary Industries, from the National Groundwater Information System (NGIS) | GDA94 / MGA zone 54 (EPSG:28354), AHD | Basalt lava flows that filled valleys cut into Palaeozoic bedrock and buried the sand and gravel of the old rivers, the deep leads |
 
@@ -35,13 +35,14 @@ Each site is published data, in its country's own coordinate system and height d
 | **Creswick: basalt over the deep leads** | **Input data: a case typed in by hand** |
 | ![Creswick deep leads model from NGIS hydrostratigraphy](docs/creswick.png) | ![The Input data tab with the worked example: its units, and the drained earth pressures down a borehole](docs/input-data.png) |
 
-## Version 0.9
+## Version 0.10
 
-- **Earth pressures** on a wall down any borehole in the Input data tab: active, at rest and passive (Rankine), drained from c′ and φ′ or undrained from su, with the depths where the soil would pull on the wall. See [Earth pressures](#earth-pressures).
-- **Contributing:** a [contribution guide](CONTRIBUTING.md) with the rules for adding data, issue templates, and a [Sponsoring](#sponsoring) section (0.8.1).
-- **Fewer notes on coarse terrain:** collars that scatter about a coarse terrain grid are summed up in one note, and only those that stand out are listed (0.8.1).
+- **Check the model:** leave-one-out cross-validation. Each borehole in turn is predicted from the others: the share of the logs predicted right, the errors of every surface, and the logs furthest from their prediction, marked on the model. See [Checking the model](#checking-the-model).
+- **Lengths in feet, centimetres or millimetres** in CSV and AGS4 files are converted to metres, and the notes say so (0.9.1).
+- **Antwerp:** three boreholes with doubtful collar heights are left out.
 
 Earlier versions:
+- **0.9:** earth pressures down a borehole in the Input data tab (Rankine, drained and undrained); a contribution guide and a Sponsoring section; collars that scatter about a coarse terrain grid summed up in one note.
 - **0.8:** the Input data tab, where your own case is entered and modelled, from one borehole up; σ′h = K0 · σ′v; the Creswick deep leads in Australia; pinch-outs at the borehole that lacks the unit, now the documented rule.
 - **0.7:** real sites in Belgium and the Netherlands; groundwater, σv, u and σ′v on sections; laboratory and in-situ tests; Dutch BRO and Flemish DOV files; a data editor; descriptions grouped by principal soil in seven languages; the RD New and Luxembourg 170 m datum fix.
 - **0.6:** coordinate systems for 40 countries, fetched terrain and maps, Japanese borehole XML, unit rules, the Sakae site, adaptive refinement, PDF reports.
@@ -293,6 +294,31 @@ Here Ka = tan²(45° − φ′/2) and Kp = tan²(45° + φ′/2) = 1/Ka. Undrain
 
 ![Undrained active, at-rest and passive earth pressures down a borehole of the worked example, with the depths where the clays would pull on the wall](docs/earth-pressure.png)
 
+## Checking the model
+
+A model honours every borehole it is built from, so its fit to them says nothing about the ground between them. **Check the model** in the panel says how far to trust it there. It leaves out each borehole in turn, builds the model from the others, and compares the borehole's log with what that model predicts at its collar: leave-one-out cross-validation, the usual check of a spatial interpolation (Isaaks and Srivastava, *An Introduction to Applied Geostatistics*, 1989).
+
+It reports:
+- the share of the logged metres predicted in the unit logged;
+- for each surface, the ground and the top of each unit: the bias (the mean of predicted minus logged), the mean absolute and RMS errors, and the largest error;
+- the boreholes outside the outline of the others apart, since the prediction there is an extrapolation;
+- the boreholes furthest from their prediction, as logs to check. Click one to move the section through it.
+
+Markers over the collars show each borehole's mean error, and hovering over a borehole gives its result. **Errors (CSV)** saves the error at every contact, and the PDF report gets a page with the results.
+
+Each model is built as the app builds it, from the same data, with the terrain grid when one is loaded. For speed, the model of the other boreholes gets a node at the collar left out instead of a refined mesh. That gives the same horizons there: within 10⁻¹¹ m without terrain, and with terrain the grid's value at the collar rather than one interpolated between mesh nodes. A site of 170 boreholes takes a few seconds. Units that only one borehole logs cannot be predicted from the others, and are named.
+
+The bundled sites, without the terrain the app downloads:
+
+| Site | Boreholes (inside the others) | Logged metres in the unit logged | Mean absolute error of the unit tops |
+|---|---|---|---|
+| Maasvlakte 2 | 100 (93) | 87.5 % | 1.3–1.6 m |
+| Antwerp | 169 (158) | 71.8 % | 1.8–3.9 m |
+| Sakae | 75 (66) | 60.1 % | 4.0–5.8 m |
+| Creswick | 150 (136) | 51.7 % | 5.6–23.9 m |
+
+With its 5 m terrain grid, Sakae reaches 62.8 %, and the mean error of the ground falls from 3.8 to 2.0 m. `scripts/check-sites.ts` prints these results.
+
 ## How a model is built
 
 Boreholes → contacts → TIN horizons → closed unit volumes → sections
@@ -359,7 +385,7 @@ The viewer uses three.js's `WebGPURenderer` with TSL node materials, so one shad
   - **Kazusa Group:** from the first mudstone, cemented silt or layer with N ≥ 50 (the bearing stratum).
 
   Layers out of this order in a log (dense beds within softer ones, for instance) are modelled with the unit above and listed in the notes. Five rock-core logs are left out: they describe mudstone from the collar, where every neighbouring log shows 10–15 m of soft alluvium first. `scripts/make-sakae-site.ts` downloads the logs and builds the dataset.
-- **Antwerp, Belgium (real site).** 173 DOV boreholes at least 15 m deep in a 3 × 3 km square over the old town and the Scheldt, each with DOV's formal lithostratigraphic interpretation. They are in Belgian Lambert 72, with heights in TAW. The units:
+- **Antwerp, Belgium (real site).** 170 DOV boreholes at least 15 m deep in a 3 × 3 km square over the old town and the Scheldt, each with DOV's formal lithostratigraphic interpretation. They are in Belgian Lambert 72, with heights in TAW. Three boreholes of 1987, GEO-87/185-B1, B2 and B3, are left out: DOV records their collar heights with an unknown method, 20 m above the surveyed collar of GEO-78/136-BLO6 nine metres away, and their logs put the top of the Boom Formation 20 m above the boreholes around them. [Cross-validation](#checking-the-model) and the check of the collars against the terrain both pointed to them. The units:
   - **Made ground and disturbed ground.**
   - **Quaternary deposits:** the thin Quaternary formations of the newer interpretations (Vlaanderen, Arenberg, Eeklo, Gent) and the undifferentiated Quaternary, as one erosive unit. Each interval keeps DOV's name.
   - **Kattendijk Formation** (Pliocene).
@@ -387,11 +413,13 @@ The viewer uses three.js's `WebGPURenderer` with TSL node materials, so one shad
 
 The modelling kernel has no rendering dependencies. It is tested in Node, and the viewer is a thin layer on top.
 
-- `src/geology.ts`: project schema and the reference datasets
+- `src/schema.ts`: the project schema (units, boreholes, logs, tests), with no data
+- `src/geology.ts`: the reference datasets
 - `src/tin.ts`: Delaunay triangulation (Bowyer–Watson with a ghost vertex, so the convex hull is always covered)
 - `src/terrain.ts`: terrain grids (reading, interpolation and coarsening)
 - `src/model.ts`: log interpretation, erosion, terrain, water table and horizon assembly
 - `src/fields.ts`: stresses, earth pressures, measured properties on sections, and their colour scales
+- `src/validation.ts`: leave-one-out cross-validation
 - `src/properties.ts`: the property catalogue and per-unit statistics
 - `src/volume.ts`: closed unit-volume meshes
 - `src/section.ts`: vertical sections
@@ -404,7 +432,7 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 - `src/crs.ts`: coordinate systems (registry, suggestion and conversion)
 - `src/tiles.ts`: map and elevation tiles, and terrain resampling
 - `src/main.ts`: three.js viewer and interface
-- `scripts/`: the generators of the synthetic datasets, of the real sites (Sakae, Antwerp, Maasvlakte) and of the coordinate system registry and DOV code list, and the offline single-file build
+- `scripts/`: the generators of the synthetic datasets, of the real sites (Sakae, Antwerp, Maasvlakte, Creswick) and of the coordinate system registry and DOV code list, the cross-validation of the real sites, and the offline single-file build
 
 ## Development
 
@@ -464,4 +492,4 @@ Apache-2.0: see [LICENSE](LICENSE). The data listed under [Data sources](#data-s
 
 ## Keywords
 
-3D geological modelling · geological model software · geotechnical engineering · engineering geology · hydrogeology · borehole logs · borehole data visualization · manual data entry · stratigraphy · subsurface modelling · cross-sections · groundwater · effective stress · horizontal stress K0 · earth pressure · active and passive earth pressure · Rankine · retaining walls · ground investigation · AGS4 · BRO · DOV · KuniJiban · NGIS · Australia · coordinate systems · GIS · three.js · WebGPU · open source
+3D geological modelling · geological model software · geotechnical engineering · engineering geology · hydrogeology · borehole logs · borehole data visualization · manual data entry · stratigraphy · subsurface modelling · cross-sections · groundwater · effective stress · horizontal stress K0 · earth pressure · active and passive earth pressure · Rankine · retaining walls · cross-validation · model uncertainty · ground investigation · AGS4 · BRO · DOV · KuniJiban · NGIS · Australia · coordinate systems · GIS · three.js · WebGPU · open source

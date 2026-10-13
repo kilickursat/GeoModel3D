@@ -1,6 +1,6 @@
 // The data editor's tables: a project as rows of text a person can type or paste, and back. A project is rebuilt from
 // the tables through the CSV importer, so data typed in are checked exactly as imported files are.
-import {GeoProject,UnitRule,Borehole} from "./geology";
+import {GeoProject,UnitRule,Borehole} from "./schema";
 import {ImportResult,importFiles,toCsv} from "./io";
 import {Crs,projectCrs,findCrs,searchCrs,customCrs} from "./crs";
 import {applyUnitRules,lithologyRules} from "./rules";

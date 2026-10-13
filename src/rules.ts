@@ -2,7 +2,7 @@
 // (if any) contain the median SPT N-value inside the interval and the elevation of its top, gives its unit. An
 // interval that no rule matches keeps its description as its unit, so nothing is dropped silently; such
 // descriptions are counted.
-import {Borehole,UnitRule,sptN} from "./geology";
+import {Borehole,UnitRule,sptN} from "./schema";
 
 const median=(v:number[])=>{const s=[...v].sort((a,b)=>a-b),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2};
 const literal=(s:string)=>s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
