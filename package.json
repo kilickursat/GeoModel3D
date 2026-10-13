@@ -1,7 +1,7 @@
 {
   "name": "geomodel3d",
   "private": true,
-  "version": "0.9.1",
+  "version": "0.10.0",
   "description": "Browser-based 3D geological and geotechnical modelling from borehole logs: stratigraphy, cross-sections, groundwater, stresses and laboratory data on real maps",
   "keywords": [
     "geology",
@@ -17,6 +17,7 @@
     "groundwater",
     "effective-stress",
     "earth-pressure",
+    "cross-validation",
     "ags4",
     "bro",
     "dov",
