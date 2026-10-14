@@ -4,7 +4,7 @@
 import {GeoModel,unitCubicMetres,footprintArea} from "./model";
 import {Section} from "./section";
 import {sectionSvg,sectionTitle} from "./sectionSvg";
-import {chainageTable,outsideStretches,unitLabel} from "./alignment";
+import {chainageTable,outsideStretches,unitLabel,lineCrossings} from "./alignment";
 import {projectCrs} from "./crs";
 import {boreholeDepth,sptN} from "./schema";
 import {SectionField,unitWeights} from "./fields";
@@ -68,8 +68,9 @@ export function reportHtml(model:GeoModel,section:Section,o:ReportOptions){
     const water=b.water?.length?Math.min(...b.water.map(x=>x.depth)):NaN,n=(b.spt??[]).map(sptN);
     return `<tr><td>${esc(b.id)}</td><td class="num">${fmt(b.x,1)}</td><td class="num">${fmt(b.y,1)}</td><td class="num">${fmt(b.z,2)}</td><td class="num">${fmt(boreholeDepth(b),2)}</td><td class="num">${b.lat===undefined?"":fmt(b.lat,6)}</td><td class="num">${b.lon===undefined?"":fmt(b.lon,6)}</td><td class="num">${fmt(water,2)}</td><td class="num">${n.length?`${n.length} (max ${fmt(Math.max(...n))})`:""}</td></tr>`;
   }).join("");
-  const svg=sectionSvg(model,section,{width:1600,height:Math.round(1600*(h-60)/(w-24)),theme:"light",legend:true,buffer:o.sectionBuffer,title:false,roundVe:true,hidden:o.hidden});
-  const fieldSvg=o.field?sectionSvg(model,section,{width:1600,height:Math.round(1600*(h-60)/(w-24)),theme:"light",legend:true,buffer:o.sectionBuffer,title:false,roundVe:true,hidden:o.hidden,field:o.field}):"";
+  const crossings=lineCrossings(section,p.alignments??[]);
+  const svg=sectionSvg(model,section,{width:1600,height:Math.round(1600*(h-60)/(w-24)),theme:"light",legend:true,buffer:o.sectionBuffer,title:false,roundVe:true,hidden:o.hidden,crossings});
+  const fieldSvg=o.field?sectionSvg(model,section,{width:1600,height:Math.round(1600*(h-60)/(w-24)),theme:"light",legend:true,buffer:o.sectionBuffer,title:false,roundVe:true,hidden:o.hidden,field:o.field,crossings}):"";
   const hidden=model.units.filter(u=>o.hidden?.has(u.id)).map(u=>u.name);
   const notes=hidden.length?[`Hidden in the 3-D view and the section: ${hidden.join(", ")}`,...o.notes]:o.notes;
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${esc(p.name)} — GeoModel3D report</title><style>

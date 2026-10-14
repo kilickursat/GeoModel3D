@@ -229,3 +229,26 @@ export function chainageTable(model:GeoModel,s:Section,step:number):ChainageRow[
 }
 // The name of the unit at a design level, as the table gives it.
 export const unitLabel=(model:GeoModel,k:number|undefined)=>k===undefined?"":k===ABOVE?"above ground":k===BELOW?"below the model":model.units[k].name;
+
+// ---------- lines across a straight section ----------
+
+// Where the lines of a project cross a straight section: the distance along the section, the line's chainage there and
+// its design levels, as levels on the line's centre; no shape of what is built along it is assumed.
+export interface Crossing { name:string; s:number; chainage:number; x:number; y:number; top?:number; bottom?:number }
+export function lineCrossings(s:Section,lines:Alignment[]):Crossing[]{
+  const n=s.s.length;
+  if(s.alignment||n<2)return [];
+  const ax=s.x[0],ay=s.y[0],dx=s.x[n-1]-ax,dy=s.y[n-1]-ay,out:Crossing[]=[];
+  for(const line of lines){
+    const ch=chainages(line),p=line.points;
+    for(let i=0;i+1<p.length;i++){
+      const ex=p[i+1].x-p[i].x,ey=p[i+1].y-p[i].y,den=dx*ey-dy*ex;
+      if(Math.abs(den)<1e-12)continue;
+      const t=((p[i].x-ax)*ey-(p[i].y-ay)*ex)/den,u=((p[i].x-ax)*dy-(p[i].y-ay)*dx)/den;
+      if(t<0||t>1||u<0||u>1)continue;
+      const c=ch[i]+u*(ch[i+1]-ch[i]);
+      out.push({name:line.name,s:s.s[0]+t*(s.s[n-1]-s.s[0]),chainage:c,x:ax+t*dx,y:ay+t*dy,...designAt(line.design,c)});
+    }
+  }
+  return out.sort((a,b)=>a.s-b.s);
+}

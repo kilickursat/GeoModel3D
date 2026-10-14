@@ -10,7 +10,7 @@ import {terrainOutside,convexHull,TerrainGrid} from "./terrain";
 import {computeSection,offsetRange,offsetThrough,principalAzimuth,Section,sectionRuns,joined,alongOf} from "./section";
 import {sectionSvg,sectionCsv,sectionFieldCsv,sectionTitle,chainageCsv} from "./sectionSvg";
 import {importFiles,toProjectJson,toBoreholeCsv,toTestsCsv,toCsv,decodeText,assignColors,toAlignmentCsv} from "./io";
-import {alignmentSection,chainages,pointAt,designAt,crossSectionAt} from "./alignment";
+import {alignmentSection,chainages,pointAt,designAt,crossSectionAt,lineCrossings,Crossing} from "./alignment";
 import {XY} from "./tin";
 import {SectionField,sectionField,availableFields,columnAt,stressAt,unitWeights,UnitWeight,withTheme,scaleLabel,colourScale,ColourScale} from "./fields";
 import {formatValue,propertyDef} from "./properties";
@@ -445,7 +445,10 @@ const designLines=new THREE.LineSegments(new THREE.BufferGeometry(),new THREE.Li
 const markerLine=new THREE.LineSegments(new THREE.BufferGeometry(),new THREE.LineBasicNodeMaterial({color:0x78c9df}));
 const markerLabel=(()=>{const el=document.createElement("div");el.className="end-label";const l=new CSS2DObject(el);l.center.set(0.5,1.2);return l})();
 let chainageLabels:CSS2DObject[]=[];
-sectionGroup.add(fence,fenceLines,outline,lineFrame,waterLine,designBand,designLines,markerLine,markerLabel,...endLabels);
+// On a straight section, where the project's lines cross it: their design levels on the section face, and their names.
+const crossLines=new THREE.LineSegments(new THREE.BufferGeometry(),designLines.material);
+let crossings:Crossing[]=[];
+sectionGroup.add(fence,fenceLines,outline,lineFrame,waterLine,designBand,designLines,markerLine,markerLabel,crossLines,...endLabels);
 
 // The line the section follows, when it is an alignment. The cut applies to straight sections only: along a line the
 // units are drawn see-through around the section.
@@ -534,6 +537,23 @@ function drawLine(){
       sectionGroup.add(l);
     }
   }
+  // A straight section crossed by lines: a bar from invert to crown, a mark at a single level, or a line up the face.
+  crossings=line?[]:lineCrossings(s,project.alignments??[]);
+  const cross:number[]=[],top=s.s.length>1?frameTop():0,mark=(top-model.base)*0.015;
+  for(const c of crossings){
+    const at=(z:number)=>[c.x-origin.x,c.y-origin.y,z-origin.z];
+    const [z0,z1]=c.top!==undefined&&c.bottom!==undefined?[c.bottom,c.top]:c.top!==undefined?[c.top-mark,c.top+mark]:[model.base,top];
+    cross.push(...at(z0),...at(z1));
+    const el=document.createElement("div");
+    el.className="ch-label";
+    el.textContent=`${c.name} · ${fmt(c.chainage)}`;
+    const l=new CSS2DObject(el);
+    l.center.set(0.5,1.25);
+    l.position.set(...(at(z1) as [number,number,number]));
+    chainageLabels.push(l);
+    sectionGroup.add(l);
+  }
+  positions(crossLines,cross);
   positions(designBand,band);
   positions(designLines,edges);
   placeMarker();
@@ -977,7 +997,7 @@ function renderSectionPanel(){
   // Behind the input tab the panel has no size; it is drawn when the model tab is shown again.
   if(!view.panel||!section||document.body.dataset.mode==="input")return;
   sectionView.querySelector(".section-name")!.textContent=section.alignment?sectionTitle(section):`Section A–A′ · ${String(view.azimuth).padStart(3,"0")}° · ${view.offset>=0?"+":""}${Math.round(view.offset)} m`;
-  sectionBody.innerHTML=sectionSvg(model,section,{width:sectionBody.clientWidth,height:sectionBody.clientHeight,theme:"dark",title:false,buffer:sectionBuffer,hidden:view.hidden,field:field??undefined,marker:section.alignment?view.chainage:undefined});
+  sectionBody.innerHTML=sectionSvg(model,section,{width:sectionBody.clientWidth,height:sectionBody.clientHeight,theme:"dark",title:false,buffer:sectionBuffer,hidden:view.hidden,field:field??undefined,marker:section.alignment?view.chainage:undefined,crossings});
 }
 
 // The lines offered: straight, the project's alignments, and drawing or importing another.
@@ -996,15 +1016,20 @@ function showLine(index:number){
   updateSection();
 }
 // Turns the camera to look square at a line, from the side it is on, at the same distance, aimed at the middle of the
-// line in plan. A camera looking down, as when the line was drawn from above, comes down to look at it from the side.
+// line in plan.
 function faceLine(line:Alignment){
-  const a=line.points[0],b=line.points[line.points.length-1],l=Math.hypot(b.x-a.x,b.y-a.y);
+  const xs=line.points.map(p=>p.x),ys=line.points.map(p=>p.y);
+  faceAcross(line.points[0],line.points[line.points.length-1],{x:(Math.min(...xs)+Math.max(...xs))/2,y:(Math.min(...ys)+Math.max(...ys))/2});
+}
+// Turns the camera to look square at the direction from a to b, aimed at `at`. A camera looking down, as when a line
+// was drawn from above, comes down to look from the side.
+function faceAcross(a:XY,b:XY,at:XY){
+  const l=Math.hypot(b.x-a.x,b.y-a.y);
   if(l<1e-6)return;
   const n={x:(b.y-a.y)/l,y:-(b.x-a.x)/l},v=camera.position.clone().sub(controls.target),dist=v.length(),h=Math.hypot(v.x,v.y);
   const side=v.x*n.x+v.y*n.y>=0?1:-1,steep=h<dist*Math.sin(THREE.MathUtils.degToRad(20));
   const across=steep?dist*Math.cos(0.6):h,up=steep?dist*Math.sin(0.6):v.z;
-  const xs=line.points.map(p=>p.x),ys=line.points.map(p=>p.y);
-  controls.target.set((Math.min(...xs)+Math.max(...xs))/2-origin.x,(Math.min(...ys)+Math.max(...ys))/2-origin.y,controls.target.z);
+  controls.target.set(at.x-origin.x,at.y-origin.y,controls.target.z);
   camera.position.set(controls.target.x+side*n.x*across,controls.target.y+side*n.y*across,controls.target.z+up);
   controls.update();
   invalidate();
@@ -1229,7 +1254,7 @@ function exportAs(kind:string){
   if(kind==="project")download(`${slug}.geomodel3d.json`,toProjectJson(project),"application/json");
   if(kind==="boreholes")download(`${slug}-boreholes.csv`,toBoreholeCsv(project),"text/csv");
   if(kind==="tests")download(`${slug}-tests.csv`,toTestsCsv(project),"text/csv");
-  if(kind==="svg")download(`${slug}-section-${tag}.svg`,sectionSvg(model,section,{width:1600,height:900,theme:"light",legend:true,buffer:sectionBuffer,roundVe:true,hidden:view.hidden,field:field??undefined}),"image/svg+xml");
+  if(kind==="svg")download(`${slug}-section-${tag}.svg`,sectionSvg(model,section,{width:1600,height:900,theme:"light",legend:true,buffer:sectionBuffer,roundVe:true,hidden:view.hidden,field:field??undefined,crossings}),"image/svg+xml");
   if(kind==="section")download(`${slug}-section-${tag}.csv`,sectionCsv(model,section),"text/csv");
   if(kind==="field"){
     if(field)download(`${slug}-section-${tag}-${field.key}.csv`,sectionFieldCsv(model,section,field),"text/csv");
@@ -1403,8 +1428,10 @@ chainageInput.oninput=()=>{
 controlsBar.querySelector<HTMLButtonElement>(".cross-here")!.onclick=()=>{
   const line=lineOf();
   if(!line)return;
-  const c=crossSectionAt(model,line,view.chainage);
+  const c=crossSectionAt(model,line,view.chainage),a=c.azimuth*Math.PI/180,dir={x:Math.sin(a),y:Math.cos(a)};
   view.alignment=-1;view.azimuth=c.azimuth;view.offset=c.offset;
+  // The camera turns to the cross-section, aimed at the line crossing it.
+  faceAcross({x:c.x-dir.x,y:c.y-dir.y},{x:c.x+dir.x,y:c.y+dir.y},c);
   renderLineOptions();syncControls();updateSection();
 };
 controlsBar.querySelector<HTMLSelectElement>(".table-step")!.onchange=e=>{view.step=Number((e.target as HTMLSelectElement).value)};

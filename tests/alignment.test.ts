@@ -164,3 +164,24 @@ describe("the profile along a line",()=>{
     expect(html.match(/class="page"/g)!.length).toBe(4);
   });
 });
+
+describe("lines across a straight section",()=>{
+  const channel=buildGeologicalModel(channelProject),tunnel=channelProject.alignments![0];
+  it("are found where the section crosses them, with the design levels there",async()=>{
+    const c=crossSectionAt(channel,tunnel,1176),s=computeSection(channel,{azimuth:c.azimuth,offset:c.offset},40);
+    const {lineCrossings}=await import("../src/alignment");
+    const found=lineCrossings(s,[tunnel]);
+    expect(found.length).toBe(1);
+    expect(found[0].chainage).toBeCloseTo(1176,0);
+    expect(Math.hypot(found[0].x-c.x,found[0].y-c.y)).toBeLessThan(1);
+    const d=designAt(tunnel.design,found[0].chainage);
+    expect(found[0].top).toBeCloseTo(d.top!,9);
+    expect(found[0].bottom).toBeCloseTo(d.bottom!,9);
+    expect(lineCrossings(alignmentSection(channel,tunnel),[tunnel])).toEqual([]);
+    const {sectionSvg}=await import("../src/sectionSvg");
+    const svg=sectionSvg(channel,s,{width:900,height:500,crossings:found});
+    expect(svg).toMatch(/<title>Synthetic tunnel at chainage 117\d(\.\d+)? m: crown [\d.]+ m, invert [\d.]+ m<\/title>/);
+    const {reportHtml}=await import("../src/report");
+    expect(reportHtml(channel,s,{paper:"A4",date:"2026-10-14",version:"0.14.0",credits:[],notes:[],sectionBuffer:40,ve:2})).toContain(">Synthetic tunnel<title>");
+  });
+});
