@@ -3,6 +3,7 @@ import {Borehole,GeoProject,Interval,UnitDef,UnitRule,SptTest,WaterLevel,TestRes
 import {TerrainGrid,isTerrainFile,readTerrain} from "./terrain";
 import {Crs,findCrs,projectCrs,suggestCrs,toProjected,toGeographic,searchCrs} from "./crs";
 import {alignmentProblem,chainages,designAt} from "./alignment";
+import {isLandXml,readLandXml} from "./landxml";
 import {XY} from "./tin";
 import {isBoringXml,readBoringXml} from "./boringXml";
 import {isBroXml,readBroXml} from "./broXml";
@@ -931,6 +932,19 @@ function readDxfLines(file:TextFile,notes:string[]):Alignment[]{
   notes.push(unitName?`${file.name}: drawing units ${unitName}${scale!==1?", converted to metres":""}; positions are read in the project's coordinates`:`${file.name}: the drawing does not state its units; positions are read as metres in the project's coordinates`);
   return out;
 }
+// LandXML and J-LandXML alignments, in the coordinate system the file names, converted to the project's where both
+// are known; otherwise read in the project's coordinates.
+function readLandXmlLines(file:TextFile,crs:Crs|null,notes:string[]):Alignment[]{
+  const r=readLandXml(file.text,file.name),fileCrs=r.crsCode?findCrs(r.crsCode):undefined;
+  notes.push(...r.notes);
+  if(fileCrs&&crs&&fileCrs.code!==crs.code){
+    for(const a of r.alignments)a.points=a.points.map(p=>{const g=toGeographic(fileCrs,p.x,p.y);return {...p,...toProjected(crs,g.lon,g.lat)}});
+    notes.push(`${file.name}: positions converted from ${fileCrs.name} (${fileCrs.code}) to ${crs.name}`);
+  }else if(r.crsCode&&!fileCrs)notes.push(`${file.name}: its coordinate system ${r.crsCode} is not known here; positions are read in the project's coordinates`);
+  else if(!r.crsCode)notes.push(`${file.name}: the file does not name its coordinate system; positions are read in the project's coordinates`);
+  else if(!crs)notes.push(`${file.name}: positions in ${fileCrs!.name}, read as the project's coordinates`);
+  return r.alignments.map(a=>checked(a,file.name));
+}
 // Alignments as CSV: the points with their chainage, and the design levels at them where given.
 export function toAlignmentCsv(a:Alignment){
   const ch=chainages(a),band=a.design?.some(d=>d.bottom!==undefined),design=!!a.design?.length;
@@ -948,7 +962,7 @@ const round3=(v:number)=>Math.round(v*1000)/1000;
 function readAlignmentFiles(lineFiles:TextFile[],profiles:TextFile[],project:GeoProject,warnings:string[]){
   const crs=projectCrs(project),added:Alignment[]=[];
   for(const f of lineFiles){
-    const read=isDxf(f)?readDxfLines(f,warnings):isGeoJsonLines(f)?readGeoJsonLines(f,crs,warnings):readLineTable(f,crs,warnings);
+    const read=isLandXml(f.text)?readLandXmlLines(f,crs,warnings):isDxf(f)?readDxfLines(f,warnings):isGeoJsonLines(f)?readGeoJsonLines(f,crs,warnings):readLineTable(f,crs,warnings);
     added.push(...read);
   }
   const all=[...(project.alignments??[]),...added];
@@ -982,7 +996,7 @@ function readAlignmentFiles(lineFiles:TextFile[],profiles:TextFile[],project:Geo
 // (positions given by latitude and longitude are placed in it).
 export function importFiles(files:TextFile[],current?:GeoProject,declared?:Crs):ImportResult{
   if(!files.length)throw new Error("No files to import");
-  const lineFiles=files.filter(f=>!isTerrainFile(f.name,f.text)&&(isDxf(f)||isGeoJsonLines(f)||lineTableKind(f)==="line"));
+  const lineFiles=files.filter(f=>!isTerrainFile(f.name,f.text)&&(isLandXml(f.text)||isDxf(f)||isGeoJsonLines(f)||lineTableKind(f)==="line"));
   const profiles=files.filter(f=>!isTerrainFile(f.name,f.text)&&lineTableKind(f)==="profile");
   if(lineFiles.length||profiles.length){
     const rest=files.filter(f=>!lineFiles.includes(f)&&!profiles.includes(f));

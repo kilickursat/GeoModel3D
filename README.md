@@ -35,11 +35,12 @@ Each site is published data, in its country's own coordinate system and height d
 | **Creswick: basalt over the deep leads** | **Input data: a case typed in by hand** |
 | ![Creswick deep leads model from NGIS hydrostratigraphy](docs/creswick.png) | ![The Input data tab with the worked example: its units, and the drained earth pressures down a borehole](docs/input-data.png) |
 
-## Version 0.13
+## Version 0.14
 
-- **Sections along a line:** the longitudinal profile along a tunnel, road, railway or dike, by chainage, with its design levels: the tunnel from crown to invert, or a road or rail level. Import the line as CSV, GeoJSON or DXF, or draw it on the model, through boreholes for a fence section. A table by chainage gives the cover, the water above the crown and the units in the tunnel face; **Cross-section** cuts square to the line at any chainage. See [Sections along a line](#sections-along-a-line).
+- **LandXML and J-LandXML alignments:** the centreline of a road, railway or tunnel straight from its design data, with straights, circular arcs and clothoid transition curves, and its design profile with the vertical curves. Straight sections now mark the lines that cross them, with the crown and invert there. See [Sections along a line](#sections-along-a-line).
 
 Earlier versions:
+- **0.13:** sections along a line: the longitudinal profile by chainage along a tunnel, road, railway or dike, with its design levels, from CSV, GeoJSON or DXF or drawn on the model; a table by chainage with the cover and the units in the tunnel face; cross-sections square to the line.
 - **0.12:** a layout for phones and tablets: the model fills the screen, the panels open one at a time from a bar at the bottom, and a tap on a borehole or a unit gives its details.
 - **0.11:** models for augmented reality, USDZ for iPhone and iPad and GLB for Android and 3-D software, with the four bundled sites ready at [kilickursat.github.io/GeoModel3D/ar/](https://kilickursat.github.io/GeoModel3D/ar/).
 - **0.10:** Check the model, a leave-one-out cross-validation that predicts each borehole from the others; lengths in feet, centimetres or millimetres converted to metres (0.9.1); three Antwerp boreholes with doubtful collar heights left out.
@@ -67,7 +68,7 @@ Use **Import data…** or drop files on the page. Files are read in the browser 
 | Flemish DOV boreholes | The XML of each borehole (`dov.vlaanderen.be/data/boring/…`) together with the XML of its interpretations (`…/data/interpretatie/…`). |
 | A project saved from GeoModel3D, or a Georeport3D extraction | The `.json` file. |
 | Terrain | An ESRI ASCII grid (`.asc`) or gridded `x y z` points (`.xyz`), with the boreholes or on its own. |
-| A tunnel, road or railway alignment | A CSV of its points, a GeoJSON line or a DXF polyline, with the boreholes or on its own ([Sections along a line](#sections-along-a-line)). |
+| A tunnel, road or railway alignment | A LandXML or J-LandXML file, a CSV of its points, a GeoJSON line or a DXF polyline, with the boreholes or on its own ([Sections along a line](#sections-along-a-line)). |
 | Nothing in a file yet | The **Input data** tab ([Entering your own data](#entering-your-own-data)). |
 
 ### CSV tables
@@ -307,6 +308,7 @@ A section can follow a line instead of running straight: a tunnel, a road, a rai
 ![The synthetic tunnel of the buried-channel demo: the section face along it in 3-D, and its profile by chainage with the tunnel from crown to invert passing through the channel gravel](docs/alignment.png)
 
 - **The line** comes from one of:
+  - a **LandXML** file (LandXML 1.2, or **J-LandXML**, the Japanese standard for exchanging 3-D design data built on it), as road and rail design software writes it. Each alignment's straights, circular arcs and clothoid spirals are followed to within 2 cm, with chainage from its stations. Its design profile (the points of vertical intersection and their parabolic vertical curves) becomes the design level. Lengths in feet or US survey feet are converted. The coordinate system the file names is used: an EPSG code, or in J-LandXML a zone of the Japanese plane rectangular system with its datum, so that `9(X,Y)` on JGD2011 is EPSG:6677. Positions are converted to the project's system where the two differ. Station equations are not applied: chainage runs on along the line, and the notes say so;
   - a CSV of its points: `x` and `y` (or `lat` and `lon`), and optionally `chainage` and design levels. A column naming the line (`alignment`, `line` or `route`) holds several lines in one file;
   - a GeoJSON LineString, in longitude and latitude, or in the project's system if the file names it;
   - a DXF polyline (LWPOLYLINE or POLYLINE), with its arcs;
@@ -320,7 +322,8 @@ A section can follow a line instead of running straight: a tunnel, a road, a rai
   - a tunnel's axis level and height (`axis`, `diameter`).
 
   They come with the points, or by chainage alone in a second CSV (`chainage`, `crown`, `invert`), which goes to the line imported last. Lengths in feet are converted, as for boreholes.
-- **Chainage** on the section bar marks a point on the profile and in 3-D. **Cross-section** turns the section into a straight one square to the line there.
+- **Chainage** on the section bar marks a point on the profile and in 3-D. **Cross-section** turns the section into a straight one square to the line there, and turns the camera to it.
+- **Straight sections mark the lines that cross them**, with the line's chainage and its design levels at the crossing. A bar runs from invert to crown, or a tick marks a single level, on the section face and in the 2-D section, the SVG and the report. These are levels on the line's centre: the shape of the tunnel is not drawn, since the data do not give it.
 - **The table by chainage** has a row every 1 to 100 m where the line is in the model:
   - the ground and the water table, and each unit's thickness;
   - with design levels, the cover above the crown or level, the water above it, and the units at the crown and the invert;
@@ -484,7 +487,8 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 - `src/fields.ts`: stresses, earth pressures, measured properties on sections, and their colour scales
 - `src/validation.ts`: leave-one-out cross-validation
 - `src/ar.ts`: models for augmented reality (USDZ and GLB)
-- `src/alignment.ts`: sections along an alignment, chainage, cross-sections square to the line, and the table by chainage
+- `src/alignment.ts`: sections along an alignment, chainage, cross-sections square to the line, lines crossing straight sections, and the table by chainage
+- `src/landxml.ts`: LandXML and J-LandXML alignments (straights, arcs, clothoids, design profiles)
 - `src/layout.ts`: the layout for phones and tablets (where the view is drawn, how the model is framed, how near a tap is to a borehole)
 - `src/properties.ts`: the property catalogue and per-unit statistics
 - `src/volume.ts`: closed unit-volume meshes
@@ -526,7 +530,7 @@ Every push to `main` runs the tests, builds the site and publishes `dist/` to Gi
    - property models in 3-D, not only on sections.
 3. **More data:** CPT import (BRO, DOV, AGS4 `SCPT`), and a reference site in the Americas once clearly licensed public data are found.
 4. Faults; constrained TIN boundaries, pinch-out lines and geological map contacts.
-5. Alignments with curves and spirals from LandXML (and J-LandXML), and the tunnel's outline on its cross-sections.
+5. Tunnel and road cross-section shapes, from given dimensions, on the sections; LandXML cross-sections and surfaces.
 6. GeoJSON, DXF and LAS import; GeoTIFF terrain.
 7. Streaming and level of detail for large models.
 

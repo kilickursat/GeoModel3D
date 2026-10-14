@@ -2,14 +2,15 @@ import {GeoModel} from "./model";
 import {Section,sectionRuns,joined} from "./section";
 import {toCsv} from "./io";
 import {SectionField,columnAt,withTheme,scaleLabel} from "./fields";
-import {chainageTable,unitLabel} from "./alignment";
+import {chainageTable,unitLabel,Crossing} from "./alignment";
 
 // roundVe draws at a round vertical exaggeration (1, 2, 2.5, 5, 10…), as drawings state it, instead of filling the height.
 // Units whose ids are in `hidden` are left unfilled and out of the legend, as in the 3-D view; borehole logs keep them.
 // A field (stresses or a measured property) colours the section in bands, units without values in it stay grey.
 // Along an alignment the section is a longitudinal profile by chainage, with the line's design levels; `marker` draws
 // a chainage on it.
-export interface SectionSvgOptions { width:number; height:number; theme?:"dark"|"light"; title?:boolean; legend?:boolean; buffer?:number; roundVe?:boolean; hidden?:ReadonlySet<string>; field?:SectionField; marker?:number }
+// `crossings` marks where the project's lines cross a straight section, with their design levels there.
+export interface SectionSvgOptions { width:number; height:number; theme?:"dark"|"light"; title?:boolean; legend?:boolean; buffer?:number; roundVe?:boolean; hidden?:ReadonlySet<string>; field?:SectionField; marker?:number; crossings?:Crossing[] }
 
 const THEMES={
   dark:{bg:"#0b1620",text:"#d9edf5",muted:"#8aa2ae",grid:"rgba(160,190,200,.14)",line:"#e8f5ff",hole:"#0b1620",water:"#5aa9ff",nodata:"#26343e",design:"#ffffff",designFill:"rgba(255,255,255,.3)",marker:"#78c9df"},
@@ -63,7 +64,8 @@ export function sectionSvg(model:GeoModel,s:Section,o:SectionSvgOptions){
   }
   const holes=s.boreholes.map(p=>({p,b:model.boreholes[p.index]}));
   let s0=Math.min(s.s[0],...holes.map(h=>h.p.s)),s1=Math.max(s.s[s.s.length-1],...holes.map(h=>h.p.s));
-  const levels=(design??[]).filter(d=>d.chainage>=s0&&d.chainage<=s1).flatMap(d=>d.bottom===undefined?[d.top]:[d.top,d.bottom]);
+  const levels=[...(design??[]).filter(d=>d.chainage>=s0&&d.chainage<=s1).flatMap(d=>d.bottom===undefined?[d.top]:[d.top,d.bottom]),
+    ...(o.crossings??[]).flatMap(c=>[c.top,c.bottom].filter((v):v is number=>v!==undefined))];
   let z0=Math.min(model.base,...holes.map(h=>h.p.bottom),...levels),z1=Math.max(...s.z[0],...holes.map(h=>h.p.top),...levels);
   const padS=(s1-s0)*0.03||1,padZ=(z1-z0)*0.06||1;
   s0-=padS;s1+=padS;z0-=padZ;z1+=padZ;
@@ -148,6 +150,16 @@ export function sectionSvg(model:GeoModel,s:Section,o:SectionSvgOptions){
       else out.push(`<polyline points="${top.join(" ")}" fill="none" stroke="${t.design}" stroke-width="1.6"><title>${designName(s)}</title></polyline>`);
     }
     out.push("</g>");
+  }
+  // Lines crossing a straight section: a bar from invert to crown, a tick at a single level, or without design levels a
+  // dotted line, at the line's centre, named above the plot.
+  for(const c of o.crossings??[]){
+    if(c.s<s0||c.s>s1)continue;
+    const x=X(c.s),title=`<title>${esc(c.name)} at chainage ${r2(c.chainage)} m${c.top===undefined?"":c.bottom===undefined?`: design level ${r2(c.top)} m`:`: crown ${r2(c.top)} m, invert ${r2(c.bottom)} m`}</title>`;
+    if(c.top!==undefined&&c.bottom!==undefined)out.push(`<g stroke="${t.design}" stroke-width="1.6">${title}<line x1="${x.toFixed(2)}" x2="${x.toFixed(2)}" y1="${Y(c.top).toFixed(2)}" y2="${Y(c.bottom).toFixed(2)}"/><line x1="${(x-5).toFixed(2)}" x2="${(x+5).toFixed(2)}" y1="${Y(c.top).toFixed(2)}" y2="${Y(c.top).toFixed(2)}"/><line x1="${(x-5).toFixed(2)}" x2="${(x+5).toFixed(2)}" y1="${Y(c.bottom).toFixed(2)}" y2="${Y(c.bottom).toFixed(2)}"/></g>`);
+    else if(c.top!==undefined)out.push(`<g stroke="${t.design}" stroke-width="1.6">${title}<line x1="${(x-7).toFixed(2)}" x2="${(x+7).toFixed(2)}" y1="${Y(c.top).toFixed(2)}" y2="${Y(c.top).toFixed(2)}"/></g>`);
+    else out.push(`<line x1="${x.toFixed(2)}" x2="${x.toFixed(2)}" y1="${m.t}" y2="${m.t+ph}" stroke="${t.design}" stroke-opacity="0.7" stroke-dasharray="2 3">${title}</line>`);
+    out.push(`<text x="${x.toFixed(2)}" y="${m.t-8}" text-anchor="middle" font-size="10" fill="${t.text}">${esc(c.name)}${title}</text>`);
   }
   if(o.marker!==undefined&&o.marker>=s0&&o.marker<=s1){
     const x=X(o.marker).toFixed(2);
