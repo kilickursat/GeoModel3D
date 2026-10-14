@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.14.0 — 2026-10-14
+
+### Added
+- **LandXML and J-LandXML alignments.** Import the LandXML 1.2 file that road, rail and tunnel design software writes, or a J-LandXML file (the Japanese standard for 3-D design data built on it).
+  - Each alignment's straights, circular arcs and spirals become its centreline, followed to within 2 cm, with chainage from the stations. Clothoids are integrated from their curvature and kept to the end the file gives; spirals of other types are drawn as clothoids, with a note. Points may be given or referred to by name.
+  - The design profile (the points of vertical intersection with their parabolic vertical curves) becomes the design level. Circular and unsymmetrical vertical curves are drawn as symmetrical parabolas of their length, with a note.
+  - Lengths in feet or US survey feet are converted. The coordinate system the file names (an EPSG code, or a J-LandXML zone of the Japanese plane rectangular system with its datum: `9(X,Y)` on JGD2011 is EPSG:6677) is converted to the project's.
+  - Station equations are not applied, with a note: chainage runs on along the line.
+- **Lines across straight sections.** A straight section marks the project's lines that cross it, with the chainage and the design levels at the crossing: a bar from invert to crown, or a tick at a single level. It shows on the section face, the 2-D section, the SVG and the report.
+
+### Changed
+- **Cross-section** turns the camera to look square at the new section, aimed at the line crossing it.
+
 ## 0.13.0 — 2026-10-14
 
 ### Added
