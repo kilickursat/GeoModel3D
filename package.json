@@ -1,7 +1,7 @@
 {
   "name": "geomodel3d",
   "private": true,
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "Browser-based 3D geological and geotechnical modelling from borehole logs: stratigraphy, cross-sections, groundwater, stresses and laboratory data on real maps",
   "keywords": [
     "geology",
@@ -22,6 +22,8 @@
     "gltf",
     "usdz",
     "mobile",
+    "tunnel",
+    "alignment",
     "ags4",
     "bro",
     "dov",
