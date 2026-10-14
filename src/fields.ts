@@ -1,7 +1,7 @@
 // Fields over the model: vertical total stress, pore pressure and vertical effective stress from the unit weights and
 // the water table, and measured properties interpolated within their units. They are evaluated on sections.
 import {GeoModel} from "./model";
-import {Section} from "./section";
+import {Section,joined} from "./section";
 import {boreholeTests,testDepth,unitAt,propertyDef,unitStatistics,measuredProperties,formatValue} from "./properties";
 
 export const GAMMA_W=9.81;
@@ -174,12 +174,14 @@ export interface SectionField {
   notes:string[];
 }
 // The horizons and water table at distance s, interpolated between the section's samples (exact: horizons are linear
-// along the section between them).
+// along the section between them); null where the section is outside the model.
 export function columnAt(section:Section,s:number){
   const S=section.s;
   if(S.length<2||s<S[0]-1e-9||s>S[S.length-1]+1e-9)return null;
   let lo=0,hi=S.length-1;
   while(hi-lo>1){const m=(lo+hi)>>1;if(S[m]<=s)lo=m;else hi=m}
+  // An alignment can leave the model and come back: between two of its stretches there is no ground.
+  if(section.runs&&!joined(section,lo)&&s>S[lo]+1e-9&&s<S[hi]-1e-9)return null;
   const t=S[hi]>S[lo]?Math.min(1,Math.max(0,(s-S[lo])/(S[hi]-S[lo]))):0;
   const lerp=(a:number[])=>a[lo]+t*(a[hi]-a[lo]);
   return {z:section.z.map(lerp),water:section.water?lerp(section.water):undefined,x:lerp(section.x),y:lerp(section.y)};

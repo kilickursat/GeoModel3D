@@ -23,6 +23,14 @@ export interface Borehole { id:string; x:number; y:number; z:number; depth?:numb
 // when given, whose median SPT N-value in the interval lies in [minN, maxN) and whose top elevation lies in
 // [minZ, maxZ). The first matching rule wins.
 export interface UnitRule { match:string; unit:string; minN?:number; maxN?:number; minZ?:number; maxZ?:number }
+// A line the ground is drawn along: a tunnel, road, railway, pipeline or dike, by points of its centreline in plan, in
+// project coordinates. Chainage, in metres, runs along the line from `start` at its first point, or is given at every
+// point. Design levels along chainage are a road or rail level (`top`), or a tunnel's crown (`top`) and invert
+// (`bottom`), as elevations in metres.
+export interface AlignmentPoint { x:number; y:number; chainage?:number }
+export interface DesignLevel { chainage:number; top:number; bottom?:number }
+export interface Alignment { name:string; points:AlignmentPoint[]; start?:number; design?:DesignLevel[]; source?:string }
+
 // x, y are in the system named by `crs`; `crsCode` (e.g. EPSG:6677) or the PROJ definition `crsProj4` georeferences it.
 // `source` credits where the data come from. `groundwaterDepth` is an assumed depth of the water table below ground,
 // used where no borehole records a water level. `margin` extends the model that many metres beyond the outline of the
@@ -30,7 +38,7 @@ export interface UnitRule { match:string; unit:string; minN?:number; maxN?:numbe
 export interface GeoProject {
   name:string; description?:string; source?:string; crs?:string; crsCode?:string; crsProj4?:string; base?:number;
   groundwaterDepth?:number; margin?:number;
-  units:UnitDef[]; rules?:UnitRule[]; boreholes:Borehole[]; terrain?:TerrainGrid;
+  units:UnitDef[]; rules?:UnitRule[]; boreholes:Borehole[]; terrain?:TerrainGrid; alignments?:Alignment[];
 }
 
 export function boreholeDepth(b:Borehole){return Math.max(b.depth??0,...b.intervals.map(i=>i.to))}
