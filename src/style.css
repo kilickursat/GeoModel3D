@@ -5,6 +5,15 @@ button,select,input{font:inherit}
 .labels{position:fixed;inset:0;pointer-events:none}
 .bh-label{font-size:10px;color:#d9edf5;background:rgba(7,16,24,.62);padding:1px 5px;border-radius:4px;white-space:nowrap}
 .end-label{font-size:12px;font-weight:700;color:#78c9df;text-shadow:0 0 4px #071018}
+.ch-label{font-size:10px;color:#9bd3e3;text-shadow:0 0 3px #071018,0 0 6px #071018;white-space:nowrap}
+/* Drawing a line: what to do and the buttons, over the model; the notes wait. */
+.draw-bar{position:fixed;top:76px;left:50%;transform:translateX(-50%);z-index:6;display:flex;align-items:center;gap:12px;max-width:calc(100vw - 48px);padding:8px 10px 8px 14px;background:rgba(7,16,24,.92);border:1px solid #78c9df;border-radius:10px;font-size:12px;color:#e8f2f7}
+.draw-actions{display:flex;gap:6px;flex:none}
+.draw-bar button{border:1px solid rgba(160,190,200,.22);background:#0d1d29;color:#d9edf5;border-radius:7px;padding:6px 10px;font:inherit;cursor:pointer}
+.draw-bar button:hover:not(:disabled){background:#15293a}
+.draw-bar button:disabled{opacity:.4;cursor:default}
+.draw-bar .draw-done{border-color:#78c9df;background:#78c9df;color:#071018;font-weight:600}
+body[data-drawing="on"] .notice{display:none}
 
 .ui{position:fixed;left:24px;top:22px;width:340px;max-width:calc(100vw - 48px);color:#e8f2f7;pointer-events:none}
 .title{font-size:27px;font-weight:700;letter-spacing:-.04em}
@@ -87,7 +96,12 @@ button,select,input{font:inherit}
 .section-control{position:fixed;left:24px;right:24px;bottom:22px;padding:9px 14px;display:flex;align-items:center;gap:18px;color:#9bb1bd;font-size:10px;letter-spacing:.06em}
 .section-control .tag{letter-spacing:.12em}
 .section-control label{display:flex;align-items:center;gap:8px;flex:1;min-width:0;text-transform:uppercase}
-.section-control label:nth-of-type(3){flex:.6}
+.section-control .ve-pick{flex:.6}
+.section-control .line-pick{flex:0 1 auto}
+.section-control .line-pick select{max-width:170px}
+.section-control .step-pick{flex:0 1 auto}
+/* A straight section has azimuth and offset; a section along a line has chainage, a cross-section and a table. */
+.section-control[data-line="along"] .straight-only,:is(.section-control,.section-view,.toolbar):not([data-line="along"]) .along-only{display:none}
 .section-control input{flex:1;min-width:60px;accent-color:#78c9df}
 .section-control output{min-width:46px;text-align:right;color:#d9edf5;letter-spacing:0;font-size:11px;font-variant-numeric:tabular-nums}
 .section-control button[aria-pressed="true"]{border-color:#78c9df;color:#78c9df}
@@ -133,10 +147,13 @@ button,select,summary,label,a{touch-action:manipulation}
 /* Mid-size screens: the notes open below the tabs, which they would cover, and the section bar packs closer. */
 @media (max-width:1260px){.notice{top:72px}}
 @media (max-width:1180px){
-  .section-control{gap:12px}
-  .section-control .tag{display:none}
-  .section-control label:nth-of-type(3){flex:.7}
-  .section-control select{max-width:150px}
+  .section-control{gap:10px}
+  .section-control .tag,.section-control .step-pick span{display:none}
+  .section-control .ve-pick{flex:.7}
+  .section-control label{gap:6px}
+  .section-control input{min-width:30px}
+  .section-control output{min-width:38px}
+  .section-control select,.section-control .line-pick select{max-width:118px}
 }
 
 /* Tabs and the input workspace */
@@ -145,7 +162,7 @@ button,select,summary,label,a{touch-action:manipulation}
 .modes button:hover{color:#e8f2f7}
 .modes button[aria-selected="true"]{background:#78c9df;color:#071018}
 .toolbar .input-data{border-color:#78c9df;color:#78c9df;font-weight:600}
-body[data-mode="input"] :is(.ui .panel,.ui .hint,.ui .site-name,.toolbar,.section-control,.section-view,.notice,.credits,.field-legend,.tooltip,.labels,.dock){display:none!important}
+body[data-mode="input"] :is(.ui .panel,.ui .hint,.ui .site-name,.toolbar,.section-control,.section-view,.notice,.credits,.field-legend,.tooltip,.labels,.dock,.draw-bar){display:none!important}
 .workspace{position:fixed;inset:72px 24px 22px;z-index:3;display:flex;flex-direction:column;background:#0a1620;border:1px solid rgba(160,190,200,.2);border-radius:12px;overflow:hidden;font-size:12px;color:#e8f2f7}
 .ws-main{flex:1;min-height:0;display:grid;grid-template-columns:178px minmax(0,1fr) 352px}
 .ws-steps{display:flex;flex-direction:column;gap:2px;padding:12px 8px;border-right:1px solid rgba(160,190,200,.12);overflow:auto}
@@ -299,7 +316,9 @@ body[data-mode="input"] :is(.ui .panel,.ui .hint,.ui .site-name,.toolbar,.sectio
 
   .section-control{flex-direction:column;align-items:stretch;gap:2px;font-size:12px;letter-spacing:.04em}
   .section-control .tag{display:none}
-  .section-control label,.section-control label:nth-of-type(3),.section-control .field-pick{flex:none;min-height:46px;gap:12px}
+  .section-control label,.section-control .ve-pick,.section-control .field-pick,.section-control .line-pick,.section-control .step-pick{flex:none;min-height:46px;gap:12px}
+  .section-control .line-pick select{max-width:none}
+  .section-control .cross-here{padding:10px 14px;font-size:14px;text-align:center}
   .section-control label>span{flex:none;width:64px}
   .section-control input{min-width:0;height:30px}
   .section-control output{min-width:54px;font-size:14px}
@@ -325,6 +344,10 @@ body[data-mode="input"] :is(.ui .panel,.ui .hint,.ui .site-name,.toolbar,.sectio
   .section-head button{padding:6px 10px}
   .tooltip{max-width:min(340px,calc(100vw - 16px));z-index:8;font-size:12px}
   .drop{z-index:9}
+  .draw-bar{top:auto;bottom:0;left:0;right:0;transform:none;max-width:none;flex-wrap:wrap;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));border-width:1px 0 0;border-radius:14px 14px 0 0;font-size:13px}
+  .draw-actions{flex:1 1 100%}
+  .draw-actions button{flex:1;padding:10px 6px;font-size:14px}
+  body[data-drawing="on"] .dock{display:none}
 }
 /* The smallest phones: the title gives up the version number. */
 @media (max-width:360px){
