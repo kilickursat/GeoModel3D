@@ -3,13 +3,15 @@ import {uniform,positionWorld,dot} from "three/tsl";
 import {OrbitControls} from "three/addons/controls/OrbitControls.js";
 import {CSS2DRenderer,CSS2DObject} from "three/addons/renderers/CSS2DRenderer.js";
 import pkg from "../package.json";
-import {GeoProject,UnitDef,UnitRule,sampleProjects,realSites,boreholeDepth} from "./geology";
-import {buildGeologicalModel,GeoModel,unitVolume,unitCubicMetres,modelBounds,footprintArea} from "./model";
+import {GeoProject,UnitDef,UnitRule,Alignment,sampleProjects,realSites,boreholeDepth} from "./geology";
+import {buildGeologicalModel,GeoModel,unitVolume,unitCubicMetres,modelBounds,footprintArea,sampleModel} from "./model";
 import {volumeGeometry} from "./volume";
 import {terrainOutside,convexHull,TerrainGrid} from "./terrain";
-import {computeSection,offsetRange,offsetThrough,principalAzimuth,Section} from "./section";
-import {sectionSvg,sectionCsv,sectionFieldCsv} from "./sectionSvg";
-import {importFiles,toProjectJson,toBoreholeCsv,toTestsCsv,toCsv,decodeText,assignColors} from "./io";
+import {computeSection,offsetRange,offsetThrough,principalAzimuth,Section,sectionRuns,joined,alongOf} from "./section";
+import {sectionSvg,sectionCsv,sectionFieldCsv,sectionTitle,chainageCsv} from "./sectionSvg";
+import {importFiles,toProjectJson,toBoreholeCsv,toTestsCsv,toCsv,decodeText,assignColors,toAlignmentCsv} from "./io";
+import {alignmentSection,chainages,pointAt,designAt,crossSectionAt} from "./alignment";
+import {XY} from "./tin";
 import {SectionField,sectionField,availableFields,columnAt,stressAt,unitWeights,UnitWeight,withTheme,scaleLabel,colourScale,ColourScale} from "./fields";
 import {formatValue,propertyDef} from "./properties";
 import {Crs,crsRegistry,projectCrs,findCrs,customCrs,searchCrs,suggestCrs,toProjected,toGeographic} from "./crs";
@@ -79,8 +81,10 @@ let imported:GeoProject|null=null;
 let model:GeoModel;
 let section:Section;
 let origin={x:0,y:0,z:0},extent=1,sectionBuffer=1;
-// `field` colours the section: "units", a stress (sv, u, s) or a measured property.
-const view={azimuth:0,offset:0,ve:1,cut:true,flip:false,exact:false,volumes:true,horizons:true,boreholes:true,labels:true,terrain:true,map:false,mapSource:"osm",panel:!compact(),hidden:new Set<string>(),field:"units"};
+// `field` colours the section: "units", a stress (sv, u, s) or a measured property. `alignment` is the line the section
+// follows, an index into the project's alignments, or -1 for a straight section by azimuth and offset; `chainage` is
+// the marker on that line, and `step` the step of its table by chainage.
+const view={azimuth:0,offset:0,ve:1,cut:true,flip:false,exact:false,volumes:true,horizons:true,boreholes:true,labels:true,terrain:true,map:false,mapSource:"osm",panel:!compact(),hidden:new Set<string>(),field:"units",alignment:-1,chainage:0,step:10};
 let field:SectionField|null=null,weights:UnitWeight[]=[];
 
 interface UnitMaterials { lit:THREE.MeshStandardNodeMaterial; flat:THREE.MeshBasicNodeMaterial }
@@ -230,6 +234,7 @@ function buildTerrain(){
   geo.computeVertexNormals();
   const material=new THREE.MeshStandardNodeMaterial({color:0x5f6f66,roughness:1,metalness:0,transparent:true,opacity:.42,depthWrite:false});
   material.maskNode=keepFragment;
+  material.userData.opacity=.42;
   terrainMesh=new THREE.Mesh(geo,material);
   terrainMesh.userData.plain=material;
   terrainMesh.userData.flat=flat;
@@ -329,6 +334,7 @@ function applyMap(layer:MapLayer|null){
   mesh.geometry.setAttribute("uv",new THREE.BufferAttribute(uv,2));
   const material=new THREE.MeshStandardNodeMaterial({map:layer.texture,roughness:1,metalness:0,transparent:true,opacity:.9,depthWrite:false});
   material.maskNode=keepFragment;
+  material.userData.opacity=.9;
   mapMaterials.splice(0).forEach(m=>m.dispose());
   mapMaterials.push(material);
   mesh.material=material;
@@ -429,40 +435,120 @@ function fitCamera(){
 const fence=new THREE.Mesh(new THREE.BufferGeometry(),new THREE.MeshBasicNodeMaterial({vertexColors:true,side:THREE.DoubleSide,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1}));
 const fenceLines=new THREE.LineSegments(new THREE.BufferGeometry(),new THREE.LineBasicNodeMaterial({color:0x0b1620,transparent:true,opacity:.75}));
 const outline=new THREE.Line(new THREE.BufferGeometry(),new THREE.LineBasicNodeMaterial({color:0x78c9df,transparent:true,opacity:.55}));
+const lineFrame=new THREE.LineSegments(new THREE.BufferGeometry(),outline.material);
 const endLabels=["A","A′"].map(t=>{const el=document.createElement("div");el.className="end-label";el.textContent=t;const l=new CSS2DObject(el);l.center.set(0.5,1.2);return l});
 const waterLine=new THREE.LineSegments(new THREE.BufferGeometry(),new THREE.LineBasicNodeMaterial({color:0x5aa9ff,transparent:true,opacity:.95}));
-sectionGroup.add(fence,fenceLines,outline,waterLine,...endLabels);
+// Along an alignment: its design levels (a band from crown to invert, or a line), labels of its chainage along the
+// ground, and a marker at the chainage chosen.
+const designBand=new THREE.Mesh(new THREE.BufferGeometry(),new THREE.MeshBasicNodeMaterial({color:0xffffff,transparent:true,opacity:.3,side:THREE.DoubleSide,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));
+const designLines=new THREE.LineSegments(new THREE.BufferGeometry(),new THREE.LineBasicNodeMaterial({color:0xffffff}));
+const markerLine=new THREE.LineSegments(new THREE.BufferGeometry(),new THREE.LineBasicNodeMaterial({color:0x78c9df}));
+const markerLabel=(()=>{const el=document.createElement("div");el.className="end-label";const l=new CSS2DObject(el);l.center.set(0.5,1.2);return l})();
+let chainageLabels:CSS2DObject[]=[];
+sectionGroup.add(fence,fenceLines,outline,lineFrame,waterLine,designBand,designLines,markerLine,markerLabel,...endLabels);
+
+// The line the section follows, when it is an alignment. The cut applies to straight sections only: along a line the
+// units are drawn see-through around the section.
+const lineOf=():Alignment|undefined=>view.alignment>=0?project.alignments?.[view.alignment]:undefined;
+const cutting=()=>view.cut&&!lineOf()&&!drawing;
+const positions=(g:{geometry:THREE.BufferGeometry},list:number[])=>{
+  g.geometry.dispose();
+  g.geometry=new THREE.BufferGeometry();
+  g.geometry.setAttribute("position",new THREE.Float32BufferAttribute(list,3));
+};
+// The top of the frame drawn around the section, a little above its highest ground.
+const frameTop=()=>{const z=Math.max(...section.z[0]);return z+(z-model.base)*0.04};
 
 function updateSection(){
-  section=computeSection(model,{azimuth:view.azimuth,offset:view.offset},sectionBuffer);
+  const line=lineOf();
+  section=line?alignmentSection(model,line,sectionBuffer):computeSection(model,{azimuth:view.azimuth,offset:view.offset},sectionBuffer);
   field=view.field==="units"?null:sectionField(model,section,view.field);
   const s=section,n=s.s.length,lines:number[]=[];
   const p=(j:number,z:number)=>[s.x[j]-origin.x,s.y[j]-origin.y,z-origin.z];
   fence.geometry.dispose();
   fence.geometry=field?fieldFence(field):unitFence();
-  s.z.forEach(z=>{for(let j=0;j<n-1;j++)lines.push(...p(j,z[j]),...p(j+1,z[j+1]))});
-  fenceLines.geometry.dispose();
-  fenceLines.geometry=new THREE.BufferGeometry();
-  fenceLines.geometry.setAttribute("position",new THREE.Float32BufferAttribute(lines,3));
+  s.z.forEach(z=>{for(let j=0;j<n-1;j++)if(joined(s,j))lines.push(...p(j,z[j]),...p(j+1,z[j+1]))});
+  positions(fenceLines,lines);
   const water:number[]=[];
-  if(s.water)for(let j=0;j<n-1;j++)if(Number.isFinite(s.water[j])&&Number.isFinite(s.water[j+1]))water.push(...p(j,s.water[j]),...p(j+1,s.water[j+1]));
-  waterLine.geometry.dispose();
-  waterLine.geometry=new THREE.BufferGeometry();
-  waterLine.geometry.setAttribute("position",new THREE.Float32BufferAttribute(water,3));
-  outline.geometry.dispose();
-  outline.geometry=new THREE.BufferGeometry();
+  if(s.water)for(let j=0;j<n-1;j++)if(joined(s,j)&&Number.isFinite(s.water[j])&&Number.isFinite(s.water[j+1]))water.push(...p(j,s.water[j]),...p(j+1,s.water[j+1]));
+  positions(waterLine,water);
+  // A frame around the section, above its ground: a rectangle for a straight section; along a line, around each
+  // stretch of it inside the model, following the line.
+  const rectangle:number[]=[],frame:number[]=[];
   if(n>1){
-    const top=Math.max(...s.z[0])+(Math.max(...s.z[0])-model.base)*0.04;
-    outline.geometry.setAttribute("position",new THREE.Float32BufferAttribute([...p(0,model.base),...p(n-1,model.base),...p(n-1,top),...p(0,top),...p(0,model.base)],3));
+    const top=frameTop();
+    if(!line)rectangle.push(...p(0,model.base),...p(n-1,model.base),...p(n-1,top),...p(0,top),...p(0,model.base));
+    else for(const [a,b] of sectionRuns(s)){
+      if(b<=a)continue;
+      frame.push(...p(a,model.base),...p(a,top),...p(b,model.base),...p(b,top));
+      for(let j=a;j<b;j++)frame.push(...p(j,model.base),...p(j+1,model.base),...p(j,top),...p(j+1,top));
+    }
     endLabels[0].position.set(...(p(0,top) as [number,number,number]));
     endLabels[1].position.set(...(p(n-1,top) as [number,number,number]));
   }
-  endLabels.forEach(l=>l.visible=n>1);
+  positions(outline,rectangle);
+  positions(lineFrame,frame);
+  endLabels.forEach(l=>l.visible=n>1&&!line);
+  drawLine();
   renderFieldLegend();
   cutSide=0;
   updateCutSide();
   applyDisplay();
   renderSectionPanel();
+}
+// A round step, 1, 2 or 5 times a power of ten, about `v`.
+function roundStep(v:number){const p=10**Math.floor(Math.log10(Math.max(v,1e-9))),f=v/p;return (f<1.5?1:f<3.5?2:f<7.5?5:10)*p}
+// The design levels of the line on the section face, its chainage along the ground, and the marker.
+function drawLine(){
+  const line=lineOf(),s=section,band:number[]=[],edges:number[]=[];
+  chainageLabels.forEach(l=>{sectionGroup.remove(l);l.element.remove()});
+  chainageLabels=[];
+  if(line&&s.alignment){
+    const ch=s.alignment.s,P=(c:number,z:number)=>{const q=pointAt(line,c,ch);return [q.x-origin.x,q.y-origin.y,z-origin.z]};
+    const d=line.design??[];
+    if(d.length>1){
+      // At the design levels and at the bends between them, so the band follows the line in plan.
+      const at=[...new Set([...d.map(q=>q.chainage),...ch.filter(c=>c>d[0].chainage&&c<d[d.length-1].chainage)])].sort((a,b)=>a-b).map(c=>({c,...designAt(d,c)}));
+      for(let i=0;i+1<at.length;i++){
+        const a=at[i],b=at[i+1];
+        if(a.top===undefined||b.top===undefined)continue;
+        edges.push(...P(a.c,a.top),...P(b.c,b.top));
+        if(a.bottom===undefined||b.bottom===undefined)continue;
+        edges.push(...P(a.c,a.bottom),...P(b.c,b.bottom));
+        band.push(...P(a.c,a.top),...P(a.c,a.bottom),...P(b.c,b.bottom),...P(a.c,a.top),...P(b.c,b.bottom),...P(b.c,b.top));
+      }
+      for(const e of [at[0],at[at.length-1]])if(e.top!==undefined&&e.bottom!==undefined)edges.push(...P(e.c,e.top),...P(e.c,e.bottom));
+    }
+    // Labels at round chainages along the ground, about eight of them.
+    const c0=ch[0],c1=ch[ch.length-1],step=roundStep((c1-c0)/8);
+    for(let i=Math.ceil(c0/step-1e-9);i*step<=c1+1e-9;i++){
+      const col=columnAt(s,i*step);
+      if(!col)continue;
+      const el=document.createElement("div");
+      el.className="ch-label";
+      el.textContent=fmt(i*step);
+      const l=new CSS2DObject(el);
+      l.center.set(0.5,1.25);
+      l.position.set(col.x-origin.x,col.y-origin.y,col.z[0]-origin.z);
+      chainageLabels.push(l);
+      sectionGroup.add(l);
+    }
+  }
+  positions(designBand,band);
+  positions(designLines,edges);
+  placeMarker();
+}
+function placeMarker(){
+  const col=lineOf()&&section?.alignment?columnAt(section,view.chainage):null,list:number[]=[];
+  if(col){
+    const top=frameTop();
+    list.push(col.x-origin.x,col.y-origin.y,model.base-origin.z,col.x-origin.x,col.y-origin.y,top-origin.z);
+    markerLabel.position.set(col.x-origin.x,col.y-origin.y,top-origin.z);
+    markerLabel.element.textContent=fmt(view.chainage,view.chainage%1?1:0);
+  }
+  positions(markerLine,list);
+  markerLabel.visible=!!col;
+  invalidate();
 }
 // The section face in unit colours: one quad strip per unit between consecutive section samples.
 function unitFence(){
@@ -472,6 +558,7 @@ function unitFence(){
     if(view.hidden.has(u.id))return;
     c.set(u.color);
     for(let j=0;j<n-1;j++){
+      if(!joined(s,j))continue;
       const t0=s.z[k][j],b0=s.z[k+1][j],t1=s.z[k][j+1],b1=s.z[k+1][j+1];
       if(t0-b0<1e-9&&t1-b1<1e-9)continue;
       for(const v of [p(j,t0),p(j,b0),p(j+1,b1),p(j,t0),p(j+1,b1),p(j+1,t1)]){pos.push(...v);col.push(c.r,c.g,c.b)}
@@ -488,6 +575,8 @@ function fieldFence(f:SectionField){
   const s=section,K=model.units.length,scale=withTheme(f.scale,true),nodata=new THREE.Color(0x26343e),c=new THREE.Color();
   const s0=s.s[0],s1=s.s[s.s.length-1],cols=[...new Set([...s.s,...Array.from({length:161},(_,i)=>s0+(s1-s0)*i/160)])].sort((a,b)=>a-b);
   const columns=cols.map(d=>({d,c:columnAt(s,d)!})).filter(q=>q.c);
+  // Where the line leaves the model between two columns, they are not joined.
+  const link=columns.map((q,i)=>i+1<columns.length&&!!columnAt(s,(q.d+columns[i+1].d)/2));
   const zmax=Math.max(...s.z[0]),dz=Math.max((zmax-model.base)/90,1e-3),eps=dz*1e-3;
   const pos:number[]=[],col:number[]=[],index:number[]=[];
   model.units.forEach((u,k)=>{
@@ -503,7 +592,7 @@ function fieldFence(f:SectionField){
       if(hex)c.set(hex);else c.copy(nodata);
       col.push(c.r,c.g,c.b);
     }
-    for(let i=0;i<columns.length-1;i++)for(let r=0;r<rows;r++){
+    for(let i=0;i<columns.length-1;i++)if(link[i])for(let r=0;r<rows;r++){
       const a=first+i*(rows+1)+r,b=a+1,a2=a+rows+1,b2=a2+1;
       index.push(a,b,b2,a,b2,a2);
     }
@@ -517,7 +606,7 @@ function fieldFence(f:SectionField){
 // The cut keeps the half beyond the section as seen from the camera, so the section face looks at the viewer.
 let cutSide=0;
 function updateCutSide(){
-  if(!section)return false;
+  if(!section||!cutting())return false;
   const n=new THREE.Vector3(section.normal.x,section.normal.y,0),p=new THREE.Vector3(section.origin.x-origin.x,section.origin.y-origin.y,0);
   const side=(n.dot(camera.position.clone().sub(p))>0?-1:1)*(view.flip?-1:1);
   if(side===cutSide)return false;
@@ -532,26 +621,33 @@ function updateCutSide(){
 
 function applyDisplay(){
   world.scale.set(1,1,view.ve);
-  cutOn.value=view.cut?1:0;
+  const cut=cutting();
+  cutOn.value=cut?1:0;
   for(const m of volumeMeshes){
     const {lit,flat}=m.userData.materials as UnitMaterials;
     m.material=view.exact?flat:lit;
     m.visible=view.volumes&&!view.hidden.has(model.units[m.userData.unit].id);
     for(const mat of [lit,flat]){
-      if(mat.transparent===view.cut){
-        mat.transparent=!view.cut;
-        mat.depthWrite=view.cut;
-        mat.side=view.cut?THREE.DoubleSide:THREE.FrontSide;
+      if(mat.transparent===cut){
+        mat.transparent=!cut;
+        mat.depthWrite=cut;
+        mat.side=cut?THREE.DoubleSide:THREE.FrontSide;
         mat.needsUpdate=true;
       }
-      mat.opacity=view.cut?1:.24;
+      // Along a line the units are fainter, so the section face along it stands out.
+      mat.opacity=cut?1:lineOf()?.1:.24;
     }
   }
   for(const l of horizonLines)l.visible=view.horizons;
   if(holeMesh)holeMesh.visible=view.boreholes;
   placeErrorMarkers();
-  if(terrainMesh)terrainMesh.visible=terrainMesh.userData.flat?view.map&&!!mapLayer:view.terrain;
-  for(const l of labels)l.visible=view.boreholes&&view.labels&&(!view.cut||clipPlane.distanceToPoint(l.position)>=0);
+  if(terrainMesh){
+    terrainMesh.visible=terrainMesh.userData.flat?view.map&&!!mapLayer:view.terrain;
+    // A section along a line is underground with nothing cut away in front of it: the ground around is see-through.
+    const m=terrainMesh.material as THREE.Material;
+    m.opacity=lineOf()?Math.min(m.userData.opacity??1,.28):m.userData.opacity??m.opacity;
+  }
+  for(const l of labels)l.visible=view.boreholes&&view.labels&&(!cut||clipPlane.distanceToPoint(l.position)>=0);
   renderCredits();
   invalidate();
 }
@@ -601,7 +697,7 @@ toolbar.id="sheet-tools";
 toolbar.innerHTML=`${sheetHead("View")}
 <button class="input-data" title="Type in or paste your own boreholes, logs, groundwater, field and laboratory tests and unit parameters, then build the model">Enter your own data…</button>
 <button class="import">Import data…</button>
-<input class="file" type="file" multiple hidden accept=".csv,.tsv,.txt,.ags,.json,.xml,.asc,.xyz">
+<input class="file" type="file" multiple hidden accept=".csv,.tsv,.txt,.ags,.json,.xml,.asc,.xyz,.geojson,.dxf">
 <details class="menu"><summary>Export</summary><div>
   <button data-export="project">Project (JSON)</button>
   <button data-export="boreholes">Boreholes (CSV)</button>
@@ -609,6 +705,8 @@ toolbar.innerHTML=`${sheetHead("View")}
   <button data-export="svg">Section (SVG)</button>
   <button data-export="section">Section (CSV)</button>
   <button data-export="field" title="The values of the field shown on the section, on a grid">Section field (CSV)</button>
+  <button data-export="chainage" class="along-only" title="Along the line: the ground, the water table, the design levels with the cover and the units at them, and each unit's thickness, at round chainages">Chainage table (CSV)</button>
+  <button data-export="alignment" class="along-only" title="The line's points with their chainage and design levels">Alignment (CSV)</button>
   <button data-export="report-A3" title="Opens the print dialog: choose Save as PDF">Report (PDF, A3)</button>
   <button data-export="report-A4" title="Opens the print dialog: choose Save as PDF">Report (PDF, A4)</button>
   <button data-export="usdz" title="The model as shown, 30 cm across, to set on a desk: opens in AR Quick Look on iPhone and iPad, downloads elsewhere">3-D model for AR (USDZ)</button>
@@ -634,10 +732,15 @@ const controlsBar=document.createElement("div");
 controlsBar.className="section-control";
 controlsBar.id="sheet-section";
 // The section sheet carries the 2-D section button in its title row, where it takes no height from the model.
+// The line is straight, by azimuth and offset, or one of the project's alignments, followed by chainage.
 controlsBar.innerHTML=`${sheetHead("Section",'<button class="panel-toggle" aria-pressed="false">2-D section</button>')}<span class="tag">SECTION</span>
-<label><span>Azimuth</span><input type="range" class="azimuth" min="0" max="179" step="1"><output class="azimuth-out"></output></label>
-<label><span>Offset</span><input type="range" class="offset" step="1"><output class="offset-out"></output></label>
-<label><span>V.E.</span><input type="range" class="ve" min="1" max="10" step="0.5"><output class="ve-out"></output></label>
+<label class="line-pick" title="A straight section, or a section along a line: a tunnel, road, railway or dike"><span>Line</span><select class="line-select" aria-label="Section line"></select></label>
+<label class="straight-only"><span>Azimuth</span><input type="range" class="azimuth" min="0" max="179" step="1"><output class="azimuth-out"></output></label>
+<label class="straight-only"><span>Offset</span><input type="range" class="offset" step="1"><output class="offset-out"></output></label>
+<label class="along-only" title="A chainage on the line: marked on the section and in 3-D"><span>Chainage</span><input type="range" class="chainage" step="any"><output class="chainage-out"></output></label>
+<button class="along-only cross-here" title="A straight section square to the line at this chainage">Cross-section</button>
+<label class="along-only step-pick" title="The table by chainage, in CSV and in the report: a row every…"><span>Table</span><select class="table-step" aria-label="Table by chainage, a row every">${[1,2,5,10,20,25,50,100].map(v=>`<option value="${v}"${v===10?" selected":""}>every ${v} m</option>`).join("")}</select></label>
+<label class="ve-pick"><span>V.E.</span><input type="range" class="ve" min="1" max="10" step="0.5"><output class="ve-out"></output></label>
 <label class="field-pick" title="Colour the section by unit, by a stress, or by a measured property interpolated within each unit"><span>Colour</span><select class="field-select" aria-label="Colour the section by"></select></label>
 <button class="panel-toggle" aria-pressed="false">2-D section</button>`;
 app.appendChild(controlsBar);
@@ -646,6 +749,7 @@ const offsetInput=controlsBar.querySelector<HTMLInputElement>(".offset")!;
 const veInput=controlsBar.querySelector<HTMLInputElement>(".ve")!;
 const panelToggles=controlsBar.querySelectorAll<HTMLButtonElement>(".panel-toggle");
 const fieldSelect=controlsBar.querySelector<HTMLSelectElement>(".field-select")!;
+const lineSelect=controlsBar.querySelector<HTMLSelectElement>(".line-select")!,chainageInput=controlsBar.querySelector<HTMLInputElement>(".chainage")!;
 
 // The two tabs: the model, and the input workspace where a case is typed in.
 const modes=document.createElement("nav");
@@ -657,7 +761,7 @@ app.appendChild(modes);
 
 const sectionView=document.createElement("div");
 sectionView.className="section-view";
-sectionView.innerHTML=`<div class="section-head"><span class="section-name"></span><button data-export="svg">SVG</button><button data-export="section">CSV</button><button class="close" aria-label="Close section view">×</button></div><div class="section-body"></div>`;
+sectionView.innerHTML=`<div class="section-head"><span class="section-name"></span><button data-export="svg">SVG</button><button data-export="section">CSV</button><button class="along-only" data-export="chainage" title="The table by chainage (CSV)">Table</button><button class="close" aria-label="Close section view">×</button></div><div class="section-body"></div>`;
 app.appendChild(sectionView);
 const sectionBody=sectionView.querySelector<HTMLDivElement>(".section-body")!;
 
@@ -682,7 +786,7 @@ app.appendChild(tooltip);
 const dropZone=document.createElement("div");
 dropZone.className="drop";
 dropZone.hidden=true;
-dropZone.innerHTML="<div>Drop borehole or terrain files<br><span>CSV tables · AGS4 · Japanese borehole XML (電子納品, KuniJiban) · GeoModel3D or Georeport3D JSON · terrain grid (.asc, .xyz)</span></div>";
+dropZone.innerHTML="<div>Drop borehole, terrain or alignment files<br><span>CSV tables · AGS4 · Japanese borehole XML (電子納品, KuniJiban) · GeoModel3D or Georeport3D JSON · terrain grid (.asc, .xyz) · alignment (CSV, GeoJSON, DXF)</span></div>";
 app.appendChild(dropZone);
 
 // ---------- small screens: the bar at the bottom and its sheets ----------
@@ -718,7 +822,8 @@ function layoutCompact(){
   if(compact()){
     const sheet=sheetElement(),side=sideQuery.matches;
     bars.top=Math.ceil(Math.max(ui.querySelector(".title")!.getBoundingClientRect().bottom,siteName.getBoundingClientRect().bottom,modes.getBoundingClientRect().bottom))+6;
-    bars.dock=dock.offsetHeight;
+    // While a line is drawn, its bar takes the place of the bar at the bottom.
+    bars.dock=drawing?drawBar.offsetHeight:dock.offsetHeight;
     bars.sheetH=sheet&&!side?sheet.offsetHeight:0;
     bars.sheetW=sheet&&side?sheet.offsetWidth:0;
     bars.notice=notice.hidden?0:notice.offsetHeight+6;
@@ -837,6 +942,20 @@ function applyRules(){
 }
 
 function syncControls(){
+  const line=lineOf(),along=line?"along":"straight";
+  controlsBar.dataset.line=along;
+  sectionView.dataset.line=along;
+  toolbar.dataset.line=along;
+  if(line){
+    const ch=chainages(line),c0=ch[0],c1=ch[ch.length-1];
+    view.chainage=Math.min(Math.max(view.chainage,c0),c1);
+    chainageInput.min=String(c0);
+    chainageInput.max=String(c1);
+    chainageInput.value=String(view.chainage);
+    controlsBar.querySelector(".chainage-out")!.textContent=fmt(view.chainage,c1-c0<100?1:0)+" m";
+  }
+  // The cut belongs to straight sections.
+  toolbar.querySelector<HTMLInputElement>('[data-view="cut"]')!.disabled=!!line;
   const [lo,hi]=offsetRange(model,view.azimuth);
   offsetInput.min=String(Math.floor(lo));
   offsetInput.max=String(Math.ceil(hi));
@@ -850,15 +969,45 @@ function syncControls(){
   panelToggles.forEach(b=>b.setAttribute("aria-pressed",String(view.panel)));
   sectionView.hidden=!view.panel;
   updateViewOffset();
-  toolbar.querySelector<HTMLInputElement>('[data-view="flip"]')!.disabled=!view.cut;
+  toolbar.querySelector<HTMLInputElement>('[data-view="flip"]')!.disabled=!cutting();
   invalidate();
 }
 
 function renderSectionPanel(){
   // Behind the input tab the panel has no size; it is drawn when the model tab is shown again.
   if(!view.panel||!section||document.body.dataset.mode==="input")return;
-  sectionView.querySelector(".section-name")!.textContent=`Section A–A′ · ${String(view.azimuth).padStart(3,"0")}° · ${view.offset>=0?"+":""}${Math.round(view.offset)} m`;
-  sectionBody.innerHTML=sectionSvg(model,section,{width:sectionBody.clientWidth,height:sectionBody.clientHeight,theme:"dark",title:false,buffer:sectionBuffer,hidden:view.hidden,field:field??undefined});
+  sectionView.querySelector(".section-name")!.textContent=section.alignment?sectionTitle(section):`Section A–A′ · ${String(view.azimuth).padStart(3,"0")}° · ${view.offset>=0?"+":""}${Math.round(view.offset)} m`;
+  sectionBody.innerHTML=sectionSvg(model,section,{width:sectionBody.clientWidth,height:sectionBody.clientHeight,theme:"dark",title:false,buffer:sectionBuffer,hidden:view.hidden,field:field??undefined,marker:section.alignment?view.chainage:undefined});
+}
+
+// The lines offered: straight, the project's alignments, and drawing or importing another.
+function renderLineOptions(){
+  const lines=project.alignments??[],line=lineOf();
+  lineSelect.innerHTML=`<option value="-1">Straight</option>${lines.map((a,i)=>`<option value="${i}">${esc(a.name)}</option>`).join("")}<option value="draw">✎ Draw a line…</option><option value="import">Import a line…</option>${line?`<option value="remove">Remove ${esc(line.name)}…</option>`:""}`;
+  lineSelect.value=String(line?view.alignment:-1);
+}
+// Shows the section along a line of the project, from its start, with the camera turned to look square at it.
+function showLine(index:number){
+  view.alignment=index;
+  const line=lineOf();
+  if(line){view.chainage=chainages(line)[0];faceLine(line)}
+  renderLineOptions();
+  syncControls();
+  updateSection();
+}
+// Turns the camera to look square at a line, from the side it is on, at the same distance, aimed at the middle of the
+// line in plan. A camera looking down, as when the line was drawn from above, comes down to look at it from the side.
+function faceLine(line:Alignment){
+  const a=line.points[0],b=line.points[line.points.length-1],l=Math.hypot(b.x-a.x,b.y-a.y);
+  if(l<1e-6)return;
+  const n={x:(b.y-a.y)/l,y:-(b.x-a.x)/l},v=camera.position.clone().sub(controls.target),dist=v.length(),h=Math.hypot(v.x,v.y);
+  const side=v.x*n.x+v.y*n.y>=0?1:-1,steep=h<dist*Math.sin(THREE.MathUtils.degToRad(20));
+  const across=steep?dist*Math.cos(0.6):h,up=steep?dist*Math.sin(0.6):v.z;
+  const xs=line.points.map(p=>p.x),ys=line.points.map(p=>p.y);
+  controls.target.set((Math.min(...xs)+Math.max(...xs))/2-origin.x,(Math.min(...ys)+Math.max(...ys))/2-origin.y,controls.target.z);
+  camera.position.set(controls.target.x+side*n.x*across,controls.target.y+side*n.y*across,controls.target.z+up);
+  controls.update();
+  invalidate();
 }
 
 // The fields offered for this model, and the colour key of the one shown.
@@ -973,7 +1122,10 @@ checkResults.addEventListener("click",e=>{
   if(!b||!validation)return;
   if(b.classList.contains("check-csv")){download(`${project.name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"geomodel3d"}-cross-validation.csv`,validationCsv(validation),"text/csv");return}
   const bh=model.boreholes.find(h=>h.id===b.dataset.hole);
-  if(bh){view.offset=offsetThrough(model,view.azimuth,bh);syncControls();queueSection()}
+  if(bh){
+    if(lineOf()){view.alignment=-1;renderLineOptions()}
+    view.offset=offsetThrough(model,view.azimuth,bh);syncControls();queueSection();
+  }
 });
 checkResults.addEventListener("change",e=>{
   const input=e.target as HTMLInputElement;
@@ -1002,8 +1154,12 @@ function loadProject(p:GeoProject,importWarnings:string[]=[],keepView=false){
   project=p;
   model=buildGeologicalModel(p);
   weights=unitWeights(model);
-  if(!keepView){view.hidden.clear();view.field="units"}
+  if(!keepView){view.hidden.clear();view.field="units";view.alignment=-1}
+  if(view.alignment>=(p.alignments?.length??0))view.alignment=-1;
+  // A line being drawn belongs to the site shown before.
+  if(drawing){drawing=null;renderDraw()}
   renderFieldOptions();
+  renderLineOptions();
   buildContent();
   if(keepView){
     const shift=new THREE.Vector3(before.x-origin.x,before.y-origin.y,(before.z-origin.z)*view.ve);
@@ -1028,6 +1184,8 @@ function loadProject(p:GeoProject,importWarnings:string[]=[],keepView=false){
   const warnings=[...importWarnings,...model.warnings];
   currentNotes=warnings;
   showNotice(`${p.name}: ${warnings.length} note${warnings.length===1?"":"s"}`,warnings);
+  // The status of the terrain and map of the site shown before is not this one's.
+  setGeoStatus("");
   if(publicSites.has(p)&&!loggedGround.has(p)&&!p.terrain&&projectCrs(p)&&!keepView)void fetchSiteTerrain();
   void updateMap();
 }
@@ -1037,7 +1195,11 @@ async function importFileList(list:FileList|File[]){
     const files=await Promise.all([...list].map(async f=>({name:f.name,text:decodeText(new Uint8Array(await f.arrayBuffer()))})));
     const result=importFiles(files,project);
     imported=result.project;
-    loadProject(result.project,result.warnings);
+    // Lines added to the site shown keep the view, and the first of them is shown.
+    const linesOnly=!!result.alignments&&result.project.boreholes===project.boreholes;
+    loadProject(result.project,result.warnings,linesOnly);
+    const first=result.alignments?.[0],index=first===undefined?-1:result.project.alignments?.findIndex(a=>a.name===first)??-1;
+    if(index>=0&&document.body.dataset.mode!=="input")showLine(index);
     // Files picked from the input tab open there, for review before building.
     if(document.body.dataset.mode==="input")workspace.edit(result.project,`Imported ${files.map(f=>f.name).join(", ")}: check the tables, then build the model.${result.warnings.length?` ${result.warnings.length} note${result.warnings.length===1?"":"s"} under Checks.`:""}`,result.warnings);
   }catch(err){
@@ -1055,8 +1217,15 @@ function download(name:string,data:string|ArrayBuffer|Uint8Array<ArrayBuffer>,ty
   setTimeout(()=>URL.revokeObjectURL(a.href),2000);
 }
 function exportAs(kind:string){
-  const slug=project.name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"geomodel3d";
-  const tag=`${String(view.azimuth).padStart(3,"0")}-${view.offset>=0?"p":"m"}${Math.abs(Math.round(view.offset))}`;
+  const slugOf=(name:string)=>name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+  const slug=slugOf(project.name)||"geomodel3d",line=lineOf();
+  const tag=line?`${slugOf(line.name)||"line"}-profile`:`${String(view.azimuth).padStart(3,"0")}-${view.offset>=0?"p":"m"}${Math.abs(Math.round(view.offset))}`;
+  if(kind==="chainage"||kind==="alignment"){
+    if(!line){showNotice("Along a line",["Choose a line under Section, Line first: a straight section has no chainage."],true);return}
+    if(kind==="chainage")download(`${slug}-${slugOf(line.name)||"line"}-by-chainage-${view.step}m.csv`,chainageCsv(model,section,view.step),"text/csv");
+    else download(`${slug}-${slugOf(line.name)||"line"}.csv`,toAlignmentCsv(line),"text/csv");
+    return;
+  }
   if(kind==="project")download(`${slug}.geomodel3d.json`,toProjectJson(project),"application/json");
   if(kind==="boreholes")download(`${slug}-boreholes.csv`,toBoreholeCsv(project),"text/csv");
   if(kind==="tests")download(`${slug}-tests.csv`,toTestsCsv(project),"text/csv");
@@ -1132,7 +1301,7 @@ function cropToContent(source:HTMLCanvasElement,maxWidth=2400){
 // The report is printed from a hidden frame; the print dialog's "Save as PDF" makes the file.
 async function printReport(paper:"A3"|"A4"){
   const html=reportHtml(model,section,{paper,image:captureView(),date:new Date().toISOString().slice(0,10),version:pkg.version,
-    credits:creditTexts(),notes:currentNotes,sectionBuffer,ve:view.ve,hidden:view.hidden,field:field??undefined,validation:validation??undefined});
+    credits:creditTexts(),notes:currentNotes,sectionBuffer,ve:view.ve,hidden:view.hidden,field:field??undefined,validation:validation??undefined,chainageStep:view.step});
   const frame=document.createElement("iframe");
   frame.className="print-frame";
   frame.setAttribute("aria-hidden","true");
@@ -1165,7 +1334,7 @@ function setMode(mode:"model"|"input"){
   modes.querySelectorAll<HTMLButtonElement>("button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.mode===mode)));
   hideTooltip();
   history.replaceState(null,"",mode==="input"?"#input":location.pathname+location.search);
-  if(mode==="input"){setSheet("");workspace.show()}
+  if(mode==="input"){setSheet("");if(drawing){drawing=null;renderDraw()}workspace.show()}
   else{renderSectionPanel();layoutCompact();invalidate()}
 }
 modes.addEventListener("click",e=>{const b=(e.target as HTMLElement).closest<HTMLButtonElement>("[data-mode]");if(b)setMode(b.dataset.mode as "model"|"input")});
@@ -1210,6 +1379,35 @@ offsetInput.oninput=()=>{view.offset=Number(offsetInput.value);syncControls();qu
 veInput.oninput=()=>{view.ve=Number(veInput.value);syncControls();applyDisplay()};
 panelToggles.forEach(b=>b.onclick=()=>{view.panel=!view.panel;syncControls();renderSectionPanel()});
 fieldSelect.onchange=()=>{view.field=fieldSelect.value;updateSection()};
+lineSelect.onchange=()=>{
+  const v=lineSelect.value,line=lineOf();
+  if(v==="draw"){renderLineOptions();startDraw();return}
+  if(v==="import"){renderLineOptions();fileInput.click();return}
+  if(v==="remove"){
+    renderLineOptions();
+    if(line&&confirm(`Remove the line ${line.name} from this project?`)){
+      project.alignments=(project.alignments??[]).filter(a=>a!==line);
+      showLine(-1);
+    }
+    return;
+  }
+  showLine(Number(v));
+};
+// The marker follows the slider, redrawn once a frame at most.
+let markerQueued=false;
+chainageInput.oninput=()=>{
+  view.chainage=Number(chainageInput.value);
+  syncControls();
+  if(!markerQueued){markerQueued=true;requestAnimationFrame(()=>{markerQueued=false;placeMarker();renderSectionPanel()})}
+};
+controlsBar.querySelector<HTMLButtonElement>(".cross-here")!.onclick=()=>{
+  const line=lineOf();
+  if(!line)return;
+  const c=crossSectionAt(model,line,view.chainage);
+  view.alignment=-1;view.azimuth=c.azimuth;view.offset=c.offset;
+  renderLineOptions();syncControls();updateSection();
+};
+controlsBar.querySelector<HTMLSelectElement>(".table-step")!.onchange=e=>{view.step=Number((e.target as HTMLSelectElement).value)};
 sectionView.querySelector<HTMLButtonElement>(".close")!.onclick=()=>{view.panel=false;syncControls()};
 
 let dragDepth=0;
@@ -1224,23 +1422,135 @@ const raycaster=new THREE.Raycaster();
 // With a mouse the read-out follows the pointer. On a touch screen a tap shows it, above the finger, until the next
 // touch; dragging to orbit shows nothing.
 let pointer:{x:number;y:number;touch:boolean}|null=null,pointerMoved=false;
-let tap:{x:number;y:number;t:number;id:number}|null=null;
 function hideTooltip(){tooltip.hidden=true;pointer=null}
+// A press that neither moves nor lasts is a click or a tap: while a line is drawn it adds a point, and on a touch screen
+// it shows the read-out.
+let press:{x:number;y:number;t:number;id:number}|null=null;
+renderer.domElement.addEventListener("pointerdown",e=>{
+  // A second finger makes it a pinch, not a tap; other mouse buttons pan.
+  press=e.isPrimary&&(e.pointerType!=="mouse"||e.button===0)?{x:e.clientX,y:e.clientY,t:performance.now(),id:e.pointerId}:null;
+  if(e.pointerType!=="mouse")hideTooltip();
+});
 renderer.domElement.addEventListener("pointermove",e=>{
-  if(e.pointerType!=="mouse"){if(tap&&Math.hypot(e.clientX-tap.x,e.clientY-tap.y)>10)tap=null;return}
-  pointer={x:e.clientX,y:e.clientY,touch:false};pointerMoved=true;
+  if(press&&press.id===e.pointerId&&Math.hypot(e.clientX-press.x,e.clientY-press.y)>10)press=null;
+  if(e.pointerType==="mouse"){pointer={x:e.clientX,y:e.clientY,touch:false};pointerMoved=true}
 });
 renderer.domElement.addEventListener("pointerleave",e=>{if(e.pointerType==="mouse")hideTooltip()});
-renderer.domElement.addEventListener("pointerdown",e=>{
-  if(e.pointerType==="mouse")return;
-  // A second finger makes it a pinch, not a tap.
-  tap=e.isPrimary?{x:e.clientX,y:e.clientY,t:performance.now(),id:e.pointerId}:null;
-  hideTooltip();
-});
 renderer.domElement.addEventListener("pointerup",e=>{
-  if(e.pointerType==="mouse"||!tap||tap.id!==e.pointerId)return;
-  if(performance.now()-tap.t<600&&Math.hypot(e.clientX-tap.x,e.clientY-tap.y)<=10){pointer={x:e.clientX,y:e.clientY,touch:true};pointerMoved=true}
-  tap=null;
+  const p=press;
+  press=null;
+  if(!p||p.id!==e.pointerId||performance.now()-p.t>=600||Math.hypot(e.clientX-p.x,e.clientY-p.y)>10)return;
+  if(drawing)addDrawPoint(e.clientX,e.clientY);
+  else if(e.pointerType!=="mouse"){pointer={x:e.clientX,y:e.clientY,touch:true};pointerMoved=true}
+});
+
+// ---------- drawing a line ----------
+
+// A line drawn on the model: each click, or tap, adds a point on the ground under it; near a borehole the point is the
+// borehole's collar, so the line passes through it. While drawing, the model is shown whole.
+let drawing:{points:XY[];holes:Array<string|undefined>}|null=null;
+const drawBar=document.createElement("div");
+drawBar.className="draw-bar";
+drawBar.hidden=true;
+drawBar.innerHTML=`<span class="draw-text" aria-live="polite"></span><span class="draw-actions"><button class="draw-undo">Undo</button><button class="draw-top" title="Look straight down on the model">From above</button><button class="draw-cancel">Cancel</button><button class="draw-done">Done</button></span>`;
+app.appendChild(drawBar);
+const drawPreview=new THREE.Line(new THREE.BufferGeometry(),new THREE.LineBasicNodeMaterial({color:0x78c9df}));
+const drawPoints=new THREE.InstancedMesh(new THREE.SphereGeometry(1,12,8),new THREE.MeshBasicNodeMaterial({color:0x78c9df}),1000);
+drawPoints.count=0;
+drawPreview.frustumCulled=drawPoints.frustumCulled=false;
+world.add(drawPreview,drawPoints);
+sizes.observe(drawBar);
+const groundLevel=()=>{const z=model.boreholes.map(b=>b.z).sort((a,b)=>a-b);return z.length?z[Math.floor(z.length/2)]:0};
+const groundAt=(x:number,y:number)=>sampleModel(model,x,y)?.[0]??groundLevel();
+function startDraw(){
+  drawing={points:[],holes:[]};
+  if(compact())setSheet("");
+  hideTooltip();
+  renderDraw();
+  applyDisplay();
+}
+function renderDraw(){
+  drawBar.hidden=!drawing;
+  document.body.dataset.drawing=drawing?"on":"";
+  const n=drawing?.points.length??0,verb=touchQuery.matches?"Tap":"Click";
+  if(drawing){
+    drawBar.querySelector(".draw-text")!.textContent=n?`${n} point${n===1?"":"s"}${n<2?`; ${verb.toLowerCase()} the next one`:""}`:`${verb} on the model to start the line; near a borehole it passes through the borehole`;
+    drawBar.querySelector<HTMLButtonElement>(".draw-undo")!.disabled=!n;
+    drawBar.querySelector<HTMLButtonElement>(".draw-done")!.disabled=n<2;
+  }
+  // The line along the ground, and its points, kept round whatever the exaggeration.
+  const pos:number[]=[],r=extent*0.006,m=new THREE.Matrix4(),q=new THREE.Quaternion(),size=new THREE.Vector3(r,r,r/view.ve);
+  drawing?.points.forEach((a,i)=>{
+    const b=drawing!.points[i+1],steps=b?24:1;
+    for(let k=0;k<steps;k++){const t=k/steps,x=a.x+(b?b.x-a.x:0)*t,y=a.y+(b?b.y-a.y:0)*t;pos.push(x-origin.x,y-origin.y,groundAt(x,y)-origin.z)}
+    drawPoints.setMatrixAt(i,m.compose(local(a.x,a.y,groundAt(a.x,a.y)),q,size));
+  });
+  positions(drawPreview,pos);
+  drawPoints.count=Math.min(n,1000);
+  drawPoints.instanceMatrix.needsUpdate=true;
+  drawPreview.visible=n>1;
+  drawPoints.visible=n>0;
+  layoutSoon();
+  invalidate();
+}
+// The borehole whose collar is drawn within `radius` pixels of a screen point, the nearest.
+function collarNear(px:number,py:number,radius=14){
+  let best:{id:string;x:number;y:number;d:number}|null=null;
+  const v=new THREE.Vector3();
+  for(const b of model.boreholes){
+    v.copy(local(b.x,b.y,b.z)).multiply(world.scale).project(camera);
+    if(v.z>1)continue;
+    const d=Math.hypot((v.x+1)/2*innerWidth-px,(1-v.y)/2*innerHeight-py);
+    if(d<=radius&&(!best||d<best.d))best={id:b.id,x:b.x,y:b.y,d};
+  }
+  return best;
+}
+// The plan position under a screen point: on the model or the terrain, else on the level of the collars.
+function planAt(px:number,py:number):XY|null{
+  raycaster.setFromCamera(new THREE.Vector2(px/innerWidth*2-1,-py/innerHeight*2+1),camera);
+  const hit=raycaster.intersectObjects([...volumeMeshes.filter(m=>m.visible),...(terrainMesh?.visible?[terrainMesh]:[])])[0];
+  const p=hit?.point??raycaster.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,0,1),-(groundLevel()-origin.z)*view.ve),new THREE.Vector3());
+  return p?{x:p.x+origin.x,y:p.y+origin.y}:null;
+}
+function addDrawPoint(px:number,py:number){
+  if(!drawing)return;
+  const hole=collarNear(px,py),at=hole??planAt(px,py),last=drawing.points[drawing.points.length-1];
+  if(!at||(last&&Math.hypot(at.x-last.x,at.y-last.y)<1e-3))return;
+  drawing.points.push({x:at.x,y:at.y});
+  drawing.holes.push(hole?.id);
+  renderDraw();
+}
+function undoDraw(){if(drawing?.points.length){drawing.points.pop();drawing.holes.pop();renderDraw()}}
+function cancelDraw(){drawing=null;renderDraw();applyDisplay()}
+function finishDraw(){
+  if(!drawing||drawing.points.length<2)return;
+  const holes=drawing.holes,base=holes.every(Boolean)?`Through ${holes[0]} to ${holes[holes.length-1]}`:"Drawn line";
+  const taken=new Set((project.alignments??[]).map(a=>a.name));
+  let name=base;
+  for(let k=2;taken.has(name);k++)name=`${base} ${k}`;
+  const line:Alignment={name,points:drawing.points.map(p=>({x:Math.round(p.x*1000)/1000,y:Math.round(p.y*1000)/1000})),source:"Drawn in GeoModel3D"};
+  drawing=null;
+  renderDraw();
+  project.alignments=[...(project.alignments??[]),line];
+  showLine(project.alignments.length-1);
+}
+function viewFromAbove(){
+  const d=camera.position.distanceTo(controls.target);
+  camera.position.set(controls.target.x,controls.target.y-d*1e-3,controls.target.z+d);
+  controls.update();
+  invalidate();
+}
+drawBar.querySelector<HTMLButtonElement>(".draw-undo")!.onclick=undoDraw;
+drawBar.querySelector<HTMLButtonElement>(".draw-top")!.onclick=viewFromAbove;
+drawBar.querySelector<HTMLButtonElement>(".draw-cancel")!.onclick=cancelDraw;
+drawBar.querySelector<HTMLButtonElement>(".draw-done")!.onclick=finishDraw;
+addEventListener("keydown",e=>{
+  if(!drawing||(e.target as Element|null)?.closest?.("input,select,textarea"))return;
+  if(e.key==="Escape")cancelDraw();
+  else if(e.key==="Enter")finishDraw();
+  else if(e.key==="Backspace"||e.key==="Delete")undoDraw();
+  else return;
+  e.preventDefault();
 });
 // What the read-out says about a stretch of a borehole: an interval of its log, or (-1) below the log.
 function holeHtml(hole:number,interval:number){
@@ -1261,7 +1571,7 @@ function holeNear(px:number,py:number,radius:number){
   for(const [hole,bh] of model.boreholes.entries()){
     top.copy(local(bh.x,bh.y,bh.z)).multiply(world.scale);
     bottom.copy(local(bh.x,bh.y,bh.z-boreholeDepth(bh))).multiply(world.scale);
-    if(view.cut&&clipPlane.distanceToPoint(top)<-1e-6)continue;
+    if(cutting()&&clipPlane.distanceToPoint(top)<-1e-6)continue;
     if(at.copy(top).sub(camera.position).dot(dir)<=0||at.copy(bottom).sub(camera.position).dot(dir)<=0)continue;
     const [ax,ay]=screen(top),[bx,by]=screen(bottom),{d}=segmentDistance(px,py,ax,ay,bx,by);
     if(d>radius||(best&&d>=best.d))continue;
@@ -1276,7 +1586,7 @@ function updateTooltip(){
   pointerMoved=false;
   if(!pointer){tooltip.hidden=true;return}
   raycaster.setFromCamera(new THREE.Vector2(pointer.x/innerWidth*2-1,-pointer.y/innerHeight*2+1),camera);
-  const kept=(h:THREE.Intersection)=>!view.cut||clipPlane.distanceToPoint(h.point)>=-1e-6;
+  const kept=(h:THREE.Intersection)=>!cutting()||clipPlane.distanceToPoint(h.point)>=-1e-6;
   let html="";
   if(holeMesh?.visible){
     const hit=raycaster.intersectObject(holeMesh).find(kept);
@@ -1290,11 +1600,11 @@ function updateTooltip(){
     const hit=raycaster.intersectObject(errorMarkers).find(kept);
     if(hit&&hit.instanceId!==undefined)html=`<b>${esc(errorMarked[hit.instanceId])}</b>${validationLine(errorMarked[hit.instanceId])}`;
   }
-  // The section face, or a unit volume in front of it.
+  // The section face, or a unit volume in front of it; along a line the units are see-through, and the face comes first.
   const faceHit=sectionGroup.visible?raycaster.intersectObject(fence)[0]:undefined;
   const volumeHit=view.volumes?raycaster.intersectObjects(volumeMeshes.filter(m=>m.visible)).find(kept):undefined;
-  if(!html&&faceHit&&(!volumeHit||faceHit.distance<=volumeHit.distance+1e-6)){
-    const along=(faceHit.point.x+origin.x-section.origin.x)*section.dir.x+(faceHit.point.y+origin.y-section.origin.y)*section.dir.y;
+  if(!html&&faceHit&&(!volumeHit||!!lineOf()||faceHit.distance<=volumeHit.distance+1e-6)){
+    const along=alongOf(section,{x:faceHit.point.x+origin.x,y:faceHit.point.y+origin.y});
     html=sectionReadout(along,faceHit.point.z/view.ve+origin.z);
   }
   if(!html&&view.volumes){
@@ -1330,7 +1640,10 @@ function sectionReadout(along:number,e:number){
   for(let i=0;i<model.units.length;i++)if(e<=c.z[i]+1e-6&&e>=c.z[i+1]-1e-6&&c.z[i]-c.z[i+1]>1e-9){k=i;break}
   if(k<0)return "";
   const st=stressAt(c.z,c.water,weights,e),assumed=weights.some(w=>w.source==="assumed");
-  let html=`<b>${esc(model.units[k].name)}</b> · ${fmt(c.z[0]-e,1)} m deep, elevation ${fmt(e,1)} m`;
+  let html=`<b>${esc(model.units[k].name)}</b> · ${section.alignment?`chainage ${fmt(along,1)} m, `:""}${fmt(c.z[0]-e,1)} m deep, elevation ${fmt(e,1)} m`;
+  // Along a line, its design levels there and the cover above them.
+  const d=section.alignment?designAt(section.alignment.design,along):{};
+  if(d.top!==undefined)html+=`<span>${d.bottom!==undefined?`crown ${fmt(d.top,2)} m, invert ${fmt(d.bottom,2)} m, cover ${fmt(c.z[0]-d.top,1)} m`:`design level ${fmt(d.top,2)} m, ${fmt(c.z[0]-d.top,1)} m below ground`}</span>`;
   const K0=model.units[k].params?.K0;
   if(st)html+=`<span>σv ${fmt(st.sv)} kPa · u ${fmt(st.u)} kPa · σ′v ${fmt(st.s)} kPa${K0!==undefined?` · σ′h ${fmt(K0*st.s)} kPa`:""}${assumed?" (some unit weights assumed)":""}</span>`;
   if(field&&!["sv","u","s","sh"].includes(field.key)){
@@ -1382,7 +1695,7 @@ renderer.setAnimationLoop(()=>{
   updateTooltip();
   if(!dirty)return;
   dirty--;
-  if(view.cut&&updateCutSide())applyDisplay();
+  if(cutting()&&updateCutSide())applyDisplay();
   renderer.render(scene,camera);
   labelRenderer.render(scene,camera);
 });

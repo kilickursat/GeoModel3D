@@ -1,12 +1,14 @@
 import {GeoModel} from "./model";
 import {XY,uniqueEdges} from "./tin";
-import {boreholeDepth} from "./schema";
+import {boreholeDepth,DesignLevel} from "./schema";
 
 // A vertical section: azimuth in degrees clockwise from north (+y), offset in metres from the model centre,
 // measured to the right of the section direction.
 export interface SectionSpec { azimuth:number; offset:number }
 export interface SectionFrame { origin:XY; dir:XY; normal:XY }
 export interface ProjectedBorehole { index:number; s:number; offset:number; top:number; bottom:number }
+// The line of a section along an alignment: its name, its points with their chainages, and its design levels.
+export interface SectionPath { name:string; s:number[]; x:number[]; y:number[]; design?:DesignLevel[] }
 export interface Section extends SectionSpec, SectionFrame {
   s:number[]; x:number[]; y:number[];
   z:number[][];
@@ -14,6 +16,28 @@ export interface Section extends SectionSpec, SectionFrame {
   boreholes:ProjectedBorehole[];
   // The water table along the section, where groundwater is known.
   water?:number[];
+  // Along an alignment (see alignment.ts), s is the chainage. The line may leave the model and come back: `runs` are
+  // the stretches inside it, each as its first and last sample.
+  alignment?:SectionPath;
+  runs?:Array<[number,number]>;
+}
+
+// The stretches of a section inside the model; a straight section crosses the footprint, which is convex, once.
+export function sectionRuns(s:Section):Array<[number,number]>{return s.runs??(s.s.length?[[0,s.s.length-1]]:[])}
+// Whether samples j and j + 1 lie on one stretch.
+export function joined(s:Section,j:number){return !s.runs||s.runs.some(([a,b])=>j>=a&&j+1<=b)}
+// Where a point in plan lies along the section: the distance along a straight section, the chainage of the nearest
+// point of an alignment.
+export function alongOf(s:Section,p:XY){
+  if(!s.alignment)return (p.x-s.origin.x)*s.dir.x+(p.y-s.origin.y)*s.dir.y;
+  const a=s.alignment;
+  let best=Infinity,at=a.s[0];
+  for(let i=0;i<a.s.length-1;i++){
+    const dx=a.x[i+1]-a.x[i],dy=a.y[i+1]-a.y[i],l2=dx*dx+dy*dy||1;
+    const t=Math.min(1,Math.max(0,((p.x-a.x[i])*dx+(p.y-a.y[i])*dy)/l2)),d=Math.hypot(p.x-a.x[i]-t*dx,p.y-a.y[i]-t*dy);
+    if(d<best){best=d;at=a.s[i]+t*(a.s[i+1]-a.s[i])}
+  }
+  return at;
 }
 
 export function modelCentre(model:GeoModel):XY{

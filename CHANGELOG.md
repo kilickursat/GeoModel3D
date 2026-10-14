@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.13.0 — 2026-10-14
+
+### Added
+- **Sections along a line.** A section can follow a tunnel, road, railway, pipeline or dike instead of running straight: **Section → Line**.
+  - The 2-D section becomes the longitudinal profile by chainage, with the line's bends dotted and its design levels drawn: a band from crown to invert, or a single level. In 3-D the section face follows the line, the units are drawn see-through around it, and the chainage is labelled along the ground.
+  - **Lines are read** from CSV (points by `x`, `y` or `lat`, `lon`, with optional `chainage` in metres or as `12+345.6`, kilometres under `km` or `KP`), GeoJSON (LineString and MultiLineString) and DXF (LWPOLYLINE and POLYLINE, arcs followed within 2 cm).
+  - **Design levels** come with the points (`crown` and `invert`, `axis` and `diameter`, or one `level`), or by chainage alone in a second CSV.
+  - **Draw a line…** adds points where the model is clicked or tapped; near a borehole the point is its collar, so a line through boreholes gives a fence section.
+  - **Chainage** on the section bar marks a point on the profile and in 3-D, and **Cross-section** cuts square to the line there.
+  - **Chainage table (CSV)**, a row every 1–100 m: ground, water table, each unit's thickness and, with design levels, the cover, the water above the crown and the units at crown and invert. Between crown and invert, each unit's share of the height gives the mixed faces along a tunnel. The PDF report gets a page of it, and names the stretches where the line is outside the model.
+  - **Alignment (CSV)** exports a line; the project file keeps them.
+- `src/alignment.ts`: the section along a line, exact as the straight one is, with a sample at every edge of the triangulation the line crosses and at each of its points. A straight line gives the straight section exactly, which the tests check.
+- The buried-channel demo has a synthetic tunnel across the channel.
+
+### Changed
+- The section bar has a **Line** choice before the azimuth; it packs closer on screens up to 1,180 pixels across.
+- The terrain and map status of the previous site is cleared when another site is opened.
+
 ## 0.12.0 — 2026-10-13
 
 ### Added

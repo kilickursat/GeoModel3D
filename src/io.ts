@@ -1,7 +1,9 @@
 import proj4 from "proj4";
-import {Borehole,GeoProject,Interval,UnitDef,UnitRule,SptTest,WaterLevel,TestResult,boreholeDepth,sptN} from "./schema";
+import {Borehole,GeoProject,Interval,UnitDef,UnitRule,SptTest,WaterLevel,TestResult,Alignment,AlignmentPoint,DesignLevel,boreholeDepth,sptN} from "./schema";
 import {TerrainGrid,isTerrainFile,readTerrain} from "./terrain";
-import {Crs,findCrs,projectCrs,suggestCrs,toProjected,searchCrs} from "./crs";
+import {Crs,findCrs,projectCrs,suggestCrs,toProjected,toGeographic,searchCrs} from "./crs";
+import {alignmentProblem,chainages,designAt} from "./alignment";
+import {XY} from "./tin";
 import {isBoringXml,readBoringXml} from "./boringXml";
 import {isBroXml,readBroXml} from "./broXml";
 import {isDovXml,readDovXml,interpretationKinds,kindNames,formationOf,stratigraphicName,DovInterpretation} from "./dovXml";
@@ -9,7 +11,8 @@ import {applyUnitRules,japaneseLithologyRules,lithologyRules} from "./rules";
 import {propertyFromHeader,propertyKey,propertyDef,implausibleTests} from "./properties";
 
 export interface TextFile { name:string; text:string }
-export interface ImportResult { project:GeoProject; warnings:string[] }
+// `alignments` names the lines read, when alignment files were among those imported.
+export interface ImportResult { project:GeoProject; warnings:string[]; alignments?:string[] }
 
 // ---------- decoding ----------
 
@@ -374,6 +377,19 @@ function readProjectJson(doc:any,file:string):ImportResult{
   if(Number.isFinite(doc.base))result.project.base=Number(doc.base);
   if(Number.isFinite(doc.groundwaterDepth))result.project.groundwaterDepth=Number(doc.groundwaterDepth);
   if(Number.isFinite(doc.margin)&&doc.margin>0)result.project.margin=Number(doc.margin);
+  // Alignments: lines with a problem are left out, and named in the notes.
+  if(Array.isArray(doc.alignments)){
+    const lines:Alignment[]=[];
+    for(const a of doc.alignments){
+      const line:Alignment={name:String(a?.name??`Line ${lines.length+1}`),points:Array.isArray(a?.points)?a.points.map((p:any)=>({x:Number(p?.x),y:Number(p?.y),...(p?.chainage!==undefined&&p?.chainage!==null?{chainage:Number(p.chainage)}:{})})):[],
+        ...(Number.isFinite(a?.start)?{start:Number(a.start)}:{}),...(typeof a?.source==="string"?{source:a.source}:{}),
+        ...(Array.isArray(a?.design)&&a.design.length?{design:a.design.map((d:any)=>({chainage:Number(d?.chainage),top:Number(d?.top),...(d?.bottom!==undefined&&d?.bottom!==null?{bottom:Number(d.bottom)}:{})}))}:{})};
+      const problem=alignmentProblem(line);
+      if(problem)result.warnings.push(`${file}: alignment ${line.name} left out: ${problem}`);
+      else lines.push(line);
+    }
+    if(lines.length)result.project.alignments=lines;
+  }
   const g=doc.terrain;
   if(g){
     const ok=["x0","y0","dx","dy","ncols","nrows"].every(k=>Number.isFinite(g[k]))&&Array.isArray(g.z)&&g.z.length===g.ncols*g.nrows;
@@ -385,7 +401,7 @@ function readProjectJson(doc:any,file:string):ImportResult{
 // JSON has no NaN, so terrain cells without data are written as null.
 export function toProjectJson(p:GeoProject){
   const doc={format:"geomodel3d-project",version:1,name:p.name,description:p.description,source:p.source,crs:p.crs,crsCode:p.crsCode,crsProj4:p.crsProj4,
-    base:p.base,groundwaterDepth:p.groundwaterDepth,margin:p.margin,units:p.units,rules:p.rules,boreholes:p.boreholes,terrain:p.terrain};
+    base:p.base,groundwaterDepth:p.groundwaterDepth,margin:p.margin,units:p.units,rules:p.rules,boreholes:p.boreholes,alignments:p.alignments,terrain:p.terrain};
   return JSON.stringify(doc,null,1).replace(/"z": \[[^\]]*\]/,m=>m.replace(/\s+/g,""))+"\n";
 }
 // One row per interval with the collar, the logged description where there is one, and the shallowest water level.
@@ -664,12 +680,317 @@ export function crsFromName(label:string):Crs|undefined{
   return found.length===1?found[0]:undefined;
 }
 
+// ---------- alignments ----------
+
+// An alignment table holds the points of a line in plan (x and y, or latitude and longitude) and, if given, their
+// chainage and design levels: a crown and an invert, an axis level and a height, or one level, such as a road or rail
+// level. A profile table holds design levels by chainage alone, for a line imported before. A column naming the line
+// splits a table into several lines.
+const LINE_ALIASES={
+  chainage:["chainage","ch","chain","station","sta","stationing","kp","km","pk","kilometrage","kilometrepoint","kilometerpoint","measure"],
+  crown:["crown","crownlevel","crownelevation","tunnelcrown","roof","rooflevel","top","toplevel"],
+  invert:["invert","invertlevel","invertelevation","tunnelinvert","bottom","bottomlevel","floor","floorlevel"],
+  axis:["axis","axislevel","axiselevation","tunnelaxis","axisz"],
+  size:["diameter","tunnelheight","excavationheight","height"],
+  level:["level","designlevel","designelevation","formationlevel","formation","roadlevel","raillevel","railtop","toprail","gradeline","grade","profilelevel","z","elevation","elev"],
+  line:["alignment","alignmentname","line","linename","route"]
+};
+type LineField=keyof typeof LINE_ALIASES;
+function lineColumns(header:string[]){
+  const h=header.map(norm),found:Partial<Record<LineField,number>>={},taken=new Set<number>();
+  for(const f of Object.keys(LINE_ALIASES) as LineField[])for(const a of LINE_ALIASES[f]){const i=h.indexOf(a);if(i>=0&&!taken.has(i)){found[f]=i;taken.add(i);break}}
+  return found;
+}
+// Columns that only borehole tables have, and names that only an alignment would carry.
+const BOREHOLE_COLUMNS=new Set(["holeid","boreholeid","bhid","hole","borehole","bh","boreholename","boreholeno","holeno","locaid","locationid","from","to","depthfrom","depthto","fromdepth","todepth","depth","unit","description","lithology","geology","soil","blows","waterdepth"]);
+const ID_COLUMNS=new Set(["id","name","point","pointid","no","number","label"]);
+const LINE_NAME=/align|centre.?line|center.?line|route|tunnel|track|chainage|profile|線形|中心線|路線|縦断/i;
+const CHAINAGE_LIKE=/^(-?\d+)\+(\d{3}(?:\.\d+)?)$/;
+// "line" for an alignment table, "profile" for design levels by chainage, or null for any other table. A table of
+// points with a borehole-like id column is a collar table, unless it also has a chainage or a design level, or the
+// file is named as a line.
+export function lineTableKind(file:TextFile):"line"|"profile"|null{
+  if(!/\.(csv|tsv|txt)$/i.test(file.name))return null;
+  const header=parseCsv(file.text.split(/\r?\n/,1)[0]??"")[0]??[];
+  const h=header.map(norm),c=columns(header),l=lineColumns(header);
+  if(h.some(v=>BOREHOLE_COLUMNS.has(v)))return null;
+  const located=(c.x!==undefined&&c.y!==undefined)||(c.lat!==undefined&&c.lon!==undefined);
+  const strong=[l.crown,l.invert,l.axis].some(i=>i!==undefined)||(l.level!==undefined&&!["z","elevation","elev","level"].includes(h[l.level]));
+  if(located)return l.chainage!==undefined||strong||LINE_NAME.test(file.name)||!h.some(v=>ID_COLUMNS.has(v))?"line":null;
+  return l.chainage!==undefined&&(strong||l.level!==undefined)?"profile":null;
+}
+// Chainage in metres: a number, or kilometres and metres written 12+345.6; a column headed km, KP or PK holds kilometres.
+function chainageOf(v:string|undefined,km:boolean){
+  const s=(v??"").trim();
+  if(!s)return NaN;
+  const m=s.replace(/^(ch|sta|km|kp)\.?\s*/i,"").match(CHAINAGE_LIKE);
+  if(m)return Number(m[1])*1000+(m[1].startsWith("-")?-1:1)*Number(m[2]);
+  const n=num(s);
+  return km?n*1000:n;
+}
+// Design levels from a row: crown and invert, axis ± half the height, or one level.
+function levelsOf(r:string[],l:Partial<Record<LineField,number>>,len:(r:string[],i?:number)=>number){
+  const crown=len(r,l.crown),invert=len(r,l.invert),axis=len(r,l.axis),size=len(r,l.size),level=len(r,l.level);
+  if(Number.isFinite(crown)&&Number.isFinite(invert))return {top:crown,bottom:invert};
+  if(Number.isFinite(axis)&&Number.isFinite(size)&&size>0)return {top:axis+size/2,bottom:axis-size/2};
+  if(Number.isFinite(crown))return {top:crown};
+  if(Number.isFinite(level))return {top:level};
+  if(Number.isFinite(axis))return {top:axis};
+  return null;
+}
+// The points of a line with the same place twice in a row kept once.
+function cleanPoints(points:AlignmentPoint[],name:string,notes:string[]){
+  const out=points.filter((p,i)=>i===0||Math.hypot(p.x-points[i-1].x,p.y-points[i-1].y)>=1e-3);
+  if(out.length<points.length)notes.push(`${name}: ${points.length-out.length} repeated point${points.length-out.length>1?"s":""} dropped`);
+  return out;
+}
+function checked(a:Alignment,file:string){
+  const problem=alignmentProblem(a);
+  if(problem)throw new Error(`${file}: ${a.name}: ${problem}`);
+  return a;
+}
+function readLineTable(file:TextFile,crs:Crs|null,notes:string[]):Alignment[]{
+  const rows=parseCsv(file.text),header=rows[0],data=rows.slice(1).filter(r=>r.some(v=>v.trim()));
+  const c=columns(header),l=lineColumns(header),h=header.map(norm),lengths=new Conversions();
+  const len=(r:string[],i?:number)=>i===undefined?NaN:lengths.metres(num(r[i]),header[i].trim(),bracketed(header[i]),i);
+  const km=l.chainage!==undefined&&["km","kp","pk"].includes(h[l.chainage]);
+  const chainage=(r:string[])=>{
+    if(l.chainage===undefined)return undefined;
+    const v=chainageOf(r[l.chainage],km);
+    if(!Number.isFinite(v))throw new Error(`${file.name}: chainage “${r[l.chainage]}” is not in metres, nor in kilometres and metres written as 12+345`);
+    return lengths.metres(v,header[l.chainage].trim(),bracketed(header[l.chainage]),l.chainage);
+  };
+  const projected=c.x!==undefined&&c.y!==undefined;
+  if(!projected&&!crs)throw new Error(`${file.name}: positions by latitude and longitude need the project's coordinate system; choose it under Coordinates first`);
+  const groups=new Map<string,string[][]>(),base=file.name.replace(/\.[^.]+$/,"");
+  for(const r of data){const key=l.line!==undefined?r[l.line]?.trim()||base:base;groups.set(key,[...(groups.get(key)??[]),r])}
+  const lines=[...groups].map(([name,list])=>{
+    const points:AlignmentPoint[]=list.map(r=>{
+      const at=projected?{x:len(r,c.x),y:len(r,c.y)}:toProjected(crs!,num(r[c.lon!]),num(r[c.lat!]));
+      const ch=chainage(r);
+      return ch===undefined?at:{...at,chainage:ch};
+    }).filter(p=>Number.isFinite(p.x)&&Number.isFinite(p.y));
+    const a:Alignment={name,points:cleanPoints(points,name,notes),source:file.name};
+    // Design levels at the points, at their own chainage.
+    const ch=alignmentProblem({...a,design:undefined})?[]:chainages(a);
+    const design:DesignLevel[]=[];
+    list.forEach(r=>{
+      const lv=levelsOf(r,l,len);
+      if(!lv)return;
+      const at=projected?{x:len(r,c.x),y:len(r,c.y)}:toProjected(crs!,num(r[c.lon!]),num(r[c.lat!]));
+      const k=a.points.findIndex(p=>Math.hypot(p.x-at.x,p.y-at.y)<1e-3);
+      if(k>=0&&!design.some(d=>d.chainage===ch[k]))design.push({chainage:ch[k],...lv});
+    });
+    if(design.length)a.design=design;
+    return checked(a,file.name);
+  });
+  if(!projected)notes.push(`${file.name}: positions converted from latitude and longitude to ${crs!.name}`);
+  if(km)notes.push(`${file.name}: the ${header[l.chainage!].trim()} column is read as kilometres`);
+  if(l.axis!==undefined&&l.size!==undefined)notes.push(`${file.name}: crown and invert are the axis level plus and minus half the ${header[l.size].trim()}`);
+  else if(l.level!==undefined&&l.crown===undefined)notes.push(`${file.name}: ${header[l.level].trim()} is read as the design level along the line`);
+  notes.push(...lengths.notes(file.name,[c.x,c.y].filter(i=>i!==undefined).map(i=>header[i!].trim())));
+  return lines;
+}
+function readProfileTable(file:TextFile,notes:string[]):DesignLevel[]{
+  const rows=parseCsv(file.text),header=rows[0],l=lineColumns(header),h=header.map(norm),lengths=new Conversions();
+  const len=(r:string[],i?:number)=>i===undefined?NaN:lengths.metres(num(r[i]),header[i].trim(),bracketed(header[i]),i);
+  const km=["km","kp","pk"].includes(h[l.chainage!]);
+  const design:DesignLevel[]=[];
+  for(const r of rows.slice(1)){
+    if(!r.some(v=>v.trim()))continue;
+    const c=lengths.metres(chainageOf(r[l.chainage!],km),header[l.chainage!].trim(),bracketed(header[l.chainage!]),l.chainage);
+    const lv=levelsOf(r,l,len);
+    if(Number.isFinite(c)&&lv)design.push({chainage:c,...lv});
+  }
+  design.sort((p,q)=>p.chainage-q.chainage);
+  if(!design.length)throw new Error(`${file.name}: no design levels with a chainage`);
+  notes.push(...lengths.notes(file.name,[]));
+  return design;
+}
+
+// GeoJSON lines: LineString and MultiLineString features. Positions are longitude and latitude, as GeoJSON has them,
+// unless the file names a projected system (the older "crs" member); heights of the points are read as design levels.
+export const isGeoJsonLines=(f:TextFile)=>/\.geojson$/i.test(f.name)||(/\.json$/i.test(f.name)&&/"(Multi)?LineString"/.test(f.text)&&!/"boreholes"\s*:/.test(f.text));
+function readGeoJsonLines(file:TextFile,crs:Crs|null,notes:string[]):Alignment[]{
+  let doc:any;
+  try{doc=JSON.parse(file.text)}catch(e){throw new Error(`${file.name}: not valid JSON (${(e as Error).message})`)}
+  const features:any[]=doc?.type==="FeatureCollection"?doc.features??[]:doc?.type==="Feature"?[doc]:[{geometry:doc,properties:{}}];
+  const named=String(doc?.crs?.properties?.name??"").match(/EPSG\D{0,3}(\d{4,5})/i)?.[1];
+  const fileCrs=named?findCrs(named):undefined;
+  if(named&&!fileCrs)throw new Error(`${file.name}: its coordinate system EPSG:${named} is not known here`);
+  const lonLat=(x:number,y:number)=>Math.abs(x)<=180&&Math.abs(y)<=90;
+  const out:Alignment[]=[];
+  let heights=false,local=false;
+  features.forEach((f,i)=>{
+    const g=f?.geometry,parts:number[][][]=g?.type==="LineString"?[g.coordinates]:g?.type==="MultiLineString"?g.coordinates:[];
+    parts.forEach((coords,j)=>{
+      const pts=(coords??[]).filter(c=>Array.isArray(c)&&Number.isFinite(c[0])&&Number.isFinite(c[1]));
+      if(pts.length<2)return;
+      const place=(c:number[]):XY=>{
+        if(fileCrs){
+          if(crs&&fileCrs.code===crs.code)return {x:c[0],y:c[1]};
+          if(!crs){local=true;return {x:c[0],y:c[1]}}
+          const g=toGeographic(fileCrs,c[0],c[1]);return toProjected(crs,g.lon,g.lat);
+        }
+        if(!lonLat(c[0],c[1])){local=true;return {x:c[0],y:c[1]}}
+        if(!crs)throw new Error(`${file.name}: GeoJSON positions are longitude and latitude, which need the project's coordinate system; choose it under Coordinates first`);
+        return toProjected(crs,c[0],c[1]);
+      };
+      const label=f?.properties?.name??f?.properties?.title??f?.properties?.id;
+      const name=`${label??file.name.replace(/\.[^.]+$/,"")}${parts.length>1?` ${j+1}`:label?"":features.length>1?` ${i+1}`:""}`;
+      const a:Alignment={name,points:cleanPoints(pts.map(place),name,notes),source:file.name};
+      if(pts.every(c=>Number.isFinite(c[2]))&&!alignmentProblem(a)){
+        const ch=chainages(a);
+        a.design=pts.length===a.points.length?pts.map((c,k)=>({chainage:ch[k],top:c[2]})):undefined;
+        heights||=!!a.design;
+      }
+      out.push(checked(a,file.name));
+    });
+  });
+  if(!out.length)throw new Error(`${file.name}: no LineString with two points or more`);
+  if(heights)notes.push(`${file.name}: the heights of the points are read as design levels`);
+  if(local)notes.push(`${file.name}: positions are read in the project's coordinates`);
+  return out;
+}
+
+// DXF polylines (LWPOLYLINE, and POLYLINE with its VERTEX entities), with arcs (bulges) followed within 2 cm. Positions
+// are read in the project's coordinates, in the drawing's units.
+export const isDxf=(f:TextFile)=>/\.dxf$/i.test(f.name)||/^\s*0\s*\r?\n\s*SECTION\s*\r?\n\s*2\s*\r?\n\s*HEADER/.test(f.text);
+const DXF_UNITS:Record<number,[number,string]>={1:[0.0254,"inches"],2:[0.3048,"feet"],3:[1609.344,"miles"],4:[0.001,"millimetres"],5:[0.01,"centimetres"],6:[1,"metres"],7:[1000,"kilometres"],10:[0.9144,"yards"]};
+function arcPoints(p:XY,q:XY,bulge:number):XY[]{
+  const dx=q.x-p.x,dy=q.y-p.y,c=Math.hypot(dx,dy),theta=4*Math.atan(bulge);
+  if(c<1e-9||Math.abs(theta)<1e-9)return [];
+  const d=c/2/Math.tan(theta/2),cx=(p.x+q.x)/2-dy/c*d,cy=(p.y+q.y)/2+dx/c*d,r=Math.hypot(p.x-cx,p.y-cy);
+  const a0=Math.atan2(p.y-cy,p.x-cx),step=2*Math.acos(Math.max(-1,1-0.02/r)),n=Math.min(720,Math.max(1,Math.ceil(Math.abs(theta)/step)));
+  return Array.from({length:n-1},(_,k)=>({x:cx+r*Math.cos(a0+theta*(k+1)/n),y:cy+r*Math.sin(a0+theta*(k+1)/n)}));
+}
+function readDxfLines(file:TextFile,notes:string[]):Alignment[]{
+  if(/^AutoCAD Binary DXF/.test(file.text))throw new Error(`${file.name}: binary DXF is not read; save the drawing as ASCII DXF`);
+  // Group codes and values in pairs, gathered into the entities of the ENTITIES section.
+  const lines=file.text.split(/\r?\n/),entities:Array<{type:string;codes:Array<[number,string]>}>=[];
+  let section="",units=0,entity:typeof entities[number]|null=null;
+  for(let i=0;i+1<lines.length;i+=2){
+    const code=Number(lines[i].trim()),value=lines[i+1].trim();
+    if(code===0){
+      if(entity){entities.push(entity);entity=null}
+      if(value==="SECTION"){section=Number(lines[i+2]?.trim())===2?(lines[i+3]??"").trim():""}
+      else if(value==="ENDSEC")section="";
+      else if(section==="ENTITIES")entity={type:value,codes:[]};
+    }else if(entity)entity.codes.push([code,value]);
+    else if(section==="HEADER"&&code===9&&value==="$INSUNITS"&&Number(lines[i+2]?.trim())===70)units=Number(lines[i+3]);
+  }
+  if(entity)entities.push(entity);
+  const polylines:Array<{layer:string;closed:boolean;v:Array<XY&{bulge:number}>}>=[];
+  for(let i=0;i<entities.length;i++){
+    const e=entities[i],p={layer:"0",closed:false,v:[] as Array<XY&{bulge:number}>};
+    if(e.type==="LWPOLYLINE"){
+      for(const [code,value] of e.codes){
+        if(code===8)p.layer=value;
+        else if(code===70)p.closed=(Number(value)&1)===1;
+        else if(code===10)p.v.push({x:Number(value),y:NaN,bulge:0});
+        else if(code===20&&p.v.length)p.v[p.v.length-1].y=Number(value);
+        else if(code===42&&p.v.length)p.v[p.v.length-1].bulge=Number(value);
+      }
+      polylines.push(p);
+    }else if(e.type==="POLYLINE"){
+      // Its VERTEX entities follow it up to SEQEND; meshes and spline frame points are no line.
+      let mesh=false;
+      for(const [code,value] of e.codes){if(code===8)p.layer=value;else if(code===70){p.closed=(Number(value)&1)===1;mesh=(Number(value)&(16|64))!==0}}
+      while(entities[i+1]?.type==="VERTEX"){
+        const q={x:NaN,y:NaN,bulge:0};
+        let flags=0;
+        for(const [code,value] of entities[++i].codes){if(code===10)q.x=Number(value);else if(code===20)q.y=Number(value);else if(code===42)q.bulge=Number(value);else if(code===70)flags=Number(value)}
+        if(!(flags&(16|64|128)))p.v.push(q);
+      }
+      if(!mesh)polylines.push(p);
+    }
+  }
+  const [scale,unitName]=DXF_UNITS[units]??[1,""];
+  const traced=polylines.map(p=>{
+    const v=p.v.filter(q=>Number.isFinite(q.x)&&Number.isFinite(q.y)),pts:XY[]=[];
+    const n=p.closed?v.length:v.length-1;
+    v.forEach((q,k)=>{pts.push({x:q.x,y:q.y});if(k<n&&q.bulge)pts.push(...arcPoints(q,v[(k+1)%v.length],q.bulge))});
+    if(p.closed&&v.length>2)pts.push({x:v[0].x,y:v[0].y});
+    return {layer:p.layer||"0",points:pts.map(q=>({x:q.x*scale,y:q.y*scale}))};
+  }).filter(p=>p.points.length>=2);
+  if(!traced.length)throw new Error(`${file.name}: no polyline (LWPOLYLINE or POLYLINE) in the drawing; draw the alignment as one polyline`);
+  // A whole drawing has many polylines: those on layers named as lines come first, and at most 20 are kept.
+  const length=(p:{points:XY[]})=>p.points.reduce((s,q,k)=>k?s+Math.hypot(q.x-p.points[k-1].x,q.y-p.points[k-1].y):0,0);
+  const named=traced.filter(p=>LINE_NAME.test(p.layer)||/^(cl|c\/l|axis)$/i.test(p.layer));
+  let kept=named.length?named:traced;
+  if(kept.length>20){kept=[...kept].sort((p,q)=>length(q)-length(p)).slice(0,20);notes.push(`${file.name}: the 20 longest of ${traced.length} polylines are kept`)}
+  else if(named.length&&named.length<traced.length)notes.push(`${file.name}: ${named.length} polyline${named.length>1?"s":""} on layers named as lines kept; ${traced.length-named.length} other polylines ignored`);
+  const count=new Map<string,number>();
+  for(const p of kept)count.set(p.layer,(count.get(p.layer)??0)+1);
+  const seen=new Map<string,number>();
+  const out=kept.map(p=>{
+    const k=(seen.get(p.layer)??0)+1;seen.set(p.layer,k);
+    const name=count.get(p.layer)!>1?`${p.layer} ${k}`:p.layer;
+    return checked({name,points:cleanPoints(p.points,name,notes),source:file.name},file.name);
+  });
+  notes.push(unitName?`${file.name}: drawing units ${unitName}${scale!==1?", converted to metres":""}; positions are read in the project's coordinates`:`${file.name}: the drawing does not state its units; positions are read as metres in the project's coordinates`);
+  return out;
+}
+// Alignments as CSV: the points with their chainage, and the design levels at them where given.
+export function toAlignmentCsv(a:Alignment){
+  const ch=chainages(a),band=a.design?.some(d=>d.bottom!==undefined),design=!!a.design?.length;
+  const rows:Array<Array<string|number|undefined>>=[["x","y","chainage_m",...(design?band?["crown_m","invert_m"]:["level_m"]:[])]];
+  a.points.forEach((p,k)=>{
+    const d=designAt(a.design,ch[k]);
+    rows.push([round3(p.x),round3(p.y),round3(ch[k]),...(design?band?[d.top===undefined?undefined:round3(d.top),d.bottom===undefined?undefined:round3(d.bottom)]:[d.top===undefined?undefined:round3(d.top)]:[])]);
+  });
+  return toCsv(rows);
+}
+const round3=(v:number)=>Math.round(v*1000)/1000;
+
+// Alignment files attach to the project imported with them, or to `current`; a profile table attaches its design
+// levels to the line named in it, or else to the last line.
+function readAlignmentFiles(lineFiles:TextFile[],profiles:TextFile[],project:GeoProject,warnings:string[]){
+  const crs=projectCrs(project),added:Alignment[]=[];
+  for(const f of lineFiles){
+    const read=isDxf(f)?readDxfLines(f,warnings):isGeoJsonLines(f)?readGeoJsonLines(f,crs,warnings):readLineTable(f,crs,warnings);
+    added.push(...read);
+  }
+  const all=[...(project.alignments??[]),...added];
+  for(const f of profiles){
+    const header=parseCsv(f.text.split(/\r?\n/,1)[0]??"")[0]??[],l=lineColumns(header);
+    const named=l.line!==undefined?parseCsv(f.text)[1]?.[l.line]?.trim():undefined;
+    const target=all.find(a=>a.name===named)??all[all.length-1];
+    if(!target)throw new Error(`${f.name}: design levels by chainage need a line; import the alignment first`);
+    const design=readProfileTable(f,warnings),i=all.indexOf(target),next={...target,design};
+    const problem=alignmentProblem(next);
+    if(problem)throw new Error(`${f.name}: ${problem}`);
+    all[i]=next;
+    if(added.includes(target))added[added.indexOf(target)]=next;
+    else added.push(next);
+    warnings.push(`${f.name}: ${design.length} design level${design.length>1?"s":""} for ${target.name}`);
+  }
+  // A line read again under the same name replaces the earlier one.
+  const names=new Set(added.map(a=>a.name));
+  project.alignments=[...(project.alignments??[]).filter(a=>!names.has(a.name)),...added.filter((a,k)=>added.findIndex(b=>b.name===a.name)===k)];
+  for(const a of added){
+    const ch=chainages(a);
+    warnings.unshift(`Alignment ${a.name}: ${a.points.length} points, chainage ${Math.round(ch[0])}–${Math.round(ch[ch.length-1])} m${a.design?.length?`, ${a.design.length} design level${a.design.length>1?"s":""}${a.design.some(d=>d.bottom!==undefined)?" (crown and invert)":""}`:""}`);
+  }
+  return [...names];
+}
+
 // ---------- entry point ----------
 
-// Terrain grids (.asc, gridded .xyz) attach to the boreholes imported with them, or to `current` when they come alone.
-// `declared` is the coordinate system of CSV tables (positions given by latitude and longitude are placed in it).
+// Terrain grids (.asc, gridded .xyz) attach to the boreholes imported with them, or to `current` when they come alone;
+// so do alignments (CSV, GeoJSON, DXF) and design profiles. `declared` is the coordinate system of CSV tables
+// (positions given by latitude and longitude are placed in it).
 export function importFiles(files:TextFile[],current?:GeoProject,declared?:Crs):ImportResult{
   if(!files.length)throw new Error("No files to import");
+  const lineFiles=files.filter(f=>!isTerrainFile(f.name,f.text)&&(isDxf(f)||isGeoJsonLines(f)||lineTableKind(f)==="line"));
+  const profiles=files.filter(f=>!isTerrainFile(f.name,f.text)&&lineTableKind(f)==="profile");
+  if(lineFiles.length||profiles.length){
+    const rest=files.filter(f=>!lineFiles.includes(f)&&!profiles.includes(f));
+    const result=rest.length?importFiles(rest,current,declared):current?{project:{...current},warnings:[]}:null;
+    if(!result)throw new Error("Load or import boreholes before adding an alignment");
+    result.alignments=readAlignmentFiles(lineFiles,profiles,result.project,result.warnings);
+    return result;
+  }
   const grids=files.filter(f=>isTerrainFile(f.name,f.text)),rest=files.filter(f=>!grids.includes(f));
   if(grids.length){
     const terrain:TerrainGrid=readTerrain(grids[0].name,grids[0].text);

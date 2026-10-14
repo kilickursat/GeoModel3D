@@ -518,8 +518,8 @@ function cellsOf(model:GeoModel){
   triangleIndex.set(model,index);
   return index;
 }
-// Horizon elevations at (x, y), or null outside the model footprint.
-export function sampleModel(model:GeoModel,x:number,y:number):number[]|null{
+// The triangle of the model that holds (x, y), with the point's barycentric weights, or null outside the footprint.
+export function locateInModel(model:GeoModel,x:number,y:number):{t:Triangle;w:[number,number,number]}|null{
   const p=model.nodes;
   if(!model.triangles.length)return null;
   const g=cellsOf(model),c=Math.floor((x-g.x0)/g.size),r=Math.floor((y-g.y0)/g.size);
@@ -530,7 +530,14 @@ export function sampleModel(model:GeoModel,x:number,y:number):number[]|null{
     const wc=((p[t.b].x-p[t.a].x)*(y-p[t.a].y)-(p[t.b].y-p[t.a].y)*(x-p[t.a].x))/d;
     const wa=1-wb-wc,e=-1e-9;
     if(wa<e||wb<e||wc<e)continue;
-    return model.horizons.map(h=>wa*h.z[t.a]+wb*h.z[t.b]+wc*h.z[t.c]);
+    return {t,w:[wa,wb,wc]};
   }
   return null;
+}
+// Horizon elevations at (x, y), or null outside the model footprint.
+export function sampleModel(model:GeoModel,x:number,y:number):number[]|null{
+  const hit=locateInModel(model,x,y);
+  if(!hit)return null;
+  const {t,w:[wa,wb,wc]}=hit;
+  return model.horizons.map(h=>wa*h.z[t.a]+wb*h.z[t.b]+wc*h.z[t.c]);
 }

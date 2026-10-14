@@ -3,7 +3,8 @@
 // any script print correctly.
 import {GeoModel,unitCubicMetres,footprintArea} from "./model";
 import {Section} from "./section";
-import {sectionSvg} from "./sectionSvg";
+import {sectionSvg,sectionTitle} from "./sectionSvg";
+import {chainageTable,outsideStretches,unitLabel} from "./alignment";
 import {projectCrs} from "./crs";
 import {boreholeDepth,sptN} from "./schema";
 import {SectionField,unitWeights} from "./fields";
@@ -22,6 +23,7 @@ export interface ReportOptions {
   hidden?:ReadonlySet<string>;  // units hidden in the view are left out of the 3-D image and the section
   field?:SectionField;          // a field shown on the section gets a page of its own
   validation?:CrossValidation;  // a cross-validation of the model, run in the app, gets a page of its own
+  chainageStep?:number;         // along an alignment, the step of the table by chainage (coarser where it would not fit)
 }
 
 const esc=(s:string)=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]!));
@@ -32,8 +34,8 @@ const range=(lo?:number,hi?:number,unit="")=>lo===undefined&&hi===undefined?"":`
 export function reportHtml(model:GeoModel,section:Section,o:ReportOptions){
   const p=model.project,crs=projectCrs(p);
   const [w,h]=o.paper==="A3"?[420,297]:[297,210];
-  const azimuth=String(Math.round(section.azimuth)).padStart(3,"0");
-  const sectionName=`Section A–A′ · ${azimuth}° · ${section.offset>=0?"+":""}${Math.round(section.offset)} m`;
+  const azimuth=String(Math.round(section.azimuth)).padStart(3,"0"),line=section.alignment;
+  const sectionName=line?sectionTitle(section):`Section A–A′ · ${azimuth}° · ${section.offset>=0?"+":""}${Math.round(section.offset)} m`;
   const foot=(part:string)=>`<div class="foot"><span>${esc(p.name)} · ${esc(o.date)} · GeoModel3D ${esc(o.version)}</span><span>${part}</span></div>`;
   const block:Array<[string,string]>=[
     ["Coordinate system",crs?`${crs.name}${crs.code?` (${crs.code})`:""}`:p.crs?`${p.crs} (not georeferenced)`:"Local, not georeferenced"],
@@ -100,6 +102,8 @@ table.block th{width:32mm}
 .foot{margin-top:auto;padding-top:3mm;border-top:0.4pt solid #c9d1d6;display:flex;justify-content:space-between;color:#5b6770;font-size:0.85em}
 .credits{color:#5b6770;font-size:0.85em;margin-top:3mm}
 .field-notes{margin:2mm 0 0;padding-left:4mm;font-size:0.9em}
+table.chainage{font-size:0.86em}
+table.chainage td,table.chainage th{padding:0.5mm 1.4mm}
 </style></head><body>
 <section class="page">
 <header><div><h1>${esc(p.name)}</h1><div class="desc">${esc(p.description??"")}</div></div>
@@ -109,8 +113,10 @@ table.block th{width:32mm}
 <div><h3>Units</h3><table><thead><tr><th>Unit (top to bottom)</th><th>Volume in the model</th><th>Properties</th></tr></thead><tbody>${legend}</tbody></table>${rules?`<p class="muted">The units are assigned to the logged descriptions by rules; they are listed with the boreholes.</p>`:""}</div></div>
 ${foot("Overview")}</section>
 <section class="page"><h2>${esc(sectionName)}</h2><div class="section">${svg}</div>
-<p class="muted">From A (${fmt(section.x[0]??NaN,1)}, ${fmt(section.y[0]??NaN,1)}) to A′ (${fmt(section.x[section.x.length-1]??NaN,1)}, ${fmt(section.y[section.y.length-1]??NaN,1)}) in ${esc(crs?.name??p.crs??"project coordinates")}; boreholes within ${fmt(o.sectionBuffer)} m are projected onto it.</p>
-${foot("Section")}</section>
+${line?`<p class="muted">Along ${esc(line.name)}, ${line.s.length} points from (${fmt(line.x[0],1)}, ${fmt(line.y[0],1)}) to (${fmt(line.x[line.x.length-1],1)}, ${fmt(line.y[line.y.length-1],1)}) in ${esc(crs?.name??p.crs??"project coordinates")}; boreholes within ${fmt(o.sectionBuffer)} m of the line are projected onto it at their nearest point.${outsideStretches(section).map(([a,b])=>` Chainage ${fmt(a)}–${fmt(b)} m lies outside the model.`).join("")}</p>`
+  :`<p class="muted">From A (${fmt(section.x[0]??NaN,1)}, ${fmt(section.y[0]??NaN,1)}) to A′ (${fmt(section.x[section.x.length-1]??NaN,1)}, ${fmt(section.y[section.y.length-1]??NaN,1)}) in ${esc(crs?.name??p.crs??"project coordinates")}; boreholes within ${fmt(o.sectionBuffer)} m are projected onto it.</p>`}
+${foot(line?"Longitudinal profile":"Section")}</section>
+${line?chainagePage(model,section,o.chainageStep??10,foot):""}
 ${o.field?`<section class="page"><h2>${esc(sectionName)} · ${esc(o.field.name)} ${esc(o.field.symbol)}</h2><div class="section">${fieldSvg}</div>
 <ul class="muted field-notes">${o.field.notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul>
 ${foot(`Section: ${o.field.name.toLowerCase()}`)}</section>`:""}
@@ -138,4 +144,30 @@ ${worst.length?`<h3>Furthest from their prediction</h3><table><thead><tr><th>Bor
   worst.map(b=>`<tr><td>${esc(b.id)}</td><td class="num">${fmt(b.mae,2)}</td><td>${b.worst?`${esc(v.surfaces[b.worst.k])} ${signed(b.worst.error)} m`:""}</td><td class="num">${b.worst?fmt(b.worst.logged,2):""}</td><td class="num">${b.worst?fmt(b.worst.predicted,2):""}</td></tr>`).join("")}</tbody></table>`:""}
 ${v.notes.length?`<ul class="notes">${v.notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul>`:""}
 ${foot("Cross-validation")}</section>`;
+}
+
+// The table by chainage along an alignment: the ground, the water table and the design levels with the cover and the
+// units at them, or without design levels each unit's thickness; at the step asked for, or a coarser round step that
+// fits the page.
+function chainagePage(model:GeoModel,section:Section,asked:number,foot:(part:string)=>string){
+  const length=section.s.length>1?section.s[section.s.length-1]-section.s[0]:0;
+  const step=[asked,1,2,5,10,20,25,50,100,200,250,500,1000].filter(v=>v>=asked).find(v=>length/v<=60)??1000;
+  const rows=chainageTable(model,section,step),band=rows.some(r=>r.bottom!==undefined),design=rows.some(r=>r.top!==undefined),wet=rows.some(r=>r.water!==undefined);
+  const head=["Chainage (m)","Ground (m)",...(wet?["Water table (m)"]:[]),
+    ...(band?["Crown (m)","Invert (m)","Cover above crown (m)",...(wet?["Water above crown (m)"]:[]),"Unit at crown","Unit at invert"]
+      :design?["Design level (m)","Depth below ground (m)",...(wet?["Water above level (m)"]:[]),"Unit at level"]
+      :model.units.map(u=>`${u.name} (m)`))];
+  const v=(x:number|undefined,d=2)=>x===undefined?"":fmt(x,d);
+  const body=rows.map(r=>{
+    const cover=r.top===undefined?undefined:r.ground-r.top,water=r.top===undefined||r.water===undefined?undefined:r.water-r.top;
+    const cells=[fmt(r.chainage,step<1?1:0),v(r.ground),...(wet?[v(r.water)]:[]),
+      ...(band?[v(r.top),v(r.bottom),v(cover),...(wet?[v(water)]:[])]:design?[v(r.top),v(cover),...(wet?[v(water)]:[])]:r.thickness.map(t=>v(t)))];
+    const names=band?[unitLabel(model,r.unitTop),unitLabel(model,r.unitBottom)]:design?[unitLabel(model,r.unitTop)]:[];
+    return `<tr>${cells.map(c=>`<td class="num">${c}</td>`).join("")}${names.map(n=>`<td>${esc(n)}</td>`).join("")}</tr>`;
+  }).join("");
+  const name=section.alignment!.name;
+  return `<section class="page"><h2>${esc(name)}: by chainage</h2>
+<table class="chainage"><thead><tr>${head.map(h=>`<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table>
+<p class="muted">Every ${fmt(step)} m of chainage where the line is in the model${step>asked?`; the table by chainage in CSV has a row every ${fmt(asked)} m`:""}. Elevations in metres; the cover is the ground above the ${band?"crown":"design level"}, negative where the ${band?"crown":"level"} is above the ground.</p>
+${foot("By chainage")}</section>`;
 }

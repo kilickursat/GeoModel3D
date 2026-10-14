@@ -5,7 +5,7 @@
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 [![three.js WebGPU](https://img.shields.io/badge/three.js-WebGPU%20%2B%20WebGL%202-black)](https://threejs.org)
 
-**Open-source 3D geological and geotechnical modelling for engineers, engineering geologists and hydrogeologists.** GeoModel3D turns borehole logs into a 3D stratigraphic model: TIN horizons, closed unit volumes and cross-sections at any angle. It places the model on a real map in the site's national coordinate system. On any section it shows the groundwater, the vertical total and effective stresses, the horizontal effective stress where K0 is given, and laboratory or in-situ test results. Down any borehole of your own case, it gives the active, at-rest and passive earth pressures on a wall, drained or undrained.
+**Open-source 3D geological and geotechnical modelling for engineers, engineering geologists and hydrogeologists.** GeoModel3D turns borehole logs into a 3D stratigraphic model: TIN horizons, closed unit volumes, cross-sections at any angle, and longitudinal profiles along a tunnel, road or railway alignment, with a table by chainage. It places the model on a real map in the site's national coordinate system. On any section it shows the groundwater, the vertical total and effective stresses, the horizontal effective stress where K0 is given, and laboratory or in-situ test results. Down any borehole of your own case, it gives the active, at-rest and passive earth pressures on a wall, drained or undrained.
 
 Data can come from:
 - CSV, AGS4, Japanese, Dutch (BRO) and Flemish (DOV) borehole files;
@@ -35,11 +35,12 @@ Each site is published data, in its country's own coordinate system and height d
 | **Creswick: basalt over the deep leads** | **Input data: a case typed in by hand** |
 | ![Creswick deep leads model from NGIS hydrostratigraphy](docs/creswick.png) | ![The Input data tab with the worked example: its units, and the drained earth pressures down a borehole](docs/input-data.png) |
 
-## Version 0.12
+## Version 0.13
 
-- **On phones and tablets:** the model fills the screen, and the panels open one at a time from a bar at the bottom; tap a borehole or a unit for its details. See [On phones and tablets](#on-phones-and-tablets).
+- **Sections along a line:** the longitudinal profile along a tunnel, road, railway or dike, by chainage, with its design levels: the tunnel from crown to invert, or a road or rail level. Import the line as CSV, GeoJSON or DXF, or draw it on the model, through boreholes for a fence section. A table by chainage gives the cover, the water above the crown and the units in the tunnel face; **Cross-section** cuts square to the line at any chainage. See [Sections along a line](#sections-along-a-line).
 
 Earlier versions:
+- **0.12:** a layout for phones and tablets: the model fills the screen, the panels open one at a time from a bar at the bottom, and a tap on a borehole or a unit gives its details.
 - **0.11:** models for augmented reality, USDZ for iPhone and iPad and GLB for Android and 3-D software, with the four bundled sites ready at [kilickursat.github.io/GeoModel3D/ar/](https://kilickursat.github.io/GeoModel3D/ar/).
 - **0.10:** Check the model, a leave-one-out cross-validation that predicts each borehole from the others; lengths in feet, centimetres or millimetres converted to metres (0.9.1); three Antwerp boreholes with doubtful collar heights left out.
 - **0.9:** earth pressures down a borehole in the Input data tab (Rankine, drained and undrained); a contribution guide and a Sponsoring section; collars that scatter about a coarse terrain grid summed up in one note.
@@ -66,6 +67,7 @@ Use **Import data…** or drop files on the page. Files are read in the browser 
 | Flemish DOV boreholes | The XML of each borehole (`dov.vlaanderen.be/data/boring/…`) together with the XML of its interpretations (`…/data/interpretatie/…`). |
 | A project saved from GeoModel3D, or a Georeport3D extraction | The `.json` file. |
 | Terrain | An ESRI ASCII grid (`.asc`) or gridded `x y z` points (`.xyz`), with the boreholes or on its own. |
+| A tunnel, road or railway alignment | A CSV of its points, a GeoJSON line or a DXF polyline, with the boreholes or on its own ([Sections along a line](#sections-along-a-line)). |
 | Nothing in a file yet | The **Input data** tab ([Entering your own data](#entering-your-own-data)). |
 
 ### CSV tables
@@ -82,6 +84,8 @@ Each table is a CSV file with a header row. Headers are matched by name: case, s
 | [tests.csv](docs/templates/tests.csv) | **Test results**, long form: one value per row | **hole id**; **depth** (m), optional **to** for a sample over a depth range; **property** (key, name or symbol of the catalogue below, or any other name); **value**; optional `unit` |
 | [tests-wide.csv](docs/templates/tests-wide.csv) | **Test results**, wide form: one sample per row | **hole id**; **depth**; one column per property, such as `w (%)`, `bulk density (Mg/m3)`, `LL`, `PL`, `su (kPa)` |
 | [boreholes-combined.csv](docs/templates/boreholes-combined.csv) | **One combined table** | The collar columns and the log columns on every row |
+| [alignment.csv](docs/templates/alignment.csv) | **An alignment**, one row per point of the line ([Sections along a line](#sections-along-a-line)) | **x** and **y**, *or* **latitude** and **longitude**; optional **chainage** (`chainage`, `ch`, `station`, metres or `12+345.6`; `km`, `KP` in kilometres) and design levels: `crown` and `invert`, `axis` and `diameter`, or one `level`; optional line name (`alignment`, `line`, `route`) |
+| [profile.csv](docs/templates/profile.csv) | **Design levels** of the line imported before, by chainage | **chainage**; `crown` and `invert`, `axis` and `diameter`, or one `level` |
 
 How these tables are read:
 - **Lengths** are in metres, unless their header names another unit in brackets: `ft` or `feet` (the international foot), `US ft` (the US survey foot), `cm` or `mm`. These are converted to metres, to the millimetre, and the notes name the columns converted: `Depth From (ft)` reads 10 as 3.048 m. Any other unit there, such as `m`, `mbgl`, `mAOD` or `m NAP`, is read as metres. This applies to eastings and northings, ground level, final depth, from and to, water depths and test depths; SPT penetration stays in millimetres.
@@ -200,12 +204,14 @@ Fields of the project file:
 - **Coordinate system:** `crsCode` georeferences the project with a code from the registry. A system not in the registry can be given as a PROJ definition in `crsProj4`.
 - **Projects built from descriptions** also keep `rules` (`match`, `unit`, and optionally `minN`, `maxN`, `minZ`, `maxZ`), and each interval's logged description as `name`.
 - **Georeport3D extractions:** `collar` easting/northing/elevation, `total_depth`, and `intervals` (`depth_from`, `depth_to`, `lithology`). A borehole without a complete collar is reported and not placed; coordinates are never invented.
+- **Alignments:** `alignments` lists the lines of the project, each with a `name` and its `points` (`x`, `y`, and a `chainage` at every point or at none). It may also have a `start` chainage and `design` levels: `chainage` and `top`, and `bottom` for a crown and invert.
 
 **Export** also writes:
 - **Boreholes (CSV)**, with descriptions and water depths;
 - **Tests (CSV)**;
 - **Section (SVG and CSV)**;
 - **Section field (CSV)**: the stress or property shown, on a grid over the section;
+- **Chainage table (CSV)** and **Alignment (CSV)**, along a line;
 - **Report (PDF, A3 or A4)**.
 
 ## Entering your own data
@@ -294,6 +300,36 @@ Here Ka = tan²(45° − φ′/2) and Kp = tan²(45° + φ′/2) = 1/Ka. Undrain
 
 ![Undrained active, at-rest and passive earth pressures down a borehole of the worked example, with the depths where the clays would pull on the wall](docs/earth-pressure.png)
 
+## Sections along a line
+
+A section can follow a line instead of running straight: a tunnel, a road, a railway, a pipeline or a dike. Choose the line under **Section → Line**. The 2-D section becomes the longitudinal profile by chainage, and in 3-D the section face follows the line, with the units drawn see-through around it. The buried-channel demo comes with a synthetic tunnel.
+
+![The synthetic tunnel of the buried-channel demo: the section face along it in 3-D, and its profile by chainage with the tunnel from crown to invert passing through the channel gravel](docs/alignment.png)
+
+- **The line** comes from one of:
+  - a CSV of its points: `x` and `y` (or `lat` and `lon`), and optionally `chainage` and design levels. A column naming the line (`alignment`, `line` or `route`) holds several lines in one file;
+  - a GeoJSON LineString, in longitude and latitude, or in the project's system if the file names it;
+  - a DXF polyline (LWPOLYLINE or POLYLINE), with its arcs;
+  - **Draw a line…**: click on the model, or tap on a phone. Near a borehole the line passes through its collar, so a line through boreholes is a fence section. **From above** looks straight down while you draw.
+
+  Lines belong to the project shown. They are kept while the page is open; **Export → Project (JSON)** saves them with it, and **Export → Alignment (CSV)** saves one line.
+- **Chainage** runs from 0 at the first point, or as the file gives it at every point: in metres, or as kilometres and metres, `12+345.6`. A column headed `km` or `KP` holds kilometres.
+- **Design levels** are drawn on the profile and in 3-D, one of:
+  - a single level, such as a road or rail level (`level`, `z`);
+  - a tunnel's crown and invert (`crown`, `invert`);
+  - a tunnel's axis level and height (`axis`, `diameter`).
+
+  They come with the points, or by chainage alone in a second CSV (`chainage`, `crown`, `invert`), which goes to the line imported last. Lengths in feet are converted, as for boreholes.
+- **Chainage** on the section bar marks a point on the profile and in 3-D. **Cross-section** turns the section into a straight one square to the line there.
+- **The table by chainage** has a row every 1 to 100 m where the line is in the model:
+  - the ground and the water table, and each unit's thickness;
+  - with design levels, the cover above the crown or level, the water above it, and the units at the crown and the invert;
+  - between crown and invert, each unit's share of the height: the mixed faces along a tunnel.
+
+  **Export → Chainage table (CSV)** writes it, and the PDF report gets a page of it.
+
+Boreholes within the section's reach of the line are projected onto it at their nearest point; those beyond its ends are left out. The profile is exact, as a straight section is: it has a sample wherever the line crosses an edge of the triangulation and at each point of the line, so the horizons are linear between samples. A straight line gives exactly the straight section, and the tests hold it to that. Where a line leaves the model and comes back, the profile has a gap, which the report names.
+
 ## Checking the model
 
 A model honours every borehole it is built from, so its fit to them says nothing about the ground between them. **Check the model** in the panel says how far to trust it there. It leaves out each borehole in turn, builds the model from the others, and compares the borehole's log with what that model predicts at its collar: leave-one-out cross-validation, the usual check of a spatial interpolation (Isaaks and Srivastava, *An Introduction to Applied Geostatistics*, 1989).
@@ -335,7 +371,7 @@ On a phone, held either way, and on a tablet held upright, the model fills the s
 
 - **A bar at the bottom** opens the panels one at a time, as sheets:
   - **Site:** the dataset, its description, the units to show or hide, the unit rules and Check the model;
-  - **Section:** azimuth, offset, vertical exaggeration, colour and the 2-D section;
+  - **Section:** the line, straight or along an alignment, its azimuth and offset or its chainage, vertical exaggeration, colour and the 2-D section;
   - **View:** what is drawn, the map and the terrain;
   - **Files:** your own data, import and export.
 
@@ -434,7 +470,7 @@ The viewer uses three.js's `WebGPURenderer` with TSL node materials, so one shad
   - **Palaeozoic bedrock.**
 
   Every log runs in this order, with no gaps to fill. Coordinates are in GDA94 / MGA zone 54, with ground elevations in metres AHD from LiDAR, a terrain model or GPS. Only bore IDs, positions, elevations, depths and the interpretation are kept: the licence and source fields of NGIS are not read. `scripts/extract-ngis-deepleads.py` reads the bores from the NGIS geodatabase on data.gov.au, and `scripts/make-deepleads-site.ts` builds the dataset.
-- **Synthetic valley, buried channel and layer-cake.** Generated by the scripts in `scripts/`; they exercise the modelling kernel and are not real sites. The channel generator also writes the true geometry the tests compare against.
+- **Synthetic valley, buried channel and layer-cake.** Generated by the scripts in `scripts/`; they exercise the modelling kernel and are not real sites. The channel generator also writes the true geometry the tests compare against, and a synthetic tunnel alignment that crosses the channel, with crown and invert levels.
 
 ## Architecture
 
@@ -448,6 +484,7 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 - `src/fields.ts`: stresses, earth pressures, measured properties on sections, and their colour scales
 - `src/validation.ts`: leave-one-out cross-validation
 - `src/ar.ts`: models for augmented reality (USDZ and GLB)
+- `src/alignment.ts`: sections along an alignment, chainage, cross-sections square to the line, and the table by chainage
 - `src/layout.ts`: the layout for phones and tablets (where the view is drawn, how the model is framed, how near a tap is to a borehole)
 - `src/properties.ts`: the property catalogue and per-unit statistics
 - `src/volume.ts`: closed unit-volume meshes
@@ -489,7 +526,7 @@ Every push to `main` runs the tests, builds the site and publishes `dist/` to Gi
    - property models in 3-D, not only on sections.
 3. **More data:** CPT import (BRO, DOV, AGS4 `SCPT`), and a reference site in the Americas once clearly licensed public data are found.
 4. Faults; constrained TIN boundaries, pinch-out lines and geological map contacts.
-5. Fence diagrams for boreholes along an alignment (tunnels, roads).
+5. Alignments with curves and spirals from LandXML (and J-LandXML), and the tunnel's outline on its cross-sections.
 6. GeoJSON, DXF and LAS import; GeoTIFF terrain.
 7. Streaming and level of detail for large models.
 
