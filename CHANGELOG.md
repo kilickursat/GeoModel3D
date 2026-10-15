@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.15.0 — 2026-10-15
+
+### Added
+- **Cone penetration tests (CPT).** CPTs are read with the boreholes, or added to the site shown, from:
+  - **GEF** files (GEF-CPT-Report): the columns by their quantity number, with the depth corrected for inclination where given, missing values, separators and units; the position in RD New (`#XYID` 31000) or an EPSG code, and the start level (`#ZID`, NAP).
+  - **BRO** CPT XML (IMBRO and IMBRO/A), in the order of the parameters the file lists, placed in RD New or by the standardized ETRS89 position, with notes for a start at the water bed or a datum other than NAP.
+  - **DOV** CPT XML (`data/sondering/…`), in Belgian Lambert 72 and TAW; DOV's pore pressure `u` is shown as u2, with a note.
+  - **AGS4** `SCPG` and `SCPT`, at their `LOCA` location, in the units of the `UNIT` row; a file with CPTs and no logs adds them to the site shown.
+  - **CSV** tables of readings, with the position on the rows or in a collar table imported with them; pressures in kPa, MPa, bar, tsf, ksf or psi are converted. Template `docs/templates/cpt.csv`.
+
+  Positions are converted to the project's coordinate system. CPTs far from the boreholes belong to another site and are left out, with a note; a CPT read again replaces the one of the same name.
+- **CPTs in 3-D:** an axis from the start to the deepest reading, with the cone resistance drawn out from it on a panel that turns to face the camera; **CPTs** in the View panel shows or hides them. Hovering, or tapping on a phone, gives the readings at that depth and the CPT's log over the units of the model there.
+- **CPTs on sections and profiles:** each CPT within reach is projected onto the section with its qc to the right and its friction ratio to the left, on one scale given under the section. Over a trace, the read-out gives its readings at that level.
+- **CPT fields:** qc, fs, Rf and u2 colour the section like the laboratory results, from the means of the readings over 0.5 m interpolated within each unit.
+- **Along a line**, the table by chainage gives qc at the crown and invert, or at the design level, and the nearest CPT with its distance.
+- **Report:** a page with the logs of the CPTs on the section, their readings by unit of the model, and a list of the CPTs. The chainage page gives qc at the design levels and the nearest CPT.
+- **Export → CPTs (CSV)**, one row per reading; the project file keeps the CPTs.
+- **The Maasvlakte site has 26 BRO CPTs:** of those made since 2018, of quality class 1 or 2 and at least 30 m deep, the deepest in each 400 m square, with a reading every 0.1 m (`scripts/make-rotterdam-site.ts`).
+- `src/cpt.ts` (readers and what follows from the readings), `src/cptSvg.ts` (a CPT's log).
+
+### Changed
+- Names on a section stay within the drawing.
+- The Input data tab keeps a project's lines and CPTs when it is rebuilt from the tables, while the coordinate system stays the same; a note says when they are left out.
+
 ## 0.14.0 — 2026-10-14
 
 ### Added
