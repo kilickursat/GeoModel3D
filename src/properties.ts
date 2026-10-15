@@ -29,6 +29,9 @@ export const properties:PropertyDef[]=[
   {key:"K0",name:"Earth pressure coefficient at rest",symbol:"K0",unit:"",decimals:2,range:[0.1,4],aliases:["k0","ko","kzero","earthpressurecoefficientatrest","coefficientofearthpressureatrest"]},
   {key:"k",name:"Hydraulic conductivity",symbol:"k",unit:"m/s",decimals:2,range:[1e-14,1],log:true,aliases:["k","ksat","permeability","hydraulicconductivity","ptstk"]},
   {key:"qc",name:"Cone resistance",symbol:"qc",unit:"MPa",decimals:2,range:[0,200],aliases:["qc","qt","coneresistance","conetipresistance","scptres"]},
+  {key:"fs",name:"Sleeve friction",symbol:"fs",unit:"kPa",decimals:0,range:[0,3000],aliases:["fs","sleevefriction","localfriction","scptfres"]},
+  {key:"Rf",name:"Friction ratio",symbol:"Rf",unit:"%",decimals:1,range:[0,50],aliases:["rf","frictionratio","scptfrr"]},
+  {key:"u2",name:"Pore pressure behind the cone",symbol:"u2",unit:"kPa",decimals:0,range:[-1000,20000],aliases:["u2","scptpwp2"]},
   {key:"Vs",name:"Shear-wave velocity",symbol:"Vs",unit:"m/s",decimals:0,range:[0,5000],aliases:["vs","shearwavevelocity"]},
   {key:"RQD",name:"Rock quality designation",symbol:"RQD",unit:"%",decimals:0,range:[0,100],aliases:["rqd"]}
 ];

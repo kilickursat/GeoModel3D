@@ -1,4 +1,4 @@
-import {Borehole,GeoProject,UnitDef,boreholeDepth} from "./schema";
+import {Borehole,GeoProject,UnitDef,Cpt,boreholeDepth} from "./schema";
 import {delaunay,Triangle,XY,triangleArea,uniqueEdges} from "./tin";
 import {TINSurface,GeologicalVolume} from "./volume";
 import {TerrainGrid,terrainZ,convexHull,boundaryResidual} from "./terrain";
@@ -28,6 +28,8 @@ export interface GeoModel {
   edges?:Array<[number,number]>;
   // The water table at every node, where groundwater is known, and where it comes from.
   water?:{z:Float64Array;source:string};
+  // The project's CPTs that can be shown: those without a start level start at the model's ground.
+  cpts:Cpt[];
 }
 // `start` is the depth where a log begins, when it begins below the collar.
 export interface BoreholeContacts { depth:Array<number|null>; eroded:Array<number|null>; deepest:number; eoh:number; notes:string[]; start?:number }
@@ -468,8 +470,28 @@ export function buildGeologicalModel(project:GeoProject,options:{probe?:XY;trian
     name:k===0?"Ground surface":k===K?"Model base":"Base of "+units[k-1].name,
     z:Float64Array.from(zk),observed:Uint8Array.from(known01[k])
   }));
-  return {project,units,boreholes,nodes:cut.mesh.nodes,triangles:cut.mesh.triangles,horizons,base,warnings,edgeChains:cut.mesh.chains,spacing,meshNodes:M,residuals,terrainAt,
-    ...(W?{water:{z:Float64Array.from(W),source:waterSource}}:{})};
+  const model:GeoModel={project,units,boreholes,nodes:cut.mesh.nodes,triangles:cut.mesh.triangles,horizons,base,warnings,edgeChains:cut.mesh.chains,spacing,meshNodes:M,residuals,terrainAt,
+    ...(W?{water:{z:Float64Array.from(W),source:waterSource}}:{}),cpts:[]};
+  model.cpts=modelCpts(model,warnings);
+  return model;
+}
+// The project's CPTs placed on the model: one without a start level starts at the model's ground where it stands
+// inside the model, and is left out elsewhere; those outside the model are named, as no field is read from them.
+function modelCpts(model:GeoModel,warnings:string[]){
+  const out:Cpt[]=[],outside:string[]=[],grounded:string[]=[];
+  for(const c of model.project.cpts??[]){
+    if(!Number.isFinite(c.x)||!Number.isFinite(c.y)||!c.depth.length)continue;
+    const g=sampleModel(model,c.x,c.y);
+    if(!g)outside.push(c.id);
+    if(Number.isFinite(c.z)){out.push(c);continue}
+    if(!g){warnings.push(`${c.id}: no start level, and outside the model; CPT not shown`);continue}
+    out.push({...c,z:g[0]});
+    grounded.push(`${c.id} (${fmt(g[0])} m)`);
+  }
+  if(grounded.length)warnings.push(`CPTs without a start level start at the model's ground: ${grounded.join(", ")}`);
+  const shown=outside.filter(id=>out.some(c=>c.id===id));
+  if(shown.length)warnings.push(`${shown.length} CPT${shown.length>1?"s lie":" lies"} outside the model, so ${shown.length>1?"they add":"it adds"} nothing to the fields on sections: ${shown.slice(0,6).join(", ")}${shown.length>6?"…":""}`);
+  return out;
 }
 
 export function horizonSurface(model:GeoModel,k:number):TINSurface{

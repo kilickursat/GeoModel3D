@@ -116,4 +116,13 @@ describe("CSV templates in docs/templates",()=>{
     expect(project.boreholes.length).toBe(3);
     expect(project.boreholes[0].intervals[1]).toEqual({from:1.5,to:8.2,unit:"CLAY",name:"Soft grey silty CLAY"});
   });
+  it("include a CPT that stands among the template boreholes",()=>{
+    const {project,warnings}=importFiles(["boreholes.csv","logs.csv","units.csv","cpt.csv"].map(read));
+    expect(warnings).toEqual(["CPTs: 1 placed, 1 with pore pressure u2; CPT-01 (14 m)"]);
+    expect(project.cpts![0]).toMatchObject({id:"CPT-01",x:512380,y:4180240,z:42.6});
+    expect(project.cpts![0].qc.length).toBe(15);
+    const m=buildGeologicalModel(project);
+    expect(m.warnings).toEqual([]);
+    expect(m.cpts.length).toBe(1);
+  });
 });

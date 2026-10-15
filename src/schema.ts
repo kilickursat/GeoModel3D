@@ -30,6 +30,16 @@ export interface UnitRule { match:string; unit:string; minN?:number; maxN?:numbe
 export interface AlignmentPoint { x:number; y:number; chainage?:number }
 export interface DesignLevel { chainage:number; top:number; bottom?:number }
 export interface Alignment { name:string; points:AlignmentPoint[]; start?:number; design?:DesignLevel[]; source?:string }
+// A cone penetration test (CPT, or CPTu with pore pressure): its position, and the level its depths start from (`z`, the
+// ground or the water bed), like a borehole's collar. The readings are arrays of one length, by increasing depth in
+// metres below the start: cone resistance qc in MPa, sleeve friction fs in kPa, pore pressure u2 (behind the cone) in
+// kPa, and the friction ratio Rf in percent where the data give it (else it is fs/qc); NaN (null in JSON) where a
+// reading has no value. `predrill` is the depth drilled or dug out before the test, `date` the day it was made.
+export interface Cpt {
+  id:string; x:number; y:number; z:number; lon?:number; lat?:number;
+  depth:number[]; qc:number[]; fs?:number[]; u2?:number[]; rf?:number[];
+  predrill?:number; date?:string;
+}
 
 // x, y are in the system named by `crs`; `crsCode` (e.g. EPSG:6677) or the PROJ definition `crsProj4` georeferences it.
 // `source` credits where the data come from. `groundwaterDepth` is an assumed depth of the water table below ground,
@@ -38,9 +48,11 @@ export interface Alignment { name:string; points:AlignmentPoint[]; start?:number
 export interface GeoProject {
   name:string; description?:string; source?:string; crs?:string; crsCode?:string; crsProj4?:string; base?:number;
   groundwaterDepth?:number; margin?:number;
-  units:UnitDef[]; rules?:UnitRule[]; boreholes:Borehole[]; terrain?:TerrainGrid; alignments?:Alignment[];
+  units:UnitDef[]; rules?:UnitRule[]; boreholes:Borehole[]; terrain?:TerrainGrid; alignments?:Alignment[]; cpts?:Cpt[];
 }
 
 export function boreholeDepth(b:Borehole){return Math.max(b.depth??0,...b.intervals.map(i=>i.to))}
+// The deepest reading of a CPT.
+export const cptDepth=(c:Cpt)=>c.depth.length?c.depth[c.depth.length-1]:0;
 // SPT N-value; a test stopped short of 300 mm is scaled to 300 mm (a converted N-value).
 export const sptN=(t:SptTest)=>t.penetration>=300?t.blows:t.blows*300/Math.max(t.penetration,1);

@@ -3,6 +3,8 @@ import {Section,sectionRuns,joined} from "./section";
 import {toCsv} from "./io";
 import {SectionField,columnAt,withTheme,scaleLabel} from "./fields";
 import {chainageTable,unitLabel,Crossing} from "./alignment";
+import {frictionRatio,thinned,cptScale,RF_SCALE} from "./cpt";
+import {cptDepth} from "./schema";
 
 // roundVe draws at a round vertical exaggeration (1, 2, 2.5, 5, 10…), as drawings state it, instead of filling the height.
 // Units whose ids are in `hidden` are left unfilled and out of the legend, as in the 3-D view; borehole logs keep them.
@@ -23,6 +25,9 @@ function niceStep(range:number,count:number){
   const raw=range/Math.max(count,1),p=10**Math.floor(Math.log10(raw)),f=raw/p;
   return (f<1.5?1:f<3?2:f<7?5:10)*p;
 }
+// CPTs on a section: the cone resistance to the right of the test's axis and the friction ratio to the left, at these
+// widths in pixels for their full scales (see cptScale).
+export function cptTraceWidths(plotWidth:number){const qc=Math.min(60,Math.max(16,plotWidth*0.04));return {qc,rf:qc*0.5}}
 const ticks=(lo:number,hi:number,count:number)=>{
   const step=niceStep(hi-lo,count),out:number[]=[];
   for(let v=Math.ceil(lo/step)*step;v<=hi+1e-9;v+=step)out.push(Math.abs(v)<1e-9?0:v);
@@ -51,8 +56,9 @@ export function sectionSvg(model:GeoModel,s:Section,o:SectionSvgOptions){
     if(lx>0&&lx+w>W-76){lx=0;row++}
     legendAt.push([lx,row]);lx+=w;
   }
-  const legendRows=o.legend&&entries.length?row+1:0,title=o.title??true;
-  const m={l:58,r:18,t:title?42:26,b:44+legendRows*18+(o.field?30:0)};
+  const legendRows=o.legend&&entries.length?row+1:0,title=o.title??true,keyed=s.cpts.length>0;
+  // Below the plot: the distance axis and its caption, the scales of the CPTs, and the colour bar of a field.
+  const m={l:58,r:18,t:title?42:26,b:44+legendRows*18+(o.field?30:0)+(keyed?16:0)};
   let pw=W-m.l-m.r;
   const ph=H-m.t-m.b;
   const out:string[]=[`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Inter, system-ui, 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic UI', Meiryo, sans-serif">`,`<rect width="${W}" height="${H}" fill="${t.bg}"/>`];
@@ -62,11 +68,12 @@ export function sectionSvg(model:GeoModel,s:Section,o:SectionSvgOptions){
     out.push(`<text x="${W/2}" y="${H/2}" text-anchor="middle" font-size="13" fill="${t.muted}">The ${s.alignment?"line":"section line"} does not cross the model footprint</text></svg>`);
     return out.join("");
   }
-  const holes=s.boreholes.map(p=>({p,b:model.boreholes[p.index]}));
-  let s0=Math.min(s.s[0],...holes.map(h=>h.p.s)),s1=Math.max(s.s[s.s.length-1],...holes.map(h=>h.p.s));
+  const holes=s.boreholes.map(p=>({p,b:model.boreholes[p.index]})),cpts=s.cpts.map(p=>({p,c:model.cpts[p.index]}));
+  const along=[...holes,...cpts].map(h=>h.p);
+  let s0=Math.min(s.s[0],...along.map(p=>p.s)),s1=Math.max(s.s[s.s.length-1],...along.map(p=>p.s));
   const levels=[...(design??[]).filter(d=>d.chainage>=s0&&d.chainage<=s1).flatMap(d=>d.bottom===undefined?[d.top]:[d.top,d.bottom]),
     ...(o.crossings??[]).flatMap(c=>[c.top,c.bottom].filter((v):v is number=>v!==undefined))];
-  let z0=Math.min(model.base,...holes.map(h=>h.p.bottom),...levels),z1=Math.max(...s.z[0],...holes.map(h=>h.p.top),...levels);
+  let z0=Math.min(model.base,...along.map(p=>p.bottom),...levels),z1=Math.max(...s.z[0],...along.map(p=>p.top),...levels);
   const padS=(s1-s0)*0.03||1,padZ=(z1-z0)*0.06||1;
   s0-=padS;s1+=padS;z0-=padZ;z1+=padZ;
   // Never draw a section with the vertical scale compressed below 1:1; narrow the plot instead.
@@ -165,15 +172,15 @@ export function sectionSvg(model:GeoModel,s:Section,o:SectionSvgOptions){
     const x=X(o.marker).toFixed(2);
     out.push(`<line x1="${x}" x2="${x}" y1="${m.t}" y2="${m.t+ph}" stroke="${t.marker}" stroke-width="1.2"/><text x="${x}" y="${m.t-8}" text-anchor="middle" font-size="10" fill="${t.marker}">${r2(o.marker)}</text>`);
   }
-  const buffer=o.buffer??Math.max(...holes.map(h=>Math.abs(h.p.offset)),1);
-  // Names go to the boreholes nearest the section first, and only where they overlap no name already placed; every
-  // borehole keeps its name as a tooltip.
-  const placed:Array<[number,number,number,number]>=[],named=new Set<number>();
-  for(const {p,b} of [...holes].sort((q,r)=>Math.abs(q.p.offset)-Math.abs(r.p.offset))){
-    const x=X(p.s),y=Y(p.top)-5,w=b.id.length*5.8+4,box:[number,number,number,number]=[x-w/2,y-10,x+w/2,y+2];
+  const buffer=o.buffer??Math.max(...along.map(p=>Math.abs(p.offset)),1);
+  // Names go to the boreholes and CPTs nearest the section first, and only where they overlap no name already placed;
+  // every one keeps its name as a tooltip. A name stays within the drawing.
+  const placed:Array<[number,number,number,number]>=[],named=new Map<number,number>(),namedCpts=new Map<number,number>();
+  for(const {p,id,cpt} of [...holes.map(h=>({p:h.p,id:h.b.id,cpt:false})),...cpts.map(h=>({p:h.p,id:h.c.id,cpt:true}))].sort((q,r)=>Math.abs(q.p.offset)-Math.abs(r.p.offset))){
+    const w=id.length*5.8+4,x=Math.min(Math.max(X(p.s),w/2+2),W-w/2-2),y=Y(p.top)-5,box:[number,number,number,number]=[x-w/2,y-10,x+w/2,y+2];
     if(placed.some(q=>box[0]<q[2]&&box[2]>q[0]&&box[1]<q[3]&&box[3]>q[1]))continue;
     placed.push(box);
-    named.add(p.index);
+    (cpt?namedCpts:named).set(p.index,x);
   }
   for(const {p,b} of holes){
     const x=X(p.s),fade=(1-0.55*Math.min(Math.abs(p.offset)/buffer,1)).toFixed(2);
@@ -187,7 +194,26 @@ export function sectionSvg(model:GeoModel,s:Section,o:SectionSvgOptions){
       const wy=Y(b.z-Math.min(...b.water.map(w=>w.depth)));
       out.push(`<path d="M${(x+4).toFixed(2)},${(wy-5).toFixed(2)}h9l-4.5,6z" fill="none" stroke="${t.water}" stroke-width="1.1"/><line x1="${(x+4).toFixed(2)}" x2="${(x+13).toFixed(2)}" y1="${(wy+3).toFixed(2)}" y2="${(wy+3).toFixed(2)}" stroke="${t.water}" stroke-width="1.1"/>`);
     }
-    out.push(`${named.has(p.index)?`<text x="${x.toFixed(2)}" y="${(Y(p.top)-5).toFixed(2)}" text-anchor="middle" font-size="9.5" fill="${t.text}">${esc(b.id)}</text>`:""}</g>`);
+    out.push(`${named.has(p.index)?`<text x="${named.get(p.index)!.toFixed(2)}" y="${(Y(p.top)-5).toFixed(2)}" text-anchor="middle" font-size="9.5" fill="${t.text}">${esc(b.id)}</text>`:""}</g>`);
+  }
+  // CPTs: the axis from the start to the deepest reading, qc to the right and Rf to the left, each over a halo in the
+  // background colour so that it reads on any fill; about one point a pixel.
+  if(cpts.length){
+    const w=cptTraceWidths(pw),qcMax=cptScale(Math.max(...cpts.flatMap(({c})=>c.qc.filter(Number.isFinite)),1));
+    const step=Math.max(0.02,0.8*(z1-z0)/ph);
+    const path=(xs:number[],ys:number[])=>{let d="",pen=false;xs.forEach((x,i)=>{if(!Number.isFinite(x)){pen=false;return}d+=`${pen?"L":"M"}${x.toFixed(1)},${ys[i].toFixed(1)}`;pen=true});return d};
+    const line=(d:string,stroke:string,width:number)=>d?`<path d="${d}" fill="none" stroke="${t.bg}" stroke-opacity="0.6" stroke-width="${width+1.8}" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${stroke}" stroke-width="${width}" stroke-linejoin="round"/>`:"";
+    for(const {p,c} of cpts){
+      const x=X(p.s),fade=(1-0.55*Math.min(Math.abs(p.offset)/buffer,1)).toFixed(2),keep=thinned(c,step),rf=frictionRatio(c);
+      const ys=keep.map(i=>Y(c.z-c.depth[i]));
+      const qx=keep.map(i=>Number.isFinite(c.qc[i])?x+Math.min(Math.max(c.qc[i],0),qcMax)/qcMax*w.qc:NaN);
+      const rx=keep.map(i=>Number.isFinite(rf[i])?x-Math.min(Math.max(rf[i],0),RF_SCALE)/RF_SCALE*w.rf:NaN);
+      out.push(`<g opacity="${fade}"><title>${esc(c.id)}: CPT, ${Math.round(Math.abs(p.offset))} m ${p.offset>=0?"right":"left"} of the ${s.alignment?`line, at chainage ${r2(p.s)} m`:"section"}; final depth ${r2(cptDepth(c))} m</title>`);
+      out.push(`<line x1="${x.toFixed(2)}" x2="${x.toFixed(2)}" y1="${Y(p.top).toFixed(2)}" y2="${Y(p.bottom).toFixed(2)}" stroke="${t.line}" stroke-width="0.7" stroke-opacity="0.7"/>`);
+      out.push(line(path(rx,ys),t.muted,0.9),line(path(qx,ys),t.line,1.1));
+      out.push(`${namedCpts.has(p.index)?`<text x="${namedCpts.get(p.index)!.toFixed(2)}" y="${(Y(p.top)-5).toFixed(2)}" text-anchor="middle" font-size="9.5" fill="${t.text}">${esc(c.id)}</text>`:""}</g>`);
+    }
+    out.push(`<text x="${(m.l+pw/2).toFixed(1)}" y="${(m.t+ph+46).toFixed(1)}" text-anchor="middle" font-size="10" fill="${t.muted}">${pw<420?`CPTs: qc 0–${qcMax} MPa →, ← Rf 0–${RF_SCALE} %`:`CPTs: qc 0–${qcMax} MPa to the right of each test, friction ratio Rf 0–${RF_SCALE} % to the left`}</text>`);
   }
 
   // A narrow drawing, as on a phone, names the ends without their coordinates and shortens the axis title, so they fit.
@@ -201,7 +227,7 @@ export function sectionSvg(model:GeoModel,s:Section,o:SectionSvgOptions){
   out.push(`<text x="${m.l+pw/2}" y="${m.t+ph+30}" text-anchor="middle" font-size="10.5" fill="${t.muted}">${axis} · V.E. ×${ve<10?ve.toFixed(1):Math.round(ve)} · dashed = inferred${s.water?narrow?" · blue = water":" · blue = water table":""}</text>`);
   if(field&&scale){
     // Colour bar: one swatch per band, with the band edges below.
-    const n=scale.colors.length,bw=Math.min(36,Math.max(16,(pw*0.55)/n)),bx=m.l+pw-n*bw,by=m.t+ph+44;
+    const n=scale.colors.length,bw=Math.min(36,Math.max(16,(pw*0.55)/n)),bx=m.l+pw-n*bw,by=m.t+ph+44+(keyed?16:0);
     out.push(`<text x="${bx-8}" y="${by+9}" text-anchor="end" font-size="10.5" fill="${t.text}">${esc(field.symbol)}${field.unit?` (${esc(field.unit)})`:""}</text>`);
     scale.colors.forEach((c,i)=>out.push(`<rect x="${(bx+i*bw).toFixed(1)}" y="${by}" width="${bw.toFixed(1)}" height="10" fill="${c}"/>`));
     const every=Math.ceil(30/bw);
@@ -246,19 +272,23 @@ export function sectionFieldCsv(model:GeoModel,s:Section,field:SectionField){
 
 // The table by chainage along an alignment: a row every `step` metres where the line is in the model, with the ground,
 // the water table, each unit's thickness and, where the line has design levels, the cover and the units at them. With
-// a crown and an invert, each unit's share of the height between them.
+// a crown and an invert, each unit's share of the height between them. Where the model has cone resistances, qc at
+// the design levels; where it has CPTs, the nearest one.
 export function chainageCsv(model:GeoModel,s:Section,step:number){
   const rows=chainageTable(model,s,step),band=rows.some(r=>r.bottom!==undefined),design=rows.some(r=>r.top!==undefined),wet=rows.some(r=>r.water!==undefined);
+  const qc=rows.some(r=>r.qcTop!==undefined),cpt=rows.some(r=>r.cpt);
   const v=(x:number|undefined)=>x===undefined||!Number.isFinite(x)?undefined:r2(x);
   const out:Array<Array<string|number|undefined>>=[["chainage_m","x","y","ground_m",...(wet?["water_table_m"]:[]),
-    ...(band?["crown_m","invert_m","cover_above_crown_m",...(wet?["water_above_crown_m"]:[]),"unit_at_crown","unit_at_invert",...model.units.map(u=>`${u.name} share_%`)]
-      :design?["design_level_m","depth_below_ground_m",...(wet?["water_above_level_m"]:[]),"unit_at_level"]:[]),
+    ...(band?["crown_m","invert_m","cover_above_crown_m",...(wet?["water_above_crown_m"]:[]),"unit_at_crown","unit_at_invert",...(qc?["qc_at_crown_MPa","qc_at_invert_MPa"]:[]),...model.units.map(u=>`${u.name} share_%`)]
+      :design?["design_level_m","depth_below_ground_m",...(wet?["water_above_level_m"]:[]),"unit_at_level",...(qc?["qc_at_level_MPa"]:[])]:[]),
+    ...(cpt?["nearest_cpt","nearest_cpt_distance_m"]:[]),
     ...model.units.map(u=>`${u.name} thickness_m`)]];
   for(const r of rows){
     const cover=r.top===undefined?undefined:r.ground-r.top,head=r.top===undefined||r.water===undefined?undefined:r.water-r.top;
     out.push([r2(r.chainage),r2(r.x),r2(r.y),r2(r.ground),...(wet?[v(r.water)]:[]),
-      ...(band?[v(r.top),v(r.bottom),v(cover),...(wet?[v(head)]:[]),unitLabel(model,r.unitTop),unitLabel(model,r.unitBottom),...model.units.map((_,k)=>r.share?Math.round(r.share[k]*1000)/10:undefined)]
-        :design?[v(r.top),v(cover),...(wet?[v(head)]:[]),unitLabel(model,r.unitTop)]:[]),
+      ...(band?[v(r.top),v(r.bottom),v(cover),...(wet?[v(head)]:[]),unitLabel(model,r.unitTop),unitLabel(model,r.unitBottom),...(qc?[v(r.qcTop),v(r.qcBottom)]:[]),...model.units.map((_,k)=>r.share?Math.round(r.share[k]*1000)/10:undefined)]
+        :design?[v(r.top),v(cover),...(wet?[v(head)]:[]),unitLabel(model,r.unitTop),...(qc?[v(r.qcTop)]:[])]:[]),
+      ...(cpt?[r.cpt?.id,v(r.cpt?.distance)]:[]),
       ...r.thickness.map(r2)]);
   }
   return toCsv(out);

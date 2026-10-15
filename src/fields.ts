@@ -1,8 +1,9 @@
 // Fields over the model: vertical total stress, pore pressure and vertical effective stress from the unit weights and
 // the water table, and measured properties interpolated within their units. They are evaluated on sections.
-import {GeoModel} from "./model";
+import {GeoModel,sampleModel} from "./model";
 import {Section,joined} from "./section";
 import {boreholeTests,testDepth,unitAt,propertyDef,unitStatistics,measuredProperties,formatValue} from "./properties";
+import {CPT_KEYS,CptKey,cptAverages,cptKeys} from "./cpt";
 
 export const GAMMA_W=9.81;
 // Used, and reported, for units given no unit weight and with none measured: typical values for soils, which overstate
@@ -134,8 +135,19 @@ export function earthPressureNotes(names:string[],shown:number[],params:Array<Re
 
 // ---------- measured properties ----------
 
-export interface PropertySample { x:number; y:number; z:number; value:number }
-// The values of a property measured in each unit, at their elevations.
+// `cpt` marks a mean of CPT readings.
+export interface PropertySample { x:number; y:number; z:number; value:number; cpt?:boolean }
+// CPT readings enter the fields as their means over this many metres of depth.
+export const CPT_STEP=0.5;
+const isCptKey=(key:string):key is CptKey=>(CPT_KEYS as readonly string[]).includes(key);
+// The unit of a reading at elevation e where the horizons lie at z (ground first): a reading on a contact belongs to
+// the unit below it, as a test at the top of a logged interval does; -1 outside the model.
+export function unitOfReading(z:ArrayLike<number>,e:number){
+  for(let k=0;k+1<z.length;k++)if(e<=z[k]+1e-9&&e>z[k+1]+1e-9)return k;
+  return -1;
+}
+// The values of a property measured in each unit, at their elevations: tests in the boreholes, by the logged interval
+// they lie in, and CPT readings, by the model's unit where they lie (a CPT outside the model adds none).
 export function propertySamples(model:GeoModel,key:string){
   const index=new Map(model.units.map((u,k)=>[u.id,k]));
   const byUnit:PropertySample[][]=model.units.map(()=>[]);
@@ -144,6 +156,15 @@ export function propertySamples(model:GeoModel,key:string){
     if(t.property!==key||!Number.isFinite(t.value)||(log&&t.value<=0))continue;
     const d=testDepth(t),k=index.get(unitAt(b,d)??"");
     if(k!==undefined)byUnit[k].push({x:b.x,y:b.y,z:b.z-d,value:log?Math.log10(t.value):t.value});
+  }
+  if(isCptKey(key))for(const c of model.cpts){
+    const z=sampleModel(model,c.x,c.y);
+    if(!z)continue;
+    for(const a of cptAverages(c,CPT_STEP)){
+      const v=key==="qc"?a.qc:key==="fs"?a.fs:key==="u2"?a.u2:a.rf,e=c.z-a.depth;
+      const k=unitOfReading(z,e);
+      if(Number.isFinite(v)&&k>=0)byUnit[k].push({x:c.x,y:c.y,z:e,value:v,cpt:true});
+    }
   }
   return byUnit;
 }
@@ -225,7 +246,10 @@ export function sectionField(model:GeoModel,section:Section,key:string):SectionF
   if(!values.length)return null;
   const without=model.units.filter((_,k)=>!samples[k].length).map(u=>u.name);
   if(without.length)notes.push(`Not measured in ${without.join(", ")}`);
-  notes.push(`${values.length} values, interpolated within each unit by inverse distance, with horizontal distances shortened 10 times`);
+  const fromCpts=samples.flat().filter(p=>p.cpt),tests=values.length-fromCpts.length;
+  const cpts=new Set(fromCpts.map(p=>`${p.x},${p.y}`)).size;
+  notes.push(`${tests?`${tests} test value${tests>1?"s":""}${fromCpts.length?" and ":""}`:""}${fromCpts.length?`${fromCpts.length} means of the readings over ${CPT_STEP} m in ${cpts} CPT${cpts>1?"s":""}`:""}, interpolated within each unit by inverse distance, with horizontal distances shortened 10 times`);
+  if(key==="Rf"&&model.cpts.some(c=>c.fs&&!c.rf))notes.push("Rf = fs/qc where the data give no friction ratio");
   const at=(s:number,e:number)=>{
     const c=columnAt(section,s);
     if(!c)return NaN;
@@ -287,7 +311,8 @@ function oklchHex(L:number,C:number,h:number){
 export const scaleLabel=(c:ColourScale,v:number)=>(c.log?`1e${Math.round(v)}`:String(Math.round(v*1000)/1000))+(c.open&&v===c.edges[c.edges.length-1]?"+":"");
 // The fields that can be shown for a model: the stresses, then each measured property.
 export function availableFields(model:GeoModel){
-  const k0=model.units.some(u=>u.params?.K0!==undefined);
+  const k0=model.units.some(u=>u.params?.K0!==undefined),measured=measuredProperties(model.boreholes);
+  const fromCpts:string[]=CPT_KEYS.filter(k=>!measured.includes(k)&&model.cpts.some(c=>cptKeys(c).includes(k)));
   return [...STRESS_FIELDS.filter(f=>f.key!=="sh"||k0).map(f=>({key:f.key as string,label:`${f.name} ${f.symbol} (${f.unit})`})),
-    ...measuredProperties(model.boreholes).map(k=>{const p=propertyDef(k);return {key:k,label:`${p.name}${p.symbol!==p.name?" "+p.symbol:""}${p.unit?` (${p.unit})`:""}`}})];
+    ...[...measured,...fromCpts].map(k=>{const p=propertyDef(k);return {key:k,label:`${p.name}${p.symbol!==p.name?" "+p.symbol:""}${p.unit?` (${p.unit})`:""}${fromCpts.includes(k)?", CPT":""}`}})];
 }

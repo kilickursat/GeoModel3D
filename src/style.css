@@ -4,6 +4,7 @@ body{background:#071018;color:#e8f2f7}
 button,select,input{font:inherit}
 .labels{position:fixed;inset:0;pointer-events:none}
 .bh-label{font-size:10px;color:#d9edf5;background:rgba(7,16,24,.62);padding:1px 5px;border-radius:4px;white-space:nowrap}
+.cpt-label{box-shadow:inset 0 0 0 1px rgba(214,230,238,.4)}
 .end-label{font-size:12px;font-weight:700;color:#78c9df;text-shadow:0 0 4px #071018}
 .ch-label{font-size:10px;color:#9bd3e3;text-shadow:0 0 3px #071018,0 0 6px #071018;white-space:nowrap}
 /* Drawing a line: what to do and the buttons, over the model; the notes wait. */
@@ -102,6 +103,8 @@ body[data-drawing="on"] .notice{display:none}
 .section-control .step-pick{flex:0 1 auto}
 /* A straight section has azimuth and offset; a section along a line has chainage, a cross-section and a table. */
 .section-control[data-line="along"] .straight-only,:is(.section-control,.section-view,.toolbar):not([data-line="along"]) .along-only{display:none}
+/* What only a project with CPTs offers. */
+.toolbar:not([data-cpts="yes"]) .cpt-only{display:none}
 .section-control input{flex:1;min-width:60px;accent-color:#78c9df}
 .section-control output{min-width:46px;text-align:right;color:#d9edf5;letter-spacing:0;font-size:11px;font-variant-numeric:tabular-nums}
 .section-control button[aria-pressed="true"]{border-color:#78c9df;color:#78c9df}
@@ -136,6 +139,7 @@ body[data-drawing="on"] .notice{display:none}
 .notice ul{margin:6px 0 0;padding-left:16px;line-height:1.5}
 .tooltip{position:fixed;pointer-events:none;padding:7px 10px;font-size:11px;color:#e8f2f7;max-width:340px}
 .tooltip span{display:block;color:#9bb1bd;margin-top:2px}
+.tooltip svg{display:block;margin-top:6px}
 .drop{position:fixed;inset:0;display:grid;place-items:center;background:rgba(7,16,24,.72);border:2px dashed #78c9df;color:#e8f2f7;font-size:18px;text-align:center;z-index:5}
 .drop span{font-size:12px;color:#9bb1bd}
 [hidden]{display:none!important}
