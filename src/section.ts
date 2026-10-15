@@ -1,12 +1,14 @@
 import {GeoModel} from "./model";
 import {XY,uniqueEdges} from "./tin";
-import {boreholeDepth,DesignLevel} from "./schema";
+import {boreholeDepth,cptDepth,DesignLevel} from "./schema";
 
 // A vertical section: azimuth in degrees clockwise from north (+y), offset in metres from the model centre,
 // measured to the right of the section direction.
 export interface SectionSpec { azimuth:number; offset:number }
 export interface SectionFrame { origin:XY; dir:XY; normal:XY }
 export interface ProjectedBorehole { index:number; s:number; offset:number; top:number; bottom:number }
+// A CPT projected onto a section: `index` into the model's CPTs, the rest as for a borehole.
+export type ProjectedCpt=ProjectedBorehole;
 // The line of a section along an alignment: its name, its points with their chainages, and its design levels.
 export interface SectionPath { name:string; s:number[]; x:number[]; y:number[]; design?:DesignLevel[] }
 export interface Section extends SectionSpec, SectionFrame {
@@ -14,6 +16,7 @@ export interface Section extends SectionSpec, SectionFrame {
   z:number[][];
   observed:boolean[][];
   boreholes:ProjectedBorehole[];
+  cpts:ProjectedCpt[];
   // The water table along the section, where groundwater is known.
   water?:number[];
   // Along an alignment (see alignment.ts), s is the chainage. The line may leave the model and come back: `runs` are
@@ -106,10 +109,16 @@ export function computeSection(model:GeoModel,spec:SectionSpec,buffer=Infinity):
     if(Math.abs(offset)<=buffer)boreholes.push({index,s:along(bh),offset,top:bh.z,bottom:bh.z-boreholeDepth(bh)});
   });
   boreholes.sort((p,q)=>p.s-q.s);
+  const cpts:ProjectedCpt[]=[];
+  model.cpts.forEach((c,index)=>{
+    const offset=across(c);
+    if(Math.abs(offset)<=buffer)cpts.push({index,s:along(c),offset,top:c.z,bottom:c.z-cptDepth(c)});
+  });
+  cpts.sort((p,q)=>p.s-q.s);
   return {...spec,...frame,
     s:unique.map(p=>p.s),x:unique.map(p=>p.x),y:unique.map(p=>p.y),
     z:H.map((_,k)=>unique.map(p=>p.z[k])),
     observed:H.map((_,k)=>unique.map(p=>p.observed[k])),
-    boreholes,
+    boreholes,cpts,
     ...(W?{water:unique.map(p=>p.w)}:{})};
 }

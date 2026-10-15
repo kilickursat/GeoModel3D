@@ -100,8 +100,8 @@ const filled=(r:string[])=>r.some(c=>c.trim()!=="");
 const csvOf=(name:TableName,rows:string[][])=>({name:`${name}.csv`,text:toCsv([COLUMNS[name].map(c=>c.csv),...rows.filter(filled)])});
 export const tableCsv=(t:EditorTables,name:TableName)=>csvOf(name,t.rows[name]).text;
 
-// A project from the tables. What the tables do not show (terrain, unit rules, other unit parameters) is kept from the
-// project being edited.
+// A project from the tables. What the tables do not show (terrain, unit rules, other unit parameters, lines and CPTs) is
+// kept from the project being edited; terrain, lines and CPTs only while its coordinate system stays the same.
 export function projectFromTables(t:EditorTables,base?:GeoProject):ImportResult{
   const crs=crsFromText(t.project.crs);
   // A single borehole needs no position, and its ground level may be left at 0 m: a case for one log.
@@ -132,7 +132,14 @@ export function projectFromTables(t:EditorTables,base?:GeoProject):ImportResult{
   }
   if(base){
     if(base.rules)p.rules=base.rules;
-    if(base.terrain&&projectCrs(base)?.proj4===crs?.proj4)p.terrain=base.terrain;
+    if(projectCrs(base)?.proj4===crs?.proj4){
+      if(base.terrain)p.terrain=base.terrain;
+      if(base.alignments?.length)p.alignments=base.alignments;
+      if(base.cpts?.length)p.cpts=base.cpts;
+    }else{
+      const left=[base.alignments?.length?`${base.alignments.length} line${base.alignments.length>1?"s":""}`:"",base.cpts?.length?`${base.cpts.length} CPT${base.cpts.length>1?"s":""}`:""].filter(Boolean);
+      if(left.length)result.warnings.push(`The coordinate system changed: ${left.join(" and ")} of the project left out, as their positions are in the old one`);
+    }
     const before=new Map(base.units.map(u=>[u.id,u]));
     for(const u of p.units){
       const extra=Object.entries(before.get(u.id)?.params??{}).filter(([k])=>!DESIGN_KEYS.includes(k));

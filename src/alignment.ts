@@ -4,9 +4,9 @@
 // point of the line, so the horizons are linear between samples. From it come the longitudinal profile, a table by
 // chainage, and straight cross-sections square to the line.
 import {GeoModel,locateInModel} from "./model";
-import {Alignment,DesignLevel,boreholeDepth} from "./schema";
-import {Section,ProjectedBorehole,offsetThrough,sectionRuns} from "./section";
-import {columnAt} from "./fields";
+import {Alignment,DesignLevel,boreholeDepth,cptDepth} from "./schema";
+import {Section,ProjectedBorehole,ProjectedCpt,offsetThrough,sectionRuns} from "./section";
+import {columnAt,sectionField} from "./fields";
 import {XY,uniqueEdges} from "./tin";
 
 // The chainage at each point: given at every point, or measured along the line from `start` (0 by default).
@@ -97,8 +97,8 @@ function boxesOf(model:GeoModel){
   return b;
 }
 
-// The section along an alignment: s is the chainage. Boreholes within `buffer` metres of the line are projected onto
-// it, at the chainage of their nearest point; those beyond its ends are left out.
+// The section along an alignment: s is the chainage. Boreholes and CPTs within `buffer` metres of the line are projected
+// onto it, at the chainage of their nearest point; those beyond its ends are left out.
 export function alignmentSection(model:GeoModel,a:Alignment,buffer=Infinity):Section{
   const ch=chainages(a),P=a.points,H=model.horizons,W=model.water?.z,nodes=model.nodes;
   const edges=model.edges??=uniqueEdges(model.triangles),boxes=boxesOf(model);
@@ -160,11 +160,17 @@ export function alignmentSection(model:GeoModel,a:Alignment,buffer=Infinity):Sec
     if(!q.beyond&&Math.abs(q.offset)<=buffer)boreholes.push({index,s:q.chainage,offset:q.offset,top:bh.z,bottom:bh.z-boreholeDepth(bh)});
   });
   boreholes.sort((p,q)=>p.s-q.s);
+  const cpts:ProjectedCpt[]=[];
+  model.cpts.forEach((c,index)=>{
+    const q=nearestOnLine(a,c,ch);
+    if(!q.beyond&&Math.abs(q.offset)<=buffer)cpts.push({index,s:q.chainage,offset:q.offset,top:c.z,bottom:c.z-cptDepth(c)});
+  });
+  cpts.sort((p,q)=>p.s-q.s);
   const a0=P[0],a1=P[P.length-1],l=Math.hypot(a1.x-a0.x,a1.y-a0.y)||1,dir={x:(a1.x-a0.x)/l,y:(a1.y-a0.y)/l};
   return {azimuth:azimuthOf(dir),offset:0,origin:{x:a0.x,y:a0.y},dir,normal:{x:dir.y,y:-dir.x},
     s:samples.map(p=>p.s),x:samples.map(p=>p.x),y:samples.map(p=>p.y),
     z:H.map((_,k)=>samples.map(p=>p.z[k])),observed:H.map((_,k)=>samples.map(p=>p.observed[k])),
-    boreholes,...(W?{water:samples.map(p=>p.w)}:{}),
+    boreholes,cpts,...(W?{water:samples.map(p=>p.w)}:{}),
     alignment:{name:a.name,s:ch,x:P.map(p=>p.x),y:P.map(p=>p.y),...(a.design?.length?{design:a.design}:{})},runs};
 }
 
@@ -204,12 +210,15 @@ export interface ChainageRow {
   top?:number; bottom?:number; unitTop?:number; unitBottom?:number;
   // Each unit's thickness, and, between crown and invert, its share of the height.
   thickness:number[]; share?:number[];
+  // Where the model has cone resistances: qc at the design levels, interpolated within their units as on the section;
+  // and the CPT nearest the line there, with its distance in plan.
+  qcTop?:number; qcBottom?:number; cpt?:{id:string;distance:number};
 }
 // A row every `step` metres, at round chainages, where the line is in the model.
 export function chainageTable(model:GeoModel,s:Section,step:number):ChainageRow[]{
   const rows:ChainageRow[]=[],K=model.units.length;
   if(s.s.length<2||!(step>0))return rows;
-  const s1=s.s[s.s.length-1];
+  const s1=s.s[s.s.length-1],qc=sectionField(model,s,"qc");
   for(let i=Math.ceil(s.s[0]/step-1e-9);i*step<=s1+1e-9;i++){
     const c=i*step,col=columnAt(s,c);
     if(!col)continue;
@@ -223,6 +232,13 @@ export function chainageTable(model:GeoModel,s:Section,step:number):ChainageRow[
       row.unitBottom=unitAtLevel(z,bottom);
       row.share=Array.from({length:K},(_,k)=>Math.max(0,Math.min(top,z[k])-Math.max(bottom,z[k+1]))/h);
     }
+    if(qc){
+      if(row.top!==undefined)row.qcTop=qc.at(c,row.top);
+      if(row.bottom!==undefined)row.qcBottom=qc.at(c,row.bottom);
+    }
+    let best:{id:string;distance:number}|undefined;
+    for(const p of model.cpts){const d=Math.hypot(p.x-col.x,p.y-col.y);if(!best||d<best.distance)best={id:p.id,distance:d}}
+    if(best)row.cpt=best;
     rows.push(row);
   }
   return rows;

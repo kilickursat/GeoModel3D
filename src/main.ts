@@ -3,13 +3,15 @@ import {uniform,positionWorld,dot} from "three/tsl";
 import {OrbitControls} from "three/addons/controls/OrbitControls.js";
 import {CSS2DRenderer,CSS2DObject} from "three/addons/renderers/CSS2DRenderer.js";
 import pkg from "../package.json";
-import {GeoProject,UnitDef,UnitRule,Alignment,sampleProjects,realSites,boreholeDepth} from "./geology";
+import {GeoProject,UnitDef,UnitRule,Alignment,Cpt,sampleProjects,realSites,boreholeDepth,cptDepth} from "./geology";
 import {buildGeologicalModel,GeoModel,unitVolume,unitCubicMetres,modelBounds,footprintArea,sampleModel} from "./model";
 import {volumeGeometry} from "./volume";
 import {terrainOutside,convexHull,TerrainGrid} from "./terrain";
 import {computeSection,offsetRange,offsetThrough,principalAzimuth,Section,sectionRuns,joined,alongOf} from "./section";
-import {sectionSvg,sectionCsv,sectionFieldCsv,sectionTitle,chainageCsv} from "./sectionSvg";
-import {importFiles,toProjectJson,toBoreholeCsv,toTestsCsv,toCsv,decodeText,assignColors,toAlignmentCsv} from "./io";
+import {sectionSvg,sectionCsv,sectionFieldCsv,sectionTitle,chainageCsv,cptTraceWidths} from "./sectionSvg";
+import {importFiles,toProjectJson,toBoreholeCsv,toTestsCsv,toCsv,decodeText,assignColors,toAlignmentCsv,toCptCsv} from "./io";
+import {cptAt,thinned,cptScale} from "./cpt";
+import {cptLogSvg,CptBand} from "./cptSvg";
 import {alignmentSection,chainages,pointAt,designAt,crossSectionAt,lineCrossings,Crossing} from "./alignment";
 import {XY} from "./tin";
 import {SectionField,sectionField,availableFields,columnAt,stressAt,unitWeights,UnitWeight,withTheme,scaleLabel,colourScale,ColourScale} from "./fields";
@@ -84,7 +86,7 @@ let origin={x:0,y:0,z:0},extent=1,sectionBuffer=1;
 // `field` colours the section: "units", a stress (sv, u, s) or a measured property. `alignment` is the line the section
 // follows, an index into the project's alignments, or -1 for a straight section by azimuth and offset; `chainage` is
 // the marker on that line, and `step` the step of its table by chainage.
-const view={azimuth:0,offset:0,ve:1,cut:true,flip:false,exact:false,volumes:true,horizons:true,boreholes:true,labels:true,terrain:true,map:false,mapSource:"osm",panel:!compact(),hidden:new Set<string>(),field:"units",alignment:-1,chainage:0,step:10};
+const view={azimuth:0,offset:0,ve:1,cut:true,flip:false,exact:false,volumes:true,horizons:true,boreholes:true,cpts:true,labels:true,terrain:true,map:false,mapSource:"osm",panel:!compact(),hidden:new Set<string>(),field:"units",alignment:-1,chainage:0,step:10};
 let field:SectionField|null=null,weights:UnitWeight[]=[];
 
 interface UnitMaterials { lit:THREE.MeshStandardNodeMaterial; flat:THREE.MeshBasicNodeMaterial }
@@ -94,6 +96,9 @@ let holeMesh:THREE.InstancedMesh|null=null;
 let terrainMesh:THREE.Mesh|null=null;
 let gridHelper:THREE.Object3D|null=null;
 let holeInfo:Array<{hole:number;interval:number}>=[];
+// CPTs: an axis each, and the cone resistance drawn out from it on a panel that turns about the axis to face the camera.
+let cptAxes:THREE.InstancedMesh|null=null;
+const cptPanels:THREE.Group[]=[],cptFills:THREE.Mesh[]=[];
 // The cross-validation of the model shown, the run in progress (a new model or Stop ends it), and its markers.
 let validation:CrossValidation|null=null,validationRun=0,errorMarkers:THREE.InstancedMesh|null=null,errorRims:THREE.InstancedMesh|null=null,errorMarked:string[]=[],showErrors=true;
 const lowerFirst=(s:string)=>s.charAt(0).toLowerCase()+s.slice(1);
@@ -120,6 +125,10 @@ function disposeContent(){
   holeMesh?.dispose();
   holeMesh=null;
   holeInfo=[];
+  cptAxes?.dispose();
+  cptAxes=null;
+  cptPanels.length=0;
+  cptFills.length=0;
   errorMarkers?.dispose();
   errorRims?.dispose();
   errorMarkers=errorRims=null;
@@ -198,6 +207,7 @@ function buildContent(){
     holeInfo=segments.map(({hole,interval})=>({hole,interval}));
     content.add(holeMesh);
   }
+  buildCpts(radius);
 
   const size=niceCeil(extent*1.35),grid=new THREE.GridHelper(size,10,0x31505d,0x193039);
   gridHelper=grid;
@@ -206,6 +216,74 @@ function buildContent(){
   content.add(grid);
 }
 function niceCeil(v:number){const p=10**Math.floor(Math.log10(v));return Math.ceil(v/p)*p}
+// Each CPT: a thin axis from its start to its deepest reading, and its cone resistance as a filled outline out to the
+// right of it, 3.5 % of the model's extent at the full scale, on a panel turned to face the camera (faceCpts).
+function buildCpts(radius:number){
+  const cpts=model.cpts;
+  if(!cpts.length)return;
+  const qcMax=cptScale(Math.max(...cpts.flatMap(c=>c.qc.filter(Number.isFinite)),1)),k=extent*0.035/qcMax;
+  const height=Math.max(...cpts.map(c=>cptDepth(c)),1),step=Math.max(0.05,height/800);
+  const fill=new THREE.MeshBasicNodeMaterial({color:0xd6e6ee,side:THREE.DoubleSide});
+  const edge=new THREE.LineBasicNodeMaterial({color:0x0b1620});
+  fill.maskNode=keepFragment;
+  edge.maskNode=keepFragment;
+  cptAxes=new THREE.InstancedMesh(new THREE.CylinderGeometry(1,1,1,8).rotateX(Math.PI/2),new THREE.MeshBasicNodeMaterial({color:0xd6e6ee}),cpts.length);
+  (cptAxes.material as THREE.MeshBasicNodeMaterial).maskNode=keepFragment;
+  const m=new THREE.Matrix4(),q=new THREE.Quaternion(),r=radius*0.55;
+  cpts.forEach((c,i)=>{
+    const bottom=c.z-cptDepth(c);
+    cptAxes!.setMatrixAt(i,m.compose(local(c.x,c.y,(c.z+bottom)/2),q,new THREE.Vector3(r,r,Math.max(c.z-bottom,0.02))));
+    // The outline and the strip between it and the axis, in the panel's plane: x across, z up.
+    const keep=thinned(c,step),line:number[]=[],strip:number[]=[];
+    let prev:{u:number;e:number}|null=null;
+    for(const j of keep){
+      const v=c.qc[j],e=c.z-c.depth[j]-origin.z;
+      if(!Number.isFinite(v)){prev=null;continue}
+      const u=Math.max(v,0)*k;
+      if(prev){
+        line.push(prev.u,0,prev.e,u,0,e);
+        strip.push(0,0,prev.e,prev.u,0,prev.e,u,0,e,0,0,prev.e,u,0,e,0,0,e);
+      }
+      prev={u,e};
+    }
+    const panel=new THREE.Group();
+    panel.position.copy(local(c.x,c.y,origin.z));
+    const g=new THREE.BufferGeometry();
+    g.setAttribute("position",new THREE.Float32BufferAttribute(strip,3));
+    const mesh=new THREE.Mesh(g,fill);
+    mesh.userData.cpt=i;
+    const outlineGeometry=new THREE.BufferGeometry();
+    outlineGeometry.setAttribute("position",new THREE.Float32BufferAttribute(line,3));
+    panel.add(mesh,new THREE.LineSegments(outlineGeometry,edge));
+    cptPanels.push(panel);
+    cptFills.push(mesh);
+    content.add(panel);
+    const el=document.createElement("div");
+    el.className="bh-label cpt-label";
+    el.textContent=c.id;
+    const label=new CSS2DObject(el);
+    label.position.copy(local(c.x,c.y,c.z));
+    label.center.set(0.5,1.3);
+    label.userData.cpt=i;
+    labels.push(label);
+    content.add(label);
+  });
+  cptAxes.instanceMatrix.needsUpdate=true;
+  content.add(cptAxes);
+  facing=NaN;
+  faceCpts();
+}
+// The CPT panels turn about their axes to face the camera, so the cone resistance reads from any side.
+let facing=NaN;
+function faceCpts(){
+  if(!cptPanels.length)return false;
+  camera.updateMatrixWorld();
+  const right=new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,0),a=Math.atan2(right.y,right.x);
+  if(Math.abs(a-facing)<1e-6)return false;
+  facing=a;
+  for(const p of cptPanels)p.rotation.z=a;
+  return true;
+}
 
 // The terrain grid around the model footprint: real data, clipped exactly at the footprint, drawn before the model
 // and translucent so it never veils it, and cut with it. Without a terrain grid, a georeferenced model gets a flat
@@ -660,6 +738,8 @@ function applyDisplay(){
   }
   for(const l of horizonLines)l.visible=view.horizons;
   if(holeMesh)holeMesh.visible=view.boreholes;
+  if(cptAxes)cptAxes.visible=view.cpts;
+  for(const p of cptPanels)p.visible=view.cpts;
   placeErrorMarkers();
   if(terrainMesh){
     terrainMesh.visible=terrainMesh.userData.flat?view.map&&!!mapLayer:view.terrain;
@@ -667,7 +747,7 @@ function applyDisplay(){
     const m=terrainMesh.material as THREE.Material;
     m.opacity=lineOf()?Math.min(m.userData.opacity??1,.28):m.userData.opacity??m.opacity;
   }
-  for(const l of labels)l.visible=view.boreholes&&view.labels&&(!cut||clipPlane.distanceToPoint(l.position)>=0);
+  for(const l of labels)l.visible=(l.userData.cpt===undefined?view.boreholes:view.cpts)&&view.labels&&(!cut||clipPlane.distanceToPoint(l.position)>=0);
   renderCredits();
   invalidate();
 }
@@ -703,8 +783,8 @@ const datasetSelect=ui.querySelector<HTMLSelectElement>(".dataset")!;
 const panel=ui.querySelector<HTMLDivElement>(".panel")!,siteName=ui.querySelector<HTMLButtonElement>(".site-name")!;
 // How to move about the model, with a mouse or with fingers.
 function renderHint(){
-  const text=touchQuery.matches?"One finger orbits · pinch to zoom · two fingers pan · tap a borehole or a unit for its details"
-    :"Drag to orbit · wheel to zoom · right-drag to pan · drop CSV, AGS4, borehole XML or JSON files to import";
+  const text=touchQuery.matches?"One finger orbits · pinch to zoom · two fingers pan · tap a borehole, a CPT or a unit for its details"
+    :"Drag to orbit · wheel to zoom · right-drag to pan · drop CSV, AGS4, GEF, XML or JSON files to import";
   ui.querySelector(".hint")!.textContent=text;
   ui.querySelector(".panel-hint")!.textContent=text;
 }
@@ -717,11 +797,12 @@ toolbar.id="sheet-tools";
 toolbar.innerHTML=`${sheetHead("View")}
 <button class="input-data" title="Type in or paste your own boreholes, logs, groundwater, field and laboratory tests and unit parameters, then build the model">Enter your own data…</button>
 <button class="import">Import data…</button>
-<input class="file" type="file" multiple hidden accept=".csv,.tsv,.txt,.ags,.json,.xml,.asc,.xyz,.geojson,.dxf">
+<input class="file" type="file" multiple hidden accept=".csv,.tsv,.txt,.ags,.json,.xml,.gef,.asc,.xyz,.geojson,.dxf">
 <details class="menu"><summary>Export</summary><div>
   <button data-export="project">Project (JSON)</button>
   <button data-export="boreholes">Boreholes (CSV)</button>
   <button data-export="tests">Tests (CSV)</button>
+  <button data-export="cpts" class="cpt-only" title="Every reading of the CPTs, with the friction ratio">CPTs (CSV)</button>
   <button data-export="svg">Section (SVG)</button>
   <button data-export="section">Section (CSV)</button>
   <button data-export="field" title="The values of the field shown on the section, on a grid">Section field (CSV)</button>
@@ -736,6 +817,7 @@ toolbar.innerHTML=`${sheetHead("View")}
   <label><input type="checkbox" data-view="volumes" checked>Volumes</label>
   <label><input type="checkbox" data-view="horizons" checked>Horizons</label>
   <label><input type="checkbox" data-view="boreholes" checked>Boreholes</label>
+  <label class="cpt-only"><input type="checkbox" data-view="cpts" checked>CPTs</label>
   <label><input type="checkbox" data-view="labels" checked>Labels</label>
   <label><input type="checkbox" data-view="terrain" checked>Terrain</label>
   <label title="Needs the coordinate system of the data; map tiles are requested from the map's server"><input type="checkbox" data-view="map">Map</label>
@@ -806,7 +888,7 @@ app.appendChild(tooltip);
 const dropZone=document.createElement("div");
 dropZone.className="drop";
 dropZone.hidden=true;
-dropZone.innerHTML="<div>Drop borehole, terrain or alignment files<br><span>CSV tables · AGS4 · Japanese borehole XML (電子納品, KuniJiban) · GeoModel3D or Georeport3D JSON · terrain grid (.asc, .xyz) · alignment (CSV, GeoJSON, DXF)</span></div>";
+dropZone.innerHTML="<div>Drop borehole, CPT, terrain or alignment files<br><span>CSV tables · AGS4 · Japanese borehole XML (電子納品, KuniJiban) · BRO and DOV XML · CPT (GEF, BRO, DOV, AGS4, CSV) · GeoModel3D or Georeport3D JSON · terrain grid (.asc, .xyz) · alignment (CSV, GeoJSON, DXF, LandXML)</span></div>";
 app.appendChild(dropZone);
 
 // ---------- small screens: the bar at the bottom and its sheets ----------
@@ -911,6 +993,7 @@ function renderPanel(){
   toolbar.querySelector<HTMLInputElement>('[data-view="map"]')!.checked=view.map;
   toolbar.querySelector<HTMLButtonElement>(".fetch-terrain")!.disabled=!crs;
   renderRules();
+  toolbar.dataset.cpts=model.cpts.length?"yes":"";
   ui.querySelector(".legend")!.innerHTML=model.units.map((u,k)=>{
     const title=[u.name,u.erosive?"Erosive base: cuts down into older units":"",unitProperties(u)].filter(Boolean).join("\n");
     return `<label title="${esc(title)}"><input type="checkbox" data-unit="${esc(u.id)}"${view.hidden.has(u.id)?"":" checked"}><i style="background:${u.color}"></i><span class="name">${esc(u.name)}</span>${u.erosive?'<span class="tag">erosive</span>':""}<span class="vol">${model.triangles.length?fmtVolume(unitCubicMetres(model,k)):""}</span></label>`;
@@ -1220,9 +1303,9 @@ async function importFileList(list:FileList|File[]){
     const files=await Promise.all([...list].map(async f=>({name:f.name,text:decodeText(new Uint8Array(await f.arrayBuffer()))})));
     const result=importFiles(files,project);
     imported=result.project;
-    // Lines added to the site shown keep the view, and the first of them is shown.
-    const linesOnly=!!result.alignments&&result.project.boreholes===project.boreholes;
-    loadProject(result.project,result.warnings,linesOnly);
+    // Lines or CPTs added to the site shown keep the view, and the first line is shown.
+    const added=(!!result.alignments||!!result.cpts)&&result.project.boreholes===project.boreholes;
+    loadProject(result.project,result.warnings,added);
     const first=result.alignments?.[0],index=first===undefined?-1:result.project.alignments?.findIndex(a=>a.name===first)??-1;
     if(index>=0&&document.body.dataset.mode!=="input")showLine(index);
     // Files picked from the input tab open there, for review before building.
@@ -1254,6 +1337,7 @@ function exportAs(kind:string){
   if(kind==="project")download(`${slug}.geomodel3d.json`,toProjectJson(project),"application/json");
   if(kind==="boreholes")download(`${slug}-boreholes.csv`,toBoreholeCsv(project),"text/csv");
   if(kind==="tests")download(`${slug}-tests.csv`,toTestsCsv(project),"text/csv");
+  if(kind==="cpts")download(`${slug}-cpts.csv`,toCptCsv(project),"text/csv");
   if(kind==="svg")download(`${slug}-section-${tag}.svg`,sectionSvg(model,section,{width:1600,height:900,theme:"light",legend:true,buffer:sectionBuffer,roundVe:true,hidden:view.hidden,field:field??undefined,crossings}),"image/svg+xml");
   if(kind==="section")download(`${slug}-section-${tag}.csv`,sectionCsv(model,section),"text/csv");
   if(kind==="field"){
@@ -1371,7 +1455,7 @@ app.addEventListener("click",e=>{
 });
 toolbar.querySelectorAll<HTMLInputElement>("[data-view]").forEach(input=>{
   input.onchange=()=>{
-    const key=input.dataset.view as "volumes"|"horizons"|"boreholes"|"labels"|"terrain"|"map"|"cut"|"flip"|"exact";
+    const key=input.dataset.view as "volumes"|"horizons"|"boreholes"|"cpts"|"labels"|"terrain"|"map"|"cut"|"flip"|"exact";
     view[key]=input.checked;
     if(key==="cut"||key==="flip")updateSection();else applyDisplay();
     if(key==="map")void updateMap();
@@ -1608,6 +1692,40 @@ function holeNear(px:number,py:number,radius:number){
   }
   return best;
 }
+// What the read-out says about a CPT at a depth: the readings there, the test, and its log over the model's units.
+function cptHtml(i:number,depth:number){
+  const c=model.cpts[i],d=Math.min(Math.max(depth,c.depth[0]),cptDepth(c)),v=cptAt(c,d);
+  return `<b>${esc(c.id)}</b> · CPT, ${fmt(d,2)} m deep, elevation ${fmt(c.z-d,2)} m<span>${readingsText(c,v)}</span><span>start ${fmt(c.z,2)} m · deepest reading ${fmt(cptDepth(c),2)} m${c.predrill?` · predrilled ${fmt(c.predrill,2)} m`:""}${c.date?` · ${esc(c.date)}`:""}</span>${cptLogSvg(c,{width:224,height:210,theme:"dark",marker:d,units:cptBands(c)})}`;
+}
+function readingsText(c:Cpt,v:ReturnType<typeof cptAt>){
+  const value=(x:number,unit:string,d:number)=>Number.isFinite(x)?`${fmt(x,d)} ${unit}`:"no reading";
+  return [`qc ${value(v.qc,"MPa",2)}`,...(c.fs?[`fs ${value(v.fs,"kPa",0)}`]:[]),...(c.fs||c.rf?[`Rf ${value(v.rf,"%",1)}`]:[]),...(c.u2?[`u2 ${value(v.u2,"kPa",0)}`]:[])].join(" · ");
+}
+// The model's units where a CPT stands, as elevation bands; none outside the model.
+function cptBands(c:Cpt):CptBand[]{
+  const z=sampleModel(model,c.x,c.y);
+  if(!z)return [];
+  return model.units.map((u,k)=>({top:z[k],bottom:z[k+1],color:u.color,name:u.name})).filter((b,k)=>b.top-b.bottom>1e-6&&!view.hidden.has(model.units[k].id));
+}
+// The CPT whose axis is drawn within `radius` pixels of a screen point, the nearest, at the depth nearest the point; a
+// CPT further from the camera than `hidden` (where opaque units hide it) is left out.
+function cptNear(px:number,py:number,radius:number,hidden=Infinity){
+  let best:{index:number;depth:number;d:number}|null=null;
+  const top=new THREE.Vector3(),bottom=new THREE.Vector3(),at=new THREE.Vector3(),dir=camera.getWorldDirection(new THREE.Vector3());
+  const screen=(v:THREE.Vector3)=>{const p=v.clone().project(camera);return [(p.x+1)/2*innerWidth,(1-p.y)/2*innerHeight]};
+  for(const [index,c] of model.cpts.entries()){
+    top.copy(local(c.x,c.y,c.z)).multiply(world.scale);
+    bottom.copy(local(c.x,c.y,c.z-cptDepth(c))).multiply(world.scale);
+    if(cutting()&&clipPlane.distanceToPoint(top)<-1e-6)continue;
+    if(at.copy(top).sub(camera.position).dot(dir)<=0||at.copy(bottom).sub(camera.position).dot(dir)<=0)continue;
+    const [ax,ay]=screen(top),[bx,by]=screen(bottom),{d}=segmentDistance(px,py,ax,ay,bx,by);
+    if(d>radius||(best&&d>=best.d))continue;
+    raycaster.ray.distanceSqToSegment(top,bottom,undefined,at);
+    if(at.distanceTo(camera.position)>hidden)continue;
+    best={index,depth:c.z-(at.z/view.ve+origin.z),d};
+  }
+  return best;
+}
 function updateTooltip(){
   if(!pointerMoved)return;
   pointerMoved=false;
@@ -1615,21 +1733,27 @@ function updateTooltip(){
   raycaster.setFromCamera(new THREE.Vector2(pointer.x/innerWidth*2-1,-pointer.y/innerHeight*2+1),camera);
   const kept=(h:THREE.Intersection)=>!cutting()||clipPlane.distanceToPoint(h.point)>=-1e-6;
   let html="";
-  if(holeMesh?.visible){
-    const hit=raycaster.intersectObject(holeMesh).find(kept);
-    if(hit&&hit.instanceId!==undefined)html=holeHtml(holeInfo[hit.instanceId].hole,holeInfo[hit.instanceId].interval);
-    else if(pointer.touch){
-      const near=holeNear(pointer.x,pointer.y,12);
-      if(near)html=holeHtml(near.hole,near.interval);
-    }
+  const faceHit=sectionGroup.visible?raycaster.intersectObject(fence)[0]:undefined;
+  const volumeHit=view.volumes?raycaster.intersectObjects(volumeMeshes.filter(m=>m.visible)).find(kept):undefined;
+  // A borehole or a CPT, the nearer of the two; a finger picks the one drawn nearest the tap. The opaque units and
+  // section face of the cut hide the CPTs behind them, whose panels are much wider than a borehole.
+  const hidden=cutting()?Math.min(volumeHit?.distance??Infinity,faceHit?.distance??Infinity)+1e-6:Infinity;
+  const holeHit=holeMesh?.visible?raycaster.intersectObject(holeMesh).find(kept):undefined;
+  const cptHit=view.cpts&&cptAxes?raycaster.intersectObjects([...cptFills,cptAxes],false).find(h=>kept(h)&&h.distance<=hidden):undefined;
+  if(cptHit&&(!holeHit||cptHit.distance<holeHit.distance)){
+    const i=cptHit.object===cptAxes?cptHit.instanceId!:cptHit.object.userData.cpt as number;
+    html=cptHtml(i,model.cpts[i].z-(cptHit.point.z/view.ve+origin.z));
+  }else if(holeHit&&holeHit.instanceId!==undefined)html=holeHtml(holeInfo[holeHit.instanceId].hole,holeInfo[holeHit.instanceId].interval);
+  else if(pointer.touch){
+    const hole=holeMesh?.visible?holeNear(pointer.x,pointer.y,12):null,cpt=view.cpts?cptNear(pointer.x,pointer.y,12,hidden):null;
+    if(cpt&&(!hole||cpt.d<hole.d))html=cptHtml(cpt.index,cpt.depth);
+    else if(hole)html=holeHtml(hole.hole,hole.interval);
   }
   if(!html&&errorMarkers?.visible){
     const hit=raycaster.intersectObject(errorMarkers).find(kept);
     if(hit&&hit.instanceId!==undefined)html=`<b>${esc(errorMarked[hit.instanceId])}</b>${validationLine(errorMarked[hit.instanceId])}`;
   }
   // The section face, or a unit volume in front of it; along a line the units are see-through, and the face comes first.
-  const faceHit=sectionGroup.visible?raycaster.intersectObject(fence)[0]:undefined;
-  const volumeHit=view.volumes?raycaster.intersectObjects(volumeMeshes.filter(m=>m.visible)).find(kept):undefined;
   if(!html&&faceHit&&(!volumeHit||!!lineOf()||faceHit.distance<=volumeHit.distance+1e-6)){
     const along=alongOf(section,{x:faceHit.point.x+origin.x,y:faceHit.point.y+origin.y});
     html=sectionReadout(along,faceHit.point.z/view.ve+origin.z);
@@ -1684,7 +1808,22 @@ function sectionTooltip(e:PointerEvent){
   const svg=sectionBody.querySelector("svg"),frame=svg?.dataset.frame?.split(",").map(Number);
   if(!svg||!frame){tooltip.hidden=true;return}
   const [l,t,pw,ph,s0,s1,z0,z1]=frame,r=svg.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
-  const html=x>=l&&x<=l+pw&&y>=t&&y<=t+ph?sectionReadout(s0+(x-l)/pw*(s1-s0),z1-(y-t)/ph*(z1-z0)):"";
+  const inside=x>=l&&x<=l+pw&&y>=t&&y<=t+ph,along=s0+(x-l)/pw*(s1-s0),level=z1-(y-t)/ph*(z1-z0);
+  let html=inside?sectionReadout(along,level):"";
+  // Over a CPT's trace, its readings at that level.
+  if(inside){
+    const w=cptTraceWidths(pw);
+    let best:{c:Cpt;d:number}|null=null;
+    for(const p of section.cpts){
+      const xp=l+(p.s-s0)/(s1-s0)*pw,c=model.cpts[p.index],depth=c.z-level;
+      if(x<xp-w.rf-2||x>xp+w.qc+2||depth<c.depth[0]-0.05||depth>cptDepth(c)+0.05)continue;
+      if(!best||Math.abs(x-xp)<best.d)best={c,d:Math.abs(x-xp)};
+    }
+    if(best){
+      const c=best.c,d=Math.min(Math.max(c.z-level,c.depth[0]),cptDepth(c)),readings=readingsText(c,cptAt(c,d));
+      html=html?`${html}<span>CPT ${esc(c.id)}, ${fmt(d,2)} m deep: ${readings}</span>`:`<b>${esc(c.id)}</b> · CPT, ${fmt(d,2)} m deep, elevation ${fmt(level,1)} m<span>${readings}</span>`;
+    }
+  }
   showTooltip(html,e.clientX,e.clientY,e.pointerType!=="mouse",true);
 }
 sectionBody.addEventListener("pointermove",e=>{if(e.pointerType==="mouse"||e.buttons)sectionTooltip(e)});
@@ -1722,6 +1861,7 @@ renderer.setAnimationLoop(()=>{
   updateTooltip();
   if(!dirty)return;
   dirty--;
+  faceCpts();
   if(cutting()&&updateCutSide())applyDisplay();
   renderer.render(scene,camera);
   labelRenderer.render(scene,camera);

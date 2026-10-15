@@ -1,13 +1,15 @@
 // A printable report: the 3-D view with a title block and legend, the vertical section as vector graphics, and the
 // boreholes, unit rules and notes. The browser's print dialog saves it as PDF with the system's fonts, so names in
 // any script print correctly.
-import {GeoModel,unitCubicMetres,footprintArea} from "./model";
+import {GeoModel,unitCubicMetres,footprintArea,sampleModel} from "./model";
 import {Section} from "./section";
 import {sectionSvg,sectionTitle} from "./sectionSvg";
 import {chainageTable,outsideStretches,unitLabel,lineCrossings} from "./alignment";
 import {projectCrs} from "./crs";
-import {boreholeDepth,sptN} from "./schema";
-import {SectionField,unitWeights} from "./fields";
+import {boreholeDepth,sptN,cptDepth} from "./schema";
+import {frictionRatio,cptScale} from "./cpt";
+import {cptLogSvg} from "./cptSvg";
+import {SectionField,unitWeights,unitOfReading} from "./fields";
 import {unitStatistics,measuredProperties,propertyDef,formatValue} from "./properties";
 import {CrossValidation} from "./validation";
 
@@ -40,6 +42,7 @@ export function reportHtml(model:GeoModel,section:Section,o:ReportOptions){
   const block:Array<[string,string]>=[
     ["Coordinate system",crs?`${crs.name}${crs.code?` (${crs.code})`:""}`:p.crs?`${p.crs} (not georeferenced)`:"Local, not georeferenced"],
     ["Boreholes",String(model.boreholes.length)],
+    ...(model.cpts.length?[["CPTs",String(model.cpts.length)] as [string,string]]:[]),
     ["Footprint",model.triangles.length?`${fmt(footprintArea(model)/1e4,2)} ha`:"—"],
     ["Ground",p.terrain?`Terrain: ${p.terrain.source??"terrain grid"}, ${fmt(p.terrain.dx,1)} m cells`:"Surface through the collars"],
     ["Data",p.source??"—"],
@@ -105,6 +108,10 @@ table.block th{width:32mm}
 .field-notes{margin:2mm 0 0;padding-left:4mm;font-size:0.9em}
 table.chainage{font-size:0.86em}
 table.chainage td,table.chainage th{padding:0.5mm 1.4mm}
+.cpt-logs{display:flex;gap:2mm;align-items:flex-start;margin-bottom:2mm}
+.cpt-logs figure{margin:0;flex:1;min-width:0;max-width:40mm}
+.cpt-logs svg{width:100%;height:auto;display:block}
+.cpt-logs figcaption{font-size:0.8em;color:#5b6770;text-align:center}
 </style></head><body>
 <section class="page">
 <header><div><h1>${esc(p.name)}</h1><div class="desc">${esc(p.description??"")}</div></div>
@@ -121,12 +128,52 @@ ${line?chainagePage(model,section,o.chainageStep??10,foot):""}
 ${o.field?`<section class="page"><h2>${esc(sectionName)} · ${esc(o.field.name)} ${esc(o.field.symbol)}</h2><div class="section">${fieldSvg}</div>
 <ul class="muted field-notes">${o.field.notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul>
 ${foot(`Section: ${o.field.name.toLowerCase()}`)}</section>`:""}
+${model.cpts.length?cptPage(model,section,o.sectionBuffer,foot):""}
 ${o.validation?validationPage(o.validation,foot):""}
 <section class="page">${params}${rules}<h2>Boreholes</h2>
 <table><thead><tr><th>Borehole</th><th>Easting (m)</th><th>Northing (m)</th><th>Collar (m)</th><th>Depth (m)</th><th>Latitude</th><th>Longitude</th><th>Water (m deep)</th><th>SPT tests</th></tr></thead><tbody>${holes}</tbody></table>
 ${notes.length?`<h3>Notes on the model (${notes.length})</h3><ul class="notes">${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul>`:""}
 ${foot(rules?"Ground parameters, interpretation, boreholes and notes":"Ground parameters, boreholes and notes")}</section>
 </body></html>`;
+}
+
+// The CPTs: the logs of those on the section, side by side at one scale over the model's units at each; every CPT with
+// its position; and their readings by the model's unit they lie in.
+function cptPage(model:GeoModel,section:Section,buffer:number,foot:(part:string)=>string){
+  const shown=section.cpts.slice(0,10).map(p=>({p,c:model.cpts[p.index]}));
+  let logs="";
+  if(shown.length){
+    const top=Math.max(...shown.map(({c})=>c.z)),bottom=Math.min(...shown.map(({c})=>c.z-cptDepth(c))),pad=Math.max(0.3,(top-bottom)*0.02);
+    const qcMax=cptScale(Math.max(...shown.flatMap(({c})=>c.qc.filter(Number.isFinite)),1));
+    logs=`<div class="cpt-logs">${shown.map(({p,c})=>{
+      const z=sampleModel(model,c.x,c.y),units=z?model.units.map((u,k)=>({top:z[k],bottom:z[k+1],color:u.color,name:u.name})).filter(b=>b.top-b.bottom>1e-6):[];
+      return `<figure>${cptLogSvg(c,{width:300,height:620,theme:"light",units,qcMax,zRange:[top+pad,bottom-pad],title:true})}<figcaption>${section.alignment?`chainage ${fmt(p.s)} m`:`${fmt(p.s-section.s[0])} m along`}, ${fmt(Math.abs(p.offset))} m ${p.offset>=0?"right":"left"}</figcaption></figure>`;
+    }).join("")}</div><p class="muted">Cone resistance qc and friction ratio Rf (fs/qc where the data give no ratio) against elevation in metres; behind them the units of the model where each CPT stands, which the CPTs did not log.${section.cpts.length>shown.length?` The first ${shown.length} of the ${section.cpts.length} CPTs on the section.`:""}</p>`;
+  }else logs=`<p class="muted">No CPT lies within ${fmt(buffer)} m of the section.</p>`;
+  // Readings by the unit of the model at their elevation; CPTs outside the model are left out.
+  const acc=model.units.map(()=>({cpts:new Set<string>(),qc:[] as number[],fs:[] as number[],rf:[] as number[]}));
+  for(const c of model.cpts){
+    const z=sampleModel(model,c.x,c.y);
+    if(!z)continue;
+    const rf=frictionRatio(c);
+    c.depth.forEach((d,i)=>{
+      const k=unitOfReading(z,c.z-d);
+      if(k<0)return;
+      const a=acc[k];
+      a.cpts.add(c.id);
+      if(Number.isFinite(c.qc[i]))a.qc.push(c.qc[i]);
+      if(Number.isFinite(c.fs?.[i]??NaN))a.fs.push(c.fs![i]);
+      if(Number.isFinite(rf[i]))a.rf.push(rf[i]);
+    });
+  }
+  const stat=(v:number[],d:number)=>v.length?`${fmt(v.reduce((x,y)=>x+y,0)/v.length,d)} <span class="muted">(${fmt(Math.min(...v),d)}–${fmt(Math.max(...v),d)})</span>`:"";
+  const byUnit=acc.some(a=>a.cpts.size)?`<h3>Readings by unit of the model</h3><table><thead><tr><th>Unit</th><th>CPTs</th><th>qc (MPa)</th><th>fs (kPa)</th><th>Rf (%)</th></tr></thead><tbody>${
+    model.units.map((u,k)=>acc[k].cpts.size?`<tr><td><i class="swatch" style="background:${esc(u.color)}"></i>${esc(u.name)}</td><td class="num">${acc[k].cpts.size}</td><td class="num">${stat(acc[k].qc,2)}</td><td class="num">${stat(acc[k].fs,0)}</td><td class="num">${stat(acc[k].rf,1)}</td></tr>`:"").join("")
+  }</tbody></table><p class="muted">Mean (range) of every reading, by the unit of the model at its elevation: the units come from the boreholes, not from the CPTs.</p>`:"";
+  const rows=model.cpts.map(c=>`<tr><td>${esc(c.id)}</td><td class="num">${fmt(c.x,1)}</td><td class="num">${fmt(c.y,1)}</td><td class="num">${fmt(c.z,2)}</td><td class="num">${fmt(cptDepth(c),2)}</td><td>${esc(c.date??"")}</td><td>${["qc",c.fs?"fs":"",c.u2?"u2":"",c.rf?"Rf":""].filter(Boolean).join(", ")}</td></tr>`).join("");
+  return `<section class="page"><h2>Cone penetration tests</h2>${logs}${byUnit}
+<h3>CPTs (${model.cpts.length})</h3><table class="chainage"><thead><tr><th>CPT</th><th>Easting (m)</th><th>Northing (m)</th><th>Start (m)</th><th>Deepest reading (m)</th><th>Date</th><th>Readings</th></tr></thead><tbody>${rows}</tbody></table>
+${foot("Cone penetration tests")}</section>`;
 }
 
 // The cross-validation: what share of the logs the model predicts from the other boreholes, the errors of each
@@ -154,21 +201,23 @@ function chainagePage(model:GeoModel,section:Section,asked:number,foot:(part:str
   const length=section.s.length>1?section.s[section.s.length-1]-section.s[0]:0;
   const step=[asked,1,2,5,10,20,25,50,100,200,250,500,1000].filter(v=>v>=asked).find(v=>length/v<=60)??1000;
   const rows=chainageTable(model,section,step),band=rows.some(r=>r.bottom!==undefined),design=rows.some(r=>r.top!==undefined),wet=rows.some(r=>r.water!==undefined);
+  const qc=rows.some(r=>r.qcTop!==undefined),cpt=rows.some(r=>r.cpt);
   const head=["Chainage (m)","Ground (m)",...(wet?["Water table (m)"]:[]),
-    ...(band?["Crown (m)","Invert (m)","Cover above crown (m)",...(wet?["Water above crown (m)"]:[]),"Unit at crown","Unit at invert"]
-      :design?["Design level (m)","Depth below ground (m)",...(wet?["Water above level (m)"]:[]),"Unit at level"]
-      :model.units.map(u=>`${u.name} (m)`))];
-  const v=(x:number|undefined,d=2)=>x===undefined?"":fmt(x,d);
+    ...(band?["Crown (m)","Invert (m)","Cover above crown (m)",...(wet?["Water above crown (m)"]:[]),"Unit at crown","Unit at invert",...(qc?["qc at crown / invert (MPa)"]:[])]
+      :design?["Design level (m)","Depth below ground (m)",...(wet?["Water above level (m)"]:[]),"Unit at level",...(qc?["qc at level (MPa)"]:[])]
+      :model.units.map(u=>`${u.name} (m)`)),...(cpt?["Nearest CPT (m away)"]:[])];
+  const v=(x:number|undefined,d=2)=>x===undefined||!Number.isFinite(x)?"":fmt(x,d);
   const body=rows.map(r=>{
     const cover=r.top===undefined?undefined:r.ground-r.top,water=r.top===undefined||r.water===undefined?undefined:r.water-r.top;
     const cells=[fmt(r.chainage,step<1?1:0),v(r.ground),...(wet?[v(r.water)]:[]),
       ...(band?[v(r.top),v(r.bottom),v(cover),...(wet?[v(water)]:[])]:design?[v(r.top),v(cover),...(wet?[v(water)]:[])]:r.thickness.map(t=>v(t)))];
     const names=band?[unitLabel(model,r.unitTop),unitLabel(model,r.unitBottom)]:design?[unitLabel(model,r.unitTop)]:[];
-    return `<tr>${cells.map(c=>`<td class="num">${c}</td>`).join("")}${names.map(n=>`<td>${esc(n)}</td>`).join("")}</tr>`;
+    const after=[...(qc&&design?[band?`<td class="num">${v(r.qcTop,1)} / ${v(r.qcBottom,1)}</td>`:`<td class="num">${v(r.qcTop,1)}</td>`]:[]),...(cpt?[`<td>${r.cpt?`${esc(r.cpt.id)} (${fmt(r.cpt.distance)})`:""}</td>`]:[])];
+    return `<tr>${cells.map(c=>`<td class="num">${c}</td>`).join("")}${names.map(n=>`<td>${esc(n)}</td>`).join("")}${after.join("")}</tr>`;
   }).join("");
   const name=section.alignment!.name;
   return `<section class="page"><h2>${esc(name)}: by chainage</h2>
 <table class="chainage"><thead><tr>${head.map(h=>`<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table>
-<p class="muted">Every ${fmt(step)} m of chainage where the line is in the model${step>asked?`; the table by chainage in CSV has a row every ${fmt(asked)} m`:""}. Elevations in metres; the cover is the ground above the ${band?"crown":"design level"}, negative where the ${band?"crown":"level"} is above the ground.</p>
+<p class="muted">Every ${fmt(step)} m of chainage where the line is in the model${step>asked?`; the table by chainage in CSV has a row every ${fmt(asked)} m`:""}. Elevations in metres; the cover is the ground above the ${band?"crown":"design level"}, negative where the ${band?"crown":"level"} is above the ground.${qc&&design?" qc is the cone resistance interpolated within the unit, as on the section.":""}</p>
 ${foot("By chainage")}</section>`;
 }
