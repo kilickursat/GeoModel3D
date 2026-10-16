@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.16.0 — 2026-10-16
+
+### Added
+- **Soil behaviour type of CPTs** (`src/sbt.ts`), by Robertson's normalised chart (Robertson 2009), reading by reading:
+  - qt as the file gives it, else qc + u2 (1 − a) with the cone's net area ratio, else qc; the readers now take qt (GEF quantity 13, BRO `correctedConeResistance`, AGS4 `SCPT_QT`, CSV `qt`) and the net area ratio (GEF `MEASUREMENTVAR` 3, BRO `coneSurfaceQuotient`, DOV `net_area_ratio`, AGS4 `SCPG_CAR`);
+  - the unit weight from the CPT (Robertson and Cabal 2010), σv0 from the start, u0 below the project's water table;
+  - Ic iterated with n = 0.381 Ic + 0.05 σ′v0/pa − 0.15 (at most 1) and (pa/σ′v0)ⁿ at most 1.7, to 10⁻⁶; zones 2 to 7 by Ic.
+  
+  On three BRO CPTs it agrees with groundhog, an independent implementation, to 1.2 × 10⁻⁷ in Ic at all 5,562 readings, with no reading in another zone; the tests hold it to groundhog's results.
+- **CPT layers:** runs of readings in one zone, joined where thinner than 0.5 m, become each CPT's layers, which take units by the unit rules (taken metre by metre on elevation). **Build the model with the CPT layers** in the Site panel adds them to the logs of the model; they show in the colours of their units in 3-D and on sections, and **Check the model** leaves them out in turn.
+- **Unit rules for the CPT layers,** for projects whose units are given in their logs.
+- **Sites with CPTs only:** CPT files far from the site shown make a project of their own, built from their layers, with units grouped by principal soil and a soil found above and below other units split into an upper and a lower unit.
+- **Read-outs and report:** the soil behaviour type and Ic at a depth, and the unit of the layer there; a soil behaviour type column in the CPT logs, with a key in the report.
+- **Field:** the soil behaviour type index Ic on sections.
+- **Maasvlakte** is built with the layers of its 26 CPTs, interpreted by the same sequence as its boreholes. Cross-validation: the boreholes are predicted at 90.2 % of their logged metres, against 87.5 % without the CPT layers.
+- `CITATION.cff` and a Citing section in the README.
+- A demo GIF at the top of the README: Maasvlakte orbited, the section swept through it, then coloured by Ic.
+
+### Changed
+- Cross-validation, its markers, its CSV (with a kind column) and its report page cover the CPT layers the model is built with.
+- The project file keeps qt, the net area ratio, the CPT layers, `cptLayers` and `cptRules`; the Input data tab keeps them too.
+
+### Fixed
+- The section bar no longer runs its items into each other on screens 901 to 1380 px wide (the vertical exaggeration ran into **Colour**), along a line too.
+- The 3-D read-out no longer follows the mouse while a button is held to orbit or pan.
+
 ## 0.15.0 — 2026-10-15
 
 ### Added

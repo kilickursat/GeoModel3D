@@ -1,11 +1,11 @@
-# GeoModel3D: 3D geological models from borehole logs, in the browser
+# GeoModel3D: 3D geological models from borehole logs and CPTs, in the browser
 
 [![Live demo](https://img.shields.io/badge/live%20demo-open-78c9df)](https://kilickursat.github.io/GeoModel3D/)
 [![Build](https://github.com/kilickursat/GeoModel3D/actions/workflows/build.yml/badge.svg)](https://github.com/kilickursat/GeoModel3D/actions/workflows/build.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 [![three.js WebGPU](https://img.shields.io/badge/three.js-WebGPU%20%2B%20WebGL%202-black)](https://threejs.org)
 
-**Open-source 3D geological and geotechnical modelling for engineers, engineering geologists and hydrogeologists.** GeoModel3D turns borehole logs into a 3D stratigraphic model: TIN horizons, closed unit volumes, cross-sections at any angle, and longitudinal profiles along a tunnel, road or railway alignment, with a table by chainage. It places the model on a real map in the site's national coordinate system. Cone penetration tests (CPT) stand beside the boreholes, and their cone resistance runs along every section. On any section it shows the groundwater, the vertical total and effective stresses, the horizontal effective stress where K0 is given, and laboratory, in-situ and CPT results. Down any borehole of your own case, it gives the active, at-rest and passive earth pressures on a wall, drained or undrained.
+**Open-source 3D geological and geotechnical modelling for engineers, engineering geologists and hydrogeologists.** GeoModel3D turns borehole logs into a 3D stratigraphic model: TIN horizons, closed unit volumes, cross-sections at any angle, and longitudinal profiles along a tunnel, road or railway alignment, with a table by chainage. It places the model on a real map in the site's national coordinate system. Cone penetration tests (CPT) stand beside the boreholes, their cone resistance runs along every section, and their layers, by Robertson's soil behaviour type, build the model with the boreholes, or alone where a site has only CPTs. On any section it shows the groundwater, the vertical total and effective stresses, the horizontal effective stress where K0 is given, and laboratory, in-situ and CPT results. Down any borehole of your own case, it gives the active, at-rest and passive earth pressures on a wall, drained or undrained.
 
 Data can come from:
 - CSV, AGS4, Japanese, Dutch (BRO) and Flemish (DOV) borehole files;
@@ -17,7 +17,7 @@ Reports are exported as PDF. It runs entirely in the browser, on computers, tabl
 - **Live:** https://kilickursat.github.io/GeoModel3D/
 - **Offline:** [geomodel3d-offline.html](https://kilickursat.github.io/GeoModel3D/geomodel3d-offline.html) is one self-contained file that opens from disk, for networks where hosted pages or local servers are not an option.
 
-![A real site: 75 KuniJiban boreholes at Sakae, Yokohama, modelled over GSI terrain with OpenStreetMap around it](docs/screenshot.png)
+![GeoModel3D at Maasvlakte 2, Rotterdam: the model built from 100 boreholes and the layers of 26 CPTs on the map, orbited, the section swept through it in 3-D and in 2-D, then coloured by the soil behaviour type index Ic of the CPTs](docs/demo.gif)
 
 ## Real sites in four countries
 
@@ -30,19 +30,23 @@ Each site is published data, in its country's own coordinate system and height d
 | **Maasvlakte 2, Rotterdam, Netherlands** | 100 geotechnical boreholes and 26 cone penetration tests from the Dutch Key Register of the Subsurface (BRO), with 3,188 laboratory results and 56 groundwater levels | RD New (EPSG:28992), NAP | Reclaimed land on Holocene clay and peat over Pleistocene sand and gravel, the harbour basins, the cone resistance, and water content, unit weight, Atterberg limits, fines and undrained shear strength |
 | **Creswick deep leads, Victoria, Australia** | 150 groundwater bores with the hydrostratigraphic interpretation of the Victorian Department of Primary Industries, from the National Groundwater Information System (NGIS) | GDA94 / MGA zone 54 (EPSG:28354), AHD | Basalt lava flows that filled valleys cut into Palaeozoic bedrock and buried the sand and gravel of the old rivers, the deep leads |
 
+![A real site: 75 KuniJiban boreholes at Sakae, Yokohama, modelled over GSI terrain with OpenStreetMap around it](docs/screenshot.png)
+
 | Antwerp: formations along the Scheldt | Maasvlakte 2: water content in the section |
 |---|---|
 | ![Antwerp model from DOV formal stratigraphy](docs/antwerp.png) | ![Maasvlakte 2 model coloured by water content](docs/maasvlakte-water-content.png) |
 | **Creswick: basalt over the deep leads** | **Input data: a case typed in by hand** |
 | ![Creswick deep leads model from NGIS hydrostratigraphy](docs/creswick.png) | ![The Input data tab with the worked example: its units, and the drained earth pressures down a borehole](docs/input-data.png) |
 
-## Version 0.15
+## Version 0.16
 
-- **Cone penetration tests (CPT):** GEF files, Dutch BRO and Flemish DOV XML, AGS4 and CSV tables are read, and the CPTs stand beside the boreholes in 3-D. On every section and longitudinal profile each CPT's cone resistance runs to the right of it and its friction ratio to the left, as on a Dutch geotechnical profile. qc, fs, Rf and u2 colour the section like the laboratory results, the table by chainage gives qc at the crown and invert, and the report gets a page of CPT logs. The Maasvlakte site now has 26 of its BRO CPTs. See [Cone penetration tests](#cone-penetration-tests).
+- **CPTs build the model.** Each CPT is classified by Robertson's soil behaviour type (2009): the index Ic of its normalised cone resistance and friction ratio, with the unit weight from the CPT itself and the water table of the project; it agrees with an independent implementation to within 10⁻⁷. Its readings become layers, the layers take units by the unit rules, and the model is built with them and the boreholes. A site with CPTs only gets a model of its own. At Maasvlakte, the 26 CPTs raise the share of the boreholes' logged metres the model predicts from 87.5 % to 90.2 %. See [Soil behaviour type and CPT layers](#soil-behaviour-type-and-cpt-layers).
+- **Citing:** `CITATION.cff` gives the citation GitHub shows under **Cite this repository**; see [Citing](#citing).
 
 ![Maasvlakte 2: 26 BRO CPTs beside the boreholes, the section coloured by their cone resistance, and each CPT's trace on the 2-D section](docs/cpt.png)
 
 Earlier versions:
+- **0.15:** cone penetration tests from GEF, BRO and DOV XML, AGS4 and CSV: beside the boreholes in 3-D, their cone resistance and friction ratio on every section, qc, fs, Rf and u2 as fields, qc at the design levels by chainage, and a report page of CPT logs.
 - **0.14:** LandXML and J-LandXML alignments, with straights, circular arcs, clothoids and the design profile; straight sections mark the lines that cross them.
 - **0.13:** sections along a line: the longitudinal profile by chainage along a tunnel, road, railway or dike, with its design levels, from CSV, GeoJSON or DXF or drawn on the model; a table by chainage with the cover and the units in the tunnel face; cross-sections square to the line.
 - **0.12:** a layout for phones and tablets: the model fills the screen, the panels open one at a time from a bar at the bottom, and a tap on a borehole or a unit gives its details.
@@ -227,7 +231,7 @@ Fields of the project file:
 - **Projects built from descriptions** also keep `rules` (`match`, `unit`, and optionally `minN`, `maxN`, `minZ`, `maxZ`), and each interval's logged description as `name`.
 - **Georeport3D extractions:** `collar` easting/northing/elevation, `total_depth`, and `intervals` (`depth_from`, `depth_to`, `lithology`). A borehole without a complete collar is reported and not placed; coordinates are never invented.
 - **Alignments:** `alignments` lists the lines of the project, each with a `name` and its `points` (`x`, `y`, and a `chainage` at every point or at none). It may also have a `start` chainage and `design` levels: `chainage` and `top`, and `bottom` for a crown and invert.
-- **CPTs:** `cpts` lists the cone penetration tests, each with an `id`, its position `x`, `y` and start level `z` (`null` to start at the model's ground), and its readings as lists of one length: `depth` (m below the start), `qc` (MPa) and, where measured, `fs` (kPa), `u2` (kPa) and `rf` (%), with `null` for a missing reading. It may also have a `date` and a `predrill` depth.
+- **CPTs:** `cpts` lists the cone penetration tests, each with an `id`, its position `x`, `y` and start level `z` (`null` to start at the model's ground), and its readings as lists of one length: `depth` (m below the start), `qc` (MPa) and, where measured, `fs` (kPa), `u2` (kPa), `rf` (%) and `qt` (MPa), with `null` for a missing reading. It may also have the cone's net area ratio `a`, a `date`, a `predrill` depth, and its `layers` (`from`, `to`, `unit`, and the soil as `name`). `cptLayers: true` builds the model with the CPT layers, and `cptRules` give them their units (else `rules` do).
 
 **Export** also writes:
 - **Boreholes (CSV)**, with descriptions and water depths;
@@ -366,9 +370,29 @@ CPTs come with the boreholes or are added to the site shown, from the files abov
 - **Read-outs:** hover over a CPT, or tap it on a phone, for its readings at that depth (qc, fs, Rf, u2) and its log beside the units of the model where it stands. Over a CPT's trace on the 2-D section, the read-out gives its readings at that level.
 - **Fields:** qc, fs, Rf and u2 colour the section like the laboratory results: the means of the readings over 0.5 m are interpolated within each unit of the model. A reading on a contact counts in the unit below. CPTs outside the model add nothing, and the notes name them.
 - **Along a line**, the table by chainage gives qc at the crown and the invert, or at the design level, and the nearest CPT with its distance.
-- **The report** gets a page of the logs of the CPTs on the section, side by side over the units of the model, the readings by unit (mean and range of qc, fs and Rf), and a list of the CPTs.
+- **The report** gets a page of the logs of the CPTs on the section, side by side with their soil behaviour type over the units of the model, the readings by unit (mean and range of qc, fs and Rf), and a list of the CPTs.
 
-What the CPTs do not do yet: they do not make units. The model is built from the boreholes, and the CPTs are drawn against it. Classifying soils from CPT readings (a soil behaviour type chart, such as Robertson's) is a choice of method, left for a later version. Nor are the readings corrected: qt, the net cone resistance and normalised values are not derived.
+### Soil behaviour type and CPT layers
+
+Each CPT is classified reading by reading with Robertson's normalised soil behaviour type (SBTn), the method of the CPT guide of Robertson and Cabal and of most CPT software:
+
+- **qt**, the cone resistance corrected for the pore pressure behind the cone: as the file gives it, else qc + u2 (1 − a) where the file gives u2 and the cone's net area ratio a, else qc (the notes say which).
+- **Unit weight**, from the CPT itself: γ/γw = 0.27 log Rf + 0.36 log(qt/pa) + 1.236, with Rf = fs/qt in percent (Robertson and Cabal 2010).
+- **Stresses:** σv0 sums the unit weights from the start of the CPT; u0 is hydrostatic below the water table of the project (through the boreholes' water levels, else its assumed groundwater depth); σ′v0 = σv0 − u0. Without a water level, u0 is 0, and the notes say so.
+- **Ic**, iterated (Robertson 2009): Qtn = ((qt − σv0)/pa)(pa/σ′v0)ⁿ with (pa/σ′v0)ⁿ at most 1.7 (Robertson and Wride 1998), Fr = fs/(qt − σv0) in percent, Ic = √((3.47 − log Qtn)² + (log Fr + 1.22)²) and n = 0.381 Ic + 0.05 σ′v0/pa − 0.15, at most 1, until n changes by less than 10⁻⁶.
+- **Zones** of Robertson's chart by Ic: 7 gravelly sand to dense sand (below 1.31), 6 sands (to 2.05), 5 sand mixtures (to 2.6), 4 silt mixtures (to 2.95), 3 clays (to 3.6) and 2 organic soils, peat (above).
+
+On three BRO CPTs, Ic agrees with groundhog, an independent open-source implementation that solves for Ic by root finding, to within 1.2 × 10⁻⁷ at all 5,562 readings that can be classified, with no reading in a different zone. The tests check the method against groundhog's results.
+
+Known limits of the method, which the notes repeat where they matter: zones 1, 8 and 9 (sensitive fine-grained soils, and very stiff soils, overconsolidated or cemented) lie off the Ic bands and are not told apart; the unit weight correlation overestimates peat; and under open water the stresses count from the bed, as on sections, so qt − σv0 is high by the weight of the water above, which matters only in the softest soils. Readings with no sleeve friction, or with qt not above σv0, are not classified.
+
+**Layers:** runs of readings in one zone become layers. A run thinner than 0.5 m joins the neighbour whose mean Ic is nearest its own, as the cone senses the ground some ten diameters around it and cannot resolve thinner layers. Each layer names its soil, such as "Clay: silty clay to clay (SBTn 3)", and takes a unit by the unit rules. Rules on elevation take a layer metre by metre, so that one part of a thick layer can belong to another unit.
+
+**Into the model:** **Build the model with the CPT layers** in the Site panel adds the CPTs whose layers have units to the logs the model is built from. Each CPT then shows its layers in the colours of their units, in 3-D and on sections, and **Check the model** leaves out each CPT's layers in turn, as it does each borehole. A project's own unit rules give the layers their units. A project whose units are given in its logs, such as an AGS4 file with unit codes, gets **Unit rules for the CPT layers** instead, which apply to the CPT layers only.
+
+**CPTs alone:** CPT files that lie far from the site shown make a project of their own, built from the CPT layers. Its units are a first grouping of the layers by principal soil (sand, silt, clay, peat). A soil that most CPTs show above and below other units, as sand over a clay layer over sand, is split into an upper and a lower unit at the median elevation of what separates them. Only occurrences of 2 m or more, at least 1 m apart, count. These are rules like any other, listed under **Unit rules for the CPT layers**, to refine with the stratigraphy of the site.
+
+**Maasvlakte** is built with the layers of its 26 CPTs, interpreted by the same sequence as its boreholes (see [Reference datasets](#reference-datasets)). Left out in turn, the CPTs' layers are predicted in the unit given by 93.8 % of their metres, and with them the boreholes are predicted better: 90.2 % of their logged metres, against 87.5 % from the boreholes alone.
 
 ## Checking the model
 
@@ -388,12 +412,12 @@ The bundled sites, without the terrain the app downloads:
 
 | Site | Boreholes (inside the others) | Logged metres in the unit logged | Mean absolute error of the unit tops |
 |---|---|---|---|
-| Maasvlakte 2 | 100 (93) | 87.5 % | 1.3–1.6 m |
+| Maasvlakte 2, with the layers of its 26 CPTs | 100 + 26 CPTs (116) | 91.4 % | 1.2–1.6 m |
 | Antwerp | 169 (158) | 71.8 % | 1.8–3.9 m |
 | Sakae | 75 (66) | 60.1 % | 4.0–5.8 m |
 | Creswick | 150 (136) | 51.7 % | 5.6–23.9 m |
 
-With its 5 m terrain grid, Sakae reaches 62.8 %, and the mean error of the ground falls from 3.8 to 2.0 m. `scripts/check-sites.ts` prints these results.
+With its 5 m terrain grid, Sakae reaches 62.8 %, and the mean error of the ground falls from 3.8 to 2.0 m. At Maasvlakte the CPT layers are left out in turn as the boreholes are: the boreholes alone are predicted at 90.2 % with the CPT layers in the model, against 87.5 % without them. `scripts/check-sites.ts` prints these results.
 
 ## Models for augmented reality
 
@@ -501,7 +525,7 @@ The viewer uses three.js's `WebGPURenderer` with TSL node materials, so one shad
   - **Holocene clay and peat:** the basal complex, from the first clay, silt or peat more than 16 m below NAP, through thin sand partings.
   - **Pleistocene sand and gravel:** below it.
 
-  In the basins the logs start at the bed, 17–21 m below NAP, so no terrain is fetched: the map lies on a plane at the collars' median level. The site also has 26 of the BRO's CPTs in the same rectangle: of the 703 made since 2018, as the boreholes were, of quality class 1 or 2 and at least 30 m deep (into the Pleistocene sand), the deepest in each 400 m square. A reading is kept every 0.1 m (of every 0.02 m measured), qc to 0.01 MPa and fs and u2 to 1 kPa, with the friction ratio the BRO gives. `scripts/make-rotterdam-site.ts` pins and downloads the IMBRO XML.
+  In the basins the logs start at the bed, 17–21 m below NAP, so no terrain is fetched: the map lies on a plane at the collars' median level. The site also has 26 of the BRO's CPTs in the same rectangle, whose layers by soil behaviour type (from all their readings) are interpreted by the same sequence as the logs and build the model with them: of the 703 made since 2018, as the boreholes were, of quality class 1 or 2 and at least 30 m deep (into the Pleistocene sand), the deepest in each 400 m square. A reading is kept every 0.1 m (of every 0.02 m measured), qc to 0.01 MPa and fs and u2 to 1 kPa, with the friction ratio the BRO gives. `scripts/make-rotterdam-site.ts` pins and downloads the IMBRO XML.
 - **Creswick deep leads, Victoria, Australia (real site).** 150 groundwater bores in about 10 × 10 km of the basalt plains north-east of Creswick, from the National Groundwater Information System (NGIS v1.1, 2013) of the Bureau of Meteorology. Lava flows filled valleys cut into Palaeozoic bedrock and buried the sand and gravel of the old rivers, the deep leads, once mined for gold. The units are the hydrostratigraphic interpretation of each log by the Victorian Department of Primary Industries, as published in NGIS, from the surface down:
   - **Surface alluvium.**
   - **Basalt, upper flows**, then **interbasalt clay** and **basalt, lower flows**.
@@ -527,6 +551,7 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 - `src/alignment.ts`: sections along an alignment, chainage, cross-sections square to the line, lines crossing straight sections, and the table by chainage
 - `src/landxml.ts`: LandXML and J-LandXML alignments (straights, arcs, clothoids, design profiles)
 - `src/cpt.ts`: cone penetration tests: GEF, BRO and DOV readers, the friction ratio, readings at a depth and averages over depth
+- `src/sbt.ts`: the soil behaviour type of CPTs (Robertson 2009) and the layers it gives
 - `src/cptSvg.ts`: a CPT's log, for the read-out and the report
 - `src/layout.ts`: the layout for phones and tablets (where the view is drawn, how the model is framed, how near a tap is to a borehole)
 - `src/properties.ts`: the property catalogue and per-unit statistics
@@ -567,7 +592,7 @@ Every push to `main` runs the tests, builds the site and publishes `dist/` to Gi
    - settlement and bearing estimates from the unit parameters;
    - earth pressures with surcharges, an excavation level and wall friction, and on sections;
    - property models in 3-D, not only on sections.
-3. **More data:** units from CPTs, by a soil behaviour type classification (the method to be chosen), so that sites with CPTs only can be modelled; a reference site in the Americas once clearly licensed public data are found.
+3. **More data:** ground parameters from CPTs (undrained shear strength, friction angle, relative density, stiffness; the correlations to be chosen); a reference site in the Americas once clearly licensed public data are found.
 4. Faults; constrained TIN boundaries, pinch-out lines and geological map contacts.
 5. Tunnel and road cross-section shapes, from given dimensions, on the sections; LandXML cross-sections and surfaces.
 6. GeoJSON, DXF and LAS import; GeoTIFF terrain.
@@ -587,6 +612,21 @@ Every push to `main` runs the tests, builds the site and publishes `dist/` to Gi
 
 No copyright is claimed here on the data above, and the Apache-2.0 licence does not apply to them.
 
+## Citing
+
+If you use GeoModel3D in your work, please cite it. GitHub's **Cite this repository** gives the reference in APA and BibTeX from [CITATION.cff](CITATION.cff):
+
+```bibtex
+@software{kilic_geomodel3d,
+  author  = {Kilic, Kursat},
+  title   = {GeoModel3D: 3D geological models from borehole logs and CPTs, in the browser},
+  url     = {https://github.com/kilickursat/GeoModel3D},
+  version = {0.16.0},
+  year    = {2026},
+  license = {Apache-2.0}
+}
+```
+
 ## Contributing
 
 Contributions are welcome: bug reports, ideas, documentation, code and openly licensed data. [CONTRIBUTING.md](CONTRIBUTING.md) explains how to set up the project, test a change and submit it, and the rules for adding data. Before starting on a larger change, please open an [issue](https://github.com/kilickursat/GeoModel3D/issues) so that the approach can be agreed; the [roadmap](#roadmap) lists what is planned. Everyone taking part follows the [code of conduct](CODE_OF_CONDUCT.md).
@@ -601,4 +641,4 @@ Apache-2.0: see [LICENSE](LICENSE). The data listed under [Data sources](#data-s
 
 ## Keywords
 
-3D geological modelling · geological model software · geotechnical engineering · engineering geology · hydrogeology · borehole logs · borehole data visualization · manual data entry · stratigraphy · subsurface modelling · cross-sections · groundwater · effective stress · horizontal stress K0 · earth pressure · active and passive earth pressure · Rankine · retaining walls · cross-validation · model uncertainty · augmented reality · AR · USDZ · glTF · ground investigation · cone penetration test · CPT · CPTu · GEF · AGS4 · BRO · DOV · KuniJiban · NGIS · Australia · coordinate systems · GIS · three.js · WebGPU · open source
+3D geological modelling · geological model software · geotechnical engineering · engineering geology · hydrogeology · borehole logs · borehole data visualization · manual data entry · stratigraphy · subsurface modelling · cross-sections · groundwater · effective stress · horizontal stress K0 · earth pressure · active and passive earth pressure · Rankine · retaining walls · cross-validation · model uncertainty · augmented reality · AR · USDZ · glTF · ground investigation · cone penetration test · CPT · CPTu · GEF · soil behaviour type · SBT · Robertson · Ic · AGS4 · BRO · DOV · KuniJiban · NGIS · Australia · coordinate systems · GIS · three.js · WebGPU · open source

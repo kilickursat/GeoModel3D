@@ -4,6 +4,7 @@ import {GeoModel,sampleModel} from "./model";
 import {Section,joined} from "./section";
 import {boreholeTests,testDepth,unitAt,propertyDef,unitStatistics,measuredProperties,formatValue} from "./properties";
 import {CPT_KEYS,CptKey,cptAverages,cptKeys} from "./cpt";
+import {cptBehaviour} from "./sbt";
 
 export const GAMMA_W=9.81;
 // Used, and reported, for units given no unit weight and with none measured: typical values for soils, which overstate
@@ -157,11 +158,13 @@ export function propertySamples(model:GeoModel,key:string){
     const d=testDepth(t),k=index.get(unitAt(b,d)??"");
     if(k!==undefined)byUnit[k].push({x:b.x,y:b.y,z:b.z-d,value:log?Math.log10(t.value):t.value});
   }
-  if(isCptKey(key))for(const c of model.cpts){
+  if(isCptKey(key)||key==="Ic")for(const c of model.cpts){
     const z=sampleModel(model,c.x,c.y);
     if(!z)continue;
-    for(const a of cptAverages(c,CPT_STEP)){
-      const v=key==="qc"?a.qc:key==="fs"?a.fs:key==="u2"?a.u2:a.rf,e=c.z-a.depth;
+    // Ic, the soil behaviour type index, averages like a reading.
+    const source=key==="Ic"?{...c,qc:cptBehaviour(model.project,c).ic,fs:undefined,u2:undefined,rf:undefined}:c;
+    for(const a of cptAverages(source,CPT_STEP)){
+      const v=key==="qc"||key==="Ic"?a.qc:key==="fs"?a.fs:key==="u2"?a.u2:a.rf,e=c.z-a.depth;
       const k=unitOfReading(z,e);
       if(Number.isFinite(v)&&k>=0)byUnit[k].push({x:c.x,y:c.y,z:e,value:v,cpt:true});
     }
@@ -250,6 +253,7 @@ export function sectionField(model:GeoModel,section:Section,key:string):SectionF
   const cpts=new Set(fromCpts.map(p=>`${p.x},${p.y}`)).size;
   notes.push(`${tests?`${tests} test value${tests>1?"s":""}${fromCpts.length?" and ":""}`:""}${fromCpts.length?`${fromCpts.length} means of the readings over ${CPT_STEP} m in ${cpts} CPT${cpts>1?"s":""}`:""}, interpolated within each unit by inverse distance, with horizontal distances shortened 10 times`);
   if(key==="Rf"&&model.cpts.some(c=>c.fs&&!c.rf))notes.push("Rf = fs/qc where the data give no friction ratio");
+  if(key==="Ic")notes.push("Ic from each CPT's readings and the stresses in place (Robertson 2009): below 2.05 sands, 2.05–2.6 sand mixtures, 2.6–2.95 silt mixtures, 2.95–3.6 clays, above 3.6 organic soils");
   const at=(s:number,e:number)=>{
     const c=columnAt(section,s);
     if(!c)return NaN;
@@ -312,7 +316,7 @@ export const scaleLabel=(c:ColourScale,v:number)=>(c.log?`1e${Math.round(v)}`:St
 // The fields that can be shown for a model: the stresses, then each measured property.
 export function availableFields(model:GeoModel){
   const k0=model.units.some(u=>u.params?.K0!==undefined),measured=measuredProperties(model.boreholes);
-  const fromCpts:string[]=CPT_KEYS.filter(k=>!measured.includes(k)&&model.cpts.some(c=>cptKeys(c).includes(k)));
+  const fromCpts:string[]=[...CPT_KEYS.filter(k=>!measured.includes(k)&&model.cpts.some(c=>cptKeys(c).includes(k))),...(model.cpts.some(c=>c.fs?.some(Number.isFinite))?["Ic"]:[])];
   return [...STRESS_FIELDS.filter(f=>f.key!=="sh"||k0).map(f=>({key:f.key as string,label:`${f.name} ${f.symbol} (${f.unit})`})),
     ...[...measured,...fromCpts].map(k=>{const p=propertyDef(k);return {key:k,label:`${p.name}${p.symbol!==p.name?" "+p.symbol:""}${p.unit?` (${p.unit})`:""}${fromCpts.includes(k)?", CPT":""}`}})];
 }

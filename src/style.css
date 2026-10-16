@@ -35,6 +35,11 @@ body[data-drawing="on"] .notice{display:none}
 .crs{display:flex;align-items:center;gap:7px;margin-top:8px;color:#9bb1bd}
 .crs input,.rule input,.geo select{min-width:0;background:#0d1d29;color:#e8f2f7;border:1px solid rgba(160,190,200,.25);border-radius:6px;padding:4px 6px;font-size:11px}
 .crs input{flex:1}
+.cpt-layers{margin-top:10px;color:#c4d2d9}
+.cpt-layers label{display:flex;align-items:center;gap:7px;cursor:pointer;color:#d9edf5}
+.cpt-layers input{margin:0;accent-color:#78c9df}
+.cpt-layers input:disabled+span{opacity:.75}
+.cpt-note{margin:4px 0 0;color:#8aa2ae}
 .rules{margin-top:10px;color:#c4d2d9}
 .rules summary{cursor:pointer;color:#d9edf5}
 .rule{margin-top:6px;padding-top:6px;border-top:1px solid rgba(160,190,200,.1)}
@@ -150,6 +155,14 @@ button,select,summary,label,a{touch-action:manipulation}
 .section-body{touch-action:none}
 /* Mid-size screens: the notes open below the tabs, which they would cover, and the section bar packs closer. */
 @media (max-width:1260px){.notice{top:72px}}
+@media (max-width:1380px){
+  .section-control{gap:12px}
+  .section-control .tag{display:none}
+  .section-control .ve-pick{flex:.8}
+  .section-control input{min-width:44px}
+  /* Along a line the bar also holds the chainage, the cross-section button and the table step. */
+  .section-control[data-line="along"] select,.section-control[data-line="along"] .line-pick select{max-width:150px}
+}
 @media (max-width:1180px){
   .section-control{gap:10px}
   .section-control .tag,.section-control .step-pick span{display:none}
@@ -158,6 +171,11 @@ button,select,summary,label,a{touch-action:manipulation}
   .section-control input{min-width:30px}
   .section-control output{min-width:38px}
   .section-control select,.section-control .line-pick select{max-width:118px}
+  .section-control[data-line="along"] select,.section-control[data-line="along"] .line-pick select{max-width:100px}
+}
+@media (max-width:1000px){
+  .section-control .ve-pick{flex:.9}
+  .section-control[data-line="along"] :is(.line-pick,.field-pick) span{display:none}
 }
 
 /* Tabs and the input workspace */

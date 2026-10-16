@@ -13,7 +13,8 @@ import {XY} from "./tin";
 // predicted minus logged (positive where the model puts it too high).
 export interface ContactCheck { k:number; logged:number; predicted:number; error:number }
 export interface BoreholeCheck {
-  id:string; x:number; y:number;
+  // `cpt`: the log is a CPT's layers.
+  id:string; x:number; y:number; cpt?:boolean;
   // Outside the outline of the other boreholes: the prediction there is an extrapolation.
   outside:boolean;
   contacts:ContactCheck[];
@@ -57,9 +58,11 @@ function distanceToPolygon(poly:XY[],p:XY){
   return d;
 }
 
-// One borehole against the model built from the others: undefined if no model of the others reaches it.
-function check(project:GeoProject,holes:Borehole[],b:Borehole,units:UnitDef[]):BoreholeCheck|undefined{
+// One log against the model built from the others: undefined if no model of the others reaches it. A borehole is left
+// out of the boreholes, a CPT's layers out of the CPTs.
+function check(project:GeoProject,holes:Borehole[],b:Borehole,units:UnitDef[],cpt:boolean):BoreholeCheck|undefined{
   const others=holes.filter(o=>o!==b),hull=convexHull(others.map(o=>({x:o.x,y:o.y})));
+  const without:GeoProject=cpt?{...project,cpts:(project.cpts??[]).filter(c=>c.id!==b.id)}:{...project,boreholes:project.boreholes.filter(o=>o.id!==b.id)};
   const distance=hull.length>2&&insidePolygon(hull,b)?0:distanceToPolygon(hull,b);
   const outside=distance>1e-6;
   // Outside the others, the model is extended to reach the borehole, as a model extent would extend it (the frame of
@@ -67,7 +70,7 @@ function check(project:GeoProject,holes:Borehole[],b:Borehole,units:UnitDef[]):B
   let margin=project.margin,z:number[]|null=null,model:GeoModel|undefined;
   for(let attempt=0;attempt<4&&!z;attempt++){
     if(outside)margin=Math.max(project.margin??0,(1.2*distance+1)*2**attempt);
-    model=buildGeologicalModel({...project,boreholes:others,...(margin!==undefined?{margin}:{})},{probe:{x:b.x,y:b.y}});
+    model=buildGeologicalModel({...without,...(margin!==undefined?{margin}:{})},{probe:{x:b.x,y:b.y}});
     z=sampleModel(model,b.x,b.y);
     if(!outside)break;
   }
@@ -107,19 +110,20 @@ function surfaceChecks(checks:BoreholeCheck[],names:string[]):SurfaceCheck[]{
   }).filter((s):s is SurfaceCheck=>!!s);
 }
 
-// Leaves out each borehole of the model in turn, yielding how many are done before each and at the end, so that a
-// caller can show progress and stop between boreholes; returns the result. `full` is the model of all the boreholes,
-// when it is already built.
+// Leaves out each log of the model in turn (the boreholes, then the CPT layers the model is built with), yielding how
+// many are done before each and at the end, so that a caller can show progress and stop between them; returns the
+// result. `full` is the model of all the logs, when it is already built.
 export function* crossValidation(project:GeoProject,full=buildGeologicalModel(project)):Generator<{done:number;total:number},CrossValidation>{
-  const holes=full.boreholes,units=full.units;
+  const holes=[...full.boreholes,...full.cptLogs],units=full.units,first=full.boreholes.length;
   const surfaces=["Ground surface",...full.units.slice(1).map(u=>`Top of ${u.name}`)];
   const boreholes:BoreholeCheck[]=[],notes:string[]=[];
-  if(holes.length<2)notes.push("Cross-validation needs at least two boreholes in the model");
+  if(holes.length<2)notes.push("Cross-validation needs at least two logs in the model");
   else for(let i=0;i<holes.length;i++){
     yield {done:i,total:holes.length};
-    const r=check(project,holes,holes[i],units);
-    if(r)boreholes.push(r);else notes.push(`${holes[i].id}: no model of the other boreholes reaches it; left out`);
+    const r=check(project,holes,holes[i],units,i>=first);
+    if(r)boreholes.push(i>=first?{...r,cpt:true}:r);else notes.push(`${holes[i].id}: no model of the other logs reaches it; left out`);
   }
+  if(full.cptLogs.length)notes.push(`${full.cptLogs.length} of the logs are CPT layers: each is left out in turn as a borehole is`);
   yield {done:holes.length,total:holes.length};
   const share=(list:BoreholeCheck[])=>{const l=list.reduce((s,b)=>s+b.logged,0);return l?list.reduce((s,b)=>s+b.right,0)/l:NaN};
   const inside=boreholes.filter(b=>!b.outside),outside=boreholes.filter(b=>b.outside);

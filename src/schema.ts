@@ -33,22 +33,26 @@ export interface Alignment { name:string; points:AlignmentPoint[]; start?:number
 // A cone penetration test (CPT, or CPTu with pore pressure): its position, and the level its depths start from (`z`, the
 // ground or the water bed), like a borehole's collar. The readings are arrays of one length, by increasing depth in
 // metres below the start: cone resistance qc in MPa, sleeve friction fs in kPa, pore pressure u2 (behind the cone) in
-// kPa, and the friction ratio Rf in percent where the data give it (else it is fs/qc); NaN (null in JSON) where a
-// reading has no value. `predrill` is the depth drilled or dug out before the test, `date` the day it was made.
+// kPa, the friction ratio Rf in percent where the data give it (else it is fs/qc), and the corrected cone resistance qt
+// in MPa where the data give it; NaN (null in JSON) where a reading has no value. `a` is the cone's net area ratio,
+// `predrill` the depth drilled or dug out before the test, `date` the day it was made. `layers` is the log the CPT
+// gives, by its soil behaviour type (src/sbt.ts), with the unit of each layer where the project's rules give one.
 export interface Cpt {
   id:string; x:number; y:number; z:number; lon?:number; lat?:number;
-  depth:number[]; qc:number[]; fs?:number[]; u2?:number[]; rf?:number[];
-  predrill?:number; date?:string;
+  depth:number[]; qc:number[]; fs?:number[]; u2?:number[]; rf?:number[]; qt?:number[]; a?:number;
+  predrill?:number; date?:string; layers?:Interval[];
 }
 
 // x, y are in the system named by `crs`; `crsCode` (e.g. EPSG:6677) or the PROJ definition `crsProj4` georeferences it.
 // `source` credits where the data come from. `groundwaterDepth` is an assumed depth of the water table below ground,
 // used where no borehole records a water level. `margin` extends the model that many metres beyond the outline of the
-// boreholes (by default it ends at the outermost boreholes).
+// boreholes (by default it ends at the outermost boreholes). `cptLayers` builds the model with the CPTs' layers as well
+// as the boreholes' logs; `cptRules` give those layers their units (else the unit rules do).
 export interface GeoProject {
   name:string; description?:string; source?:string; crs?:string; crsCode?:string; crsProj4?:string; base?:number;
   groundwaterDepth?:number; margin?:number;
   units:UnitDef[]; rules?:UnitRule[]; boreholes:Borehole[]; terrain?:TerrainGrid; alignments?:Alignment[]; cpts?:Cpt[];
+  cptLayers?:boolean; cptRules?:UnitRule[];
 }
 
 export function boreholeDepth(b:Borehole){return Math.max(b.depth??0,...b.intervals.map(i=>i.to))}

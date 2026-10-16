@@ -135,7 +135,11 @@ export function projectFromTables(t:EditorTables,base?:GeoProject):ImportResult{
     if(projectCrs(base)?.proj4===crs?.proj4){
       if(base.terrain)p.terrain=base.terrain;
       if(base.alignments?.length)p.alignments=base.alignments;
-      if(base.cpts?.length)p.cpts=base.cpts;
+      if(base.cpts?.length){
+        p.cpts=base.cpts;
+        if(base.cptLayers)p.cptLayers=true;
+        if(base.cptRules)p.cptRules=base.cptRules;
+      }
     }else{
       const left=[base.alignments?.length?`${base.alignments.length} line${base.alignments.length>1?"s":""}`:"",base.cpts?.length?`${base.cpts.length} CPT${base.cpts.length>1?"s":""}`:""].filter(Boolean);
       if(left.length)result.warnings.push(`The coordinate system changed: ${left.join(" and ")} of the project left out, as their positions are in the old one`);

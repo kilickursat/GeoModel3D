@@ -6,8 +6,9 @@ import {parseXml,withoutPrefixes,XmlNode,descendants,childNodes,textOf} from "./
 import {Cpt} from "./schema";
 
 // A CPT as read from a file. Its position is in the coordinate system `crs` (an EPSG code) where the file names one,
-// else by latitude and longitude, else in the project's coordinates; `notes` say what was converted or assumed.
-export interface CptRead { cpt:Cpt; crs?:string; notes:string[] }
+// else by latitude and longitude, else in the project's coordinates; `notes` say what was converted or assumed, and
+// `source` names the register it comes from.
+export interface CptRead { cpt:Cpt; crs?:string; notes:string[]; source?:string }
 
 const finite=(v:number|undefined):v is number=>v!==undefined&&Number.isFinite(v);
 // Converted values keep six significant figures, so 0.052 MPa reads as 52 kPa.
@@ -84,12 +85,12 @@ export function thinned(c:Cpt,step:number):number[]{
 }
 
 // Readings in order of depth, with the rows that have no depth, or no reading at all, left out.
-export interface CptRow { depth:number; qc:number; fs:number; u2:number; rf:number }
-export function cptReadings(id:string,rows:CptRow[]):Pick<Cpt,"depth"|"qc"|"fs"|"u2"|"rf">{
+export interface CptRow { depth:number; qc:number; fs:number; u2:number; rf:number; qt?:number }
+export function cptReadings(id:string,rows:CptRow[]):Pick<Cpt,"depth"|"qc"|"fs"|"u2"|"rf"|"qt">{
   const kept=rows.filter(r=>Number.isFinite(r.depth)&&[r.qc,r.fs,r.u2,r.rf].some(Number.isFinite)).sort((a,b)=>a.depth-b.depth);
   if(!kept.some(r=>Number.isFinite(r.qc)))throw new Error(`${id}: no cone resistance (qc) readings`);
-  const col=(k:"fs"|"u2"|"rf")=>kept.some(r=>Number.isFinite(r[k]))?{[k]:kept.map(r=>r[k])}:{};
-  return {depth:kept.map(r=>r.depth),qc:kept.map(r=>r.qc),...col("fs"),...col("u2"),...col("rf")};
+  const col=(k:"fs"|"u2"|"rf"|"qt")=>kept.some(r=>Number.isFinite(r[k]??NaN))?{[k]:kept.map(r=>r[k]??NaN)}:{};
+  return {depth:kept.map(r=>r.depth),qc:kept.map(r=>r.qc),...col("fs"),...col("u2"),...col("rf"),...col("qt")};
 }
 // Depths written as negative numbers (downwards) are made positive.
 function downwards(rows:Array<{depth:number}>,notes:string[]){
@@ -103,8 +104,9 @@ const baseName=(file:string)=>file.replace(/^.*[\\/]/,"").replace(/\.[^.]+$/,"")
 
 export const isGef=(text:string)=>/^\s*#GEFID\s*=/i.test(text.slice(0,500));
 // GEF quantity numbers of the columns read (GEF-CPT-Report): penetration length, cone resistance, sleeve friction,
-// friction ratio, pore pressures u1, u2 and u3, the resultant inclination, and the depth corrected for inclination.
-const Q={length:1,qc:2,fs:3,rf:4,u1:5,u2:6,u3:7,inclination:8,depth:11};
+// friction ratio, pore pressures u1, u2 and u3, the resultant inclination, the depth corrected for inclination, and the
+// corrected cone resistance qt.
+const Q={length:1,qc:2,fs:3,rf:4,u1:5,u2:6,u3:7,inclination:8,depth:11,qt:13};
 // The factor from a unit of pressure to kPa: SI, bar, kgf/cm², and the US units tsf (short tons per square foot), ksf
 // and psi; null for any other.
 const PRESSURE_UNITS:Array<[RegExp,number]>=[[/^(mpa|mn\/m2|n\/mm2)$/,1000],[/^(kpa|kn\/m2)$/,1],[/^(pa|n\/m2)$/,0.001],[/^bar$/,100],
@@ -166,9 +168,9 @@ export function readGef(text:string,file:string):CptRead[]{
   const useCorrected=!!corrected?.some(Number.isFinite);
   if(!useCorrected&&column(Q.inclination))notes.push("depth is the penetration length: the file has no depth corrected for inclination");
   const depth=useCorrected?corrected!:length!;
-  const qc=read(Q.qc,"MPa","qc")!,fs=read(Q.fs,"kPa","fs"),u2=read(Q.u2,"kPa","u2"),rf=read(Q.rf);
+  const qc=read(Q.qc,"MPa","qc")!,fs=read(Q.fs,"kPa","fs"),u2=read(Q.u2,"kPa","u2"),rf=read(Q.rf),qt=read(Q.qt,"MPa","qt");
   if(!u2&&(column(Q.u1)||column(Q.u3)))notes.push(`pore pressure ${column(Q.u1)?"u1":"u3"} is not read; only u2, behind the cone`);
-  const rows=depth.map((d,i)=>({depth:d,qc:qc[i],fs:fs?.[i]??NaN,u2:u2?.[i]??NaN,rf:rf?.[i]??NaN}));
+  const rows=depth.map((d,i)=>({depth:d,qc:qc[i],fs:fs?.[i]??NaN,u2:u2?.[i]??NaN,rf:rf?.[i]??NaN,qt:qt?.[i]??NaN}));
   downwards(rows,notes);
   const cpt:Cpt={id,x:NaN,y:NaN,z:NaN,...cptReadings(id,rows)};
   // Position: XYID gives the coordinate system code (31000 is RD, the Dutch national grid), then x and y; ZID the
@@ -185,10 +187,13 @@ export function readGef(text:string,file:string):CptRead[]{
     cpt.z=Number(zid[1]);
     if(zid[0].replace(/^0+(?=\d)/,"")!=="31000")notes.push(`levels are in vertical datum code ${zid[0]}, not NAP (31000)`);
   }
-  const date=first("STARTDATE"),pre=values("MEASUREMENTVAR").find(v=>Number(v[0])===13),level=values("MEASUREMENTTEXT").find(v=>Number(v[0])===9);
+  const date=first("STARTDATE"),vars=values("MEASUREMENTVAR"),level=values("MEASUREMENTTEXT").find(v=>Number(v[0])===9);
+  const pre=vars.find(v=>Number(v[0])===13),area=vars.find(v=>Number(v[0])===3);
   const day=date.length>=3?isoDate(date[0],date[1],date[2]):undefined;
   if(day)cpt.date=day;
   if(pre&&Number(pre[1])>0)cpt.predrill=Number(pre[1]);
+  // The net area ratio of the cone (MEASUREMENTVAR 3), which corrects qc for the pore pressure behind it.
+  if(area&&Number(area[1])>0&&Number(area[1])<=1)cpt.a=Number(area[1]);
   if(level&&/water|bodem|seabed|sea ?bed|mudline/i.test(level[1]??""))notes.push("depths start at the water bed");
   return [{cpt,crs,notes}];
 }
@@ -238,8 +243,11 @@ export function readBroCpt(text:string,file:string):CptRead[]{
     const useDepth=records.some(r=>Number.isFinite(at("depth",r)));
     if(!useDepth&&records.some(r=>Number.isFinite(at("inclinationResultant",r))))notes.push("depth is the penetration length: the BRO gives no depth corrected for inclination");
     const rows=records.map(r=>({depth:at(useDepth?"depth":"penetrationLength",r),qc:at("coneResistance",r),fs:scaled(at("localFriction",r),1000),
-      u2:scaled(at("porePressureU2",r),1000),rf:at("frictionRatio",r)}));
-    return {cpt:{...cpt,...cptReadings(id,rows)},crs,notes};
+      u2:scaled(at("porePressureU2",r),1000),rf:at("frictionRatio",r),qt:at("correctedConeResistance",r)}));
+    // The net area ratio of the cone, which corrects qc for the pore pressure behind it.
+    const area=Number(textOf(survey,"coneSurfaceQuotient")||NaN);
+    if(area>0&&area<=1)cpt.a=area;
+    return {cpt:{...cpt,...cptReadings(id,rows)},crs,notes,source:"BRO, Basisregistratie Ondergrond: cone penetration tests (CPT), public domain (CC0)"};
   });
 }
 
@@ -260,9 +268,10 @@ export function readDovCpt(text:string,file:string):CptRead[]{
     const points=descendants(childNodes(s,"ligging")[0]??s,"Point"),point=points.find(p=>DOV_CRS[srsCode(p)]);
     const [x,y,z]=posOf(point);
     const cpt:Cpt={id,x:point?x:NaN,y:point?y:NaN,z:Number.isFinite(z)?z:NaN,depth:[],qc:[]};
-    const day=textOf(s,"datum_aanvang").slice(0,10),pit=num(textOf(childNodes(s,"sondeonderzoek")[0]??s,"diepte_put"));
+    const survey=childNodes(s,"sondeonderzoek")[0]??s,day=textOf(s,"datum_aanvang").slice(0,10),pit=num(textOf(survey,"diepte_put")),area=num(textOf(survey,"net_area_ratio"));
     if(/^\d{4}-\d{2}-\d{2}$/.test(day))cpt.date=day;
     if(pit>0)cpt.predrill=pit;
+    if(area>0&&area<=1)cpt.a=area;
     // Readings: penetration length and depth in m, qc in MPa, fs and u in kPa. DOV does not say where on the cone u is
     // measured.
     const data=descendants(s,"meetdata");
@@ -270,6 +279,6 @@ export function readDovCpt(text:string,file:string):CptRead[]{
     const rows=data.map(m=>({depth:num(textOf(m,useDepth?"diepte":"lengte")),qc:num(textOf(m,"qc")),fs:num(textOf(m,"fs")),u2:num(textOf(m,"u")),rf:NaN}));
     if(rows.some(r=>Number.isFinite(r.u2)))notes.push("DOV does not say where on the cone the pore pressure u is measured; it is shown as u2");
     if(!useDepth)notes.push("depth is the penetration length: no depth corrected for inclination is given");
-    return {cpt:{...cpt,...cptReadings(id,rows)},crs:point?DOV_CRS[srsCode(point)]:undefined,notes};
+    return {cpt:{...cpt,...cptReadings(id,rows)},crs:point?DOV_CRS[srsCode(point)]:undefined,notes,source:"Databank Ondergrond Vlaanderen (DOV): cone penetration tests"};
   });
 }

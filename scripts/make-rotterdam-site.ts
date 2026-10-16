@@ -9,6 +9,7 @@ import {importFiles,toProjectJson} from "../src/io";
 import {GeoProject,UnitDef,Borehole,Interval,Cpt} from "../src/geology";
 import {findCrs,toGeographic} from "../src/crs";
 import {thinned} from "../src/cpt";
+import {soilBehaviour,cptLayers,waterTableAt,joinLayers} from "../src/sbt";
 import {PINNED} from "./rotterdam-boreholes";
 import {PINNED_CPTS} from "./rotterdam-cpts";
 
@@ -81,7 +82,8 @@ for(const id of PINNED){
 }
 
 // The CPTs, every reading at least 0.1 m below the last one kept (of readings every 0.02 m) so that the site stays small;
-// qc to 0.01 MPa, fs and u2 to 1 kPa, which is finer than the tests measure, and the friction ratio as the BRO gives it.
+// qc and qt to 0.01 MPa, fs and u2 to 1 kPa, which is finer than the tests measure, and the friction ratio as the BRO
+// gives it. Their layers come from all the readings.
 const cptFiles:Array<{name:string;text:string}>=[];
 for(const id of PINNED_CPTS){
   const path=new URL(`${id}.xml`,cptCache);
@@ -100,8 +102,11 @@ function slim(c:Cpt):Cpt{
   if(c.fs)out.fs=pick(c.fs,0);
   if(c.u2)out.u2=pick(c.u2,0);
   if(c.rf)out.rf=pick(c.rf,2);
+  if(c.qt)out.qt=pick(c.qt,2);
+  if(c.a)out.a=c.a;
   if(c.predrill)out.predrill=c.predrill;
   if(c.date)out.date=c.date;
+  if(c.layers)out.layers=c.layers;
   return out;
 }
 
@@ -127,14 +132,32 @@ function interpret(b:Borehole):Borehole{
   }
   return {...b,intervals:iv.map((i,j)=>({...i,unit:first<0?(top(i)>-21?"Sand":"Pleistocene"):j<first?"Sand":j<=last?"Holocene clay":"Pleistocene"}))};
 }
+// A CPT's layers by its soil behaviour type (src/sbt.ts), interpreted as the logs are: the basal Holocene clay and peat
+// from its first clay, silt or peat below 16 m below NAP, through thin sand partings, to the first thicker sand. A CPT
+// without the complex changes from sand to Pleistocene at 21 m below NAP, taken in pieces of at most 1 m as the app's
+// rules take a layer.
+function interpretCpt(project:GeoProject,c:Cpt):Cpt{
+  const whole=cptLayers(c,soilBehaviour(c,waterTableAt(project,c.x,c.y,c.z)));
+  const done=interpret({id:c.id,x:c.x,y:c.y,z:c.z,intervals:whole}).intervals;
+  if(done.some(i=>i.unit==="Holocene clay"))return {...c,layers:done};
+  const pieces:Interval[]=[];
+  for(const i of done){
+    const parts=Math.max(1,Math.ceil(i.to-i.from-1e-9)),h=(i.to-i.from)/parts;
+    for(let k=0;k<parts;k++){
+      const from=round(i.from+k*h,3),to=k===parts-1?i.to:round(i.from+(k+1)*h,3);
+      pieces.push({...i,from,to,unit:c.z-from>-21?"Sand":"Pleistocene"});
+    }
+  }
+  return {...c,layers:joinLayers(pieces)};
+}
 const {project:raw,warnings}=importFiles([...files,...cptFiles]);
-const cpts=(raw.cpts??[]).map(slim),years=cpts.map(c=>c.date?.slice(0,4)).filter(Boolean).sort();
+const cpts=(raw.cpts??[]).map(c=>slim(interpretCpt(raw,c))),years=cpts.map(c=>c.date?.slice(0,4)).filter(Boolean).sort();
 const project:GeoProject={
   name:"Maasvlakte 2, Rotterdam (BRO)",
-  description:`${raw.boreholes.length} geotechnical boreholes of the Port of Rotterdam on Maasvlakte 2, 2017–2024, from the Dutch Key Register of the Subsurface (BRO), with their groundwater levels and ${raw.boreholes.reduce((n,b)=>n+(b.tests?.length??0),0)} laboratory test results, and ${cpts.length} of its cone penetration tests (CPT), ${years[0]}–${years[years.length-1]}: the deepest in each 400 m square, of those since 2018 of quality class 1 or 2 and at least 30 m deep, with a reading every 0.1 m. Land reclaimed in 2008–2013 from the North Sea: sand fill and sea-bed sand over the basal Holocene clay and peat, on Pleistocene sand and gravel. The units are an interpretation of each described log as a sequence (scripts/make-rotterdam-site.ts), with the paving of the quays in the sand; the logs keep the BRO soil names. Boreholes in the harbour basins start at its bed, 17–21 m below NAP. Heights in metres NAP.`,
+  description:`${raw.boreholes.length} geotechnical boreholes of the Port of Rotterdam on Maasvlakte 2, 2017–2024, from the Dutch Key Register of the Subsurface (BRO), with their groundwater levels and ${raw.boreholes.reduce((n,b)=>n+(b.tests?.length??0),0)} laboratory test results, and ${cpts.length} of its cone penetration tests (CPT), ${years[0]}–${years[years.length-1]}: the deepest in each 400 m square, of those since 2018 of quality class 1 or 2 and at least 30 m deep, with a reading every 0.1 m. Land reclaimed in 2008–2013 from the North Sea: sand fill and sea-bed sand over the basal Holocene clay and peat, on Pleistocene sand and gravel. The units are an interpretation of each described log as a sequence (scripts/make-rotterdam-site.ts), with the paving of the quays in the sand; the logs keep the BRO soil names. The CPTs' layers, by their soil behaviour type (Robertson 2009), are interpreted by the same sequence, and the model is built with them and the boreholes. Boreholes in the harbour basins start at its bed, 17–21 m below NAP. Heights in metres NAP.`,
   source:"BRO, Basisregistratie Ondergrond: geotechnical borehole research (BHR-GT) and cone penetration tests (CPT), public domain (CC0)",
   crs:raw.crs,crsCode:raw.crsCode,
-  units,boreholes:raw.boreholes.map(interpret),cpts
+  units,boreholes:raw.boreholes.map(interpret),cpts,cptLayers:true
 };
 writeFileSync(new URL("../src/data/rotterdam-site.json",import.meta.url),toProjectJson(project));
 console.log(`${project.boreholes.length} boreholes, ${cpts.length} CPTs (${cpts.reduce((n,c)=>n+c.depth.length,0)} readings)`);

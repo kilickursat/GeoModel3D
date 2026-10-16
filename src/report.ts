@@ -9,6 +9,7 @@ import {projectCrs} from "./crs";
 import {boreholeDepth,sptN,cptDepth} from "./schema";
 import {frictionRatio,cptScale} from "./cpt";
 import {cptLogSvg} from "./cptSvg";
+import {cptBehaviour,SBT_ZONES} from "./sbt";
 import {SectionField,unitWeights,unitOfReading} from "./fields";
 import {unitStatistics,measuredProperties,propertyDef,formatValue} from "./properties";
 import {CrossValidation} from "./validation";
@@ -42,7 +43,7 @@ export function reportHtml(model:GeoModel,section:Section,o:ReportOptions){
   const block:Array<[string,string]>=[
     ["Coordinate system",crs?`${crs.name}${crs.code?` (${crs.code})`:""}`:p.crs?`${p.crs} (not georeferenced)`:"Local, not georeferenced"],
     ["Boreholes",String(model.boreholes.length)],
-    ...(model.cpts.length?[["CPTs",String(model.cpts.length)] as [string,string]]:[]),
+    ...(model.cpts.length?[["CPTs",`${model.cpts.length}${model.cptLogs.length?`, ${model.cptLogs.length} with their layers in the model`:""}`] as [string,string]]:[]),
     ["Footprint",model.triangles.length?`${fmt(footprintArea(model)/1e4,2)} ha`:"—"],
     ["Ground",p.terrain?`Terrain: ${p.terrain.source??"terrain grid"}, ${fmt(p.terrain.dx,1)} m cells`:"Surface through the collars"],
     ["Data",p.source??"—"],
@@ -112,6 +113,7 @@ table.chainage td,table.chainage th{padding:0.5mm 1.4mm}
 .cpt-logs figure{margin:0;flex:1;min-width:0;max-width:40mm}
 .cpt-logs svg{width:100%;height:auto;display:block}
 .cpt-logs figcaption{font-size:0.8em;color:#5b6770;text-align:center}
+.sbt-key{display:flex;flex-wrap:wrap;gap:1mm 4mm;margin:0 0 2mm;font-size:0.85em}
 </style></head><body>
 <section class="page">
 <header><div><h1>${esc(p.name)}</h1><div class="desc">${esc(p.description??"")}</div></div>
@@ -147,8 +149,9 @@ function cptPage(model:GeoModel,section:Section,buffer:number,foot:(part:string)
     const qcMax=cptScale(Math.max(...shown.flatMap(({c})=>c.qc.filter(Number.isFinite)),1));
     logs=`<div class="cpt-logs">${shown.map(({p,c})=>{
       const z=sampleModel(model,c.x,c.y),units=z?model.units.map((u,k)=>({top:z[k],bottom:z[k+1],color:u.color,name:u.name})).filter(b=>b.top-b.bottom>1e-6):[];
-      return `<figure>${cptLogSvg(c,{width:300,height:620,theme:"light",units,qcMax,zRange:[top+pad,bottom-pad],title:true})}<figcaption>${section.alignment?`chainage ${fmt(p.s)} m`:`${fmt(p.s-section.s[0])} m along`}, ${fmt(Math.abs(p.offset))} m ${p.offset>=0?"right":"left"}</figcaption></figure>`;
-    }).join("")}</div><p class="muted">Cone resistance qc and friction ratio Rf (fs/qc where the data give no ratio) against elevation in metres; behind them the units of the model where each CPT stands, which the CPTs did not log.${section.cpts.length>shown.length?` The first ${shown.length} of the ${section.cpts.length} CPTs on the section.`:""}</p>`;
+      return `<figure>${cptLogSvg(c,{width:300,height:620,theme:"light",units,zones:cptBehaviour(model.project,c).zone,qcMax,zRange:[top+pad,bottom-pad],title:true})}<figcaption>${section.alignment?`chainage ${fmt(p.s)} m`:`${fmt(p.s-section.s[0])} m along`}, ${fmt(Math.abs(p.offset))} m ${p.offset>=0?"right":"left"}</figcaption></figure>`;
+    }).join("")}</div><p class="sbt-key">${SBT_ZONES.slice().reverse().map(z=>`<span><i class="swatch" style="background:${z.color}"></i>${z.zone} ${esc(z.name)}</span>`).join("")}</p>
+<p class="muted">Soil behaviour type (SBT) by Robertson (2009): the index Ic of the normalised cone resistance and friction ratio, with the unit weight from the CPT (Robertson &amp; Cabal 2010) and the water table of the project. Cone resistance qc and friction ratio Rf (fs/qc where the data give no ratio) against elevation in metres; behind them the units of the model where each CPT stands${model.cptLogs.length?", built with the CPT layers":", which the CPTs did not log"}.${section.cpts.length>shown.length?` The first ${shown.length} of the ${section.cpts.length} CPTs on the section.`:""}</p>`;
   }else logs=`<p class="muted">No CPT lies within ${fmt(buffer)} m of the section.</p>`;
   // Readings by the unit of the model at their elevation; CPTs outside the model are left out.
   const acc=model.units.map(()=>({cpts:new Set<string>(),qc:[] as number[],fs:[] as number[],rf:[] as number[]}));
@@ -185,7 +188,7 @@ function validationPage(v:CrossValidation,foot:(part:string)=>string){
     list.map(q=>`<tr><td>${esc(q.name)}</td><td class="num">${q.n}</td><td class="num">${signed(q.bias)}</td><td class="num">${fmt(q.mae,2)}</td><td class="num">${fmt(q.rms,2)}</td><td class="num">${signed(q.max)}</td><td>${esc(q.at)}</td></tr>`).join("")}</tbody></table>`;
   const worst=[...inside].filter(b=>Number.isFinite(b.mae)).sort((a,b)=>b.mae-a.mae).slice(0,12);
   return `<section class="page"><h2>Cross-validation</h2>
-<p>Each borehole in turn was left out, the model was built from the others, and its log was compared with what that model predicts at its collar (leave-one-out cross-validation). ${inside.length} borehole${inside.length===1?"":"s"} lie inside the outline of the others: <b>${pct(v.share.inside)}</b> of their logged metres are predicted in the unit logged.${outside?` ${outside} lie outside it, where the prediction extrapolates: ${pct(v.share.outside)}.`:""}${v.terrain?" The ground between boreholes is the terrain grid.":""}</p>
+<p>Each ${v.boreholes.some(b=>b.cpt)?"log (each borehole, and the layers of each CPT the model is built with)":"borehole"} in turn was left out, the model was built from the others, and its log was compared with what that model predicts at its collar (leave-one-out cross-validation). ${inside.length} ${v.boreholes.some(b=>b.cpt)?"log":"borehole"}${inside.length===1?"":"s"} lie inside the outline of the others: <b>${pct(v.share.inside)}</b> of their logged metres are predicted in the unit logged.${outside?` ${outside} lie outside it, where the prediction extrapolates: ${pct(v.share.outside)}.`:""}${v.terrain?" The ground between boreholes is the terrain grid.":""}</p>
 <h3>Errors at the boreholes inside the others, predicted minus logged</h3>${table(v.inside)}
 ${v.outside.length?`<h3>Outside the others</h3>${table(v.outside)}`:""}
 ${worst.length?`<h3>Furthest from their prediction</h3><table><thead><tr><th>Borehole</th><th>Mean absolute error (m)</th><th>Largest error</th><th>Logged (m)</th><th>Predicted (m)</th></tr></thead><tbody>${

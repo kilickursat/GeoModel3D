@@ -157,11 +157,12 @@ describe("importing CPTs",()=>{
     expect(c.qc[0]).toBe(1);
     expect(c.fs![100]).toBe(80);
     expect(r.warnings[0]).toMatch(/^CPTs: 1 placed, 1 with pore pressure u2; C1 \(18 m\)/);
-    // Pressures in other units are converted; a CPT table needs boreholes to join.
+    // Pressures in other units are converted; a CPT table alone makes a project of its own.
     const tsf=importFiles([{name:"c.csv",text:"cpt,x,y,z,depth,qc (tsf),fs (tsf)\nC2,40,40,10,1,10,0.5\n"}],layered).project.cpts![0];
     expect(tsf.qc[0]).toBeCloseTo(0.957605,6);
     expect(tsf.fs![0]).toBeCloseTo(47.88,2);
-    expect(()=>importFiles([cptTable(readings("C1",50,50,10))])).toThrow(/import boreholes before adding CPTs/);
+    const alone=importFiles([cptTable(readings("C1",50,50,10))]).project;
+    expect([alone.boreholes.length,alone.cpts!.length,alone.cptLayers]).toEqual([0,1,true]);
   });
 
   it("places CPTs by a collar table imported with them, and with boreholes from the same files",()=>{
@@ -183,8 +184,10 @@ describe("importing CPTs",()=>{
     expect(r.project.cpts![0].x).toBeCloseTo(b.x+30,2);
     expect(r.project.cpts![0].y).toBeCloseTo(b.y,2);
     expect(r.warnings).toContain("1 CPT position converted from Amersfoort / RD New to BD72 / Belgian Lambert 72");
-    // The same file at its own position, near Rotterdam, is about 90 km from the Antwerp boreholes.
-    expect(()=>importFiles([{name:"r.gef",text:GEF}],antwerpProject)).toThrow(/None of the CPTs lies near the boreholes of Antwerp/);
+    // The same file at its own position, near Rotterdam, is about 90 km from the Antwerp boreholes: a project of its own.
+    const far=importFiles([{name:"r.gef",text:GEF}],antwerpProject);
+    expect([far.project.name,far.project.crsCode,far.project.boreholes.length]).toEqual(["r","EPSG:28992",0]);
+    expect(far.warnings.join(" ")).toMatch(/None of the CPTs lies near the boreholes of Antwerp, Belgium \(DOV\) \(the nearest is 84\.1 km away\): they make a project of their own/);
     // A file that cannot be read says why; next to one that can, it is named in the notes.
     const bore=gef("#REPORTCODE= GEF-BORE-Report, 1, 0, 0","0;1\n");
     expect(()=>importFiles([{name:"b.gef",text:bore}],rotterdamProject)).toThrow(/b\.gef: a GEF borehole log/);
@@ -218,7 +221,7 @@ describe("importing CPTs",()=>{
     ].join("\r\n");
     const r=importFiles([{name:"site.ags",text:ags}]);
     expect(r.project.boreholes.map(b=>b.id)).toEqual(["BH1","BH2","BH4"]);
-    expect(r.project.cpts).toEqual([{id:"CPT1",x:523165,y:178470,z:21.3,depth:[1,5],qc:[0.8,15],fs:[20,90],u2:[30,40],rf:[2.5,0.6]}]);
+    expect(r.project.cpts).toEqual([{id:"CPT1",x:523165,y:178470,z:21.3,depth:[1,5],qc:[0.8,15],fs:[20,90],u2:[30,40],rf:[2.5,0.6],layers:expect.any(Array)}]);
     expect(r.warnings.join(" ")).not.toMatch(/CPT1: collar without intervals/);
     // CPTs alone, in MPa as AGS 4.1 gives them, join the project shown.
     const alone=ags.split("\r\n").filter(l=>!/^"(DATA|HEADING|UNIT|TYPE|GROUP)","(BH|GEOL|LOCA_ID","GEOL)/.test(l)||/"GROUP","(?!GEOL)/.test(l)).join("\r\n")
@@ -268,7 +271,7 @@ describe("CPTs on the model",()=>{
   });
 
   it("interpolates qc, fs, Rf and u2 within units from the CPT readings",()=>{
-    expect(availableFields(m).filter(f=>/CPT/.test(f.label)).map(f=>f.key)).toEqual(["qc","fs","Rf","u2"]);
+    expect(availableFields(m).filter(f=>/CPT/.test(f.label)).map(f=>f.key)).toEqual(["qc","fs","Rf","u2","Ic"]);
     const s=computeSection(m,{azimuth:90,offset:0},20),qc=sectionField(m,s,"qc")!;
     expect(qc.at(0,8)).toBeCloseTo(1,9);
     expect(qc.at(0,-2)).toBeCloseTo(10,9);

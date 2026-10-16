@@ -1,6 +1,7 @@
 import proj4 from "proj4";
 import {Borehole,GeoProject,Interval,UnitDef,UnitRule,SptTest,WaterLevel,TestResult,Alignment,AlignmentPoint,DesignLevel,Cpt,boreholeDepth,sptN,cptDepth} from "./schema";
 import {CptRead,CptRow,cptReadings,pressureKpa,frictionRatio,isGef,readGef,isBroCpt,readBroCpt,isDovCpt,readDovCpt} from "./cpt";
+import {classifiedLayers,soilBehaviour,waterTableAt,layerUnits} from "./sbt";
 import {TerrainGrid,isTerrainFile,readTerrain} from "./terrain";
 import {Crs,findCrs,projectCrs,suggestCrs,toProjected,toGeographic,searchCrs} from "./crs";
 import {alignmentProblem,chainages,designAt} from "./alignment";
@@ -150,7 +151,7 @@ interface Collar { x:number; y:number; z:number; depth?:number; lon?:number; lat
 // units when the intervals carry descriptions only. `cpts` holds the readings of each CPT, with its position where its
 // own rows give it, else that of its location (`loca`) or name in the collars.
 interface Tables { collars:Map<string,Collar>; intervals:Map<string,Interval[]>; units:UnitDef[]; warnings:string[]; measured?:Map<string,Measured>; rules?:UnitRule[]; cpts?:Map<string,CptTable> }
-interface CptTable { loca?:string; at?:{x:number;y:number;z:number;lon:number;lat:number}; rows:CptRow[] }
+interface CptTable { loca?:string; at?:{x:number;y:number;z:number;lon:number;lat:number}; rows:CptRow[]; a?:number }
 interface Measured { spt:SptTest[]; water:WaterLevel[]; tests:TestResult[] }
 function measuredOf(t:Tables,id:string){
   t.measured??=new Map();
@@ -176,7 +177,8 @@ const CPT_ALIASES={
   qc:["qc","coneresistance","conetipresistance","tipresistance","conusweerstand","scptres"],
   fs:["fs","sleevefriction","localfriction","sleeveresistance","frictionresistance","sidefriction","plaatselijkewrijving","scptfres"],
   u2:["u2","porepressure","porepressureu2","porewaterpressure","waterspanning","scptpwp2","u"],
-  rf:["rf","frictionratio","frictionnumber","wrijvingsgetal","scptfrr"]
+  rf:["rf","frictionratio","frictionnumber","wrijvingsgetal","scptfrr"],
+  qt:["qt","correctedconeresistance","gecorrigeerdeconusweerstand","scptqt"]
 };
 type CptField=keyof typeof CPT_ALIASES;
 function cptColumns(header:string[]){
@@ -200,7 +202,7 @@ function readCptTable(file:TextFile,rows:string[][],t:Tables){
   const header=rows[0],c=cptColumns(header),p=columns(header),lengths=new Conversions(),base=file.name.replace(/\.[^.]+$/,"");
   const len=(r:string[],i?:number)=>i===undefined?NaN:lengths.metres(num(r[i]),header[i].trim(),bracketed(header[i]),i);
   const scale=(i:number|undefined,to:"MPa"|"kPa")=>i===undefined?1:pressureScale(header[i],to,file.name,t.warnings);
-  const fq=scale(c.qc,"MPa"),ff=scale(c.fs,"kPa"),fu=scale(c.u2,"kPa");
+  const fq=scale(c.qc,"MPa"),ff=scale(c.fs,"kPa"),fu=scale(c.u2,"kPa"),ft=scale(c.qt,"MPa");
   const value=(r:string[],i:number|undefined,f:number)=>i===undefined?NaN:converted(num(r[i]),f);
   t.cpts??=new Map();
   for(const r of rows.slice(1)){
@@ -211,7 +213,7 @@ function readCptTable(file:TextFile,rows:string[][],t:Tables){
     const x=len(r,p.x),y=len(r,p.y),lon=value(r,p.lon,1),lat=value(r,p.lat,1),z=len(r,p.z);
     if(!e.at&&((Number.isFinite(x)&&Number.isFinite(y))||(Number.isFinite(lon)&&Number.isFinite(lat))))e.at={x,y,z,lon,lat};
     else if(e.at&&!Number.isFinite(e.at.z)&&Number.isFinite(z))e.at.z=z;
-    e.rows.push({depth:len(r,c.depth),qc:value(r,c.qc,fq),fs:value(r,c.fs,ff),u2:value(r,c.u2,fu),rf:value(r,c.rf,1)});
+    e.rows.push({depth:len(r,c.depth),qc:value(r,c.qc,fq),fs:value(r,c.fs,ff),u2:value(r,c.u2,fu),rf:value(r,c.rf,1),qt:value(r,c.qt,ft)});
   }
   t.warnings.push(...lengths.notes(file.name,[p.x,p.y].filter(i=>i!==undefined).map(i=>header[i!].trim())));
 }
@@ -224,7 +226,7 @@ function cptReads(t:Tables):CptRead[]{
     if(!at||!((Number.isFinite(at.x)&&Number.isFinite(at.y))||(Number.isFinite(at.lon)&&Number.isFinite(at.lat)))){t.warnings.push(`${id}: no position (x and y, or latitude and longitude) for this CPT; not placed`);continue}
     try{
       const geo=Number.isFinite(at.lon)&&Number.isFinite(at.lat)?{lon:at.lon,lat:at.lat}:{};
-      out.push({cpt:{id,x:at.x,y:at.y,z:at.z,...geo,...cptReadings(id,e.rows)},notes:[]});
+      out.push({cpt:{id,x:at.x,y:at.y,z:at.z,...geo,...cptReadings(id,e.rows),...(e.a!==undefined?{a:e.a}:{})},notes:[]});
     }catch(err){t.warnings.push((err as Error).message)}
   }
   return out;
@@ -357,14 +359,16 @@ function agsTables(g:ReturnType<typeof parseAgs4>,file:string,warnings:string[])
       if(scpt.some(r=>r[h]?.trim()))warnings.push(`${file}: ${h} has ${unit?`the unit “${unit}”, which is not known`:"no unit"}; read as MPa, the AGS4 unit`);
       return to==="MPa"?1:1000;
     };
-    const fq=scale("SCPT_RES","MPa"),ff=scale("SCPT_FRES","kPa"),fu=scale("SCPT_PWP2","kPa");
+    const fq=scale("SCPT_RES","MPa"),ff=scale("SCPT_FRES","kPa"),fu=scale("SCPT_PWP2","kPa"),ft=scale("SCPT_QT","MPa");
     const tests=new Map<string,Set<string>>();
     for(const r of scpt)tests.set(r.LOCA_ID,(tests.get(r.LOCA_ID)??new Set()).add(r.SCPG_TESN??""));
+    // The cone area ratio of each test (SCPG_CAR), which corrects qc for the pore pressure behind the cone.
+    const ratio=new Map((g.get("SCPG")??[]).map(r=>[`${r.LOCA_ID}/${r.SCPG_TESN??""}`,num(r.SCPG_CAR)]));
     t.cpts=new Map();
     for(const r of scpt){
       const id=tests.get(r.LOCA_ID)!.size>1?`${r.LOCA_ID}/${r.SCPG_TESN}`:r.LOCA_ID;
-      if(!t.cpts.has(id))t.cpts.set(id,{loca:r.LOCA_ID,rows:[]});
-      t.cpts.get(id)!.rows.push({depth:len("SCPT",r,"SCPT_DPTH"),qc:converted(num(r.SCPT_RES),fq),fs:converted(num(r.SCPT_FRES),ff),u2:converted(num(r.SCPT_PWP2),fu),rf:num(r.SCPT_FRR)});
+      if(!t.cpts.has(id)){const a=ratio.get(`${r.LOCA_ID}/${r.SCPG_TESN??""}`);t.cpts.set(id,{loca:r.LOCA_ID,rows:[],...(a!==undefined&&a>0&&a<=1?{a}:{})})}
+      t.cpts.get(id)!.rows.push({depth:len("SCPT",r,"SCPT_DPTH"),qc:converted(num(r.SCPT_RES),fq),fs:converted(num(r.SCPT_FRES),ff),u2:converted(num(r.SCPT_PWP2),fu),rf:num(r.SCPT_FRR),qt:converted(num(r.SCPT_QT),ft)});
     }
   }
   return {t,len,lengths};
@@ -500,13 +504,18 @@ function readProjectJson(doc:any,file:string):ImportResult{
     for(const c of doc.cpts){
       const id=String(c?.id??"").trim(),depth=list(c?.depth),qc=list(c?.qc);
       if(!id||!depth?.length||qc?.length!==depth.length||!Number.isFinite(Number(c?.x))||!Number.isFinite(Number(c?.y))){result.warnings.push(`${file}: CPT ${id||"without a name"} is incomplete and was left out`);continue}
-      const same=(k:"fs"|"u2"|"rf")=>{const v=list(c[k]);return v&&v.length===depth.length?{[k]:v}:{}};
+      const same=(k:"fs"|"u2"|"rf"|"qt")=>{const v=list(c[k]);return v&&v.length===depth.length?{[k]:v}:{}};
+      const layers=Array.isArray(c.layers)?c.layers.filter((l:any)=>l&&Number.isFinite(Number(l.from))&&Number.isFinite(Number(l.to))&&Number(l.to)>Number(l.from))
+        .map((l:any)=>({from:Number(l.from),to:Number(l.to),unit:String(l.unit??"").trim(),...(typeof l.name==="string"?{name:l.name}:{})})):undefined;
       cpts.push({id,x:Number(c.x),y:Number(c.y),z:c.z===null||c.z===undefined?NaN:Number(c.z),
-        ...(Number.isFinite(c.lon)&&Number.isFinite(c.lat)?{lon:Number(c.lon),lat:Number(c.lat)}:{}),depth,qc,...same("fs"),...same("u2"),...same("rf"),
-        ...(Number(c.predrill)>0?{predrill:Number(c.predrill)}:{}),...(typeof c.date==="string"?{date:c.date}:{})});
+        ...(Number.isFinite(c.lon)&&Number.isFinite(c.lat)?{lon:Number(c.lon),lat:Number(c.lat)}:{}),depth,qc,...same("fs"),...same("u2"),...same("rf"),...same("qt"),
+        ...(Number(c.a)>0&&Number(c.a)<=1?{a:Number(c.a)}:{}),...(Number(c.predrill)>0?{predrill:Number(c.predrill)}:{}),...(typeof c.date==="string"?{date:c.date}:{}),
+        ...(layers?{layers}:{})});
     }
     if(cpts.length)result.project.cpts=cpts;
   }
+  if(Array.isArray(doc.cptRules))result.project.cptRules=doc.cptRules.filter((r:any)=>r&&typeof r.match==="string"&&typeof r.unit==="string");
+  if(doc.cptLayers===true)result.project.cptLayers=true;
   const g=doc.terrain;
   if(g){
     const ok=["x0","y0","dx","dy","ncols","nrows"].every(k=>Number.isFinite(g[k]))&&Array.isArray(g.z)&&g.z.length===g.ncols*g.nrows;
@@ -518,9 +527,11 @@ function readProjectJson(doc:any,file:string):ImportResult{
 // JSON has no NaN, so terrain cells without data are written as null.
 export function toProjectJson(p:GeoProject){
   const doc={format:"geomodel3d-project",version:1,name:p.name,description:p.description,source:p.source,crs:p.crs,crsCode:p.crsCode,crsProj4:p.crsProj4,
-    base:p.base,groundwaterDepth:p.groundwaterDepth,margin:p.margin,units:p.units,rules:p.rules,boreholes:p.boreholes,alignments:p.alignments,cpts:p.cpts,terrain:p.terrain};
-  // Long lists of numbers (the terrain grid, CPT readings) take one line each.
-  return JSON.stringify(doc,null,1).replace(/"(z|depth|qc|fs|u2|rf)": \[[^\]{}"]*\]/g,m=>m.replace(/\s+/g,""))+"\n";
+    base:p.base,groundwaterDepth:p.groundwaterDepth,margin:p.margin,units:p.units,rules:p.rules,boreholes:p.boreholes,alignments:p.alignments,
+    cpts:p.cpts,cptLayers:p.cptLayers,cptRules:p.cptRules,terrain:p.terrain};
+  // Long lists of numbers (the terrain grid, CPT readings) take one line each, and so does each layer of a CPT.
+  return JSON.stringify(doc,null,1).replace(/"(z|depth|qc|fs|u2|rf|qt)": \[[^\]{}"]*\]/g,m=>m.replace(/\s+/g,""))
+    .replace(/\{\s*"from": [^{}\]]*?"name": "[^"]*"\s*\}/g,m=>m.replace(/\n\s*/g,""))+"\n";
 }
 // One row per interval with the collar, the logged description where there is one, and the shallowest water level.
 export function toBoreholeCsv(p:GeoProject){
@@ -623,36 +634,42 @@ function assemble(t:Tables,name:string,crsName:string|undefined,inferUnits:boole
 // ---------- CPTs ----------
 
 // CPTs join a project: placed in its coordinate system (converted from the one their file names, or from latitude and
-// longitude), replacing CPTs of the same name. CPTs far from the project's boreholes belong to another site and are
-// left out; if none is near, nothing is added. Returns the names of the CPTs placed.
+// longitude), replacing CPTs of the same name, each with the layers its soil behaviour type gives (src/sbt.ts) and their
+// units by the project's rules. CPTs far from the project's boreholes (or, without boreholes, from its CPTs) belong to
+// another site and are left out; if none is near, nothing is added and AnotherSite is thrown. Returns the names of the
+// CPTs placed.
+class AnotherSite extends Error {}
 function placeCpts(project:GeoProject,reads:CptRead[],warnings:string[]):string[]{
-  const crs=projectCrs(project),placed:Cpt[]=[],moved=new Map<string,number>(),asLocal=new Map<string,number>();
-  const holes=project.boreholes.filter(b=>Number.isFinite(b.x)&&Number.isFinite(b.y));
+  const crs=projectCrs(project),placed:Cpt[]=[],moved=new Map<string,number>(),asLocal=new Map<string,number>(),notes:string[]=[];
+  const known:XY[]=project.boreholes.length?project.boreholes:project.cpts??[];
+  const holes=known.filter(b=>Number.isFinite(b.x)&&Number.isFinite(b.y));
   const x0=Math.min(...holes.map(b=>b.x)),x1=Math.max(...holes.map(b=>b.x)),y0=Math.min(...holes.map(b=>b.y)),y1=Math.max(...holes.map(b=>b.y));
-  const reach=Math.max(2000,Math.hypot(x1-x0,y1-y0));
+  const reach=Math.max(2000,Math.hypot(x1-x0,y1-y0)),what=project.boreholes.length?"boreholes":"CPTs";
   let nearest=Infinity;
   const r3=(v:number)=>Math.round(v*1000)/1000;
   for(const r of reads){
     const c:Cpt={...r.cpt};
-    for(const n of r.notes)warnings.push(`${c.id}: ${n}`);
+    for(const n of r.notes)notes.push(`${c.id}: ${n}`);
     const from=r.crs?findCrs(r.crs):undefined;
     if(Number.isFinite(c.x)&&Number.isFinite(c.y)){
-      if(r.crs&&!from)warnings.push(`${c.id}: its coordinate system ${r.crs} is not known here; its position is read in the project's coordinates`);
+      if(r.crs&&!from)notes.push(`${c.id}: its coordinate system ${r.crs} is not known here; its position is read in the project's coordinates`);
       else if(from&&crs&&from.code!==crs.code){const g=toGeographic(from,c.x,c.y),p=toProjected(crs,g.lon,g.lat);c.x=r3(p.x);c.y=r3(p.y);moved.set(from.name,(moved.get(from.name)??0)+1)}
       else if(from&&!crs)asLocal.set(from.name,(asLocal.get(from.name)??0)+1);
     }else if(Number.isFinite(c.lon)&&Number.isFinite(c.lat)){
-      if(!crs){warnings.push(`${c.id}: placed by latitude and longitude, which needs the project's coordinate system; not placed`);continue}
+      if(!crs){notes.push(`${c.id}: placed by latitude and longitude, which needs the project's coordinate system; not placed`);continue}
       const p=toProjected(crs,c.lon!,c.lat!);c.x=r3(p.x);c.y=r3(p.y);moved.set("latitude and longitude",(moved.get("latitude and longitude")??0)+1);
-    }else{warnings.push(`${c.id}: no position; not placed`);continue}
+    }else{notes.push(`${c.id}: no position; not placed`);continue}
     const d=holes.length?Math.hypot(Math.max(0,x0-c.x,c.x-x1),Math.max(0,y0-c.y,c.y-y1)):0;
     nearest=Math.min(nearest,d);
-    if(d>reach){warnings.push(`${c.id}: ${(d/1000).toFixed(1)} km from the boreholes; left out, as it belongs to another site`);continue}
+    if(d>reach){notes.push(`${c.id}: ${(d/1000).toFixed(1)} km from the ${what}; left out, as it belongs to another site`);continue}
     placed.push(c);
   }
   if(!placed.length){
-    if(Number.isFinite(nearest))throw new Error(`None of the CPTs lies near the boreholes of ${project.name} (the nearest is ${(nearest/1000).toFixed(1)} km away): open, or import, the boreholes of their site first`);
+    if(Number.isFinite(nearest))throw new AnotherSite(`None of the CPTs lies near the ${what} of ${project.name} (the nearest is ${(nearest/1000).toFixed(1)} km away)`);
+    warnings.push(...notes);
     throw new Error(reads.length?"No CPT could be placed: CPTs need a position (x and y, or latitude and longitude)":"No CPT readings in the files");
   }
+  warnings.push(...notes);
   // Two CPTs of one name in the files: the later is named after its file too, or numbered.
   const seen=new Set<string>();
   for(const c of placed){let id=c.id;for(let k=2;seen.has(id);k++)id=`${c.id} (${k})`;if(id!==c.id){warnings.push(`${c.id}: a second CPT of this name is called ${id}`);c.id=id}seen.add(id)}
@@ -661,9 +678,97 @@ function placeCpts(project:GeoProject,reads:CptRead[],warnings:string[]):string[
   project.cpts=[...(project.cpts??[]).filter(c=>!seen.has(c.id)),...placed];
   for(const [name,n] of moved)warnings.push(`${n} CPT position${n>1?"s":""} converted from ${name} to ${crs!.name}`);
   for(const [name,n] of asLocal)warnings.push(`${n} CPT position${n>1?"s":""} in ${name}, read as the project's coordinates (the project has no coordinate system)`);
+  warnings.push(...classifyCpts(project,placed));
   const u2=placed.filter(c=>c.u2?.some(Number.isFinite)).length;
   warnings.unshift(`CPTs: ${placed.length} placed${u2?`, ${u2} with pore pressure u2`:""}; ${placed.slice(0,8).map(c=>`${c.id} (${Math.round(cptDepth(c)*10)/10} m)`).join(", ")}${placed.length>8?"…":""}`);
   return placed.map(c=>c.id);
+}
+// The layers of CPTs by their soil behaviour type, and their units by the project's rules for CPT layers (else its unit
+// rules); notes that sum up what the classification rests on.
+export function classifyCpts(project:GeoProject,cpts:Cpt[]){
+  const from={given:0,corrected:0,qc:0},rules=project.cptRules??project.rules;
+  let unclassified=0,readings=0,noWater=0,layers=0,mapped=0,noFs=0;
+  for(const c of cpts){
+    const r=classifiedLayers(project,c);
+    c.layers=r.layers;
+    from[r.behaviour.qtFrom]++;
+    readings+=c.depth.length;unclassified+=r.behaviour.unclassified;
+    if(!c.fs?.some(Number.isFinite))noFs++;
+    if(!Number.isFinite(c.z)||waterTableAt(project,c.x,c.y,c.z)===undefined)noWater++;
+    layers+=r.layers.length;mapped+=r.layers.filter(l=>l.unit).length;
+  }
+  const notes=[`Soil behaviour type of ${cpts.length} CPT${cpts.length>1?"s":""} by Robertson (2009): qt ${[from.given?`as given in ${from.given}`:"",from.corrected?`corrected for u2 in ${from.corrected}`:"",from.qc?`taken as qc in ${from.qc}`:""].filter(Boolean).join(", ")}; ${layers} layer${layers===1?"":"s"} of 0.5 m or more${rules?`, ${mapped} of them given a unit by the ${project.cptRules?"rules for CPT layers":"unit rules"}`:", without units (the project has no unit rules)"}`];
+  if(unclassified)notes.push(`${unclassified} of ${readings} CPT readings could not be classified: no sleeve friction, or qt not above σv0`);
+  if(noFs)notes.push(`${noFs} CPT${noFs>1?"s have":" has"} no sleeve friction, so no soil behaviour type and no layers`);
+  if(noWater)notes.push(`No water level is known for ${noWater} CPT${noWater>1?"s":""}: classified with no pore pressure in place; set the project's groundwater depth to give one`);
+  return notes;
+}
+// CPTs that belong to no project shown make a project of their own, modelled from their layers: their units are a first
+// grouping of the layers by principal soil (as for other described logs), to refine with the unit rules for CPT layers.
+function cptProject(reads:CptRead[],name:string,warnings:string[]):ImportResult{
+  const codes=[...new Set(reads.filter(r=>Number.isFinite(r.cpt.x)&&r.crs&&findCrs(r.crs)).map(r=>r.crs!))];
+  let crs:Crs|undefined=codes.length?findCrs(codes[0]):undefined;
+  if(codes.length>1)warnings.push(`The CPT files name ${codes.length} coordinate systems (${codes.join(", ")}); ${codes[0]} is used`);
+  const geo=reads.filter(r=>!Number.isFinite(r.cpt.x)&&Number.isFinite(r.cpt.lon)&&Number.isFinite(r.cpt.lat));
+  if(!crs&&geo.length){
+    const mean=(k:"lon"|"lat")=>geo.reduce((a,r)=>a+r.cpt[k]!,0)/geo.length;
+    crs=suggestCrs(mean("lon"),mean("lat"))[0];
+    warnings.push(`CPT positions by latitude and longitude placed in ${crs.name}${crs.code?` (${crs.code})`:""}, suggested for their location`);
+  }
+  const project:GeoProject={name,crs:crs?.name,units:[],boreholes:[],cptRules:lithologyRules.map(r=>({...r})),cptLayers:true};
+  if(crs?.code&&findCrs(crs.code))project.crsCode=crs.code;
+  else if(crs)project.crsProj4=crs.proj4;
+  const ids=placeCpts(project,reads,warnings);
+  project.cptRules=splitRepeatedUnits(project,warnings);
+  for(const c of project.cpts!)if(c.layers)c.layers=layerUnits(c.layers,c.z,project.cptRules);
+  // Units in the order the layers show them.
+  const logs:Borehole[]=project.cpts!.filter(c=>Number.isFinite(c.z)).map(c=>({id:c.id,x:c.x,y:c.y,z:c.z,intervals:(c.layers??[]).filter(l=>l.unit)}));
+  const {order,conflicts}=inferUnitOrder(logs);
+  project.units=assignColors(order.map(id=>({id,name:id,color:""})));
+  warnings.push(...conflicts);
+  const noZ=project.cpts!.filter(c=>!Number.isFinite(c.z)).length;
+  if(noZ)warnings.push(`${noZ} CPT${noZ>1?"s have":" has"} no start level: with no borehole to give the ground, ${noZ>1?"they are":"it is"} left out of the model`);
+  warnings.push("The model is built from the CPTs alone. Its units are a first grouping of the CPT layers by principal soil (soil behaviour type, not formations); edit the unit rules for the CPT layers to model the stratigraphy");
+  const sources=[...new Set(reads.map(r=>r.source).filter(Boolean))];
+  if(sources.length===1)project.source=sources[0];
+  project.description=`Made from ${ids.length} cone penetration test${ids.length>1?"s":""}: the layers of each by its soil behaviour type (Robertson 2009), grouped into units by principal soil.`;
+  return {project,warnings,cpts:ids};
+}
+// A unit that most CPTs show above and below other units (sand over clay over sand) cannot be one unit of a layered
+// model: it is split into an upper and a lower unit at the median elevation of the middle of what separates its first
+// two occurrences, by rules on the elevation of the layers, which the unit rules for the CPT layers then show. Only
+// occurrences of 2 m or more, at least 1 m apart, count: thin beds within a unit do not split it.
+function splitRepeatedUnits(project:GeoProject,warnings:string[]):UnitRule[]{
+  const rules=project.cptRules!.map(r=>({...r})),cpts=(project.cpts??[]).filter(c=>Number.isFinite(c.z)&&c.layers?.length);
+  const runs=cpts.map(c=>{
+    const out:Array<{unit:string;from:number;to:number}>=[];
+    for(const l of c.layers!){const last=out[out.length-1];if(last&&last.unit===l.unit)last.to=l.to;else if(l.unit)out.push({unit:l.unit,from:l.from,to:l.to})}
+    return {c,out};
+  });
+  const out:UnitRule[]=[];
+  for(const r of rules){
+    const splits:number[]=[];let shows=0;
+    for(const {c,out:seq} of runs){
+      const at=seq.map((q,k)=>q.unit===r.unit?k:-1).filter(k=>k>=0);
+      if(at.length)shows++;
+      const thick=at.filter(k=>seq[k].to-seq[k].from>=2);
+      if(thick.length>=2&&seq[thick[1]].from-seq[thick[0]].to>=1)splits.push(c.z-(seq[thick[0]].to+seq[thick[1]].from)/2);
+    }
+    if(splits.length<2||splits.length<shows/2){out.push(r);continue}
+    const z=Math.round(splits.sort((a,b)=>a-b)[Math.floor(splits.length/2)]*10)/10;
+    out.push({...r,unit:`${r.unit}, upper`,minZ:z},{...r,unit:`${r.unit}, lower`});
+    warnings.push(`${r.unit} lies above and below other units in ${splits.length} of ${shows} CPTs: split into an upper and a lower unit at ${z} m, the median elevation between them`);
+  }
+  return out;
+}
+// CPTs that join the project shown when they lie near its boreholes, and otherwise make a project of their own.
+function cptsAlone(reads:CptRead[],current:GeoProject|undefined,name:string,warnings:string[]):ImportResult{
+  if(current){
+    const project={...current},attempt=[...warnings];
+    try{return {project,warnings:attempt,cpts:placeCpts(project,reads,attempt)}}
+    catch(e){if(!(e instanceof AnotherSite))throw e;warnings.push(`${(e as Error).message}: they make a project of their own`)}
+  }
+  return cptProject(reads,name,warnings);
 }
 // GEF, BRO and DOV CPT files, and AGS4 files with CPTs only. A file that cannot be read is named in the notes; when no
 // file can be read, the import fails with their reasons.
@@ -1198,13 +1303,15 @@ export function importFiles(files:TextFile[],current?:GeoProject,declared?:Crs):
     result.alignments=readAlignmentFiles(lineFiles,profiles,result.project,result.warnings);
     return result;
   }
-  // CPT files join the boreholes imported with them, or the project shown when they come alone.
+  // CPT files join the boreholes imported with them, or the project shown when they come alone and lie near it; else
+  // they make a project of their own.
   const cptFiles=files.filter(f=>!isTerrainFile(f.name,f.text)&&isCptFile(f));
   if(cptFiles.length){
-    const rest=files.filter(f=>!cptFiles.includes(f));
-    const result=rest.length?importFiles(rest,current,declared):current?{project:{...current},warnings:[]}:null;
-    if(!result)throw new Error("Load or import boreholes before adding CPTs: CPTs are shown with a model built from boreholes");
-    result.cpts=placeCpts(result.project,readCptFiles(cptFiles,result.warnings),result.warnings);
+    const rest=files.filter(f=>!cptFiles.includes(f)),warnings:string[]=[],reads=readCptFiles(cptFiles,warnings);
+    if(!rest.length)return cptsAlone(reads,current,cptFiles.length===1?cptFiles[0].name.replace(/\.[^.]+$/,""):"Imported CPTs",warnings);
+    const result=importFiles(rest,current,declared);
+    result.warnings.push(...warnings);
+    result.cpts=placeCpts(result.project,reads,result.warnings);
     return result;
   }
   const grids=files.filter(f=>isTerrainFile(f.name,f.text)),rest=files.filter(f=>!grids.includes(f));
@@ -1239,12 +1346,8 @@ export function importFiles(files:TextFile[],current?:GeoProject,declared?:Crs):
   }
   const t:Tables={collars:new Map(),intervals:new Map(),units:[],warnings:[]};
   for(const f of files)readCsvTable(f,t);
-  // CPT tables without logs join the project shown.
-  if(!t.intervals.size&&t.cpts?.size){
-    if(!current)throw new Error("Load or import boreholes before adding CPTs: CPTs are shown with a model built from boreholes");
-    const project={...current},warnings=[...t.warnings];
-    return {project,warnings,cpts:placeCpts(project,cptReads(t),warnings)};
-  }
+  // CPT tables without logs join the project shown, or make a project of their own.
+  if(!t.intervals.size&&t.cpts?.size)return cptsAlone(cptReads(t),current,files.length===1?files[0].name.replace(/\.[^.]+$/,""):"Imported CPTs",[...t.warnings]);
   if(!t.intervals.size)throw new Error("No interval table found: the CSV files need hole id, from, to and unit columns");
   return assemble(t,files.length===1?files[0].name.replace(/\.[^.]+$/,""):"Imported boreholes",undefined,false,declared);
 }
