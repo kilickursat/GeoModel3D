@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use GeoModel3D, please cite it as below."
+type: software
+title: "GeoModel3D: 3D geological models from borehole logs and CPTs, in the browser"
+abstract: >-
+  Open-source 3D geological and geotechnical modelling in the browser: layered models from borehole logs and cone
+  penetration tests (classified by Robertson's soil behaviour type), sections at any angle and along tunnel, road or
+  railway alignments, groundwater, stresses, earth pressures, cross-validation of the model, and reports, on real maps in
+  the site's national coordinate system.
+authors:
+  - family-names: Kilic
+    given-names: Kursat
+    email: kilic_kursat@hotmail.com
+repository-code: "https://github.com/kilickursat/GeoModel3D"
+url: "https://kilickursat.github.io/GeoModel3D/"
+license: Apache-2.0
+version: 0.16.0
+date-released: "2026-10-16"
+keywords:
+  - geological modelling
+  - geotechnical engineering
+  - borehole logs
+  - cone penetration test
+  - soil behaviour type
+  - stratigraphy
+  - cross-section
+  - tunnel alignment
+  - groundwater
+  - WebGPU
