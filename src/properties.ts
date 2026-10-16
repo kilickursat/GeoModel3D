@@ -32,6 +32,7 @@ export const properties:PropertyDef[]=[
   {key:"fs",name:"Sleeve friction",symbol:"fs",unit:"kPa",decimals:0,range:[0,3000],aliases:["fs","sleevefriction","localfriction","scptfres"]},
   {key:"Rf",name:"Friction ratio",symbol:"Rf",unit:"%",decimals:1,range:[0,50],aliases:["rf","frictionratio","scptfrr"]},
   {key:"u2",name:"Pore pressure behind the cone",symbol:"u2",unit:"kPa",decimals:0,range:[-1000,20000],aliases:["u2","scptpwp2"]},
+  {key:"Ic",name:"Soil behaviour type index",symbol:"Ic",unit:"",decimals:2,range:[0.5,5],aliases:["ic","sbtindex","soilbehaviourtypeindex"]},
   {key:"Vs",name:"Shear-wave velocity",symbol:"Vs",unit:"m/s",decimals:0,range:[0,5000],aliases:["vs","shearwavevelocity"]},
   {key:"RQD",name:"Rock quality designation",symbol:"RQD",unit:"%",decimals:0,range:[0,100],aliases:["rqd"]}
 ];

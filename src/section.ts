@@ -64,12 +64,12 @@ export function offsetThrough(model:GeoModel,azimuth:number,p:XY){
   const {origin,normal}=sectionFrame(model,{azimuth,offset:0});
   return (p.x-origin.x)*normal.x+(p.y-origin.y)*normal.y;
 }
-// Azimuth of the long axis of the borehole layout (principal component), the most informative default section. It
-// uses the boreholes, not the mesh, so subdividing the mesh never turns the default section.
+// Azimuth of the long axis of the layout of the logs (principal component), the most informative default section. It
+// uses the boreholes and the CPT logs, not the mesh, so subdividing the mesh never turns the default section.
 export function principalAzimuth(model:GeoModel){
   const c=modelCentre(model);
   let sxx=0,syy=0,sxy=0;
-  for(const p of model.boreholes){const dx=p.x-c.x,dy=p.y-c.y;sxx+=dx*dx;syy+=dy*dy;sxy+=dx*dy}
+  for(const p of [...model.boreholes,...model.cptLogs]){const dx=p.x-c.x,dy=p.y-c.y;sxx+=dx*dx;syy+=dy*dy;sxy+=dx*dy}
   const angle=0.5*Math.atan2(2*sxy,sxx-syy);
   const az=(90-angle*180/Math.PI+360)%180;
   return Math.round(az);

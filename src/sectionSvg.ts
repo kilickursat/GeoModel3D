@@ -203,13 +203,19 @@ export function sectionSvg(model:GeoModel,s:Section,o:SectionSvgOptions){
     const step=Math.max(0.02,0.8*(z1-z0)/ph);
     const path=(xs:number[],ys:number[])=>{let d="",pen=false;xs.forEach((x,i)=>{if(!Number.isFinite(x)){pen=false;return}d+=`${pen?"L":"M"}${x.toFixed(1)},${ys[i].toFixed(1)}`;pen=true});return d};
     const line=(d:string,stroke:string,width:number)=>d?`<path d="${d}" fill="none" stroke="${t.bg}" stroke-opacity="0.6" stroke-width="${width+1.8}" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${stroke}" stroke-width="${width}" stroke-linejoin="round"/>`:"";
+    // A CPT whose layers the model is built with shows them in a narrow column, in the colours of their units.
+    const logs=new Map(model.cptLogs.map(l=>[l.id,l]));
     for(const {p,c} of cpts){
-      const x=X(p.s),fade=(1-0.55*Math.min(Math.abs(p.offset)/buffer,1)).toFixed(2),keep=thinned(c,step),rf=frictionRatio(c);
+      const x=X(p.s),fade=(1-0.55*Math.min(Math.abs(p.offset)/buffer,1)).toFixed(2),keep=thinned(c,step),rf=frictionRatio(c),log=logs.get(c.id);
       const ys=keep.map(i=>Y(c.z-c.depth[i]));
       const qx=keep.map(i=>Number.isFinite(c.qc[i])?x+Math.min(Math.max(c.qc[i],0),qcMax)/qcMax*w.qc:NaN);
       const rx=keep.map(i=>Number.isFinite(rf[i])?x-Math.min(Math.max(rf[i],0),RF_SCALE)/RF_SCALE*w.rf:NaN);
-      out.push(`<g opacity="${fade}"><title>${esc(c.id)}: CPT, ${Math.round(Math.abs(p.offset))} m ${p.offset>=0?"right":"left"} of the ${s.alignment?`line, at chainage ${r2(p.s)} m`:"section"}; final depth ${r2(cptDepth(c))} m</title>`);
+      out.push(`<g opacity="${fade}"><title>${esc(c.id)}: CPT, ${Math.round(Math.abs(p.offset))} m ${p.offset>=0?"right":"left"} of the ${s.alignment?`line, at chainage ${r2(p.s)} m`:"section"}; final depth ${r2(cptDepth(c))} m${log?"; its layers are in the model":""}</title>`);
       out.push(`<line x1="${x.toFixed(2)}" x2="${x.toFixed(2)}" y1="${Y(p.top).toFixed(2)}" y2="${Y(p.bottom).toFixed(2)}" stroke="${t.line}" stroke-width="0.7" stroke-opacity="0.7"/>`);
+      if(log)for(const iv of log.intervals){
+        const u=model.units.find(q=>q.id===iv.unit);
+        out.push(`<rect x="${(x-2).toFixed(2)}" y="${Y(c.z-iv.from).toFixed(2)}" width="4" height="${Math.max(Y(c.z-iv.to)-Y(c.z-iv.from),0.5).toFixed(2)}" fill="${u?.color??"#999999"}" stroke="${t.hole}" stroke-width="0.4"/>`);
+      }
       out.push(line(path(rx,ys),t.muted,0.9),line(path(qx,ys),t.line,1.1));
       out.push(`${namedCpts.has(p.index)?`<text x="${namedCpts.get(p.index)!.toFixed(2)}" y="${(Y(p.top)-5).toFixed(2)}" text-anchor="middle" font-size="9.5" fill="${t.text}">${esc(c.id)}</text>`:""}</g>`);
     }

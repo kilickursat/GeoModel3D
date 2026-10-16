@@ -117,8 +117,11 @@ describe("CSV templates in docs/templates",()=>{
     expect(project.boreholes[0].intervals[1]).toEqual({from:1.5,to:8.2,unit:"CLAY",name:"Soft grey silty CLAY"});
   });
   it("include a CPT that stands among the template boreholes",()=>{
-    const {project,warnings}=importFiles(["boreholes.csv","logs.csv","units.csv","cpt.csv"].map(read));
-    expect(warnings).toEqual(["CPTs: 1 placed, 1 with pore pressure u2; CPT-01 (14 m)"]);
+    const {project,warnings}=importFiles(["boreholes.csv","logs.csv","units.csv","water.csv","cpt.csv"].map(read));
+    expect(warnings).toEqual(["CPTs: 1 placed, 1 with pore pressure u2; CPT-01 (14 m)",
+      "Soil behaviour type of 1 CPT by Robertson (2009): qt taken as qc in 1; 4 layers of 0.5 m or more, without units (the project has no unit rules)"]);
+    expect(project.cpts![0].layers!.map(l=>[l.from,l.to,l.name])).toEqual([[0.5,2,"Sand mixture: silty sand to sandy silt (SBTn 5)"],[2,8,"Clay: silty clay to clay (SBTn 3)"],
+      [8,9,"Silt mixture: clayey silt to silty clay (SBTn 4)"],[9,14,"Sand: clean sand to silty sand (SBTn 6)"]]);
     expect(project.cpts![0]).toMatchObject({id:"CPT-01",x:512380,y:4180240,z:42.6});
     expect(project.cpts![0].qc.length).toBe(15);
     const m=buildGeologicalModel(project);

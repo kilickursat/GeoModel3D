@@ -11,6 +11,7 @@ import {computeSection,offsetRange,offsetThrough,principalAzimuth,Section,sectio
 import {sectionSvg,sectionCsv,sectionFieldCsv,sectionTitle,chainageCsv,cptTraceWidths} from "./sectionSvg";
 import {importFiles,toProjectJson,toBoreholeCsv,toTestsCsv,toCsv,decodeText,assignColors,toAlignmentCsv,toCptCsv} from "./io";
 import {cptAt,thinned,cptScale} from "./cpt";
+import {cptBehaviour,layerUnits,sbtZone} from "./sbt";
 import {cptLogSvg,CptBand} from "./cptSvg";
 import {alignmentSection,chainages,pointAt,designAt,crossSectionAt,lineCrossings,Crossing} from "./alignment";
 import {XY} from "./tin";
@@ -96,8 +97,9 @@ let holeMesh:THREE.InstancedMesh|null=null;
 let terrainMesh:THREE.Mesh|null=null;
 let gridHelper:THREE.Object3D|null=null;
 let holeInfo:Array<{hole:number;interval:number}>=[];
-// CPTs: an axis each, and the cone resistance drawn out from it on a panel that turns about the axis to face the camera.
-let cptAxes:THREE.InstancedMesh|null=null;
+// CPTs: an axis each, in segments, and the cone resistance drawn out from it on a panel that turns about the axis to
+// face the camera; `cptOfSegment` gives the CPT of each segment of the axes.
+let cptAxes:THREE.InstancedMesh|null=null,cptOfSegment:number[]=[];
 const cptPanels:THREE.Group[]=[],cptFills:THREE.Mesh[]=[];
 // The cross-validation of the model shown, the run in progress (a new model or Stop ends it), and its markers.
 let validation:CrossValidation|null=null,validationRun=0,errorMarkers:THREE.InstancedMesh|null=null,errorRims:THREE.InstancedMesh|null=null,errorMarked:string[]=[],showErrors=true;
@@ -127,6 +129,7 @@ function disposeContent(){
   holeInfo=[];
   cptAxes?.dispose();
   cptAxes=null;
+  cptOfSegment=[];
   cptPanels.length=0;
   cptFills.length=0;
   errorMarkers?.dispose();
@@ -216,8 +219,10 @@ function buildContent(){
   content.add(grid);
 }
 function niceCeil(v:number){const p=10**Math.floor(Math.log10(v));return Math.ceil(v/p)*p}
-// Each CPT: a thin axis from its start to its deepest reading, and its cone resistance as a filled outline out to the
-// right of it, 3.5 % of the model's extent at the full scale, on a panel turned to face the camera (faceCpts).
+// Each CPT: an axis from its start to its deepest reading, and its cone resistance as a filled outline out to the right
+// of it, 3.5 % of the model's extent at the full scale, on a panel turned to face the camera (faceCpts). The axis of a
+// CPT whose layers the model is built with shows them in the colours of their units, as a borehole shows its log; the
+// others are thin and plain.
 function buildCpts(radius:number){
   const cpts=model.cpts;
   if(!cpts.length)return;
@@ -227,12 +232,29 @@ function buildCpts(radius:number){
   const edge=new THREE.LineBasicNodeMaterial({color:0x0b1620});
   fill.maskNode=keepFragment;
   edge.maskNode=keepFragment;
-  cptAxes=new THREE.InstancedMesh(new THREE.CylinderGeometry(1,1,1,8).rotateX(Math.PI/2),new THREE.MeshBasicNodeMaterial({color:0xd6e6ee}),cpts.length);
-  (cptAxes.material as THREE.MeshBasicNodeMaterial).maskNode=keepFragment;
-  const m=new THREE.Matrix4(),q=new THREE.Quaternion(),r=radius*0.55;
+  const logs=new Map(model.cptLogs.map(l=>[l.id,l])),plain="#d6e6ee";
+  const segments:Array<{cpt:number;top:number;bottom:number;color:string;r:number}>=[];
   cpts.forEach((c,i)=>{
-    const bottom=c.z-cptDepth(c);
-    cptAxes!.setMatrixAt(i,m.compose(local(c.x,c.y,(c.z+bottom)/2),q,new THREE.Vector3(r,r,Math.max(c.z-bottom,0.02))));
+    const bottom=c.z-cptDepth(c),log=logs.get(c.id);
+    if(!log){segments.push({cpt:i,top:c.z,bottom,color:plain,r:radius*0.55});return}
+    let at=c.z;
+    for(const iv of log.intervals){
+      if(c.z-iv.from<at-1e-6)segments.push({cpt:i,top:at,bottom:c.z-iv.from,color:plain,r:radius*0.55});
+      segments.push({cpt:i,top:c.z-iv.from,bottom:c.z-iv.to,color:model.units.find(u=>u.id===iv.unit)?.color??plain,r:radius*0.8});
+      at=c.z-iv.to;
+    }
+    if(at>bottom+1e-6)segments.push({cpt:i,top:at,bottom,color:plain,r:radius*0.55});
+  });
+  cptAxes=new THREE.InstancedMesh(new THREE.CylinderGeometry(1,1,1,8).rotateX(Math.PI/2),new THREE.MeshBasicNodeMaterial(),segments.length);
+  (cptAxes.material as THREE.MeshBasicNodeMaterial).maskNode=keepFragment;
+  const m=new THREE.Matrix4(),q=new THREE.Quaternion(),col=new THREE.Color();
+  segments.forEach((sg,j)=>{
+    const c=cpts[sg.cpt];
+    cptAxes!.setMatrixAt(j,m.compose(local(c.x,c.y,(sg.top+sg.bottom)/2),q,new THREE.Vector3(sg.r,sg.r,Math.max(sg.top-sg.bottom,0.02))));
+    cptAxes!.setColorAt(j,col.set(sg.color));
+  });
+  cptOfSegment=segments.map(sg=>sg.cpt);
+  cpts.forEach((c,i)=>{
     // The outline and the strip between it and the axis, in the panel's plane: x across, z up.
     const keep=thinned(c,step),line:number[]=[],strip:number[]=[];
     let prev:{u:number;e:number}|null=null;
@@ -769,6 +791,7 @@ ui.innerHTML=`<div class="title">GeoModel3D <span>${pkg.version.split(".").slice
   <label class="crs">Coordinates <input class="crs-input" list="crs-options" placeholder="EPSG code, system or country" spellcheck="false" autocomplete="off"></label>
   <datalist id="crs-options"></datalist>
   <div class="legend"></div>
+  <div class="cpt-layers" hidden><label><input type="checkbox" class="use-cpt-layers"><span>Build the model with the CPT layers</span></label><p class="cpt-note"></p></div>
   <details class="rules"><summary>Unit rules</summary><div class="rule-list"></div>
     <div class="rule-actions"><button class="add-rule">Add rule</button><button class="apply-rules">Apply</button></div><div class="rule-note"></div></details>
   <details class="check"><summary>Check the model</summary>
@@ -973,7 +996,7 @@ function renderPanel(){
   siteName.textContent=project.name;
   ui.querySelector(".desc")!.textContent=project.description??"";
   const count=(n:number,what:string)=>`${n} ${what}${n===1?"":"s"}`;
-  const stats=[count(model.boreholes.length,"borehole"),count(model.units.length,"unit"),count(model.horizons.length,"horizon")];
+  const stats=[count(model.boreholes.length,"borehole"),...(model.cpts.length?[count(model.cpts.length,"CPT")]:[]),count(model.units.length,"unit"),count(model.horizons.length,"horizon")];
   if(model.triangles.length)stats.push(`footprint ${fmtArea(footprintArea(model))}`);
   if(project.terrain)stats.push(`terrain ${fmt(project.terrain.dx,1)} m grid`);
   ui.querySelector(".stats")!.innerHTML=stats.join(" · ");
@@ -993,6 +1016,7 @@ function renderPanel(){
   toolbar.querySelector<HTMLInputElement>('[data-view="map"]')!.checked=view.map;
   toolbar.querySelector<HTMLButtonElement>(".fetch-terrain")!.disabled=!crs;
   renderRules();
+  renderCptLayers();
   toolbar.dataset.cpts=model.cpts.length?"yes":"";
   ui.querySelector(".legend")!.innerHTML=model.units.map((u,k)=>{
     const title=[u.name,u.erosive?"Erosive base: cuts down into older units":"",unitProperties(u)].filter(Boolean).join("\n");
@@ -1011,16 +1035,35 @@ const ruleRow=(r:Partial<UnitRule>)=>`<div class="rule"><div class="rule-main"><
 <span>→</span><input class="r-unit" list="unit-options" value="${esc(r.unit??"")}" placeholder="unit" aria-label="Unit"><button class="r-del" aria-label="Remove rule">×</button></div>
 <div class="rule-if"><label>N ≥<input class="r-minN" type="number" step="any" value="${r.minN??""}"></label><label>N &lt;<input class="r-maxN" type="number" step="any" value="${r.maxN??""}"></label>
 <label title="Elevation of the top of the interval, m">top ≥<input class="r-minZ" type="number" step="any" value="${r.minZ??""}"></label><label>&lt;<input class="r-maxZ" type="number" step="any" value="${r.maxZ??""}"></label></div></div>`;
+// The rules the panel edits: the unit rules, which give the CPT layers their units too unless the project has rules for
+// them; or, in a project whose units are given rather than read from descriptions, the rules for the CPT layers.
+const ruleTarget=()=>project.rules?"rules":project.cpts?.length?"cptRules":null;
+// The soils of the CPT layers that no rule gives a unit, with their counts.
+function unmatchedLayers(cpts:GeoProject["cpts"]){
+  const out=new Map<string,number>();
+  for(const c of cpts??[])for(const l of c.layers??[])if(!l.unit&&l.name)out.set(l.name,(out.get(l.name)??0)+1);
+  return out;
+}
+const listed=(m:Map<string,number>)=>`${[...m].slice(0,12).map(([n,c])=>`${n} (${c})`).join(", ")}${m.size>12?"…":""}`;
 function renderRules(){
-  const box=ui.querySelector<HTMLDetailsElement>(".rules")!;
-  box.hidden=!project.rules;
-  if(!project.rules)return;
-  box.querySelector("summary")!.textContent=`Unit rules (${project.rules.length})`;
-  ruleList.innerHTML=project.rules.map(ruleRow).join("")+`<datalist id="unit-options">${project.units.map(u=>`<option value="${esc(u.id)}">${esc(u.name)}</option>`).join("")}</datalist>`;
-  const {unmatched}=applyUnitRules(project.boreholes,project.rules);
-  const names=new Set(project.boreholes.flatMap(b=>b.intervals.map(i=>i.name).filter(Boolean)));
-  box.querySelector(".rule-note")!.textContent=`${names.size} logged descriptions. The first rule that matches a description, its median N-value and the elevation of its top gives the unit.`+
-    (unmatched.size?` No rule matches: ${[...unmatched].slice(0,12).map(([n,c])=>`${n} (${c})`).join(", ")}${unmatched.size>12?"…":""}`:"");
+  const box=ui.querySelector<HTMLDetailsElement>(".rules")!,target=ruleTarget();
+  box.hidden=!target;
+  if(!target)return;
+  const rules=(target==="rules"?project.rules:project.cptRules)??[],layered=!!project.cpts?.length&&(target==="cptRules"||!project.cptRules);
+  box.querySelector("summary")!.textContent=`${target==="rules"?"Unit rules":"Unit rules for the CPT layers"} (${rules.length})`;
+  ruleList.innerHTML=rules.map(ruleRow).join("")+`<datalist id="unit-options">${project.units.map(u=>`<option value="${esc(u.id)}">${esc(u.name)}</option>`).join("")}</datalist>`;
+  const notes:string[]=[];
+  if(target==="rules"){
+    const {unmatched}=applyUnitRules(project.boreholes,rules);
+    const names=new Set(project.boreholes.flatMap(b=>b.intervals.map(i=>i.name).filter(Boolean)));
+    notes.push(`${names.size} logged descriptions${layered?" and the soils of the CPT layers":""}. The first rule that matches a description, its median N-value and the elevation of its top gives the unit.`);
+    if(unmatched.size)notes.push(`No rule matches: ${listed(unmatched)}`);
+  }else{
+    notes.push("The first rule that matches the soil of a CPT layer (its soil behaviour type) and the elevation of its top gives the layer its unit; rules on N-values do not apply.");
+    if(!project.cptRules&&project.cpts?.some(c=>c.layers?.some(l=>l.unit)))notes.push("The layers' units now come from the site's own interpretation; rules applied here replace it.");
+  }
+  if(layered){const u=unmatchedLayers(project.cpts);if(u.size)notes.push(`CPT layers no rule matches stay out of the model: ${listed(u)}`)}
+  box.querySelector(".rule-note")!.textContent=notes.join(" ");
 }
 function readRules():UnitRule[]{
   const num=(row:Element,c:string)=>{const v=(row.querySelector(c) as HTMLInputElement).value.trim();return v===""?undefined:Number(v)};
@@ -1030,19 +1073,50 @@ function readRules():UnitRule[]{
     return r;
   }).filter(r=>r.match&&r.unit);
 }
-// New units go to the bottom of the column; units no interval uses any more are dropped.
+// New units go to the bottom of the column; units no interval or CPT layer uses any more are dropped.
 function applyRules(){
-  const rules=readRules();
-  const {boreholes,unmatched}=applyUnitRules(project.boreholes,rules);
-  const used=new Set(boreholes.flatMap(b=>b.intervals.map(i=>i.unit)));
+  const rules=readRules(),target=ruleTarget(),notes=[`${rules.length} ${target==="rules"?"unit rules":"rules for the CPT layers"} applied`];
+  let boreholes=project.boreholes;
+  if(target==="rules"){
+    const r=applyUnitRules(project.boreholes,rules);
+    boreholes=r.boreholes;
+    if(r.unmatched.size)notes.push(`Descriptions that no rule assigns to a unit are modelled as units of their own: ${[...r.unmatched].map(([n,c])=>`${n} (${c})`).join(", ")}`);
+  }
+  // The CPT layers follow the rules applied, unless the project has rules of their own for them.
+  const cpts=target==="cptRules"||!project.cptRules?project.cpts?.map(c=>c.layers?{...c,layers:layerUnits(c.layers,c.z,rules)}:c):project.cpts;
+  const used=new Set([...boreholes.flatMap(b=>b.intervals.map(i=>i.unit)),...(cpts??[]).flatMap(c=>(c.layers??[]).map(l=>l.unit))].filter(Boolean));
   const kept=project.units.filter(u=>used.has(u.id)),added=[...used].filter(id=>!kept.some(u=>u.id===id));
-  const notes=[`${rules.length} unit rules applied`];
   if(added.length)notes.push(`New units added at the bottom of the column: ${added.join(", ")}`);
-  if(unmatched.size)notes.push(`Descriptions that no rule assigns to a unit are modelled as units of their own: ${[...unmatched].map(([n,c])=>`${n} (${c})`).join(", ")}`);
-  const next:GeoProject={...project,rules,boreholes,units:assignColors([...kept.map(u=>({...u})),...added.map(id=>({id,name:id,color:""}))])};
+  const unmatched=unmatchedLayers(cpts);
+  if(unmatched.size)notes.push(`CPT layers no rule matches stay out of the model: ${listed(unmatched)}`);
+  const next:GeoProject={...project,...(target==="rules"?{rules}:{cptRules:rules}),boreholes,...(cpts?{cpts}:{}),units:assignColors([...kept.map(u=>({...u})),...added.map(id=>({id,name:id,color:""}))])};
   imported=next;
   loadProject(next,notes,true);
 }
+// Whether the model is built with the CPT layers: for a project with CPTs only, always.
+const cptBlock=ui.querySelector<HTMLDivElement>(".cpt-layers")!,cptToggle=cptBlock.querySelector<HTMLInputElement>(".use-cpt-layers")!;
+function renderCptLayers(){
+  const cpts=project.cpts??[];
+  cptBlock.hidden=!cpts.length;
+  if(!cpts.length)return;
+  const alone=!project.boreholes.length,withUnits=cpts.filter(c=>c.layers?.some(l=>l.unit)).length;
+  cptToggle.checked=alone||!!project.cptLayers;
+  cptToggle.disabled=alone;
+  const rules=project.cptRules?"the rules for the CPT layers":project.rules?"the unit rules":withUnits?"the site's own interpretation":"";
+  cptBlock.querySelector(".cpt-note")!.textContent=`Layers by each CPT's soil behaviour type (Robertson 2009), at least 0.5 m thick${rules?`, with units by ${rules}`:""}: ${withUnits} of ${cpts.length} CPT${cpts.length>1?"s have":" has"} layers with units.${alone?" With no boreholes, the model is built from them.":withUnits?"":" Give the layers units with the unit rules below."}`;
+}
+cptToggle.onchange=()=>{
+  const notes=[cptToggle.checked?"The model is built with the CPT layers as well as the boreholes":"The model is built from the boreholes alone"];
+  project.cptLayers=cptToggle.checked||undefined;
+  // Units the layers have and the logs do not go to the bottom of the column.
+  const known=new Set(project.units.map(u=>u.id));
+  const added=[...new Set((project.cpts??[]).flatMap(c=>(c.layers??[]).map(l=>l.unit)).filter(u=>u&&!known.has(u)))];
+  if(cptToggle.checked&&added.length){
+    project.units=assignColors([...project.units,...added.map(id=>({id,name:id,color:""}))]);
+    notes.push(`Units of the CPT layers added at the bottom of the column: ${added.join(", ")}`);
+  }
+  loadProject(project,notes,true);
+};
 
 function syncControls(){
   const line=lineOf(),along=line?"along":"straight";
@@ -1147,7 +1221,7 @@ async function runValidation(){
     const r=steps.next();
     if(run!==validationRun)return;
     if(r.done){validation=r.value;break}
-    checkStatus.textContent=`${r.value.done} of ${r.value.total} boreholes`;
+    checkStatus.textContent=`${r.value.done} of ${r.value.total} ${model.cptLogs.length?"logs":"boreholes"}`;
     await new Promise(resolve=>setTimeout(resolve,0));
     if(run!==validationRun||model!==target)return;
   }
@@ -1168,12 +1242,12 @@ function renderValidation(){
   const inside=v.boreholes.filter(b=>!b.outside),outside=v.boreholes.length-inside.length;
   const pct=(x:number)=>Number.isFinite(x)?`${fmt(100*x,1)} %`:"–",m=(x:number)=>(x>0?"+":"")+fmt(x,1);
   const worst=[...inside].filter(b=>Number.isFinite(b.mae)).sort((a,b)=>b.mae-a.mae).slice(0,8);
-  const scale=errorScale(v);
-  checkResults.innerHTML=`<p>${inside.length} borehole${inside.length===1?"":"s"} inside the others: <b>${pct(v.share.inside)}</b> of the logged metres predicted in the unit logged${outside?`. ${outside} outside them, by extrapolation: ${pct(v.share.outside)}`:""}.${v.terrain?" The ground between boreholes is the terrain grid.":""}</p>
+  const scale=errorScale(v),word=v.boreholes.some(b=>b.cpt)?"log":"borehole";
+  checkResults.innerHTML=`<p>${inside.length} ${word}${inside.length===1?"":"s"} inside the others: <b>${pct(v.share.inside)}</b> of the logged metres predicted in the unit logged${outside?`. ${outside} outside them, by extrapolation: ${pct(v.share.outside)}`:""}.${v.terrain?" The ground between boreholes is the terrain grid.":""}</p>
 ${v.inside.length?`<table class="check-table"><thead><tr><th>Surface</th><th>n</th><th>Bias</th><th>Mean</th><th>RMS</th><th>Largest</th></tr></thead><tbody>${v.inside.map(q=>`<tr><td>${esc(q.name)}</td><td>${q.n}</td><td>${m(q.bias)}</td><td>${fmt(q.mae,1)}</td><td>${fmt(q.rms,1)}</td><td title="${esc(q.at)}">${m(q.max)}</td></tr>`).join("")}</tbody></table>
-<p class="check-note">Metres, predicted minus logged, at the boreholes inside the others: bias is the mean error, mean the mean absolute error.</p>`:""}
+<p class="check-note">Metres, predicted minus logged, at the ${word}s inside the others: bias is the mean error, mean the mean absolute error.${word==="log"?" Logs are the boreholes and the CPT layers the model is built with.":""}</p>`:""}
 ${worst.length?`<p>Furthest from their prediction:</p><ol class="check-worst">${worst.map(b=>`<li><button data-hole="${esc(b.id)}" title="Move the section through it">${esc(b.id)}</button> ${fmt(b.mae,1)} m${b.worst?`; ${esc(lowerFirst(v.surfaces[b.worst.k]))} ${m(b.worst.error)} m`:""}</li>`).join("")}</ol>`:""}
-<label class="check-colour"><input type="checkbox" class="colour-errors"${showErrors?" checked":""}>Mark the boreholes by their mean error (m)</label>
+<label class="check-colour"><input type="checkbox" class="colour-errors"${showErrors?" checked":""}>Mark the ${word}s by their mean error (m)</label>
 <div class="check-legend"><div class="fl-bar">${scale.colors.map(c=>`<i style="background:${c}"></i>`).join("")}</div><div class="fl-ticks">${[0,Math.round(scale.colors.length/2),scale.colors.length].map(i=>`<span>${esc(scaleLabel(scale,scale.edges[i]))}</span>`).join("")}</div></div>
 ${v.notes.length?`<ul class="check-notes">${v.notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul>`:""}
 <div class="check-actions"><button class="check-csv">Errors (CSV)</button></div>`;
@@ -1202,7 +1276,7 @@ function placeErrorMarkers(){
   if(!errorMarkers||!errorRims)return;
   const r=extent*0.011,m=new THREE.Matrix4(),q=new THREE.Quaternion(),scale=new THREE.Vector3(r,r,r/view.ve),rim=scale.clone().multiplyScalar(1.3);
   errorMarked.forEach((id,i)=>{
-    const bh=model.boreholes.find(b=>b.id===id)!,at=local(bh.x,bh.y,bh.z+2.2*r/view.ve);
+    const bh=[...model.boreholes,...model.cptLogs].find(b=>b.id===id)!,at=local(bh.x,bh.y,bh.z+2.2*r/view.ve);
     errorMarkers!.setMatrixAt(i,m.compose(at,q,scale));
     errorRims!.setMatrixAt(i,m.compose(at,q,rim));
   });
@@ -1211,15 +1285,15 @@ function placeErrorMarkers(){
   invalidate();
 }
 function validationCsv(v:CrossValidation){
-  const rows:Array<Array<string|number>>=[["borehole","x","y","outside the others","surface","logged elevation (m)","predicted elevation (m)","error (m)"]];
-  for(const b of v.boreholes)for(const q of b.contacts)rows.push([b.id,b.x,b.y,b.outside?"yes":"no",v.surfaces[q.k],Number(q.logged.toFixed(3)),Number(q.predicted.toFixed(3)),Number(q.error.toFixed(3))]);
+  const rows:Array<Array<string|number>>=[["log","kind","x","y","outside the others","surface","logged elevation (m)","predicted elevation (m)","error (m)"]];
+  for(const b of v.boreholes)for(const q of b.contacts)rows.push([b.id,b.cpt?"CPT layers":"borehole",b.x,b.y,b.outside?"yes":"no",v.surfaces[q.k],Number(q.logged.toFixed(3)),Number(q.predicted.toFixed(3)),Number(q.error.toFixed(3))]);
   return toCsv(rows);
 }
 // The result of one borehole, for the read-out.
 function validationLine(id:string){
   const b=validation?.boreholes.find(q=>q.id===id);
   if(!b)return "";
-  return `<span>Predicted from the other boreholes${b.outside?", outside them":""}: mean error ${fmt(b.mae,2)} m${b.worst?`, largest at the ${esc(lowerFirst(validation!.surfaces[b.worst.k]))}, ${b.worst.error>0?"+":""}${fmt(b.worst.error,2)} m`:""}</span>`;
+  return `<span>Predicted from the other ${validation!.boreholes.some(q=>q.cpt)?"logs":"boreholes"}${b.outside?", outside them":""}: mean error ${fmt(b.mae,2)} m${b.worst?`, largest at the ${esc(lowerFirst(validation!.surfaces[b.worst.k]))}, ${b.worst.error>0?"+":""}${fmt(b.worst.error,2)} m`:""}</span>`;
 }
 checkButton.onclick=()=>{
   if(checkButton.textContent==="Stop"){validationRun++;renderValidation();checkStatus.textContent="Stopped";return}
@@ -1229,7 +1303,7 @@ checkResults.addEventListener("click",e=>{
   const b=(e.target as Element).closest<HTMLButtonElement>("button");
   if(!b||!validation)return;
   if(b.classList.contains("check-csv")){download(`${project.name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"geomodel3d"}-cross-validation.csv`,validationCsv(validation),"text/csv");return}
-  const bh=model.boreholes.find(h=>h.id===b.dataset.hole);
+  const bh=[...model.boreholes,...model.cptLogs].find(h=>h.id===b.dataset.hole);
   if(bh){
     if(lineOf()){view.alignment=-1;renderLineOptions()}
     view.offset=offsetThrough(model,view.azimuth,bh);syncControls();queueSection();
@@ -1278,7 +1352,7 @@ function loadProject(p:GeoProject,importWarnings:string[]=[],keepView=false){
     view.ve=Math.min(5,Math.max(1,Math.round(extent/(height*3)*2)/2));
     view.azimuth=model.nodes.length>1?principalAzimuth(model):0;
     view.offset=0;
-    view.labels=model.boreholes.length<=(compact()?20:40);
+    view.labels=model.boreholes.length+model.cpts.length<=(compact()?20:40);
     toolbar.querySelector<HTMLInputElement>('[data-view="labels"]')!.checked=view.labels;
     view.map=publicSites.has(p)&&!!projectCrs(p);
   }
@@ -1530,8 +1604,8 @@ addEventListener("drop",e=>{e.preventDefault();dragDepth=0;dropZone.hidden=true;
 // ---------- hover ----------
 
 const raycaster=new THREE.Raycaster();
-// With a mouse the read-out follows the pointer. On a touch screen a tap shows it, above the finger, until the next
-// touch; dragging to orbit shows nothing.
+// With a mouse the read-out follows the pointer, and hides while a button is held to orbit or pan. On a touch screen a
+// tap shows it, above the finger, until the next touch; dragging to orbit shows nothing.
 let pointer:{x:number;y:number;touch:boolean}|null=null,pointerMoved=false;
 function hideTooltip(){tooltip.hidden=true;pointer=null}
 // A press that neither moves nor lasts is a click or a tap: while a line is drawn it adds a point, and on a touch screen
@@ -1544,7 +1618,7 @@ renderer.domElement.addEventListener("pointerdown",e=>{
 });
 renderer.domElement.addEventListener("pointermove",e=>{
   if(press&&press.id===e.pointerId&&Math.hypot(e.clientX-press.x,e.clientY-press.y)>10)press=null;
-  if(e.pointerType==="mouse"){pointer={x:e.clientX,y:e.clientY,touch:false};pointerMoved=true}
+  if(e.pointerType==="mouse"){pointer=e.buttons?null:{x:e.clientX,y:e.clientY,touch:false};pointerMoved=true}
 });
 renderer.domElement.addEventListener("pointerleave",e=>{if(e.pointerType==="mouse")hideTooltip()});
 renderer.domElement.addEventListener("pointerup",e=>{
@@ -1694,8 +1768,16 @@ function holeNear(px:number,py:number,radius:number){
 }
 // What the read-out says about a CPT at a depth: the readings there, the test, and its log over the model's units.
 function cptHtml(i:number,depth:number){
-  const c=model.cpts[i],d=Math.min(Math.max(depth,c.depth[0]),cptDepth(c)),v=cptAt(c,d);
-  return `<b>${esc(c.id)}</b> · CPT, ${fmt(d,2)} m deep, elevation ${fmt(c.z-d,2)} m<span>${readingsText(c,v)}</span><span>start ${fmt(c.z,2)} m · deepest reading ${fmt(cptDepth(c),2)} m${c.predrill?` · predrilled ${fmt(c.predrill,2)} m`:""}${c.date?` · ${esc(c.date)}`:""}</span>${cptLogSvg(c,{width:224,height:210,theme:"dark",marker:d,units:cptBands(c)})}`;
+  const c=model.cpts[i],d=Math.min(Math.max(depth,c.depth[0]),cptDepth(c)),v=cptAt(c,d),b=cptBehaviour(model.project,c);
+  return `<b>${esc(c.id)}</b> · CPT, ${fmt(d,2)} m deep, elevation ${fmt(c.z-d,2)} m<span>${readingsText(c,v)}</span>${sbtText(c,b,d)}<span>start ${fmt(c.z,2)} m · deepest reading ${fmt(cptDepth(c),2)} m${c.predrill?` · predrilled ${fmt(c.predrill,2)} m`:""}${c.date?` · ${esc(c.date)}`:""}</span>${validationLine(c.id)}${cptLogSvg(c,{width:224,height:210,theme:"dark",marker:d,units:cptBands(c),zones:b.zone})}`;
+}
+// The soil behaviour type at a depth: the reading nearest it, and the layer of the model's logs there.
+function sbtText(c:Cpt,b:ReturnType<typeof cptBehaviour>,d:number){
+  let i=0;
+  for(let j=1;j<c.depth.length;j++)if(Math.abs(c.depth[j]-d)<Math.abs(c.depth[i]-d))i=j;
+  const z=sbtZone(b.zone[i]),layer=model.cptLogs.find(l=>l.id===c.id)?.intervals.find(l=>d>=l.from-1e-6&&d<=l.to+1e-6);
+  const unit=layer?model.units.find(u=>u.id===layer.unit)?.name??layer.unit:"";
+  return z?`<span>SBTn ${z.zone} (Ic ${fmt(b.ic[i],2)}), ${esc(lowerFirst(z.name))}${unit?` · in the model: ${esc(unit)}`:""}</span>`:"";
 }
 function readingsText(c:Cpt,v:ReturnType<typeof cptAt>){
   const value=(x:number,unit:string,d:number)=>Number.isFinite(x)?`${fmt(x,d)} ${unit}`:"no reading";
@@ -1741,7 +1823,7 @@ function updateTooltip(){
   const holeHit=holeMesh?.visible?raycaster.intersectObject(holeMesh).find(kept):undefined;
   const cptHit=view.cpts&&cptAxes?raycaster.intersectObjects([...cptFills,cptAxes],false).find(h=>kept(h)&&h.distance<=hidden):undefined;
   if(cptHit&&(!holeHit||cptHit.distance<holeHit.distance)){
-    const i=cptHit.object===cptAxes?cptHit.instanceId!:cptHit.object.userData.cpt as number;
+    const i=cptHit.object===cptAxes?cptOfSegment[cptHit.instanceId!]:cptHit.object.userData.cpt as number;
     html=cptHtml(i,model.cpts[i].z-(cptHit.point.z/view.ve+origin.z));
   }else if(holeHit&&holeHit.instanceId!==undefined)html=holeHtml(holeInfo[holeHit.instanceId].hole,holeInfo[holeHit.instanceId].interval);
   else if(pointer.touch){

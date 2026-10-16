@@ -1,12 +1,14 @@
-// A CPT's log: the cone resistance and the friction ratio against elevation, side by side, over the units of the model
-// where the CPT stands; for the read-out in the app and the report.
+// A CPT's log: its soil behaviour type, and the cone resistance and the friction ratio against elevation, side by side,
+// over the units of the model where the CPT stands; for the read-out in the app and the report.
 import {Cpt,cptDepth} from "./schema";
 import {frictionRatio,thinned,cptScale,RF_SCALE} from "./cpt";
+import {sbtZone} from "./sbt";
 
-// `units`: the model's units at the CPT, as elevation bands; `marker`: a depth to mark; `zRange`: the elevations shown
-// (top, bottom), shared by logs drawn side by side; `qcMax`: the full scale of qc in MPa.
+// `units`: the model's units at the CPT, as elevation bands; `zones`: the soil behaviour type zone of each reading;
+// `marker`: a depth to mark; `zRange`: the elevations shown (top, bottom), shared by logs drawn side by side; `qcMax`:
+// the full scale of qc in MPa.
 export interface CptBand { top:number; bottom:number; color:string; name:string }
-export interface CptLogOptions { width:number; height:number; theme?:"dark"|"light"; marker?:number; units?:CptBand[]; qcMax?:number; zRange?:[number,number]; title?:boolean }
+export interface CptLogOptions { width:number; height:number; theme?:"dark"|"light"; marker?:number; units?:CptBand[]; zones?:number[]; qcMax?:number; zRange?:[number,number]; title?:boolean }
 
 const THEMES={
   dark:{bg:"#0b1620",text:"#d9edf5",muted:"#8aa2ae",grid:"rgba(160,190,200,.16)",line:"#e8f5ff",marker:"#78c9df",frame:"rgba(160,190,200,.4)"},
@@ -21,7 +23,8 @@ function niceStep(range:number,count:number){
 
 export function cptLogSvg(c:Cpt,o:CptLogOptions){
   const t=THEMES[o.theme??"dark"],W=o.width,H=o.height,bottom=c.z-cptDepth(c);
-  const m={l:36,r:6,t:o.title?34:22,b:8},gap=8,pw=W-m.l-m.r-gap,qw=Math.round(pw*0.66),rw=pw-qw,ph=H-m.t-m.b;
+  // A column of the soil behaviour type, then the panels of qc and Rf.
+  const zw=o.zones?10:0,m={l:36+(zw?zw+4:0),r:6,t:o.title?34:22,b:8},gap=8,pw=W-m.l-m.r-gap,qw=Math.round(pw*0.66),rw=pw-qw,ph=H-m.t-m.b;
   const pad=Math.max(0.3,(c.z-bottom)*0.02),[top,low]=o.zRange??[c.z+pad,bottom-pad];
   const Y=(e:number)=>m.t+(top-e)/(top-low)*ph,qcMax=o.qcMax??cptScale(Math.max(...c.qc.filter(Number.isFinite),1));
   const qx=m.l,rx=m.l+qw+gap,out:string[]=[];
@@ -37,7 +40,25 @@ export function cptLogSvg(c:Cpt,o:CptLogOptions){
   const step=niceStep(top-low,6);
   for(let v=Math.ceil(low/step)*step;v<=top+1e-9;v+=step){
     const y=Y(v).toFixed(1);
-    out.push(`<line x1="${qx}" x2="${rx+rw}" y1="${y}" y2="${y}" stroke="${t.grid}"/><text x="${m.l-4}" y="${(Y(v)+3).toFixed(1)}" text-anchor="end" font-size="9" fill="${t.muted}">${r2(Math.abs(v)<1e-9?0:v)}</text>`);
+    out.push(`<line x1="${qx}" x2="${rx+rw}" y1="${y}" y2="${y}" stroke="${t.grid}"/><text x="${m.l-(zw?zw+8:4)}" y="${(Y(v)+3).toFixed(1)}" text-anchor="end" font-size="9" fill="${t.muted}">${r2(Math.abs(v)<1e-9?0:v)}</text>`);
+  }
+ // The zone of each reading, in runs, from the reading to the next one.
+  if(o.zones){
+    const x=m.l-zw-4;
+    let from=-1;
+    const run=(i:number,end:number)=>{
+      const z=sbtZone(o.zones![i]);
+      if(!z)return;
+      const y0=Math.max(m.t,Y(c.z-c.depth[i])),y1=Math.min(m.t+ph,Y(c.z-end));
+      if(y1>y0)out.push(`<rect x="${x}" y="${y0.toFixed(1)}" width="${zw}" height="${(y1-y0+0.3).toFixed(1)}" fill="${z.color}"><title>SBTn ${z.zone}: ${z.name}</title></rect>`);
+    };
+    for(let i=0;i<c.depth.length;i++){
+      if(from>=0&&o.zones[i]===o.zones[from])continue;
+      if(from>=0)run(from,c.depth[i]);
+      from=i;
+    }
+    if(from>=0)run(from,c.depth[c.depth.length-1]);
+    out.push(`<text x="${x+zw/2}" y="${m.t-5}" text-anchor="middle" font-size="9" fill="${t.muted}">SBT</text><rect x="${x}" y="${m.t}" width="${zw}" height="${ph}" fill="none" stroke="${t.frame}" stroke-width="0.6"/>`);
   }
   for(const f of [0.5,1])out.push(`<line x1="${(qx+qw*f).toFixed(1)}" x2="${(qx+qw*f).toFixed(1)}" y1="${m.t}" y2="${m.t+ph}" stroke="${t.grid}"/>`);
   out.push(`<line x1="${(rx+rw/2).toFixed(1)}" x2="${(rx+rw/2).toFixed(1)}" y1="${m.t}" y2="${m.t+ph}" stroke="${t.grid}"/>`);
