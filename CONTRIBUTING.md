@@ -7,7 +7,7 @@ Thank you for helping. GeoModel3D is open source under the [Apache-2.0 licence](
 - **Report a bug.** [Open an issue](https://github.com/kilickursat/GeoModel3D/issues/new/choose) with the version shown next to the title in the app, your browser and system, what you did, what you expected and what happened. A small file that shows the problem helps most; remove anything confidential from it first.
 - **Ask for a feature.** Describe the task it serves (for example "earth pressures on an embedded wall") and, for a calculation, the method and a reference: a standard, a textbook or a paper.
 - **Improve the documentation:** the README, the CSV templates in [`docs/templates/`](docs/templates/) and the help texts in the app.
-- **Contribute code.** For anything larger than a small fix, open an issue first, so that the approach is agreed before you spend time on it. The [roadmap](README.md#roadmap) lists what is planned.
+- **Contribute code.** For anything larger than a small fix, open an issue first, so that the approach is agreed before you spend time on it. [Planned](docs/methods.md#planned) lists what is planned.
 - **Propose a public site or a data source,** following the [rules for data](#data-sites-and-test-fixtures) below.
 
 ## Setting up
@@ -25,7 +25,7 @@ npm run dev      # Vite's development server, where you can run one
 
 Where a local server cannot be used, build and open `dist/geomodel3d-offline.html` from disk: it is the whole app in one file.
 
-The modelling kernel (`src/model.ts`, `src/fields.ts`, `src/io.ts` and the other modules that do not render) has no browser dependencies and is tested in Node. The viewer (`src/main.ts`) and the Input data tab (`src/input.ts`) are thin layers on top. The [Architecture](README.md#architecture) section of the README lists every module.
+The modelling kernel (`src/model.ts`, `src/fields.ts`, `src/io.ts` and the other modules that do not render) has no browser dependencies and is tested in Node. The viewer (`src/main.ts`) and the Input data tab (`src/input.ts`) are thin layers on top. [Architecture](docs/methods.md#architecture) lists every module.
 
 ## Making a change
 
@@ -52,7 +52,7 @@ By contributing, you agree that your contribution is licensed under Apache-2.0, 
 GeoModel3D includes real data only when there is no doubt that it may be shared. For any data added to the repository, as a reference site or as a test fixture:
 
 - **The licence must allow redistribution,** such as CC0, CC BY or an open government licence. Link the licence terms in the pull request.
-- **Credit the source** as the licence asks, in the README's [Data sources](README.md#data-sources) and in the dataset's `source` field, and say what was changed.
+- **Credit the source** as the licence asks, under [Data sources](docs/sites.md#data-sources) and in the dataset's `source` field, and say what was changed.
 - **No personal data.** Leave out the names, signatures, registration numbers, telephone numbers and e-mail addresses of people, and the details of owners. Scripts must not read such fields.
 - **No access workarounds.** Use only data offered for download or through a documented service. Do not scrape sites that refuse automated access, and do not work around logins, rate limits or terms of use.
 - **When in doubt, leave it out.** No site is worth a licence or privacy problem.
@@ -68,4 +68,4 @@ Everyone taking part is expected to follow the [code of conduct](CODE_OF_CONDUCT
 
 ## Sponsoring
 
-To sponsor GeoModel3D, see [Sponsoring](README.md#sponsoring) in the README.
+To sponsor GeoModel3D, see [Contributing](README.md#contributing) in the README.
