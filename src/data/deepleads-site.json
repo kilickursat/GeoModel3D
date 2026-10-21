@@ -2,7 +2,7 @@
  "format": "geomodel3d-project",
  "version": 1,
  "name": "Creswick deep leads, Victoria (NGIS)",
- "description": "150 groundwater bores on the basalt plains north-east of Creswick, central Victoria, from the National Groundwater Information System (NGIS v1.1, 2013). Basalt lava flows filled valleys cut into Palaeozoic bedrock and buried the sand and gravel of the old rivers, the deep leads, once mined for gold. The units are the hydrostratigraphic interpretation of each log by the Victorian Department of Primary Industries, as published in NGIS; each interval keeps its name. Ground elevations in metres AHD, from LiDAR (36), a terrain model (109) or GPS (3). Terrain from Terrain Tiles, fetched when the project opens.",
+ "description": "150 groundwater bores near Creswick, central Victoria (NGIS v1.1, 2013). Basalt lava filled valleys cut into Palaeozoic bedrock and buried the gravels of old rivers, the deep leads once mined for gold. Units from the hydrostratigraphy published in NGIS. Heights in m AHD.",
  "source": "National Groundwater Information System v1.1, © Commonwealth of Australia (Bureau of Meteorology), CC BY 3.0 AU, via data.gov.au; bore data © State of Victoria",
  "crs": "GDA94 / MGA zone 54",
  "crsCode": "EPSG:28354",

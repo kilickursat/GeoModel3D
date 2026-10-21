@@ -28,7 +28,7 @@ export function cptLogSvg(c:Cpt,o:CptLogOptions){
   const pad=Math.max(0.3,(c.z-bottom)*0.02),[top,low]=o.zRange??[c.z+pad,bottom-pad];
   const Y=(e:number)=>m.t+(top-e)/(top-low)*ph,qcMax=o.qcMax??cptScale(Math.max(...c.qc.filter(Number.isFinite),1));
   const qx=m.l,rx=m.l+qw+gap,out:string[]=[];
-  out.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Inter, system-ui, 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic UI', Meiryo, sans-serif">`);
+  out.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic UI', Meiryo, sans-serif">`);
   if(o.title)out.push(`<text x="${m.l}" y="12" font-size="11" font-weight="600" fill="${t.text}">${esc(c.id)}</text>`);
   // The units of the model behind both panels, faint, so the readings stay in front.
   for(const u of o.units??[]){

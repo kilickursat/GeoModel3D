@@ -2,7 +2,7 @@
  "format": "geomodel3d-project",
  "version": 1,
  "name": "Sakae, Yokohama (KuniJiban)",
- "description": "75 borehole logs from MLIT road surveys around Sakae-ku, Yokohama, 2001–2025, from KuniJiban. The units are an interpretation of the logged soil names, SPT N-values and elevations: see the unit rules. Terrain: GSI 5 m DEM, fetched when the project opens. Five rock-core logs that contradict their neighbours are left out.",
+ "description": "75 borehole logs from MLIT road surveys in Sakae-ku, Yokohama (KuniJiban, 2001–2025). Units from the logged soil names, SPT N-values and elevations (see Unit rules); terrain from the GSI 5 m DEM. Five rock-core logs that contradict their neighbours are left out.",
  "source": "国土地盤情報検索サイト「KuniJiban」の地盤情報 (KuniJiban ground information: MLIT, PWRI, PARI). Individual logs carry no copyright.",
  "crs": "JGD2011 / Japan Plane Rectangular CS IX",
  "crsCode": "EPSG:6677",
