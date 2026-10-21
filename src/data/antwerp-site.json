@@ -2,7 +2,7 @@
  "format": "geomodel3d-project",
  "version": 1,
  "name": "Antwerp, Belgium (DOV)",
- "description": "170 boreholes in the centre of Antwerp, 15 m deep or more, with DOV's formal lithostratigraphic interpretation of each (2000–2024): made ground and Quaternary deposits over the Pliocene Kattendijk and Miocene Berchem sands and the Oligocene Boom Clay. The thin Quaternary formations are one unit here; each interval keeps DOV's name. Heights in metres TAW. Terrain from Terrain Tiles with Fetch terrain: it is not fetched when the project opens, as some logs start under water, below the water surface the tiles give.",
+ "description": "170 boreholes in central Antwerp, at least 15 m deep, with DOV's formal lithostratigraphy (2000–2024): made ground and Quaternary deposits over the Kattendijk and Berchem sands and the Boom Clay. Heights in m TAW. Some logs start under water, so terrain is fetched only when asked for.",
  "source": "Databank Ondergrond Vlaanderen (DOV): formal stratigraphy, Flemish Government (VPO); consulted on 07/10/2026, on https://www.dov.vlaanderen.be. Free reuse under the Flemish model licence for free reuse.",
  "crs": "BD72 / Belgian Lambert 72",
  "crsCode": "EPSG:31370",

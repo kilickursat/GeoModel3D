@@ -59,7 +59,7 @@ const crs=projectCrs(raw)!;
 const years=files.map(f=>f.text.match(/<調査期間_終了年月日>(\d{4})/)?.[1]).filter(Boolean).map(Number);
 const project:GeoProject={
   name:"Sakae, Yokohama (KuniJiban)",
-  description:`${boreholes.length} borehole logs from MLIT road surveys around Sakae-ku, Yokohama, ${Math.min(...years)}–${Math.max(...years)}, from KuniJiban. The units are an interpretation of the logged soil names, SPT N-values and elevations: see the unit rules. Terrain: GSI 5 m DEM, fetched when the project opens. Five rock-core logs that contradict their neighbours are left out.`,
+  description:`${boreholes.length} borehole logs from MLIT road surveys in Sakae-ku, Yokohama (KuniJiban, ${Math.min(...years)}–${Math.max(...years)}). Units from the logged soil names, SPT N-values and elevations (see Unit rules); terrain from the GSI 5 m DEM. Five rock-core logs that contradict their neighbours are left out.`,
   source:"国土地盤情報検索サイト「KuniJiban」の地盤情報 (KuniJiban ground information: MLIT, PWRI, PARI). Individual logs carry no copyright.",
   crs:crs.name,crsCode:crs.code,
   units,rules,boreholes

@@ -80,7 +80,7 @@ export function reportHtml(model:GeoModel,section:Section,o:ReportOptions){
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${esc(p.name)} — GeoModel3D report</title><style>
 @page{size:${o.paper} landscape;margin:12mm}
 *{box-sizing:border-box}
-html,body{margin:0;background:#fff;color:#1d2730;font-family:Inter,system-ui,"Segoe UI","Hiragino Sans","Noto Sans JP","Noto Sans CJK JP","Yu Gothic UI",Meiryo,sans-serif;font-size:${o.paper==="A3"?9.5:8}pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+html,body{margin:0;background:#fff;color:#1d2730;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,"Hiragino Sans","Noto Sans JP","Yu Gothic UI",Meiryo,sans-serif;font-size:${o.paper==="A3"?9.5:8}pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .page{width:${w-24}mm;min-height:${h-24}mm;display:flex;flex-direction:column;break-after:page;page-break-after:always}
 .page:last-child{break-after:auto;page-break-after:auto}
 header{display:flex;gap:8mm;justify-content:space-between;align-items:flex-start;border-bottom:1.2pt solid #1d2730;padding-bottom:3mm;margin-bottom:4mm}

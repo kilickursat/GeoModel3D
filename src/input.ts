@@ -147,15 +147,15 @@ export function createInputWorkspace(o:InputOptions):InputWorkspace{
     const saved=readSaved(),current=o.current();
     const choice=(key:string,title:string,text:string)=>`<button class="ws-choice" data-start="${key}"><b>${title}</b><span>${text}</span></button>`;
     return `<div class="ws-start"><h2>Enter your own data</h2>
-<p>Type in, or paste from a spreadsheet, the boreholes of your case with their positions and logs, the groundwater, field and laboratory tests, and the units with their unit weights and design values. <b>Build model</b> turns them into the 3-D model, sections and stresses. Everything stays in this browser: nothing is uploaded.</p>
+<p>Type in or paste your boreholes, logs, water levels, tests and units, then <b>Build model</b>. Nothing is uploaded: the data stay in this browser.</p>
 <div class="ws-choices">${[
-      choice("new","New case","Empty tables to fill in. One borehole is enough: the model then extends around it."),
-      choice("example","Worked example","Four boreholes with water levels, SPT, laboratory tests and unit parameters: the format, ready to change."),
-      choice("current","Edit the dataset shown",`${esc(current.name)}: its tables, to change or add to.`),
-      choice("import","Import files…","CSV, AGS4, borehole XML or project JSON, to review here before building."),
+      choice("new","New case","Empty tables. One borehole is enough."),
+      choice("example","Worked example","Four boreholes with water levels, SPT, tests and unit parameters, to edit."),
+      choice("current","Edit the site shown",`The tables of ${esc(current.name)}.`),
+      choice("import","Import files…","CSV, AGS4, borehole XML or project JSON."),
       ...(saved?[choice("saved","Continue the saved case",`${esc(saved.tables.project.name)}, kept in this browser since ${esc(new Date(saved.savedAt).toLocaleString())}.`)]:[])
     ].join("")}</div>
-<p class="ws-note">${t?`Open now: <b>${esc(t.project.name)}</b>; starting another case replaces it. `:""}What you type is kept in this browser, so a reload does not lose it, until you type in another case. Save case (JSON) keeps a copy you can import again.</p></div>`;
+<p class="ws-note">${t?`Open now: <b>${esc(t.project.name)}</b>; starting another case replaces it. `:""}What you type is kept in this browser until you start another case. Save case (JSON) keeps a copy.</p></div>`;
   }
   function projectView(){
     const f=t!.project,field=(key:keyof typeof f,label:string,hint:string,attrs="")=>

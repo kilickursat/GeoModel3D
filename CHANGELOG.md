@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.17.0 — 2026-10-21
+
+Changes after feedback from users: the interface was hard to take in, the model jumped while it was turned, its sides did not match, and there was too much text.
+
+### Fixed
+- Turning the model no longer swaps the half shown. The model opened cut at the section, and the half kept was chosen from the camera on every frame. Turning past the section plane replaced one half with the other, so the model seemed to jump and its two sides to show different ground. The model now opens whole and solid. **Cut** on the section bar removes the part in front of the section, and the half it keeps stays as the model turns; **Flip** keeps the other half.
+- In a solid model, boreholes and CPTs inside it are no longer picked through the units. A borehole shows its details at its collar.
+- The 3-D view is drawn only in the part of the screen the panels leave, so no panel lies over it. Headless Chromium drew part of the canvas wrongly when large panels covered it.
+
+### Changed
+- A plainer interface:
+  - a top bar with the tabs, **Import…**, **Export** and a help menu;
+  - the site and its units in a panel on the left. The description is folded to three lines, and a site's notes are under **Notes** instead of in a box that opened with every site; the box still opens after an import, an error or an action;
+  - what is drawn, the vertical exaggeration, the map and the terrain in one **View** menu over the model, with **See-through** for the translucent units;
+  - the section's controls in a bar under the model, with the 2-D section under it. **Azimuth** and **Offset** are now **Direction** and **Position**;
+  - light colours, the system's font and plain labels.
+- Shorter texts: the site descriptions, the notes on CPT layers and unit rules, the Input data tab and the drop zone.
+- The README is short. The guide, the methods, the data formats and the sites are in `docs/`.
+- The demo GIF and the screenshots show the new interface.
+
+### Removed
+- The SVG and CSV buttons of the section bar; **Export** has them.
+
 ## 0.16.0 — 2026-10-16
 
 ### Added

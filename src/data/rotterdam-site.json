@@ -2,7 +2,7 @@
  "format": "geomodel3d-project",
  "version": 1,
  "name": "Maasvlakte 2, Rotterdam (BRO)",
- "description": "100 geotechnical boreholes of the Port of Rotterdam on Maasvlakte 2, 2017–2024, from the Dutch Key Register of the Subsurface (BRO), with their groundwater levels and 3188 laboratory test results, and 26 of its cone penetration tests (CPT), 2019–2026: the deepest in each 400 m square, of those since 2018 of quality class 1 or 2 and at least 30 m deep, with a reading every 0.1 m. Land reclaimed in 2008–2013 from the North Sea: sand fill and sea-bed sand over the basal Holocene clay and peat, on Pleistocene sand and gravel. The units are an interpretation of each described log as a sequence (scripts/make-rotterdam-site.ts), with the paving of the quays in the sand; the logs keep the BRO soil names. The CPTs' layers, by their soil behaviour type (Robertson 2009), are interpreted by the same sequence, and the model is built with them and the boreholes. Boreholes in the harbour basins start at its bed, 17–21 m below NAP. Heights in metres NAP.",
+ "description": "100 geotechnical boreholes and 26 CPTs on Maasvlakte 2, Port of Rotterdam (BRO, 2017–2026), with 3188 laboratory results and groundwater levels. Land reclaimed from the North Sea: sand fill and sea-bed sand over Holocene clay and peat, on Pleistocene sand and gravel. Boreholes in the harbour basins start at the bed, 17–21 m below NAP. Heights in m NAP.",
  "source": "BRO, Basisregistratie Ondergrond: geotechnical borehole research (BHR-GT) and cone penetration tests (CPT), public domain (CC0)",
  "crs": "Amersfoort / RD New",
  "crsCode": "EPSG:28992",

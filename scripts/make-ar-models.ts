@@ -63,7 +63,7 @@ ${sites.map(s=>`<section class="site"><h2>${esc(s.name)}</h2>
 <div class="actions" data-slug="${s.slug}" data-title="${esc(s.name)}"><a class="ar" rel="ar" href="${s.slug}.usdz" hidden><img src="${label("View in AR")}" width="132" height="34" alt="View in AR"></a><a class="button scene" href="#" hidden>View in AR</a>
 <a href="${s.slug}.glb" download>GLB, ${mb(s.glb)}</a><a href="${s.slug}.usdz" download>USDZ, ${mb(s.usdz)}</a></div>
 <div class="credit">${s.triangles.toLocaleString("en-US")} triangles. ${esc(s.source)}</div></section>`).join("\n")}
-<p class="credit">The data keep their own terms, listed with the changes made under <a href="https://github.com/kilickursat/GeoModel3D#data-sources">Data sources</a>; each file carries its source credit. GeoModel3D ${esc(pkg.version)} is open source under the Apache-2.0 licence.</p>
+<p class="credit">The data keep their own terms, listed with the changes made under <a href="https://github.com/kilickursat/GeoModel3D/blob/main/docs/sites.md#data-sources">Data sources</a>; each file carries its source credit. GeoModel3D ${esc(pkg.version)} is open source under the Apache-2.0 licence.</p>
 </main>
 <script>
 // AR Quick Look where Safari supports it; Scene Viewer on Android, which needs the file's full address.
