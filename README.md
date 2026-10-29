@@ -5,6 +5,7 @@
 [![Open the app](https://img.shields.io/badge/app-open-1f6fd1)](https://kilickursat.github.io/GeoModel3D/)
 [![Build](https://github.com/kilickursat/GeoModel3D/actions/workflows/build.yml/badge.svg)](https://github.com/kilickursat/GeoModel3D/actions/workflows/build.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
+[![XERJ Corpus Hub contributor](https://hub.xerj.org/contributors/kilickursat/badge.svg)](https://hub.xerj.org/contributors/kilickursat)
 
 GeoModel3D builds a layered ground model from borehole logs and cone penetration tests and puts it on a map in the site's own coordinate system. You can cut sections through it at any angle or along a tunnel or road alignment. It runs in the browser on a computer, tablet or phone. There is nothing to install, and your data are not uploaded anywhere.
 
@@ -84,6 +85,10 @@ GitHub's **Cite this repository** gives the reference from [CITATION.cff](CITATI
   license = {Apache-2.0}
 }
 ```
+
+## XERJ Corpus Hub
+
+GeoModel3D's source code is in the [XERJ Corpus Hub](https://hub.xerj.org/corpus/kilickursat--geomodel3d), a shared library that AI agents search on their own machine. Their answers name the repository, the commit, and the file and line they come from.
 
 ## License
 
