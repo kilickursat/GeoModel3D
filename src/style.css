@@ -33,6 +33,12 @@ button,select,summary,label,a{touch-action:manipulation}
 input[type=checkbox],input[type=range]{accent-color:var(--accent)}
 input[type=checkbox]{margin:0}
 
+/* What the app is (index.html): shown while it loads, and in its place where it cannot start. */
+.intro{height:100%;overflow:auto;max-width:640px;margin:0 auto;padding:48px 16px;font-size:15px;line-height:1.55}
+.intro h1{margin:0 0 6px;font-size:26px;font-weight:650}
+.intro .lead{margin:0 0 16px;font-size:17px;color:var(--text-2)}
+.intro-status{color:var(--text-3)}
+
 /* Controls */
 .files>.import,.menu>summary,.view-button,.section-control button,.section-head button,.rule-actions button,.check-actions button,
 .draw-bar button,.ws-foot button,.ed-tools button{background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius);padding:5px 11px;line-height:1.3;cursor:pointer;white-space:nowrap}
@@ -55,7 +61,7 @@ button:disabled,select:disabled{opacity:.5;cursor:default}
 /* Top bar: the name, the tabs, files and help */
 .ui{display:contents}
 .topbar{position:fixed;left:0;right:0;top:0;height:var(--top-bar);background:var(--panel);border-bottom:1px solid var(--border);z-index:3}
-.title{position:fixed;left:16px;top:0;height:var(--top-bar);display:flex;align-items:center;gap:7px;font-size:15px;font-weight:650;z-index:4}
+.title{position:fixed;left:16px;top:0;height:var(--top-bar);margin:0;display:flex;align-items:center;gap:7px;font-size:15px;font-weight:650;z-index:4}
 .title span{font-size:12px;font-weight:400;color:var(--text-3)}
 .site-name{display:none}
 .modes{position:fixed;left:176px;top:8px;z-index:4;display:flex;padding:2px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px}

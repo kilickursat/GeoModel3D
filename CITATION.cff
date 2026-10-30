@@ -14,8 +14,8 @@ authors:
 repository-code: "https://github.com/kilickursat/GeoModel3D"
 url: "https://kilickursat.github.io/GeoModel3D/"
 license: Apache-2.0
-version: 0.17.0
-date-released: "2026-10-21"
+version: 0.17.1
+date-released: "2026-10-30"
 keywords:
   - geological modelling
   - geotechnical engineering

@@ -80,7 +80,7 @@ GitHub's **Cite this repository** gives the reference from [CITATION.cff](CITATI
   author  = {Kilic, Kursat},
   title   = {GeoModel3D: 3D geological models from borehole logs and CPTs, in the browser},
   url     = {https://github.com/kilickursat/GeoModel3D},
-  version = {0.17.0},
+  version = {0.17.1},
   year    = {2026},
   license = {Apache-2.0}
 }
