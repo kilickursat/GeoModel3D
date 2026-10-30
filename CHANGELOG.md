@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.17.1 — 2026-10-30
+
+### Fixed
+- In a browser without WebGL 2 or WebGPU the page stayed blank. It now describes GeoModel3D and says what the 3-D view needs. The same description shows while the app loads, and without JavaScript.
+
+### Changed
+- For search engines:
+  - a shorter title and description;
+  - the app's name as the page's main heading, and a one-line description at the top of the help menu;
+  - structured data that describe a free web app;
+  - a sitemap with the app and the AR page. It no longer lists the offline file, a copy of the app. `robots.txt` is gone: search engines read it only at the root of a site, never in a project's folder on GitHub Pages.
+- On phones, the browser's bar is white like the top bar instead of the old dark blue.
+
 ## 0.17.0 — 2026-10-21
 
 Changes after feedback from users: the interface was hard to take in, the model jumped while it was turned, its sides did not match, and there was too much text.

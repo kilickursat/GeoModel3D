@@ -46,7 +46,14 @@ camera.up.set(0,0,1);
 // WebGPU wherever the browser offers it; the renderer falls back to WebGL 2 by itself, and ?backend=webgl forces it.
 const wantWebGPU=new URLSearchParams(location.search).get("backend")!=="webgl";
 const renderer=new THREE.WebGPURenderer({antialias:true,forceWebGL:!wantWebGPU});
-await renderer.init();
+// Without WebGPU or WebGL 2, the page keeps the description from index.html and says what is missing instead of
+// staying blank.
+try{await renderer.init()}catch(e){
+  const status=document.querySelector(".intro-status");
+  if(status)status.textContent="This browser could not start the 3-D view, which needs WebGL 2 or WebGPU. Try an up-to-date Chrome, Edge, Firefox or Safari, with hardware acceleration turned on.";
+  throw e;
+}
+document.querySelector(".intro")?.remove();
 const webgl="WebGL 2";
 const backendName=(renderer.backend as {isWebGPUBackend?:boolean}).isWebGPUBackend?"WebGPU":webgl;
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
@@ -814,7 +821,7 @@ const ui=document.createElement("div");
 ui.className="ui";
 // On a small screen each panel opens as a sheet, with a title, buttons of its own and a close button.
 const sheetHead=(title:string,buttons="")=>`<div class="sheet-head"><b>${title}</b>${buttons}<button class="sheet-close" aria-label="Close">×</button></div>`;
-ui.innerHTML=`<div class="topbar"></div><div class="title">GeoModel3D <span>${pkg.version.split(".").slice(0,2).join(".")}</span></div>
+ui.innerHTML=`<div class="topbar"></div><h1 class="title">GeoModel3D <span>${pkg.version.split(".").slice(0,2).join(".")}</span></h1>
 <button class="site-name" aria-controls="sheet-site"></button>
 <div class="panel" id="sheet-site">
   ${sheetHead("Site")}
@@ -875,6 +882,7 @@ toolbar.innerHTML=`${sheetHead("View")}
     <button data-export="usdz" title="Opens in AR Quick Look on iPhone and iPad">3-D model for AR (USDZ)</button>
   </div></details>
   <details class="menu help"><summary aria-label="Help">?</summary><div>
+    <p class="about">3-D geological models from borehole logs and CPTs, in the browser. Free and open source.</p>
     <p class="help-hint"></p>
     <p><a href="https://github.com/kilickursat/GeoModel3D/blob/main/docs/guide.md" target="_blank" rel="noopener">Guide</a> · <a href="https://github.com/kilickursat/GeoModel3D/blob/main/docs/data-formats.md" target="_blank" rel="noopener">Data formats</a></p>
     <p><a href="https://github.com/kilickursat/GeoModel3D/issues" target="_blank" rel="noopener">Report a problem</a></p>

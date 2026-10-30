@@ -41,6 +41,7 @@ writeFileSync(join(out,"index.html"),`<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>GeoModel3D in AR</title>
 <meta name="description" content="Real ground models from borehole logs, to set on a desk in augmented reality with a phone or tablet.">
+<link rel="canonical" href="https://kilickursat.github.io/GeoModel3D/ar/">
 <style>
 :root{color-scheme:dark}
 [hidden]{display:none!important}
