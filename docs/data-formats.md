@@ -17,6 +17,7 @@ Use **Import…** at the top right, or drop files on the page. Files are read in
 | Terrain | An ESRI ASCII grid (`.asc`) or gridded `x y z` points (`.xyz`), with the boreholes or on its own. |
 | A tunnel, road or railway alignment | A LandXML or J-LandXML file, a CSV of its points, a GeoJSON line or a DXF polyline, with the boreholes or on its own ([Sections along a line](guide.md#sections-along-a-line)). |
 | Cone penetration tests (CPT) | GEF files, BRO or DOV CPT XML, an AGS4 file with `SCPG` and `SCPT`, or a CSV table, with the boreholes or on their own ([CPT files](#cone-penetration-tests-cpt)). |
+| Borehole logs in a PDF report | The `.pdf`, if it has text in it (not a scan): its logs are read in the browser and checked beside the page before use ([Reading borehole logs from PDFs](guide.md#reading-borehole-logs-from-pdfs)). |
 | Nothing in a file yet | The **Input data** tab ([Entering your own data](guide.md#entering-your-own-data)). |
 
 ## CSV tables

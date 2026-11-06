@@ -1,0 +1,86 @@
+{
+ "id": "148301107",
+ "ground": 65.26,
+ "x": -29525.99627146574,
+ "y": -70549.22502691587,
+ "crs": "EPSG:6677",
+ "water": 9.8,
+ "bottom": 48.29,
+ "layers": [
+  {
+   "from": 0,
+   "to": 0.6,
+   "description": "埋土"
+  },
+  {
+   "from": 0.6,
+   "to": 13.85,
+   "description": "火山灰質粘性土"
+  },
+  {
+   "from": 13.85,
+   "to": 14.2,
+   "description": "砂利・礫混り砂"
+  },
+  {
+   "from": 14.2,
+   "to": 17.9,
+   "description": "砂質粘性土"
+  },
+  {
+   "from": 17.9,
+   "to": 19.2,
+   "description": "砂"
+  },
+  {
+   "from": 19.2,
+   "to": 20.95,
+   "description": "砂質粘性土"
+  },
+  {
+   "from": 20.95,
+   "to": 22.4,
+   "description": "シルト混り砂"
+  },
+  {
+   "from": 22.4,
+   "to": 23.9,
+   "description": "砂"
+  },
+  {
+   "from": 23.9,
+   "to": 24.5,
+   "description": "砂質粘性土"
+  },
+  {
+   "from": 24.5,
+   "to": 31.8,
+   "description": "シルト"
+  },
+  {
+   "from": 31.8,
+   "to": 33,
+   "description": "砂質シルト"
+  },
+  {
+   "from": 33,
+   "to": 35.25,
+   "description": "粘土質砂"
+  },
+  {
+   "from": 35.25,
+   "to": 37,
+   "description": "礫質土"
+  },
+  {
+   "from": 37,
+   "to": 37.6,
+   "description": "砂"
+  },
+  {
+   "from": 37.6,
+   "to": 48.29,
+   "description": "軟岩・風化岩"
+  }
+ ]
+}

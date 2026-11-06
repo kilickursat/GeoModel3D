@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.18.0 — 2026-11-06
+
+### Added
+- Borehole logs read from PDF reports, in the browser. Drop a PDF on the page, choose it with **Import…**, or use **Read logs from PDFs…** in the **Input data** tab. From PDFs with text in them, logs drawn with a depth scale and logs set out as tables (From and To columns) are read, with the borehole's name, ground level, final depth, water level and position. Pages that are not logs are left out, and scanned pages are listed as not read.
+- A review of the boreholes read:
+  - each borehole's values and layers beside the page, with a box around the text each value was read from;
+  - the values to check marked, with the reason;
+  - checks of names, gaps, overlaps, depths and levels as you edit;
+  - **Use these boreholes**, which opens them in the Input data tables, with their units in order down the logs.
+- Before a PDF is read, you are asked to agree: the PDF is read on your device and not uploaded, and you check every value before use. **Help** says when you agreed, and lets you withdraw it.
+
+### Changed
+- The grouping of descriptions into units: "TOP SOIL" written as two words, and road layers (aggregate, granular base and subbase, base course), are made ground. A rock name counts only where it comes before the soil name, so "SAND, some silt, trace rock fragments" is sand.
+
+### Notes
+- The reader, with PDF.js and its files, loads only when a PDF is read. The offline file does not read PDFs.
+
 ## 0.17.1 — 2026-10-30
 
 ### Fixed

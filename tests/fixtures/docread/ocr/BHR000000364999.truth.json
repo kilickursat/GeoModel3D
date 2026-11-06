@@ -1,0 +1,65 @@
+{
+ "id": "BHR000000364999",
+ "ground": -19.3,
+ "x": 63234.25,
+ "y": 442006.97,
+ "crs": "EPSG:28992",
+ "bottom": 30,
+ "layers": [
+  {
+   "from": 0,
+   "to": 0.6,
+   "description": "Sand (zand)"
+  },
+  {
+   "from": 0.6,
+   "to": 3.2,
+   "description": "Clay (klei)"
+  },
+  {
+   "from": 3.2,
+   "to": 8,
+   "description": "Sand (zand)"
+  },
+  {
+   "from": 8,
+   "to": 9.4,
+   "description": "Sand, slightly gravelly (zwak grindig zand)"
+  },
+  {
+   "from": 9.4,
+   "to": 12.2,
+   "description": "Sand, strongly gravelly (sterk grindig zand)"
+  },
+  {
+   "from": 12.2,
+   "to": 17.4,
+   "description": "Sand, slightly gravelly (zwak grindig zand)"
+  },
+  {
+   "from": 17.4,
+   "to": 21,
+   "description": "Sand, strongly gravelly (sterk grindig zand)"
+  },
+  {
+   "from": 21,
+   "to": 22,
+   "description": "Sand, slightly gravelly (zwak grindig zand)"
+  },
+  {
+   "from": 22,
+   "to": 22.4,
+   "description": "Sand, clayey (kleiig zand)"
+  },
+  {
+   "from": 22.4,
+   "to": 29,
+   "description": "Clay (klei)"
+  },
+  {
+   "from": 29,
+   "to": 30,
+   "description": "Sand (zand)"
+  }
+ ]
+}

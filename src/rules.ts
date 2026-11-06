@@ -44,13 +44,18 @@ const firstNoun=(soil:keyof typeof SOILS)=>{
   const others=(Object.keys(SOILS) as Array<keyof typeof SOILS>).filter(k=>k!==soil).map(k=>SOILS[k]).join("|");
   return `^(?:(?!\\b(?:${others})\\b).)*\\b(?:${SOILS[soil]})\\b`;
 };
+// Rock names count where they come before any soil noun: "SAND, some silt, trace rock fragments" is sand, "fractured
+// rock" and "MUDSTONE, weathered to clay" are rock.
+const ALL_SOILS=Object.values(SOILS).join("|");
+const rockFirst=(names:string)=>`^(?:(?!\\b(?:${ALL_SOILS})\\b).)*(?:${names})`;
 export const lithologyRules:UnitRule[]=[
-  {match:"made ground|\\b(?:back)?fill\\b|topsoil|concrete|asphalt|tarmac|rubble|hardcore|\\bbrick|\\bslag\\b|antropogeen|ophoging|\\bpuin\\b|\\bbeton\\b|remblai|terrain rapporté|terre végétale|auff[üu]llung|mutterboden|relleno|aterro|riporto",unit:"Made ground"},
+  // Road layers are made ground too: aggregate, granular base and subbase, base course.
+  {match:"made ground|\\b(?:back)?fill\\b|top\\s?soil|concrete|asphalt|tarmac|rubble|hardcore|\\bbrick|\\bslag\\b|\\baggregate\\b|granular (?:base|sub-?base)|base course|\\bsub-?base\\b|antropogeen|ophoging|\\bpuin\\b|\\bbeton\\b|remblai|terrain rapporté|terre végétale|auff[üu]llung|mutterboden|relleno|aterro|riporto",unit:"Made ground"},
   {match:firstNoun("peat"),unit:"Peat"},
-  {match:"mudstone|siltstone|claystone|shale|\\bmarl",unit:"Mudstone and siltstone"},
-  {match:"sandstone|conglomerate|breccia",unit:"Sandstone"},
-  {match:"limestone|chalk|dolomite|kalksteen|\\bkrijt\\b",unit:"Limestone and chalk"},
-  {match:"granite|basalt|andesite|rhyolite|diorite|gabbro|gneiss|schist|quartzite|slate|\\btuff\\b|\\brock\\b|bedrock",unit:"Rock"},
+  {match:rockFirst("mudstone|siltstone|claystone|shale|\\bmarl"),unit:"Mudstone and siltstone"},
+  {match:rockFirst("sandstone|conglomerate|breccia"),unit:"Sandstone"},
+  {match:rockFirst("limestone|chalk|dolomite|kalksteen|\\bkrijt\\b"),unit:"Limestone and chalk"},
+  {match:rockFirst("granite|basalt|andesite|rhyolite|diorite|gabbro|gneiss|schist|quartzite|slate|\\btuff\\b|\\brock\\b|bedrock"),unit:"Rock"},
   {match:firstNoun("gravel"),unit:"Gravel"},
   {match:firstNoun("sand"),unit:"Sand"},
   {match:firstNoun("silt"),unit:"Silt"},
