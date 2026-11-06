@@ -1,0 +1,66 @@
+{
+ "id": "BHR000000470162",
+ "ground": 3.64,
+ "x": 63323.862,
+ "y": 441938.048,
+ "crs": "EPSG:28992",
+ "water": 3.4,
+ "bottom": 30,
+ "layers": [
+  {
+   "from": 0,
+   "to": 0.5,
+   "description": "Concrete (betonOngebroken)"
+  },
+  {
+   "from": 0.5,
+   "to": 5,
+   "description": "Sand (zand)"
+  },
+  {
+   "from": 5,
+   "to": 8,
+   "description": "Sand, slightly gravelly (zwak grindig zand)"
+  },
+  {
+   "from": 8,
+   "to": 10,
+   "description": "Sand, clayey (kleiig zand)"
+  },
+  {
+   "from": 10,
+   "to": 12,
+   "description": "Sand (zand)"
+  },
+  {
+   "from": 12,
+   "to": 12.6,
+   "description": "Sand, silty (siltig zand)"
+  },
+  {
+   "from": 12.6,
+   "to": 15,
+   "description": "Sand (zand)"
+  },
+  {
+   "from": 15,
+   "to": 23.4,
+   "description": "Sand, silty (siltig zand)"
+  },
+  {
+   "from": 23.4,
+   "to": 27,
+   "description": "Clay (klei)"
+  },
+  {
+   "from": 27,
+   "to": 28.2,
+   "description": "Sand, silty (siltig zand)"
+  },
+  {
+   "from": 28.2,
+   "to": 30,
+   "description": "Sand, slightly gravelly (zwak grindig zand)"
+  }
+ ]
+}

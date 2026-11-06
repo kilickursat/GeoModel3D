@@ -75,10 +75,16 @@ export interface InputOptions {
   onBuild(result:ImportResult):void;
   // Opens the file picker; imported files come back through edit().
   onImport():void;
+  // Opens the picker for PDFs, where they can be read; boreholes read from them come back through open().
+  onReadPdf?():void;
   download(name:string,text:string,type:string):void;
 }
-// edit() opens a project for review, with the notes of the files it was imported from.
-export interface InputWorkspace { element:HTMLElement; show():void; edit(project:GeoProject,message:string,notes?:string[]):void }
+// edit() opens a project for review, with the notes of the files it was imported from; open() opens tables made
+// elsewhere (the boreholes read from PDFs), with their notes; status() shows a message in the bar at the bottom.
+export interface InputWorkspace {
+  element:HTMLElement; show():void; edit(project:GeoProject,message:string,notes?:string[]):void;
+  open(tables:EditorTables,message:string,notes?:string[]):void; status(message:string):void;
+}
 
 export function createInputWorkspace(o:InputOptions):InputWorkspace{
   let t:EditorTables|null=null,origin:EditorTables|null=null,base:GeoProject|undefined;
@@ -153,6 +159,7 @@ export function createInputWorkspace(o:InputOptions):InputWorkspace{
       choice("example","Worked example","Four boreholes with water levels, SPT, tests and unit parameters, to edit."),
       choice("current","Edit the site shown",`The tables of ${esc(current.name)}.`),
       choice("import","Import files…","CSV, AGS4, borehole XML or project JSON."),
+      ...(o.onReadPdf?[choice("pdf","Read logs from PDFs…","Borehole logs in digital PDFs, read in this browser. You check every value before it is used.")]:[]),
       ...(saved?[choice("saved","Continue the saved case",`${esc(saved.tables.project.name)}, kept in this browser since ${esc(new Date(saved.savedAt).toLocaleString())}.`)]:[])
     ].join("")}</div>
 <p class="ws-note">${t?`Open now: <b>${esc(t.project.name)}</b>; starting another case replaces it. `:""}What you type is kept in this browser until you start another case. Save case (JSON) keeps a copy.</p></div>`;
@@ -339,6 +346,7 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
   const blankRow=(name:TableName)=>{const r=COLUMNS[name].map(()=>"");if(PER_HOLE.includes(name)&&filter)r[0]=filter;return r};
   function choose(key:string){
     if(key==="import"){o.onImport();return}
+    if(key==="pdf"){o.onReadPdf?.();return}
     if(edited()&&!confirm("Replace the open case? Its edits are lost unless you saved them (Save case)."))return;
     const current=o.current(),saved=readSaved();
     if(key==="new")begin(emptyTables(),undefined,"project","A new case: name it and say where it is, then fill in the tables.");
@@ -421,6 +429,8 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
   return {
     element:el,
     show(){if(!t&&step!=="start")step="start";render();refresh(true)},
-    edit(project,text,notes){begin(tablesFromProject(project),project,"boreholes",text,notes)}
+    edit(project,text,notes){begin(tablesFromProject(project),project,"boreholes",text,notes)},
+    open(tables,text,notes){begin(tables,undefined,"boreholes",text,notes)},
+    status(text){message=text;el.querySelector(".ws-status")!.textContent=text}
   };
 }

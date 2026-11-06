@@ -1,0 +1,101 @@
+{
+ "id": "BHR000000470165",
+ "ground": 3.64,
+ "x": 62840.606,
+ "y": 441888.942,
+ "crs": "EPSG:28992",
+ "water": 3.1,
+ "bottom": 30,
+ "layers": [
+  {
+   "from": 0,
+   "to": 0.5,
+   "description": "Concrete (betonOngebroken)"
+  },
+  {
+   "from": 0.5,
+   "to": 4,
+   "description": "Sand (zand)"
+  },
+  {
+   "from": 4,
+   "to": 6,
+   "description": "Sand, clayey (kleiig zand)"
+  },
+  {
+   "from": 6,
+   "to": 10,
+   "description": "Sand (zand)"
+  },
+  {
+   "from": 10,
+   "to": 11,
+   "description": "Sand, clayey (kleiig zand)"
+  },
+  {
+   "from": 11,
+   "to": 13,
+   "description": "Sand (zand)"
+  },
+  {
+   "from": 13,
+   "to": 14,
+   "description": "Sand, clayey (kleiig zand)"
+  },
+  {
+   "from": 14,
+   "to": 15,
+   "description": "Sand (zand)"
+  },
+  {
+   "from": 15,
+   "to": 20,
+   "description": "Sand, clayey (kleiig zand)"
+  },
+  {
+   "from": 20,
+   "to": 23,
+   "description": "Sand (zand)"
+  },
+  {
+   "from": 23,
+   "to": 24,
+   "description": "Clay, strongly sandy (sterk zandige klei)"
+  },
+  {
+   "from": 24,
+   "to": 26,
+   "description": "Clay, slightly sandy (zwak zandige klei)"
+  },
+  {
+   "from": 26,
+   "to": 27,
+   "description": "Clay, strongly sandy (sterk zandige klei)"
+  },
+  {
+   "from": 27,
+   "to": 27.1,
+   "description": "Clay, slightly sandy (zwak zandige klei)"
+  },
+  {
+   "from": 27.1,
+   "to": 27.3,
+   "description": "Peat, clayey (kleiig veen)"
+  },
+  {
+   "from": 27.3,
+   "to": 27.5,
+   "description": "Clay, slightly sandy (zwak zandige klei)"
+  },
+  {
+   "from": 27.5,
+   "to": 28,
+   "description": "Sand, clayey (kleiig zand)"
+  },
+  {
+   "from": 28,
+   "to": 30,
+   "description": "Sand, slightly gravelly (zwak grindig zand)"
+  }
+ ]
+}

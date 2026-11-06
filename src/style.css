@@ -341,6 +341,125 @@ body[data-mode="input"] :is(.panel,.section-control,.section-view,.view-menu,.no
   .ws-status{flex:1 1 100%}
 }
 
+/* Reading PDFs: the agreement asked first, and the review of the boreholes read, over everything else. Values to check
+   wear the orange of the legend's tags; problems that stop their use, the danger red. */
+.agree{width:min(560px,calc(100vw - 32px));padding:20px 22px 18px;border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);color:var(--text);background:var(--surface);font-size:14px;line-height:1.5}
+.agree::backdrop{background:rgba(20,30,40,.35)}
+.agree h2{margin:0 0 10px;font-size:17px}
+.agree ul{margin:0 0 12px;padding-left:18px}
+.agree li{margin:6px 0}
+.agree p{margin:0 0 16px;color:var(--text-2)}
+.agree-actions{display:flex;justify-content:flex-end;gap:8px}
+.pdf-agreement .withdraw,.dr-ok,.dr-unread li button{border:0;background:none;padding:0;color:var(--accent);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.agree-actions button,.dr-head button,.dr-bar button,.dr-add{background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius);padding:5px 11px;line-height:1.3;cursor:pointer;white-space:nowrap}
+.agree-actions button{padding:7px 16px}
+:is(.agree-actions,.dr-head,.dr-bar) button:hover:not(:disabled),.dr-add:hover{background:var(--surface-2);border-color:#aab3bc}
+.agree-actions .agree-yes,.dr-head .dr-use{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.agree-actions .agree-yes:hover,.dr-head .dr-use:hover:not(:disabled){background:#1a5fb4;border-color:#1a5fb4}
+.dr{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;background:var(--surface);padding-top:env(safe-area-inset-top,0px)}
+.dr-head{display:flex;align-items:center;gap:8px;padding:8px 16px;border-bottom:1px solid var(--border);background:var(--panel)}
+.dr-title{flex:1;min-width:0;display:flex;flex-direction:column}
+.dr-title b{font-size:15px}
+.dr-sub{color:var(--text-3);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dr-say{color:var(--danger);font-size:12px;max-width:40%}
+.dr-say:empty{display:none}
+.dr-main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(400px,46%) minmax(0,1fr)}
+.dr-side{min-height:0;overflow:auto;padding:12px 14px 28px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:12px}
+.dr-checks{padding:8px 10px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;color:var(--text-2)}
+.dr-checks p{margin:0}
+.dr-checks b{color:var(--text)}
+.dr-n-error{color:var(--danger);font-weight:600}
+.dr-checks ul{list-style:none;margin:6px 0 0;padding:0}
+.dr-checks li button{display:block;width:100%;border:0;background:none;padding:3px 4px 3px 20px;text-align:left;color:var(--text-2);border-radius:4px;cursor:pointer;position:relative;line-height:1.4}
+.dr-checks li button:hover{background:var(--surface)}
+.dr-checks li button::before{position:absolute;left:4px;top:3px;font-weight:700}
+.dr-checks li.error button::before{content:"✕";color:var(--danger)}
+.dr-checks li.warn button::before{content:"!";color:#c98500;left:7px}
+.dr-checks li.note button::before{content:"i";color:var(--text-3);left:7px;font-style:italic}
+.dr-checks summary{margin-top:4px;cursor:pointer;color:var(--accent)}
+.dr-tabs{display:flex;flex-wrap:wrap;gap:6px}
+.dr-tabs:empty{display:none}
+.dr-tab{display:flex;align-items:center;gap:4px;padding:2px 2px 2px 8px;border:1px solid var(--border-strong);border-radius:6px;background:var(--surface)}
+.dr-tab.on{border-color:var(--accent);background:var(--accent-soft)}
+.dr-tab button{display:flex;align-items:baseline;gap:6px;border:0;background:none;padding:3px 6px;cursor:pointer;font-weight:600}
+.dr-tab small{font-weight:400;color:var(--text-3)}
+.dr-tab i{font-style:normal;font-size:11px;font-weight:600;color:#8a4b0f;background:#fbefe2;border-radius:8px;padding:0 6px}
+.dr-tab.off button{opacity:.55}
+.dr-fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px 10px}
+.dr-field{display:flex;flex-direction:column;gap:2px;min-width:0}
+.dr-field label{color:var(--text-2);font-size:12px}
+.dr-field input{background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius);padding:4px 8px;min-width:0}
+.dr-field input::placeholder{color:var(--text-3);font-style:italic}
+.dr-field.flag input{border-color:#e0a050;background:#fff8ee}
+.dr-field.on input{box-shadow:0 0 0 2px var(--accent-soft);border-color:var(--accent)}
+.dr-flag{color:#8a4b0f;font-size:11.5px;line-height:1.35}
+.dr-layers-head{display:flex;align-items:baseline;gap:8px;margin-top:4px}
+.dr-layers-head span{flex:1;color:var(--text-3);font-size:12px}
+.dr-table-wrap{overflow:auto;border:1px solid var(--border);border-radius:8px;margin-top:6px}
+.dr-layers{border-collapse:collapse;width:100%}
+.dr-layers th{position:sticky;top:0;z-index:1;background:var(--surface-2);color:var(--text-2);font-weight:600;text-align:left;padding:5px 6px;white-space:nowrap;border-bottom:1px solid var(--border)}
+.dr-layers td{padding:1px 2px;border-bottom:1px solid var(--border);vertical-align:top}
+.dr-layers :is(input,textarea){width:100%;background:transparent;border:1px solid transparent;border-radius:4px;padding:3px 5px;font:inherit;color:inherit}
+.dr-layers input{min-width:0}
+.dr-layers th:nth-child(2),.dr-layers th:nth-child(3){width:5.2em}
+.dr-layers th:nth-child(4){width:9.5em}
+.dr-layers textarea{min-width:200px;resize:none;overflow:hidden;line-height:1.4;display:block}
+.dr-layers :is(input,textarea):hover{border-color:var(--border-strong)}
+.dr-layers :is(input,textarea):focus{outline:none;border-color:var(--accent);background:var(--surface)}
+.dr-row.flag td{background:#fff8ee}
+.dr-row.on td,.dr-why.on td{background:var(--accent-soft)}
+.dr-why td{padding:0 6px 6px;font-size:12px;color:#8a4b0f;background:#fff8ee}
+.dr-row:has(+.dr-why) td{border-bottom:0}
+.dr-n{color:var(--text-3);text-align:right;padding:6px 6px 0 4px!important;font-variant-numeric:tabular-nums}
+.dr-acts{white-space:nowrap}
+.dr-acts button{border:0;background:none;color:var(--text-3);cursor:pointer;font-size:15px;line-height:1;padding:5px 4px}
+.dr-acts .dr-del:hover{color:var(--danger)}
+.dr-acts .dr-ins:hover{color:var(--accent)}
+.dr-empty{color:var(--text-3);margin:8px}
+.dr-unread{color:var(--text-2);font-size:12px}
+.dr-unread summary{cursor:pointer;color:var(--text-2)}
+.dr-unread ul{margin:6px 0 0;padding-left:16px}
+.dr-unread li{margin:3px 0}
+.dr-unread li.error{color:var(--danger)}
+.dr-view{min-width:0;min-height:0;display:flex;flex-direction:column;background:#e3e7eb}
+.dr-bar{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--surface);border-bottom:1px solid var(--border)}
+.dr-bar button{padding:4px 10px}
+.dr-pageno{color:var(--text-2);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dr-gap{flex:1}
+.dr-scroll{flex:1;min-height:0;overflow:auto;padding:12px}
+.dr-sheet{position:relative;margin:0 auto;background:#fff;box-shadow:0 1px 4px rgba(20,30,40,.2)}
+.dr-sheet canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.dr-boxes{position:absolute;inset:0}
+.dr-box{position:absolute;border-radius:2px;outline:1.5px solid rgba(31,111,209,.55);outline-offset:1px;background:rgba(31,111,209,.08);cursor:pointer}
+.dr-box.flag{outline-color:rgba(201,133,0,.95);background:rgba(201,133,0,.14)}
+.dr-box.on{outline:2.5px solid var(--accent);background:rgba(31,111,209,.24);z-index:1}
+.dr-box.flag.on{outline-color:#c98500;background:rgba(201,133,0,.3)}
+.dr-page-note{margin:8px 0 0;text-align:center;color:var(--text-3)}
+.dr-page-note:empty{display:none}
+/* On a phone each layer is a card: its depths and unit, labelled, over its description. */
+@media (max-width:600px){
+  .dr-layers thead{display:none}
+  .dr-layers tr.dr-row{display:grid;grid-template-columns:1.6em minmax(0,1fr) minmax(0,1fr) minmax(0,1.6fr) auto;padding:4px 0;border-bottom:1px solid var(--border)}
+  .dr-layers tr.dr-row td{border:0;padding:1px}
+  .dr-layers tr.dr-row td[data-label]::before{content:attr(data-label);display:block;padding:0 6px;color:var(--text-3);font-size:11px}
+  .dr-layers tr.dr-row td:nth-child(5){grid-column:2/-1;grid-row:2}
+  .dr-layers tr.dr-row td:nth-child(6){grid-column:5;grid-row:1;align-self:end}
+  .dr-layers tr.dr-row:has(+.dr-why){border-bottom:0}
+  .dr-layers textarea{min-width:0}
+  .dr-why{display:block}
+  .dr-why td{display:block}
+  .dr-why td:first-child{display:none}
+}
+@media (max-width:900px){
+  .dr-head{flex-wrap:wrap;padding:8px 12px}
+  .dr-title{flex:1 1 100%}
+  .dr-say{max-width:none;flex:1 1 100%;order:3}
+  .dr-head button{flex:1;padding:9px 12px}
+  .dr-main{display:flex;flex-direction:column;overflow:auto}
+  .dr-side{flex:none;overflow:visible;border-right:0;padding:12px}
+  .dr-view{flex:none;height:78vh;height:78dvh;border-top:1px solid var(--border)}
+}
+
 /* Phones, held either way, and small tablets held upright (the queries of layout.ts): the model fills the screen under
    the top bar, and the panels open one at a time, as sheets, from the bar at the bottom; the notes fold to one line
    and the 2-D section opens across the top. The page measures --top-h (the top bar), --dock-h (the bar at the

@@ -1,6 +1,6 @@
 # Using GeoModel3D
 
-The parts of the app beyond turning a model and cutting sections: your own data, stresses and properties, earth pressures, sections along a line, CPTs, the check of the model, AR and phones. How the model itself is built is in [methods](methods.md); file formats are in [data formats](data-formats.md).
+The parts of the app beyond turning a model and cutting sections: your own data, borehole logs read from PDFs, stresses and properties, earth pressures, sections along a line, CPTs, the check of the model, AR and phones. How the model itself is built is in [methods](methods.md); file formats are in [data formats](data-formats.md).
 
 ## Entering your own data
 
@@ -11,6 +11,7 @@ The **Input data** tab, next to **3-D model** at the top of the page, is where y
 - **Worked example:** four boreholes with water levels, SPT, laboratory tests and unit parameters, to see the format and change it;
 - **Edit the site shown:** the tables of the model on screen, to change or add to;
 - **Import files…:** CSV, AGS4, borehole XML or project JSON, opened here for review before building;
+- **Read logs from PDFs…:** borehole logs in PDF reports, checked beside the page before use ([Reading borehole logs from PDFs](#reading-borehole-logs-from-pdfs));
 - **Continue the saved case:** what you typed before, if this browser kept it.
 
 Then fill in the steps:
@@ -37,6 +38,35 @@ Good to know:
 - **Unit weights** give the stresses: γ above the water table and γsat below it. A unit without them takes the mean measured unit weight, or else 18 and 20 kN/m³, which the preview and the report say. **K0** gives σ′h, and **c′, φ′ and su** the earth pressures. E and k are design parameters, kept with the model and listed in the report.
 - **Pasting:** cells copied from a spreadsheet paste into any table, starting at the cell pasted into, and add rows as needed. Large tables are shown one borehole at a time.
 - **Nothing is uploaded.** What you type is kept in this browser, so a reload does not lose it, until you type in another case. **Save case (JSON)** keeps a copy you can import again, and **Download table (CSV)** saves a table as CSV.
+
+## Reading borehole logs from PDFs
+
+The borehole logs in a PDF report can become the boreholes of your case. GeoModel3D reads them in the browser and shows each value beside the page it was read from, and you check them before they are used. Drop the PDF on the page, choose it with **Import…**, or use **Read logs from PDFs…** at the start of the **Input data** tab. Several PDFs can be read at once.
+
+**The agreement.** The first time, GeoModel3D asks you to agree to reading PDFs. The PDF is read on your device and is not uploaded or sent anywhere. Reading is automatic and can be wrong, so you check every value before you use it. If you disagree, the PDF is not read and everything else works as before. Your answer is kept in this browser: **Help (?)** says when you agreed, and **Withdraw** takes it back, so that you are asked again.
+
+**What is read.** PDFs with text in them, as made by a program (not scanned):
+- **logs drawn with a depth scale:** the boundaries are the depths written beside the log that fit the scale, and each line of the description column goes to the layer it is in. A log over several pages is joined, and several logs on one page are read apart;
+- **logs set out as tables,** with the top and base of each layer under headings such as **From** and **To**, beside its description;
+- **the header:** the borehole's name, the ground level, the final depth, the water level, and the position as an easting and northing (or X and Y) or as a latitude and longitude. Labels in English, Dutch, French, German and Japanese are read.
+
+A page is read as a log only where it says it is one: a title such as "Log of borehole BH3" or ボーリング柱状図, or a heading over the descriptions such as "Description" or 土質区分, with a depth scale beside them. The other pages of a report are listed as having no log.
+
+Not read yet: scanned pages (listed as such), handwriting, SPT values and other columns of results, and the name of the coordinate system.
+
+**The review.** Each borehole read has a tab. Its values and layers are on the left and the page is on the right, with a box around the text each value was read from. Pointing at a value lights its box, and pointing at a box lights its value; clicking in a value turns the page to it. Values that the page does not give as they are used are marked, with the reason: for example a depth whose decimal point was lost ("read as “450”; the decimal point put back"), or thin top layers worked out from the thicknesses in their descriptions. Editing a marked value, or **Looks right**, clears the mark.
+
+The list at the top checks the boreholes as you edit them. Nothing is corrected silently:
+- **problems to fix** before use: a borehole without a name, two boreholes with one name, layers without usable depths or a unit;
+- **values to check:** gaps and overlaps between layers, a final depth above the base of the log, a water level below the hole, a borehole without a position or a ground level (where there are several), and the values marked by the reader.
+
+Edit any value or description, add a layer below another with **+**, delete one with **×**, or leave a borehole out with its tick box.
+
+**Use these boreholes** opens them in the **Input data** tables, named after the document, for the usual checks and **Build model**:
+- each layer's unit comes from the grouping of soil and rock names by principal material (Japanese names by their own grouping). The **Units** table lists them in their order down the logs, ready for unit weights and design values;
+- positions given as eastings and northings are in a coordinate system the document does not name: give it under **Project**, or the model stays on a local grid. Latitudes and longitudes are converted as for imported files.
+
+**Your documents stay with you.** The PDF is read in this browser and is not uploaded. The reader and the files it needs (fonts, character maps, image decoders) come from GeoModel3D's own site, and only after you agree. The offline file does not read PDFs: open the app at [kilickursat.github.io/GeoModel3D](https://kilickursat.github.io/GeoModel3D/) to read them.
 
 ## Groundwater, stresses and measured properties
 
