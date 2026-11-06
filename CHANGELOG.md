@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.19.1 — 2026-11-06
+
+### Changed
+- On a computer with a graphics card beside the processor's own graphics, the reading model asks the browser for the faster graphics processor, and runs on the one it is given. The progress line names its maker, for example "Reading … by OCR (WebGPU, nvidia)".
+
 ## 0.19.0 — 2026-11-06
 
 ### Added
