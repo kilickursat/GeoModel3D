@@ -6,7 +6,7 @@
 // their boxes, in its pixels.
 //
 // Messages in: {type:"load", base} (the folder of the model files), {type:"read", id, width, height, data}.
-// Messages out: {type:"progress", loaded, total} while downloading, {type:"ready", backend}, {type:"boxes", id, done,
+// Messages out: {type:"progress", loaded, total} while downloading, {type:"ready", backend, gpu}, {type:"boxes", id, done,
 // total} while reading, {type:"lines", id, lines}, {type:"backend", backend, reason} when WebGPU fails and the
 // processor takes over, {type:"error", id?, message}.
 import * as ort from "onnxruntime-web/webgpu";
@@ -68,13 +68,22 @@ async function load(base:string){
   ort.env.logLevel="error";
   ort.env.wasm.numThreads=1;
   ort.env.wasm.wasmBinary=files.wasm??new Uint8Array(await (await fetch(wasmUrl)).arrayBuffer());
-  // WebGPU where an adapter is offered; the processor otherwise, or where WebGPU cannot build the model.
-  const gpu=(navigator as Navigator&{gpu?:{requestAdapter():Promise<unknown>}}).gpu;
-  if(gpu&&await gpu.requestAdapter().catch(()=>null)){
+  // WebGPU where an adapter is offered: the high-performance one, so that a computer with a graphics card beside the
+  // processor's own graphics reads on the card (the browser decides which it gives). The adapter is handed to ONNX
+  // Runtime, so the model runs on the very GPU asked for. The processor otherwise, or where WebGPU cannot build the model.
+  type Adapter={info?:{vendor?:string}};
+  const gpu=(navigator as Navigator&{gpu?:{requestAdapter(o?:{powerPreference?:string}):Promise<Adapter|null>}}).gpu;
+  const adapter=gpu?await gpu.requestAdapter({powerPreference:"high-performance"}).catch(()=>null):null;
+  if(adapter){
+    ort.env.webgpu.adapter=adapter;
+    ort.env.webgpu.powerPreference="high-performance";
+    vendor=adapter.info?.vendor??"";
     try{await sessions("webgpu");return}catch{/* falls back below */}
   }
   await sessions("wasm");
 }
+// The maker of the GPU read on ("nvidia", "intel", "amd", "apple"…), where the browser says it.
+let vendor="";
 
 async function recognise(img:Img):Promise<Reading>{
   const x=recInput(img);
@@ -104,7 +113,7 @@ self.onmessage=(e:MessageEvent)=>{
   const m=e.data as {type:"load";base:string}|{type:"read";id:number;width:number;height:number;data:ArrayBuffer};
   queue=queue.then(async()=>{
     try{
-      if(m.type==="load"){await load(m.base);post({type:"ready",backend});return}
+      if(m.type==="load"){await load(m.base);post({type:"ready",backend,gpu:backend==="webgpu"?vendor:""});return}
       const img={data:new Uint8ClampedArray(m.data),width:m.width,height:m.height};
       let lines:OcrLine[];
       try{lines=await read(img,m.id)}

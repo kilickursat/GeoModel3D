@@ -24,11 +24,13 @@ export async function readPdfs(files:File[],host:ReviewHost){
       reader.ocr=createOcr(p=>{
         if(p.stage==="download")review.progress(`Downloading the reading model: ${mb(p.loaded)} of ${mb(p.total)} MB`);
         else if(p.stage==="page")review.progress(`${reader.status}: ${p.done} of ${p.total} lines`);
-        else reader.backend=p.backend;
+        else reader.backend="";   // WebGPU failed: the processor reads on
       });
       review.progress("Starting the reading model…");
     }
-    reader.backend=await reader.ocr.ready;
+    const on=await reader.ocr.ready;
+    // Where the model reads, for the progress line: "WebGPU, nvidia"; nothing on the processor.
+    reader.backend=on.backend==="webgpu"?`WebGPU${on.gpu?`, ${on.gpu}`:""}`:"";
     return reader.ocr;
   };
   for(const f of files){
@@ -59,7 +61,7 @@ export async function readPdfs(files:File[],host:ReviewHost){
       for(const n of scan){
         if(review.closed)return;
         if(!ocr){if(!pages.some(p=>p.page===n))unread.push({doc,page:n,scanned:true,error:why});continue}
-        reader.status=`Reading ${f.name}${d.pages>1?`: page ${n} of ${d.pages}`:""} by OCR${reader.backend==="webgpu"?" (WebGPU)":""}`;
+        reader.status=`Reading ${f.name}${d.pages>1?`: page ${n} of ${d.pages}`:""} by OCR${reader.backend?` (${reader.backend})`:""}`;
         review.progress(reader.status+"…");
         try{
           const img=await d.image(n),lines=await ocr.read(img);
