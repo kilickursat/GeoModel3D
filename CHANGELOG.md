@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.19.0 — 2026-11-06
+
+### Added
+- Scanned pages and images of logs are read too, by a text-reading model on your device: PP-OCRv6 small by PaddlePaddle, run with ONNX Runtime Web on the graphics processor through WebGPU, or on the processor where the browser has no WebGPU. The log is then read from its lines as from a PDF's own text, and the review says it was read by OCR. Drop a PNG, JPEG or WebP image like a PDF. A page whose own text has a log's title but no depth scale (a typed header over a scanned log) is read this way too.
+- The model (about 60 MB) is downloaded from GeoModel3D's own site the first time it is needed, checked against the sums the build wrote, and kept in this browser. **Help** shows how much is kept and removes it.
+
+### Changed
+- The agreement asked before a document is read names the reading model and its download. An earlier agreement is asked again.
+- In the review, two layers with the same description each light their own text on the page.
+
 ## 0.18.0 — 2026-11-06
 
 ### Added

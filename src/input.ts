@@ -159,7 +159,7 @@ export function createInputWorkspace(o:InputOptions):InputWorkspace{
       choice("example","Worked example","Four boreholes with water levels, SPT, tests and unit parameters, to edit."),
       choice("current","Edit the site shown",`The tables of ${esc(current.name)}.`),
       choice("import","Import files…","CSV, AGS4, borehole XML or project JSON."),
-      ...(o.onReadPdf?[choice("pdf","Read logs from PDFs…","Borehole logs in digital PDFs, read in this browser. You check every value before it is used.")]:[]),
+      ...(o.onReadPdf?[choice("pdf","Read logs from PDFs…","Borehole logs in PDFs, scanned or not, or in images, read in this browser. You check every value before it is used.")]:[]),
       ...(saved?[choice("saved","Continue the saved case",`${esc(saved.tables.project.name)}, kept in this browser since ${esc(new Date(saved.savedAt).toLocaleString())}.`)]:[])
     ].join("")}</div>
 <p class="ws-note">${t?`Open now: <b>${esc(t.project.name)}</b>; starting another case replaces it. `:""}What you type is kept in this browser until you start another case. Save case (JSON) keeps a copy.</p></div>`;

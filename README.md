@@ -16,7 +16,7 @@ GeoModel3D builds a layered ground model from borehole logs and cone penetration
 ## What it does
 
 - Builds the model from boreholes, CPTs or both: horizons between the boreholes and a closed volume for each unit. One borehole is enough to start.
-- Reads borehole logs from PDF reports on your device, logs drawn with a depth scale or set out as tables. You check each value beside the page it was read from before it is used.
+- Reads borehole logs from PDF reports and images on your device, logs drawn with a depth scale or set out as tables, scanned pages included. You check each value beside the page it was read from before it is used.
 - Cuts sections at any direction and position, or along an alignment from LandXML, CSV, GeoJSON or DXF, or drawn on the model. Along a line it gives a table by chainage with the cover and the units at the crown and invert.
 - Shows groundwater, σv, u, σ′v and σ′h on sections, and interpolates laboratory and in-situ results within each unit.
 - Classifies CPTs by Robertson's soil behaviour type (2009). Their layers can build the model alongside the boreholes.
@@ -33,7 +33,7 @@ Use **Import…** or drop the files on the page:
 | Data | Formats |
 |---|---|
 | Boreholes | CSV tables ([templates](docs/templates)), AGS4, Japanese electronic-delivery XML (KuniJiban), Dutch BRO and Flemish DOV XML, project JSON |
-| Borehole logs in PDFs | PDFs with text (not scans), read in the browser and reviewed before use ([how](docs/guide.md#reading-borehole-logs-from-pdfs)) |
+| Borehole logs in PDFs | PDFs, with text or scanned, and images of logs, read in the browser and reviewed before use ([how](docs/guide.md#reading-borehole-logs-from-pdfs)) |
 | CPTs | GEF, BRO and DOV CPT XML, AGS4 (`SCPG`, `SCPT`), CSV |
 | Terrain | ESRI ASCII grid (`.asc`), gridded `x y z` |
 | Alignments | LandXML and J-LandXML, CSV, GeoJSON, DXF |
@@ -82,7 +82,7 @@ GitHub's **Cite this repository** gives the reference from [CITATION.cff](CITATI
   author  = {Kilic, Kursat},
   title   = {GeoModel3D: 3D geological models from borehole logs and CPTs, in the browser},
   url     = {https://github.com/kilickursat/GeoModel3D},
-  version = {0.18.0},
+  version = {0.19.0},
   year    = {2026},
   license = {Apache-2.0}
 }
@@ -94,4 +94,4 @@ GeoModel3D's source code is in the [XERJ Corpus Hub](https://hub.xerj.org/corpus
 
 ## License
 
-Apache-2.0: see [LICENSE](LICENSE). The data of the sample sites keep their own terms, listed in [sites](docs/sites.md#data-sources). PDFs are read with [PDF.js](https://mozilla.github.io/pdf.js/) (Apache-2.0); the fonts and image decoders served with it keep their own licences, which are served beside them.
+Apache-2.0: see [LICENSE](LICENSE). The data of the sample sites keep their own terms, listed in [sites](docs/sites.md#data-sources). PDFs are read with [PDF.js](https://mozilla.github.io/pdf.js/) (Apache-2.0); the fonts and image decoders served with it keep their own licences, which are served beside them. Scanned pages are read with [PP-OCRv6 small](https://huggingface.co/PaddlePaddle/PP-OCRv6_small_det_onnx) by PaddlePaddle (Apache-2.0) and [ONNX Runtime Web](https://onnxruntime.ai/) (MIT).

@@ -82,6 +82,15 @@ describe("reading a drawn log",()=>{
     expect(log.layers.map(l=>[l.from,l.to,l.description])).toEqual([[0,0.05,"50mm ASPHALT"],[0.05,0.3,"250mm AGGREGATE"],[0.3,4.5,"CLAY: soft, grey"],[4.5,9.8,"SAND: dense"]]);
     expect(log.flagged).toEqual([0.05]);
   });
+  it("takes a depth of 0 written at the top of the log for its top, not for a boundary",()=>{
+    const [log]=readPage([...drawnLog(),L("0.00",900,yAt(0)+8,40)],1000,800);
+    expect(log.layers.map(l=>[l.from,l.to])).toEqual([[0,1.2],[1.2,4.5],[4.5,9.8]]);
+  });
+  it("links each layer to its own lines where two layers have the same description",()=>{
+    const lines=drawnLog().map(e=>/^(CLAY|SAND):/.test(e.text)?{...e,text:"SAND: dense"}:e);
+    const [log]=readPage(lines,1000,800);
+    expect(log.layers.slice(1).map(l=>[l.description,l.src.filter(e=>/SAND/.test(e.text)).map(e=>Math.round(e.cy))])).toEqual([["SAND: dense",[300]],["SAND: dense",[480]]]);
+  });
   it("keeps a line a boundary runs through with the layer above, unless it starts the layer below",()=>{
     // Descriptions with titles: the boundary at 4.50 m runs through "brown, moist", the end of the clay, and the boundary
     // at 9.80 m through the title of the layer below it (by their centres, each would be on the wrong side).
@@ -129,7 +138,7 @@ describe("unit rules for real logs",()=>{
 
 describe("the review's draft, its checks and the Input data tables",()=>{
   const drafts=()=>draftHoles(0,"site-report.pdf",readDocument([{page:2,width:1000,height:800,lines:drawnLog()}]).logs);
-  const hole=(id:string,layers:Array<[string,string]>,extra:Partial<DraftHole["values"]>={}):DraftHole=>({use:true,doc:0,file:"a.pdf",pages:[1],kind:"scale",
+  const hole=(id:string,layers:Array<[string,string]>,extra:Partial<DraftHole["values"]>={}):DraftHole=>({use:true,doc:0,file:"a.pdf",pages:[1],kind:"scale",ocr:false,
     values:{id,x:"100",y:"200",lat:"",lon:"",ground:"10",final:"",water:"",...extra},flags:{},src:{},
     layers:layers.map(([from,to])=>({from,to,unit:"Clay",description:"Clay",autoUnit:false,src:[]}))});
   it("drafts each log with its values, and units by the lithology rules",()=>{

@@ -3,7 +3,7 @@
 // lights its value; focusing a value turns the page to it. Values the reader is unsure of are marked with the reason,
 // until they are edited or confirmed. The checks run as values are edited, and "Use these boreholes" hands the
 // boreholes to the Input data tables, which check them again as typed data.
-import {PdfDoc,renderPage} from "./pdftext";
+import type {Doc} from "./pdftext";
 import {DraftHole,Check,FIELDS,Field,checkDraft,draftTables,unitFor,pageRanges,num} from "./draft";
 import type {TextLine} from "./reconstruct";
 import {lithologyRules,japaneseLithologyRules} from "../rules";
@@ -19,7 +19,7 @@ const ZOOMS=[1,1.5,2,3,4];
 const RULE_UNITS=[...new Set([...lithologyRules,...japaneseLithologyRules].map(r=>r.unit))];
 
 export function createReview(host:ReviewHost){
-  const docs:PdfDoc[]=[],sizes=new Map<string,{width:number;height:number}>();
+  const docs:Doc[]=[],sizes=new Map<string,{width:number;height:number}>(),closing:Array<()=>void>=[];
   let holes:DraftHole[]=[],checks:Check[]=[],unread:Unread[]=[],problems:string[]=[];
   let current=0,active="",edited=false,closed=false,ready=false,timer:ReturnType<typeof setTimeout>|undefined;
   const view={doc:0,page:1,zoom:0};
@@ -29,8 +29,8 @@ export function createReview(host:ReviewHost){
   el.className="dr";
   el.setAttribute("role","dialog");
   el.setAttribute("aria-modal","true");
-  el.setAttribute("aria-label","Borehole logs read from PDFs");
-  el.innerHTML=`<header class="dr-head"><div class="dr-title"><b>Borehole logs from PDFs</b><span class="dr-sub" aria-live="polite">Opening…</span></div>
+  el.setAttribute("aria-label","Borehole logs read from documents");
+  el.innerHTML=`<header class="dr-head"><div class="dr-title"><b>Borehole logs from documents</b><span class="dr-sub" aria-live="polite">Opening…</span></div>
 <span class="dr-say" aria-live="assertive"></span><button class="dr-cancel">Cancel</button><button class="dr-use" disabled>Use these boreholes</button></header>
 <div class="dr-main">
   <div class="dr-side"><div class="dr-checks"></div><div class="dr-tabs" role="tablist" aria-label="Boreholes read"></div><div class="dr-hole" role="tabpanel"></div><div class="dr-unread"></div></div>
@@ -82,7 +82,7 @@ export function createReview(host:ReviewHost){
         l.flag?`<tr class="dr-why" data-key="${key}"><td></td><td colspan="5">${esc(l.to)} m: ${esc(l.flag)} <button class="dr-ok" data-ok="${key}">Looks right</button></td></tr>`:""}`;
     };
     panel.innerHTML=`<div class="dr-fields">${FIELDS.map(field).join("")}</div>
-<div class="dr-layers-head"><b>Layers</b><span>${h.kind==="table"?"read from the From and To columns of a table":"read by the depth scale on the page"}</span><button class="dr-add">Add layer</button></div>
+<div class="dr-layers-head"><b>Layers</b><span>${h.kind==="table"?"read from the From and To columns of a table":"read by the depth scale on the page"}${h.ocr?", by OCR from a scanned page":""}</span><button class="dr-add">Add layer</button></div>
 <div class="dr-table-wrap"><table class="dr-layers"><thead><tr><th></th><th>From (m)</th><th>To (m)</th><th>Unit</th><th>Description</th><th></th></tr></thead><tbody>${h.layers.map(layer).join("")}</tbody></table>${
       h.layers.length?"":'<p class="dr-empty">No layers: add them, or leave this borehole out.</p>'}</div>`;
     $("#dr-units").innerHTML=[...new Set([...holes.flatMap(h=>h.layers.map(l=>l.unit.trim())),...RULE_UNITS])].filter(Boolean).map(u=>`<option value="${esc(u)}">`).join("");
@@ -93,8 +93,11 @@ export function createReview(host:ReviewHost){
     docs.forEach((d,i)=>{
       const of=unread.filter(u=>u.doc===i),name=docs.length>1?`${d.name}: `:"";
       const go=(u:Unread)=>`<button data-doc="${i}" data-page="${u.page}">page ${u.page}</button>`;
-      const scanned=of.filter(u=>u.scanned).map(u=>u.page),logs=of.filter(u=>!u.scanned&&u.log),other=of.filter(u=>!u.scanned&&!u.log).map(u=>u.page);
-      if(scanned.length)parts.push(`<li>${esc(name)}${scanned.length===1?"Page":"Pages"} ${pageRanges(scanned)}: scanned ${scanned.length===1?"image":"images"}, not read. Reading scanned pages comes in a later version.</li>`);
+      const scanned=of.filter(u=>u.scanned),logs=of.filter(u=>!u.scanned&&u.log),other=of.filter(u=>!u.scanned&&!u.log).map(u=>u.page);
+      for(const why of new Set(scanned.map(u=>u.error))){
+        const pages=scanned.filter(u=>u.error===why).map(u=>u.page);
+        parts.push(`<li>${esc(name)}${pages.length===1?"Page":"Pages"} ${pageRanges(pages)}: scanned, not read: ${esc(why)}.</li>`);
+      }
       for(const u of logs)parts.push(`<li>${esc(name)}${go(u)}${u.id?` (${esc(u.id)})`:""}: looks like a log, but ${esc(u.error)}.</li>`);
       if(other.length)parts.push(`<li>${esc(name)}${other.length===1?"Page":"Pages"} ${pageRanges(other)}: no borehole log found.</li>`);
     });
@@ -130,7 +133,7 @@ export function createReview(host:ReviewHost){
     if(now!==shown)sheet.querySelector("canvas")!.replaceWith(document.createElement("canvas"));
     shown=now;
     job?.cancel();
-    const j=renderPage(d,view.page,canvas,css);
+    const j=d.render(view.page,canvas,css);
     job=j;
     j.done.then(()=>{if(job===j&&!closed)sheet.querySelector("canvas")!.replaceWith(canvas)},err=>{if(job===j)pageNote.textContent=`This page could not be drawn: ${(err as Error).message}`});
     drawBoxes();
@@ -266,6 +269,7 @@ export function createReview(host:ReviewHost){
     if(closed)return;
     closed=true;
     clearTimeout(timer);job?.cancel();
+    for(const f of closing)f();
     for(const d of docs)void d.close();
     el.remove();
     host.onClose();
@@ -275,7 +279,9 @@ export function createReview(host:ReviewHost){
     element:el,
     get closed(){return closed},
     progress(text:string){sub.textContent=text},
-    addDoc(d:PdfDoc){docs.push(d);return docs.length-1},
+    // What to stop when the review closes (the reading model in the middle of a page).
+    onClose(f:()=>void){closing.push(f)},
+    addDoc(d:Doc){docs.push(d);return docs.length-1},
     size(doc:number,page:number,width:number,height:number){sizes.set(key(doc,page),{width,height})},
     show(read:DraftHole[],notRead:Unread[],failed:string[]){
       holes=read;unread=notRead;problems=failed;ready=true;
