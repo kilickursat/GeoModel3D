@@ -32,6 +32,8 @@ export default defineConfig({
   plugins:[pdfjsAssets()],
   resolve:{alias:[{find:/^three$/,replacement:"three/webgpu"}]},
   build:{target:"es2022",chunkSizeWarningLimit:1500},
+  // The reading model's worker (src/docread/ocr.worker.ts) is a module: ONNX Runtime Web is one.
+  worker:{format:"es"},
   // Geometry tests build full models; allow slower CI machines.
   test:{testTimeout:20000}
 });

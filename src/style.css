@@ -350,7 +350,7 @@ body[data-mode="input"] :is(.panel,.section-control,.section-view,.view-menu,.no
 .agree li{margin:6px 0}
 .agree p{margin:0 0 16px;color:var(--text-2)}
 .agree-actions{display:flex;justify-content:flex-end;gap:8px}
-.pdf-agreement .withdraw,.dr-ok,.dr-unread li button{border:0;background:none;padding:0;color:var(--accent);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.pdf-agreement .withdraw,.reading-model .remove-model,.dr-ok,.dr-unread li button{border:0;background:none;padding:0;color:var(--accent);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
 .agree-actions button,.dr-head button,.dr-bar button,.dr-add{background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius);padding:5px 11px;line-height:1.3;cursor:pointer;white-space:nowrap}
 .agree-actions button{padding:7px 16px}
 :is(.agree-actions,.dr-head,.dr-bar) button:hover:not(:disabled),.dr-add:hover{background:var(--surface-2);border-color:#aab3bc}

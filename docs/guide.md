@@ -11,7 +11,7 @@ The **Input data** tab, next to **3-D model** at the top of the page, is where y
 - **Worked example:** four boreholes with water levels, SPT, laboratory tests and unit parameters, to see the format and change it;
 - **Edit the site shown:** the tables of the model on screen, to change or add to;
 - **Import files…:** CSV, AGS4, borehole XML or project JSON, opened here for review before building;
-- **Read logs from PDFs…:** borehole logs in PDF reports, checked beside the page before use ([Reading borehole logs from PDFs](#reading-borehole-logs-from-pdfs));
+- **Read logs from PDFs…:** borehole logs in PDF reports, scanned or not, or in images, checked beside the page before use ([Reading borehole logs from PDFs](#reading-borehole-logs-from-pdfs));
 - **Continue the saved case:** what you typed before, if this browser kept it.
 
 Then fill in the steps:
@@ -41,18 +41,23 @@ Good to know:
 
 ## Reading borehole logs from PDFs
 
-The borehole logs in a PDF report can become the boreholes of your case. GeoModel3D reads them in the browser and shows each value beside the page it was read from, and you check them before they are used. Drop the PDF on the page, choose it with **Import…**, or use **Read logs from PDFs…** at the start of the **Input data** tab. Several PDFs can be read at once.
+The borehole logs in a PDF report, or in an image of a log, can become the boreholes of your case. GeoModel3D reads them in the browser and shows each value beside the page it was read from, and you check them before they are used. Drop the PDF or image (PNG, JPEG or WebP) on the page, choose it with **Import…**, or use **Read logs from PDFs…** at the start of the **Input data** tab. Several documents can be read at once.
 
-**The agreement.** The first time, GeoModel3D asks you to agree to reading PDFs. The PDF is read on your device and is not uploaded or sent anywhere. Reading is automatic and can be wrong, so you check every value before you use it. If you disagree, the PDF is not read and everything else works as before. Your answer is kept in this browser: **Help (?)** says when you agreed, and **Withdraw** takes it back, so that you are asked again.
+**The agreement.** The first time, GeoModel3D asks you to agree to reading documents. A document is read on your device and is not uploaded or sent anywhere. Reading is automatic and can be wrong, so you check every value before you use it. Scanned pages and images need a text-reading model, which is downloaded the first time (see below). If you disagree, the document is not read and everything else works as before. Your answer is kept in this browser: **Help (?)** says when you agreed, and **Withdraw** takes it back, so that you are asked again.
 
-**What is read.** PDFs with text in them, as made by a program (not scanned):
+**What is read.** The pages of a PDF with text in them, as made by a program, are read from that text. Scanned pages and images are read by the reading model (below). In both:
 - **logs drawn with a depth scale:** the boundaries are the depths written beside the log that fit the scale, and each line of the description column goes to the layer it is in. A log over several pages is joined, and several logs on one page are read apart;
 - **logs set out as tables,** with the top and base of each layer under headings such as **From** and **To**, beside its description;
 - **the header:** the borehole's name, the ground level, the final depth, the water level, and the position as an easting and northing (or X and Y) or as a latitude and longitude. Labels in English, Dutch, French, German and Japanese are read.
 
 A page is read as a log only where it says it is one: a title such as "Log of borehole BH3" or ボーリング柱状図, or a heading over the descriptions such as "Description" or 土質区分, with a depth scale beside them. The other pages of a report are listed as having no log.
 
-Not read yet: scanned pages (listed as such), handwriting, SPT values and other columns of results, and the name of the coordinate system.
+**Scanned pages and images** are read by a text-reading model, [PP-OCRv6 small](https://huggingface.co/PaddlePaddle/PP-OCRv6_small_rec_onnx) by PaddlePaddle (Apache-2.0), run with ONNX Runtime Web. It finds the lines of text on the page and reads each, turning vertical text upright, and the log is then read from those lines as from a PDF's own text. A page whose own text has a log's title or headings but no depth scale (a typed header over a scanned log) is read this way too.
+- **The download.** The first time it is needed, the model (about 60 MB) is downloaded from GeoModel3D's own site, checked, and kept in this browser, so that it is not downloaded again. **Help (?)** shows how much is kept, and **Remove** deletes it.
+- **Where it runs.** On your device: on the graphics processor through WebGPU where the browser offers it, otherwise on the processor, where a page takes about half a minute.
+- **Check these logs closely.** A log read from a scan says so in the review and in its checks. Reading a clean scan of a printed log is usually right, but a blurred or skewed page, small print or stamps across the log give more mistakes.
+
+Not read yet: handwriting, SPT values and other columns of results, and the name of the coordinate system.
 
 **The review.** Each borehole read has a tab. Its values and layers are on the left and the page is on the right, with a box around the text each value was read from. Pointing at a value lights its box, and pointing at a box lights its value; clicking in a value turns the page to it. Values that the page does not give as they are used are marked, with the reason: for example a depth whose decimal point was lost ("read as “450”; the decimal point put back"), or thin top layers worked out from the thicknesses in their descriptions. Editing a marked value, or **Looks right**, clears the mark.
 
@@ -66,7 +71,7 @@ Edit any value or description, add a layer below another with **+**, delete one 
 - each layer's unit comes from the grouping of soil and rock names by principal material (Japanese names by their own grouping). The **Units** table lists them in their order down the logs, ready for unit weights and design values;
 - positions given as eastings and northings are in a coordinate system the document does not name: give it under **Project**, or the model stays on a local grid. Latitudes and longitudes are converted as for imported files.
 
-**Your documents stay with you.** The PDF is read in this browser and is not uploaded. The reader and the files it needs (fonts, character maps, image decoders) come from GeoModel3D's own site, and only after you agree. The offline file does not read PDFs: open the app at [kilickursat.github.io/GeoModel3D](https://kilickursat.github.io/GeoModel3D/) to read them.
+**Your documents stay with you.** A PDF or image is read in this browser and is not uploaded. The reader, the reading model and the files they need (fonts, character maps, image decoders) come from GeoModel3D's own site, and only after you agree. The offline file does not read documents: open the app at [kilickursat.github.io/GeoModel3D](https://kilickursat.github.io/GeoModel3D/) to read them.
 
 ## Groundwater, stresses and measured properties
 

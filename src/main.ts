@@ -24,6 +24,7 @@ import {reportHtml} from "./report";
 import {createInputWorkspace} from "./input";
 import {agreement,askAgreement,withdrawAgreement} from "./agreement";
 import {loadReader} from "./reader";
+import {modelCacheSize,removeModelCache} from "./modelcache";
 import {crossValidation,CrossValidation} from "./validation";
 import {arModel,toGlb,toUsdz,quickLookAvailable} from "./ar";
 import {COMPACT,COMPACT_SIDE,Rect,viewShift,fitAngle,segmentDistance} from "./layout";
@@ -40,7 +41,9 @@ const compact=()=>compactQuery.matches;
 const calm=matchMedia("(prefers-reduced-motion: reduce)");
 // Borehole logs are read from PDFs in the hosted app; the offline file (opened from disk) leaves the reader out.
 const pdfReading=location.protocol!=="file:";
-const isPdf=(f:File)=>/\.pdf$/i.test(f.name)||f.type==="application/pdf";
+// Documents to read: PDFs, and images of logs (scans, photographs).
+const isDocument=(f:File)=>/\.(pdf|png|jpe?g|webp)$/i.test(f.name)||/^(application\/pdf|image\/(png|jpeg|webp))$/.test(f.type);
+const DOCUMENTS=".pdf,.png,.jpg,.jpeg,.webp";
 
 // ---------- scene ----------
 
@@ -867,8 +870,8 @@ toolbar.id="sheet-tools";
 toolbar.innerHTML=`${sheetHead("View")}
 <div class="files">
   <button class="import">Import…</button>
-  <input class="file" type="file" multiple hidden accept=".csv,.tsv,.txt,.ags,.json,.xml,.gef,.asc,.xyz,.geojson,.dxf${pdfReading?",.pdf":""}">
-  <input class="pdf-file" type="file" multiple hidden accept=".pdf,application/pdf">
+  <input class="file" type="file" multiple hidden accept=".csv,.tsv,.txt,.ags,.json,.xml,.gef,.asc,.xyz,.geojson,.dxf${pdfReading?","+DOCUMENTS:""}">
+  <input class="pdf-file" type="file" multiple hidden accept="${DOCUMENTS}">
   <details class="menu export"><summary>Export</summary><div>
     <button data-export="report-A3" title="Opens the print dialog: choose Save as PDF">Report, A3 (PDF)</button>
     <button data-export="report-A4" title="Opens the print dialog: choose Save as PDF">Report, A4 (PDF)</button>
@@ -893,6 +896,7 @@ toolbar.innerHTML=`${sheetHead("View")}
     <p><a href="https://github.com/kilickursat/GeoModel3D/blob/main/docs/guide.md" target="_blank" rel="noopener">Guide</a> · <a href="https://github.com/kilickursat/GeoModel3D/blob/main/docs/data-formats.md" target="_blank" rel="noopener">Data formats</a></p>
     <p><a href="https://github.com/kilickursat/GeoModel3D/issues" target="_blank" rel="noopener">Report a problem</a></p>
     <p class="pdf-agreement" hidden></p>
+    <p class="reading-model" hidden></p>
     <p class="backend">GeoModel3D ${pkg.version} · ${backendName}${wantWebGPU&&backendName!=="WebGPU"?"":` · <a href="?backend=${backendName==="WebGPU"?"webgl":"webgpu"}">use ${backendName==="WebGPU"?webgl:"WebGPU"}</a>`}</p>
   </div></details>
 </div>
@@ -992,7 +996,7 @@ app.appendChild(tooltip);
 const dropZone=document.createElement("div");
 dropZone.className="drop";
 dropZone.hidden=true;
-dropZone.innerHTML=`<div>Drop files to import<span>Boreholes, CPTs, terrain grids and alignments: CSV, AGS4, GEF, XML, JSON, DXF, LandXML${pdfReading?"<br>Borehole logs in PDFs, read in this browser":""}</span></div>`;
+dropZone.innerHTML=`<div>Drop files to import<span>Boreholes, CPTs, terrain grids and alignments: CSV, AGS4, GEF, XML, JSON, DXF, LandXML${pdfReading?"<br>Borehole logs in PDFs or images, read in this browser":""}</span></div>`;
 app.appendChild(dropZone);
 
 // ---------- small screens: the bar at the bottom and its sheets ----------
@@ -1476,7 +1480,7 @@ function loadProject(p:GeoProject,importWarnings:string[]=[],keepView=false){
 }
 
 async function importFileList(list:FileList|File[]){
-  const pdfs=[...list].filter(isPdf),others=[...list].filter(f=>!isPdf(f));
+  const pdfs=[...list].filter(isDocument),others=[...list].filter(f=>!isDocument(f));
   if(pdfs.length)void readPdfs(pdfs);
   if(!others.length)return;
   try{
@@ -1504,11 +1508,11 @@ function sayPdf(title:string,lines:string[],error=false){
 // and its review hands the boreholes to the input tab.
 async function readPdfs(files:File[]){
   if(!pdfReading){
-    sayPdf("PDFs",["The offline file does not read PDFs. Open GeoModel3D at kilickursat.github.io/GeoModel3D to read them: there too, the PDF is read in your browser and not uploaded."],true);
+    sayPdf("PDFs and images",["The offline file does not read PDFs or images of logs. Open GeoModel3D at kilickursat.github.io/GeoModel3D to read them: there too, they are read in your browser and not uploaded."],true);
     return;
   }
   if(!agreement()&&!await askAgreement()){
-    sayPdf("PDF not read",["You did not agree to reading PDFs, so the PDF was not read. Everything else works as before."]);
+    sayPdf("Not read",["You did not agree to reading documents, so it was not read. Everything else works as before."]);
     return;
   }
   try{
@@ -1654,14 +1658,21 @@ fileInput.onchange=()=>{if(fileInput.files?.length){importFileList(fileInput.fil
 pdfInput.onchange=()=>{if(pdfInput.files?.length)void readPdfs([...pdfInput.files]);pdfInput.value=""};
 // Help says whether reading PDFs was agreed to, and offers to withdraw it.
 const helpMenu=toolbar.querySelector<HTMLDetailsElement>(".menu.help")!,agreementLine=helpMenu.querySelector<HTMLParagraphElement>(".pdf-agreement")!;
+// Help also says how much of the reading model is kept in this browser, and removes it.
+const modelLine=helpMenu.querySelector<HTMLParagraphElement>(".reading-model")!;
 function renderAgreement(){
   const a=agreement();
   agreementLine.hidden=!pdfReading;
-  agreementLine.innerHTML=a?`Reading PDFs: agreed on ${esc(new Date(a.date+"T12:00:00").toLocaleDateString(undefined,{dateStyle:"long"}))}. <button class="withdraw">Withdraw</button>`
-    :"Reading PDFs: you are asked to agree before a PDF is read.";
+  agreementLine.innerHTML=a?`Reading documents: agreed on ${esc(new Date(a.date+"T12:00:00").toLocaleDateString(undefined,{dateStyle:"long"}))}. <button class="withdraw">Withdraw</button>`
+    :"Reading documents: you are asked to agree before a PDF or image is read.";
+  void modelCacheSize().then(n=>{
+    modelLine.hidden=!pdfReading||!n;
+    modelLine.innerHTML=n?`Reading model: ${Math.round(n/1e6)} MB kept in this browser. <button class="remove-model">Remove</button>`:"";
+  });
 }
 helpMenu.addEventListener("toggle",()=>{if(helpMenu.open)renderAgreement()});
 agreementLine.addEventListener("click",e=>{if((e.target as Element).closest(".withdraw")){withdrawAgreement();renderAgreement()}});
+modelLine.addEventListener("click",e=>{if((e.target as Element).closest(".remove-model"))void removeModelCache().then(renderAgreement)});
 app.addEventListener("click",e=>{
   const kind=(e.target as HTMLElement).closest<HTMLElement>("[data-export]")?.dataset.export;
   if(kind){exportAs(kind);for(const d of document.querySelectorAll<HTMLDetailsElement>("details.menu[open]"))d.open=false;if(compact()&&sheetOpen()==="files")setSheet("")}
