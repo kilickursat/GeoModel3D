@@ -9,6 +9,10 @@
 
 GeoModel3D builds a layered ground model from borehole logs and cone penetration tests and puts it on a map in the site's own coordinate system. You can cut sections through it at any angle or along a tunnel or road alignment. It runs in the browser on a computer, tablet or phone. There is nothing to install, and your data are not uploaded anywhere.
 
+**Watch the 38-second introduction** ([docs/promo.mp4](docs/promo.mp4)): a scanned borehole log read on the device, checked against its page, built into a model, then the whole Maasvlakte 2 site cut and coloured by effective stress. Every screen is the app itself; the data are public BRO records.
+
+[![Play the GeoModel3D introduction video (38 s)](docs/promo-poster.jpg)](docs/promo.mp4)
+
 ![Maasvlakte 2, Rotterdam: the model from 100 boreholes and 26 CPTs, turned, cut at the section, the section moved through it, then coloured by the CPTs' soil behaviour type index](docs/demo.gif)
 
 **Open it:** [kilickursat.github.io/GeoModel3D](https://kilickursat.github.io/GeoModel3D/). Where hosted pages or local servers are not allowed, download [geomodel3d-offline.html](https://kilickursat.github.io/GeoModel3D/geomodel3d-offline.html): one file that opens from disk.
