@@ -6,6 +6,7 @@
 [![Build](https://github.com/kilickursat/GeoModel3D/actions/workflows/build.yml/badge.svg)](https://github.com/kilickursat/GeoModel3D/actions/workflows/build.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 [![XERJ Corpus Hub contributor](https://hub.xerj.org/contributors/kilickursat/badge.svg)](https://hub.xerj.org/contributors/kilickursat)
+[![Mentioned in Awesome Mining](https://awesome.re/mentioned-badge.svg)](https://github.com/XploraHub/awesome-mining)
 
 GeoModel3D builds a layered ground model from borehole logs and cone penetration tests and puts it on a map in the site's own coordinate system. You can cut sections through it at any angle or along a tunnel or road alignment. It runs in the browser on a computer, tablet or phone. There is nothing to install, and your data are not uploaded anywhere.
 
