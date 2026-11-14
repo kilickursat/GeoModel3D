@@ -212,6 +212,24 @@ A section can follow a line instead of running straight: a tunnel, a road, a rai
 
 Boreholes and CPTs within the section's reach of the line are projected onto it at their nearest point; those beyond its ends are left out. The profile is exact, as a straight section is: it has a sample wherever the line crosses an edge of the triangulation and at each point of the line, so the horizons are linear between samples. A straight line gives exactly the straight section, and the tests hold it to that. Where a line leaves the model and comes back, the profile has a gap, which the report names.
 
+### Corridor dashboard
+
+With a project that has alignments, choose **Corridor** on the Section bar. It uses the selected alignment, or the first project alignment while the section is Straight. On a phone, open the **Section** sheet first. The dashboard pins the displayed model, alignment and design levels when opened; unfinished input edits are excluded.
+
+Choose the station spacing and optional cover/distance screens, then **Run dashboard**. The cover screen starts at 5 m and the nearest-log distance screen at 100 m, shown in the controls; clear a threshold to disable that screen. These are user settings, not limits from a design standard. Changing settings removes the earlier results and disables their CSV until rerun.
+
+The dashboard shows:
+
+- a shared elevation plot for ground, groundwater, design top and available design bottom;
+- sampled cover (**ground − design top**) and water head (**water − design top**), in metres;
+- the units at design top and bottom, or explicit above-ground/below-model positions;
+- the nearest borehole or CPT layer log actually used by the geological model, with horizontal distance;
+- station flags for missing coverage/design/water, design levels outside the model, water above design, and the selected cover/distance screens.
+
+Select a station to inspect it, or **View at chainage** to move the existing model's alignment marker there. **Download corridor CSV** preserves station values, flags, settings, alignment geometry/design, snapshot time, engine version and scenario label where available. Cancel or close stops the worker. The dashboard runs locally and in the standalone HTML.
+
+The station list retains alignment ends, vertices, design knots and model entry/exit boundaries, with explicit gaps. Work is limited to 2,001 stations and regular spacing may be increased, as reported. Supplied chainages are retained even if their scale differs from the line's physical length. Results and extrema describe the sampled stations; hazards and extrema between them can be missed. Counts are station counts, not percentages of route length. Groundwater head is an elevation difference, not pressure or a flow calculation. A short distance to a used log does not measure confidence, and being inside a model with an extended margin does not establish observation support. Use common horizontal and height datums for the model and design.
+
 ## Cone penetration tests
 
 CPTs come with the boreholes or are added to the site shown, from the files above. The Maasvlakte site has 26 BRO CPTs.

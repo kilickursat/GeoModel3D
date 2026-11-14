@@ -245,7 +245,7 @@ body[data-drawing="on"] .notice{display:none}
   .section-control input[type=range]{min-width:48px}
   .section-control .step-pick span,.section-control .field-pick>span{display:none}
 }
-@media (max-width:960px) and (min-width:901px) and (min-height:521px),(max-width:960px) and (min-width:901px) and (pointer:fine){
+@media (max-width:1050px) and (min-width:901px) and (min-height:521px),(max-width:1050px) and (min-width:901px) and (pointer:fine){
   .section-control label:has(input[type=range])>span,.section-control .step-pick{display:none}
 }
 
@@ -531,7 +531,7 @@ body[data-mode="input"] :is(.panel,.section-control,.section-view,.view-menu,.no
   .section-control .bar-title,.section-control .bar-gap,.section-control .bar-export,.section-control>.panel-toggle{display:none}
   .section-control label,.section-control .line-pick,.section-control .field-pick,.section-control .step-pick{flex:none;max-width:none;min-height:46px;gap:12px}
   .section-control label:has(input[type=range]){flex:none;max-width:none}
-  .section-control .cross-here{padding:10px 14px;font-size:14px;text-align:center}
+  .section-control .cross-here,.section-control .corridor-open{padding:10px 14px;font-size:14px;text-align:center}
   .section-control label>span{flex:none;width:76px}
   .section-control .cut-pick>span,.section-control .flip-pick>span{width:auto}
   .section-control input[type=range]{min-width:0;height:30px}

@@ -24,6 +24,7 @@ import {reportHtml} from "./report";
 import {createInputWorkspace,InputModelContext} from "./input";
 import {parseWorkspace} from "./workspace";
 import {showEvidence} from "./evidenceView";
+import {showCorridor} from "./corridorView";
 import {agreement,askAgreement,withdrawAgreement} from "./agreement";
 import {loadReader} from "./reader";
 import {modelCacheSize,removeModelCache} from "./modelcache";
@@ -937,7 +938,7 @@ addEventListener("pointerdown",e=>{
   if(!t.closest(".view-menu"))openViewMenu(false);
   for(const d of document.querySelectorAll<HTMLDetailsElement>("details.menu[open]"))if(!d.contains(t))d.open=false;
 });
-addEventListener("keydown",e=>{if(e.key==="Escape"){openViewMenu(false);for(const d of document.querySelectorAll<HTMLDetailsElement>("details.menu[open]"))d.open=false}});
+addEventListener("keydown",e=>{if(!e.defaultPrevented&&e.key==="Escape"){openViewMenu(false);for(const d of document.querySelectorAll<HTMLDetailsElement>("details.menu[open]"))d.open=false}});
 
 const controlsBar=document.createElement("div");
 controlsBar.className="section-control";
@@ -948,8 +949,9 @@ controlsBar.innerHTML=`${sheetHead("Section",'<button class="panel-toggle" aria-
 <label class="line-pick" title="A straight section, or one along a line such as a tunnel or road"><select class="line-select" aria-label="Section line"></select></label>
 <label class="straight-only" title="Direction of the section, clockwise from north"><span>Direction</span><input type="range" class="azimuth" min="0" max="179" step="1"><output class="azimuth-out"></output></label>
 <label class="straight-only" title="Position of the section across the model"><span>Position</span><input type="range" class="offset" step="1"><output class="offset-out"></output></label>
-<label class="along-only"><span>Chainage</span><input type="range" class="chainage" step="any"><output class="chainage-out"></output></label>
+<label class="along-only"><span>Chainage</span><input type="range" class="chainage" aria-label="Chainage" step="any"><output class="chainage-out"></output></label>
 <button class="along-only cross-here" title="A straight section square to the line at this chainage">Cross-section</button>
+<button class="corridor-open" title="Open the corridor dashboard for the selected line, or the first project alignment">Corridor</button>
 <label class="along-only step-pick"><span>Table</span><select class="table-step" aria-label="Table by chainage, a row every">${[1,2,5,10,20,25,50,100].map(v=>`<option value="${v}"${v===10?" selected":""}>every ${v} m</option>`).join("")}</select></label>
 <label class="field-pick"><span>Colour</span><select class="field-select" aria-label="Colour the section by"></select></label>
 <label class="cut-pick straight-only" title="Removes the part of the model in front of the section"><input type="checkbox" data-view="cut"><span>Cut</span></label>
@@ -1065,7 +1067,7 @@ dock.addEventListener("click",e=>{
 });
 siteName.onclick=()=>setSheet(sheetOpen()==="site"?"":"site");
 app.addEventListener("click",e=>{if((e.target as Element).closest(".sheet-close"))setSheet("")});
-addEventListener("keydown",e=>{if(e.key==="Escape"&&compact()&&sheetOpen())setSheet("")});
+addEventListener("keydown",e=>{if(!e.defaultPrevented&&e.key==="Escape"&&compact()&&sheetOpen())setSheet("")});
 // A sheet from the bottom follows a finger that pulls its title down, and closes when let go far enough down.
 app.addEventListener("pointerdown",e=>{
   const head=(e.target as Element).closest(".sheet-head"),sheet=sheetElement();
@@ -1249,6 +1251,7 @@ function syncControls(){
   controlsBar.dataset.line=along;
   sectionView.dataset.line=along;
   toolbar.dataset.line=along;
+  controlsBar.querySelector<HTMLButtonElement>(".corridor-open")!.hidden=!(project.alignments?.length);
   if(line){
     const ch=chainages(line),c0=ch[0],c1=ch[ch.length-1];
     view.chainage=Math.min(Math.max(view.chainage,c0),c1);
@@ -1795,6 +1798,18 @@ controlsBar.querySelector<HTMLButtonElement>(".cross-here")!.onclick=()=>{
   faceAcross({x:c.x-dir.x,y:c.y-dir.y},{x:c.x+dir.x,y:c.y+dir.y},c);
   renderLineOptions();syncControls();updateSection();
 };
+controlsBar.querySelector<HTMLButtonElement>(".corridor-open")!.onclick=()=>{
+  const pinnedProject=project,line=lineOf()??project.alignments?.[0];
+  if(!line)return;
+  const index=project.alignments!.indexOf(line);
+  showCorridor(project,line,{download,projectLabel:workspaceContext?.name,engineVersion:pkg.version,initialStep:view.step,
+    onSelectChainage:chainage=>{
+      if(project!==pinnedProject||project.alignments?.[index]!==line){
+        showNotice("Corridor snapshot",["The displayed project changed while the dashboard was open. Open its corridor dashboard again to move the marker."],true);return;
+      }
+      showLine(index);view.chainage=chainage;syncControls();placeMarker();renderSectionPanel();
+    }});
+};
 controlsBar.querySelector<HTMLSelectElement>(".table-step")!.onchange=e=>{view.step=Number((e.target as HTMLSelectElement).value)};
 sectionView.querySelector<HTMLButtonElement>(".close")!.onclick=()=>{view.panel=false;syncControls()};
 
@@ -1959,7 +1974,7 @@ drawBar.querySelector<HTMLButtonElement>(".draw-top")!.onclick=viewFromAbove;
 drawBar.querySelector<HTMLButtonElement>(".draw-cancel")!.onclick=cancelDraw;
 drawBar.querySelector<HTMLButtonElement>(".draw-done")!.onclick=finishDraw;
 addEventListener("keydown",e=>{
-  if(!drawing||(e.target as Element|null)?.closest?.("input,select,textarea"))return;
+  if(e.defaultPrevented||!drawing||(e.target as Element|null)?.closest?.("input,select,textarea"))return;
   if(e.key==="Escape")cancelDraw();
   else if(e.key==="Enter")finishDraw();
   else if(e.key==="Backspace"||e.key==="Delete")undoDraw();

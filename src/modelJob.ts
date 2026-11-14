@@ -10,8 +10,8 @@ function calculationProject(project:GeoProject):GeoProject{
 }
 export interface ModelJob<T> { result:Promise<T>;cancel():void }
 
-// One pinned pair per worker. Both views share termination, cancellation and structured-clone error handling.
-export function createModelJob<T>(makeWorker:()=>Worker,before:GeoProject,after:GeoProject,options:unknown,label:string):ModelJob<T>{
+// Each view shares termination, cancellation and structured-clone error handling.
+function workerJob<T>(makeWorker:()=>Worker,message:()=>unknown,label:string):ModelJob<T>{
   let worker:Worker|undefined,settled=false,rejectJob:(reason:unknown)=>void=()=>{};
   const finish=()=>{settled=true;worker?.terminate()};
   const result=new Promise<T>((resolve,reject)=>{
@@ -32,11 +32,18 @@ export function createModelJob<T>(makeWorker:()=>Worker,before:GeoProject,after:
         if(settled)return;
         finish();reject(new Error(`The ${label} result could not be read.`));
       };
-      worker.postMessage({before:calculationProject(before),after:calculationProject(after),options});
+      worker.postMessage(message());
     }catch(error){finish();reject(error)}
   });
   return {result,cancel(){
     if(settled)return;
     finish();rejectJob(new DOMException(`${label} cancelled.`,"AbortError"));
   }};
+}
+
+export function createModelJob<T>(makeWorker:()=>Worker,before:GeoProject,after:GeoProject,options:unknown,label:string):ModelJob<T>{
+  return workerJob(makeWorker,()=>({before:calculationProject(before),after:calculationProject(after),options}),label);
+}
+export function createProjectJob<T>(makeWorker:()=>Worker,project:GeoProject,options:unknown,label:string):ModelJob<T>{
+  return workerJob(makeWorker,()=>({project:calculationProject(project),options}),label);
 }

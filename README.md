@@ -23,6 +23,7 @@ GeoModel3D builds a layered ground model from borehole logs and cone penetration
 - Builds the model from boreholes, CPTs or both: horizons between the boreholes and a closed volume for each unit. One borehole is enough to start.
 - Reads borehole logs from PDF reports and images on your device, logs drawn with a depth scale or set out as tables, scanned pages included. You check each value beside the page it was read from before it is used.
 - Cuts sections at any direction and position, or along an alignment from LandXML, CSV, GeoJSON or DXF, or drawn on the model. Along a line it gives a table by chainage with the cover and the units at the crown and invert.
+- Screens an alignment in a corridor dashboard: sampled cover, groundwater head, design-level units and distance to the logs used by the model, with explicit unknowns and a CSV.
 - Shows groundwater, σv, u, σ′v and σ′h on sections, and interpolates laboratory and in-situ results within each unit.
 - Classifies CPTs by Robertson's soil behaviour type (2009). Their layers can build the model alongside the boreholes.
 - Gives active, at-rest and passive earth pressures (Rankine) down a borehole of your own case.

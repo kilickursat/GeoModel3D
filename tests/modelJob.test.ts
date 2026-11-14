@@ -1,5 +1,5 @@
 import {describe,it,expect} from "vitest";
-import {createModelJob} from "../src/modelJob";
+import {createModelJob,createProjectJob} from "../src/modelJob";
 import type {GeoProject} from "../src/schema";
 
 class TestWorker {
@@ -41,6 +41,16 @@ describe("numerical worker jobs",()=>{
     job.cancel();worker.onmessage!({data:{type:"result",value:"late"}} as MessageEvent);
     await expect(job.result).rejects.toMatchObject({name:"AbortError"});
     expect(worker.terminated).toBe(true);job.cancel();
+  });
+
+  it("runs single-project dashboards without duplicating source data and can cancel them",async()=>{
+    const worker=new TestWorker(),options={alignment:{name:"Survey",points:[{x:0,y:0},{x:10,y:0}]},settings:{step:5}};
+    const job=createProjectJob(()=>worker.worker(),project,options,"dashboard");
+    expect(worker.message.project.groundwater).toEqual(project.groundwater);
+    expect(worker.message.project.boreholes[0].intervals[0].evidenceId).toBeUndefined();
+    expect(worker.message.before).toBeUndefined();expect(worker.message.after).toBeUndefined();
+    expect(worker.message.options).toEqual(options);
+    job.cancel();await expect(job.result).rejects.toMatchObject({name:"AbortError"});expect(worker.terminated).toBe(true);
   });
 
   it("terminates and reports scientific calculation and browser worker failures",async()=>{
