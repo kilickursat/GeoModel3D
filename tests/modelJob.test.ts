@@ -1,5 +1,5 @@
 import {describe,it,expect} from "vitest";
-import {createModelJob,createProjectJob} from "../src/modelJob";
+import {createModelJob,createProjectJob,createProjectsJob} from "../src/modelJob";
 import type {GeoProject} from "../src/schema";
 
 class TestWorker {
@@ -51,6 +51,19 @@ describe("numerical worker jobs",()=>{
     expect(worker.message.before).toBeUndefined();expect(worker.message.after).toBeUndefined();
     expect(worker.message.options).toEqual(options);
     job.cancel();await expect(job.result).rejects.toMatchObject({name:"AbortError"});expect(worker.terminated).toBe(true);
+  });
+
+  it("keeps all selected interpretation inputs and excludes source pages from ensemble workers",async()=>{
+    const source={...structuredClone(project),evidence:{largePage:"private page"}} as unknown as GeoProject;
+    const alternative=structuredClone(source);alternative.name="Alternative";alternative.boreholes[0].water=[{depth:3}];
+    const originals=structuredClone([source,alternative]),worker=new TestWorker();
+    const job=createProjectsJob(()=>worker.worker(),[source,alternative],{unitId:"sand"},"disagreement");
+    expect(worker.message.projects).toHaveLength(2);
+    expect(worker.message.projects.every((p:any)=>p.evidence===undefined&&p.boreholes[0].evidenceId===undefined)).toBe(true);
+    expect(worker.message.projects[0].boreholes[0].water[0].depth).toBe(2);
+    expect(worker.message.projects[1].boreholes[0].water[0].depth).toBe(3);
+    expect([source,alternative]).toEqual(originals);
+    job.cancel();await expect(job.result).rejects.toMatchObject({name:"AbortError"});
   });
 
   it("terminates and reports scientific calculation and browser worker failures",async()=>{

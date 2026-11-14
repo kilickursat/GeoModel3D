@@ -2,31 +2,38 @@
 // they never enter the ground model as observations or imply a quantified reduction in geological uncertainty.
 import type {Alignment,GeoProject} from "./schema";
 import {analyzeCorridor,CorridorFlag,CorridorLog,CorridorReport,CorridorStation} from "./corridor";
+import {DisagreementCase,prepareDisagreementModels,sampleDisagreement} from "./disagreement";
 import {toCsv} from "./io";
 
+export interface InvestigationDisagreementContext { cases:DisagreementCase[];unitId:string }
 export interface InvestigationOptions {
   step?:number;budget?:number;minSpacing?:number;includeOutside?:boolean;prioritizeFlags?:boolean;
   depthBelowDesign?:number;minCover?:number;maxSupportDistance?:number;maxSamples?:number;
+  disagreementContext?:InvestigationDisagreementContext;prioritizeDisagreement?:boolean;
 }
 export type InvestigationLog=CorridorLog;
-export type InvestigationExclusion="outside-model"|"near-recorded"|"duplicate-location";
+export type InvestigationExclusion="outside-model"|"near-recorded"|"duplicate-location"|"missing-disagreement";
+export interface InvestigationModelRange { unitId:string;min:number;max:number;width:number;count:number;total:number;caseIds:string[] }
 export interface InvestigationCandidate {
   stationIndex:number;eligible:boolean;exclusion?:InvestigationExclusion;nearestRecordedDistance?:number;
+  missingCaseIds?:string[];
 }
 export interface InvestigationProposal extends CorridorStation {
   id:string;rank:number;stationIndex:number;baselineDistance?:number;planningDistance?:number;nearestRecordedDistance?:number;
   reasons:string[];proposedDepth?:number;targetElevation?:number;targetReference?:"design-bottom"|"design-top";
   terminationElevation?:number;belowModel?:boolean;
+  modelRange?:InvestigationModelRange;
 }
 export interface InvestigationPlan {
   format:"geomodel3d-investigation-plan";version:1;projectName:string;
   crs?:{name?:string;code?:string;proj4?:string};alignment:Alignment;
   options:{step:number;budget:number;minSpacing:number;includeOutside:boolean;prioritizeFlags:boolean;maxSamples:number;
-    depthBelowDesign?:number;minCover?:number;maxSupportDistance?:number};
+    depthBelowDesign?:number;minCover?:number;maxSupportDistance?:number;prioritizeDisagreement?:boolean};
+  disagreement?:{unitId:string;caseIds:string[];caseLabels:string[]};
   corridor:CorridorReport;recordedLogs:InvestigationLog[];usedLogs:InvestigationLog[];
   candidates:InvestigationCandidate[];proposals:InvestigationProposal[];
   summary:{stationCount:number;eligibleCount:number;excludedOutside:number;excludedRecorded:number;excludedDuplicate:number;
-    excludedByProposals:number;proposedCount:number;budgetShortfall:number;maxGapBefore?:number;maxGapAfter?:number};
+    excludedByProposals:number;proposedCount:number;budgetShortfall:number;maxGapBefore?:number;maxGapAfter?:number;excludedDisagreement?:number};
   notes:string[];
 }
 const finite=(n:unknown):n is number=>typeof n==="number"&&Number.isFinite(n);
@@ -42,28 +49,48 @@ function nearest(point:{x:number;y:number},points:Array<{x:number;y:number}>):nu
 function maximum(values:Array<number|undefined>):number|undefined{
   return values.length&&values.every(finite)?values.reduce((a,b)=>Math.max(a,b),0):undefined;
 }
+// Canonical comparison excludes only source evidence, which numerical workers deliberately leave out. Keep all
+// modelling fields, sequences and assumptions so a context from another snapshot cannot silently rank this one.
+function snapshotIdentity(project:GeoProject):string{
+  const clean=(value:unknown):unknown=>Array.isArray(value)?value.map(clean):value&&typeof value==="object"
+    ?Object.fromEntries(Object.entries(value).filter(([key,v])=>v!==undefined&&key!=="evidence"&&key!=="evidenceId").sort(([a],[b])=>a.localeCompare(b)).map(([key,v])=>[key,clean(v)])):value;
+  return JSON.stringify(clean(project));
+}
 
 export function planInvestigation(project:GeoProject,alignment:Alignment,options:InvestigationOptions={}):InvestigationPlan{
-  const budget=options.budget??5,minSpacing=options.minSpacing??20,includeOutside=options.includeOutside??false,prioritizeFlags=options.prioritizeFlags??false;
+  const budget=options.budget??5,minSpacing=options.minSpacing??20,includeOutside=options.includeOutside??false,prioritizeFlags=options.prioritizeFlags??false,prioritizeDisagreement=options.prioritizeDisagreement??false;
   if(!Number.isInteger(budget)||budget<1||budget>50)throw new Error("The location budget must be an integer from 1 to 50.");
   if(!finite(minSpacing)||minSpacing<0)throw new Error("Minimum location spacing must be a finite nonnegative number of metres.");
-  if(typeof includeOutside!=="boolean"||typeof prioritizeFlags!=="boolean")throw new Error("Outside-model and flagged-station choices must be boolean.");
+  if(typeof includeOutside!=="boolean"||typeof prioritizeFlags!=="boolean"||typeof prioritizeDisagreement!=="boolean")throw new Error("Outside-model and priority choices must be boolean.");
+  if(prioritizeFlags&&prioritizeDisagreement)throw new Error("Choose either screening-flag priority or model-disagreement priority.");
+  const context=prioritizeDisagreement?options.disagreementContext:undefined;
+  if(prioritizeDisagreement&&(!context||!Array.isArray(context.cases)||typeof context.unitId!=="string"||!context.unitId.trim()))throw new Error("Model-disagreement priority needs selected saved cases and a contact.");
+  if(context&&(!context.cases[0]?.project||snapshotIdentity(project)!==snapshotIdentity(context.cases[0].project)))throw new Error("The disagreement reference snapshot must match the project being planned. Reopen analysis for the current project.");
+  if(context&&!project.units.some(unit=>unit.id===context.unitId))throw new Error("The selected disagreement contact is absent from the reference project.");
+  const disagreementModels=context?prepareDisagreementModels(context.cases):undefined;
+  const ranges=new Map<number,InvestigationModelRange>();
   if(options.depthBelowDesign!==undefined&&(!finite(options.depthBelowDesign)||options.depthBelowDesign<0))throw new Error("Depth below design must be finite and nonnegative.");
   for(const [kind,logs] of [["borehole",project.boreholes],["CPT",project.cpts??[]]] as const){
     if(new Set(logs.map(log=>log.id)).size!==logs.length)throw new Error(`${kind} IDs must be unique for an investigation plan.`);
   }
-  const corridor=analyzeCorridor(project,alignment,options),recordedLogs:InvestigationLog[]=[
-    ...project.boreholes.map(({id,x,y})=>({id,x,y,kind:"borehole" as const})),
-    ...(project.cpts??[]).map(({id,x,y})=>({id,x,y,kind:"cpt" as const}))
-  ].filter(log=>finite(log.x)&&finite(log.y));
+  const corridor=analyzeCorridor(project,alignment,options),recorded=new Map<string,InvestigationLog>();
+  for(const source of context?context.cases.map(c=>c.project):[project])for(const log of [
+    ...source.boreholes.map(({id,x,y})=>({id,x,y,kind:"borehole" as const})),
+    ...(source.cpts??[]).map(({id,x,y})=>({id,x,y,kind:"cpt" as const}))
+  ])if(finite(log.x)&&finite(log.y))recorded.set(JSON.stringify([log.kind,log.id,log.x,log.y]),log);
+  const recordedLogs=[...recorded.values()];
   const usedLogs=structuredClone(corridor.usedLogs),seen:Array<{x:number;y:number}>=[];
   const candidates=corridor.stations.map((station,stationIndex):InvestigationCandidate=>{
-    const d=nearest(station,recordedLogs);let exclusion:InvestigationExclusion|undefined;
+    const d=nearest(station,recordedLogs);let exclusion:InvestigationExclusion|undefined,missingCaseIds:string[]|undefined;
     if(!includeOutside&&!station.inside)exclusion="outside-model";
     else if(d!==undefined&&tooClose(d,minSpacing))exclusion="near-recorded";
     else if(seen.some(previous=>distance(previous,station)<=coincident))exclusion="duplicate-location";
-    else seen.push(station);
-    return {stationIndex,eligible:!exclusion,...(exclusion?{exclusion}:{}),...(d===undefined?{}:{nearestRecordedDistance:d})};
+    else if(context&&disagreementModels){
+      const sampled=sampleDisagreement(disagreementModels,station.x,station.y,context.unitId);
+      if(!sampled.complete||!finite(sampled.min)||!finite(sampled.max)||!finite(sampled.width)){exclusion="missing-disagreement";missingCaseIds=sampled.missingCaseIds.slice()}
+      else {ranges.set(stationIndex,{unitId:context.unitId,min:sampled.min,max:sampled.max,width:sampled.width,count:sampled.count,total:sampled.total,caseIds:context.cases.map(c=>c.id)});seen.push(station)}
+    }else seen.push(station);
+    return {stationIndex,eligible:!exclusion,...(exclusion?{exclusion}:{}),...(d===undefined?{}:{nearestRecordedDistance:d}),...(missingCaseIds?{missingCaseIds}:{})};
   });
   const eligible=candidates.filter(c=>c.eligible),proposals:InvestigationProposal[]=[],selected=new Set<number>();
   const planningDistance=(station:CorridorStation)=>{
@@ -82,6 +109,10 @@ export function planInvestigation(project:GeoProject,alignment:Alignment,options
       const d=planningDistance(station);
       if(!best){best=candidate;bestDistance=d;continue}
       const first=corridor.stations[best.stationIndex];
+      if(disagreementModels){
+        const width=ranges.get(candidate.stationIndex)!.width,firstWidth=ranges.get(best.stationIndex)!.width;
+        if(Math.abs(width-firstWidth)>tolerance){if(width>firstWidth){best=candidate;bestDistance=d}continue}
+      }
       if(prioritizeFlags&&flagged(station)!==flagged(first)){
         if(flagged(station)){best=candidate;bestDistance=d}continue;
       }
@@ -94,15 +125,17 @@ export function planInvestigation(project:GeoProject,alignment:Alignment,options
     }
     if(!best)break;
     const station=corridor.stations[best.stationIndex],rank=proposals.length+1,baselineDistance=station.nearestLog?.distance,reasons:string[]=[];
+    const modelRange=ranges.get(best.stationIndex);
+    if(modelRange)reasons.push(`Largest remaining complete selected-interpretation range: ${modelRange.width.toFixed(2)} m for contact ${modelRange.unitId}, from all ${modelRange.total} selected cases.`);
     if(prioritizeFlags&&flagged(station))reasons.push(`Flagged stations were prioritized: ${station.flags.filter(f=>priorityFlags.has(f)).join(", ")}.`);
     reasons.push(bestDistance===undefined?"No used logs provide a baseline distance. The first geometric seed is nearest the alignment's chainage midpoint.":
-      `Largest remaining distance to used logs and earlier proposed sites: ${bestDistance.toFixed(2)} m.`);
+      `${modelRange?"Distance to used logs and earlier proposals, used to break range ties":"Largest remaining distance to used logs and earlier proposed sites"}: ${bestDistance.toFixed(2)} m.`);
     if(baselineDistance!==undefined)reasons.push(`Nearest used baseline log is ${baselineDistance.toFixed(2)} m away in plan.`);
     if(!station.inside)reasons.push("Outside the existing model: ground, geological predictions and proposed depth are unavailable.");
     let id=`Proposed-${String(rank).padStart(2,"0")}`;while(occupiedIds.has(id))id+="-plan";occupiedIds.add(id);
     const proposal:InvestigationProposal={...structuredClone(station),id,rank,stationIndex:best.stationIndex,
       ...(baselineDistance===undefined?{}:{baselineDistance}),...(bestDistance===undefined?{}:{planningDistance:bestDistance}),
-      ...(best.nearestRecordedDistance===undefined?{}:{nearestRecordedDistance:best.nearestRecordedDistance}),reasons};
+      ...(best.nearestRecordedDistance===undefined?{}:{nearestRecordedDistance:best.nearestRecordedDistance}),reasons,...(modelRange?{modelRange:structuredClone(modelRange)}:{})};
     if(options.depthBelowDesign!==undefined){
       const target=station.bottom??station.top;
       if(station.inside&&station.ground!==undefined&&target!==undefined){
@@ -130,18 +163,22 @@ export function planInvestigation(project:GeoProject,alignment:Alignment,options
     options.includeOutside?"Outside-model candidate stations were explicitly permitted; no extrapolated ground, geology or depth is supplied there.":"Candidates outside the existing model were excluded. Model coverage can include an inferred margin and does not establish observation support.",
     prioritizeFlags?"Stations with low-cover, water-above-design, above-ground, below-model or distant-support flags are considered before other eligible stations, then by the same distance rule. Missing-data flags do not create an assumed hazard severity.":"Screening flags are shown as context and do not change the default distance ranking.",
     options.depthBelowDesign===undefined?"No depth buffer was supplied, so no proposed drilling depth is given.":`Optional proposed depth is model ground minus design bottom (or design top if no bottom) plus ${options.depthBelowDesign} m, only where that gives positive below-ground penetration. Ground and design must share a vertical datum; this is a geometric target, not a prescribed investigation depth.`];
+  if(context)notes.push(`Model-disagreement priority ranks the complete min/max elevation range for contact ${context.unitId} at each exact candidate coordinate, then uses the existing gap rule for ties. All selected cases must provide that contact; missing ranges are excluded, while a complete zero-width range remains valid.`,
+    "In disagreement mode, physical spacing excludes recorded borehole/CPT positions from every selected case. Repeated kind, ID and XY records are merged; moved records retain both positions. The baseline gap still uses only logs admitted to the reference model.",
+    "Selected-interpretation spread is not a calibrated probability, measured prediction error or expected reduction in uncertainty. Proposed sites do not change the model range or the observations. Source projects are retained in their saved revisions, not copied into this plan.");
   if(!usedLogs.length)notes.push("No used baseline logs exist. The first candidate is seeded at the chainage midpoint; baseline maximum gap is unavailable. Any later finite gap is hypothetical spacing only, with no finite baseline improvement claim.");
-  if(!eligible.length)notes.push("No eligible candidate locations remain after model-coverage, recorded-collar spacing and duplicate-position exclusions.");
+  if(!eligible.length)notes.push(`No eligible candidate locations remain after model-coverage, recorded-collar spacing, duplicate-position${context?" and selected-range availability":""} exclusions.`);
   if(proposals.length<budget)notes.push(`Only ${proposals.length} of ${budget} requested locations fit the candidate grid and spacing rules. Reduce spacing, adjust the candidate grid or explicitly allow outside-model locations to explore alternatives.`);
   notes.push(...corridor.notes.map(note=>`Corridor: ${note}`));
   const crs=project.crs||project.crsCode||project.crsProj4?{...(project.crs?{name:project.crs}:{}),...(project.crsCode?{code:project.crsCode}:{}),...(project.crsProj4?{proj4:project.crsProj4}:{})}:undefined;
   return {format:"geomodel3d-investigation-plan",version:1,projectName:project.name,...(crs?{crs}:{}),alignment:structuredClone(alignment),
     options:{step:corridor.options.step,budget,minSpacing,includeOutside,prioritizeFlags,maxSamples:corridor.options.maxSamples,
-      ...(options.depthBelowDesign===undefined?{}:{depthBelowDesign:options.depthBelowDesign}),...(options.minCover===undefined?{}:{minCover:options.minCover}),...(options.maxSupportDistance===undefined?{}:{maxSupportDistance:options.maxSupportDistance})},
+      ...(options.depthBelowDesign===undefined?{}:{depthBelowDesign:options.depthBelowDesign}),...(options.minCover===undefined?{}:{minCover:options.minCover}),...(options.maxSupportDistance===undefined?{}:{maxSupportDistance:options.maxSupportDistance}),...(context?{prioritizeDisagreement:true}:{})},
+    ...(context?{disagreement:{unitId:context.unitId,caseIds:context.cases.map(c=>c.id),caseLabels:context.cases.map(c=>c.label??c.project.name)}}:{}),
     corridor,recordedLogs,usedLogs,candidates,proposals,
     summary:{stationCount:candidates.length,eligibleCount:eligible.length,excludedOutside:candidates.filter(c=>c.exclusion==="outside-model").length,
       excludedRecorded:candidates.filter(c=>c.exclusion==="near-recorded").length,excludedDuplicate:candidates.filter(c=>c.exclusion==="duplicate-location").length,
-      excludedByProposals,proposedCount:proposals.length,budgetShortfall:budget-proposals.length,...(before===undefined?{}:{maxGapBefore:before}),...(after===undefined?{}:{maxGapAfter:after})},notes};
+      excludedByProposals,proposedCount:proposals.length,budgetShortfall:budget-proposals.length,...(before===undefined?{}:{maxGapBefore:before}),...(after===undefined?{}:{maxGapAfter:after}),...(context?{excludedDisagreement:candidates.filter(c=>c.exclusion==="missing-disagreement").length}:{})},notes};
 }
 
 export function investigationCsv(plan:InvestigationPlan):string{
@@ -150,5 +187,10 @@ export function investigationCsv(plan:InvestigationPlan):string{
   const o=plan.options,s=plan.summary,metadata=[plan.projectName,plan.alignment.name,o.budget,o.minSpacing,o.step,plan.corridor.range.actualStep,String(o.includeOutside),String(o.prioritizeFlags),o.depthBelowDesign,o.minCover,o.maxSupportDistance,o.maxSamples,s.eligibleCount,s.budgetShortfall,s.maxGapBefore,s.maxGapAfter,JSON.stringify(plan.crs??{}),JSON.stringify(plan.alignment.points),plan.corridor.range.start,JSON.stringify(plan.alignment.design??[]),JSON.stringify(plan.notes)];
   const rows=plan.proposals.map(p=>[p.id,p.rank,p.chainage,p.x,p.y,String(p.inside),p.ground,p.top,p.bottom,p.cover,p.waterHead,p.nearestLog?.id,p.nearestLog?.kind,p.baselineDistance,p.nearestRecordedDistance,p.planningDistance,p.proposedDepth,p.targetElevation,p.targetReference,p.terminationElevation,p.belowModel===undefined?undefined:String(p.belowModel),p.flags.join(";"),JSON.stringify(p.reasons),...metadata]);
   if(!rows.length)rows.push([...Array(headers.length).fill(""),...metadata]);
-  return toCsv([[...headers,...metadataNames],...rows]);
+  const priorityNames=["ranking_method","disagreement_contact_id","disagreement_case_ids","disagreement_case_labels","excluded_missing_disagreement","model_range_min_m","model_range_max_m","model_range_width_m","model_range_count","model_range_total"];
+  return toCsv([[...headers,...metadataNames,...priorityNames],...rows.map((row,index)=>{
+    const range=plan.proposals[index]?.modelRange;
+    return [...row,o.prioritizeDisagreement?"selected-interpretation-range":o.prioritizeFlags?"screening-flags":"coverage-gap",plan.disagreement?.unitId,
+      ...(plan.disagreement?[JSON.stringify(plan.disagreement.caseIds),JSON.stringify(plan.disagreement.caseLabels)]:[undefined,undefined]),s.excludedDisagreement,range?.min,range?.max,range?.width,range?.count,range?.total];
+  })]);
 }

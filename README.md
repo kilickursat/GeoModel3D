@@ -25,10 +25,12 @@ GeoModel3D builds a layered ground model from borehole logs and cone penetration
 - Cuts sections at any direction and position, or along an alignment from LandXML, CSV, GeoJSON or DXF, or drawn on the model. Along a line it gives a table by chainage with the cover and the units at the crown and invert.
 - Screens an alignment in a corridor dashboard: sampled cover, groundwater head, design-level units and distance to the logs used by the model, with explicit unknowns and a CSV.
 - Proposes additional investigation locations along an alignment from sampled coverage gaps, a location-count budget and physical spacing. Export the plan without changing measured boreholes.
+- Can prioritize investigation candidates by complete model disagreement at their exact coordinates, preserving spacing and recorded-collar exclusions across the selected interpretations.
 - Shows groundwater, σv, u, σ′v and σ′h on sections, and interpolates laboratory and in-situ results within each unit.
 - Classifies CPTs by Robertson's soil behaviour type (2009). Their layers can build the model alongside the boreholes.
 - Gives active, at-rest and passive earth pressures (Rankine) down a borehole of your own case.
 - Checks the model by leaving each borehole out and predicting it from the others, so you can see how far to trust it between boreholes.
+- Maps contact disagreement between selected saved interpretations and shows their min–max section ranges. Held-out location checks report observed range coverage and errors; ranges are not calibrated confidence intervals.
 - Reviews new boreholes against an earlier saved model: mapped forecast errors, signed model shifts, unit agreement, changed inputs and a revision-linked CSV.
 - Keeps source text, highlighted page previews and correction history with PDF-derived values. Inspect them from the input tables or a source-backed borehole in the model; changed values require a new acceptance.
 - Branches named scenarios with independent drafts and compares fixed revisions along the same section or alignment, with overlaid contacts, groundwater/stress differences and CSV output. Groundwater can follow observations, an assumed depth, or readings available as of a date.
@@ -93,7 +95,7 @@ GitHub's **Cite this repository** gives the reference from [CITATION.cff](CITATI
   author  = {Kilic, Kursat},
   title   = {GeoModel3D: 3D geological models from borehole logs and CPTs, in the browser},
   url     = {https://github.com/kilickursat/GeoModel3D},
-  version = {0.20.0},
+  version = {0.21.0},
   year    = {2026},
   license = {Apache-2.0}
 }

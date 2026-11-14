@@ -10,6 +10,7 @@ import {changeEvidenceField,acceptEvidenceField,evidenceRecord} from "./evidence
 import {showEvidence} from "./evidenceView";
 import {showComparison} from "./comparisonView";
 import {showDataImpact} from "./impactView";
+import {showDisagreement} from "./disagreementView";
 import {ImportResult,toProjectJson} from "./io";
 import {properties} from "./properties";
 import {buildGeologicalModel,GeoModel} from "./model";
@@ -244,7 +245,7 @@ export function createInputWorkspace(o:InputOptions):InputWorkspace{
 <button class="ws-scenario-create">Create scenario</button><button class="ws-scenario-rename">Rename scenario</button></div>
 <ul class="ws-scenario-list">${doc.scenarios.map(c=>`<li><b>${esc(c.name)}</b>${c.id===active.id?' <span class="ws-active">Selected</span>':""}<p>${esc(c.headRevisionId?label(c.headRevisionId):"No built revision yet")}</p>${c.fromRevisionId?`<small>Started from ${esc(label(c.fromRevisionId))}</small>`:""}</li>`).join("")}</ul>
 <h3>Compare saved revisions</h3><p>Choose two fixed revisions. Unbuilt edits are kept in their scenario but are excluded from this comparison. Both models use the same section or reference alignment.</p>
-<div class="ws-comparison-picks"><label>Before <select class="ws-compare-before" aria-label="Before revision"${revisions.length?"":" disabled"}>${options(compareBefore)}</select></label><label>After <select class="ws-compare-after" aria-label="After revision"${revisions.length?"":" disabled"}>${options(compareAfter)}</select></label><button class="ws-compare"${revisions.length?"":" disabled"}>Compare revisions</button><button class="ws-impact"${revisions.length?"":" disabled"}>Review new data</button></div><p>Review new data lists changed inputs and checks the before model's predictions against newly added borehole logs. Use section comparisons to inspect changes between the collars.</p></div>`;
+<div class="ws-comparison-picks"><label>Before <select class="ws-compare-before" aria-label="Before revision"${revisions.length?"":" disabled"}>${options(compareBefore)}</select></label><label>After <select class="ws-compare-after" aria-label="After revision"${revisions.length?"":" disabled"}>${options(compareAfter)}</select></label><button class="ws-compare"${revisions.length?"":" disabled"}>Compare revisions</button><button class="ws-impact"${revisions.length?"":" disabled"}>Review new data</button><button class="ws-disagreement"${revisions.length>=2?"":" disabled"}>Model disagreement</button></div><p>Review new data lists changed inputs and checks the before model's predictions against newly added borehole logs. Use section comparisons to inspect changes between the collars. Model disagreement maps and ranges require at least two saved revisions and include held-out contact checks.</p></div>`;
   }
   function waterDraft(){
     return t!.groundwaterDraft??{mode:"observed" as const,depth:"",date:"",includeUndated:false};
@@ -484,6 +485,11 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
         render();persist(true);
       }
       catch(error){message=(error as Error).message;status.textContent=message}
+      return;
+    }
+    if(workspaceDocument&&b.classList.contains("ws-disagreement")){
+      showDisagreement(workspaceDocument.revisions,{download:o.download,initialRevisionIds:[compareBefore,compareAfter],
+        scenarioLabels:Object.fromEntries(workspaceDocument.scenarios.map(s=>[s.id,s.name]))});
       return;
     }
     if(workspaceDocument&&(b.classList.contains("ws-compare")||b.classList.contains("ws-impact"))){

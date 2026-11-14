@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.21.0 — 2026-11-14
+
+### Added
+- Selected-interpretation disagreement maps and section contact ranges from two to six saved revisions, with complete-case coverage, stable unit matching and explicit missing results. Ranges describe the chosen interpretations rather than calibrated probabilities.
+- Held-out contact validation removes the reference observation and co-located logs from every selected interpretation before scoring. Empirical range coverage and prediction errors are reported separately for interior and extrapolated checks, with sampling limits and exclusions preserved in exports.
+- Investigation planning can prioritize complete contact disagreement at each exact candidate location while preserving physical spacing and recorded-collar exclusions. Proposals remain planning suggestions, with traceable source revisions and range metadata.
+- A release workflow builds and tests the exact version tag, verifies release metadata and artifact checksums, and attaches the standalone HTML and checksum using the ephemeral Actions token. Manual dispatch can repair an existing release's missing assets without replacing its notes or verified files.
+
 ## 0.20.0 — 2026-11-14
 
 ### Added
