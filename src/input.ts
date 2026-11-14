@@ -9,6 +9,7 @@ import {createWorkspaceStore} from "./storage";
 import {changeEvidenceField,acceptEvidenceField,evidenceRecord} from "./evidence";
 import {showEvidence} from "./evidenceView";
 import {showComparison} from "./comparisonView";
+import {showDataImpact} from "./impactView";
 import {ImportResult,toProjectJson} from "./io";
 import {properties} from "./properties";
 import {buildGeologicalModel,GeoModel} from "./model";
@@ -243,7 +244,7 @@ export function createInputWorkspace(o:InputOptions):InputWorkspace{
 <button class="ws-scenario-create">Create scenario</button><button class="ws-scenario-rename">Rename scenario</button></div>
 <ul class="ws-scenario-list">${doc.scenarios.map(c=>`<li><b>${esc(c.name)}</b>${c.id===active.id?' <span class="ws-active">Selected</span>':""}<p>${esc(c.headRevisionId?label(c.headRevisionId):"No built revision yet")}</p>${c.fromRevisionId?`<small>Started from ${esc(label(c.fromRevisionId))}</small>`:""}</li>`).join("")}</ul>
 <h3>Compare saved revisions</h3><p>Choose two fixed revisions. Unbuilt edits are kept in their scenario but are excluded from this comparison. Both models use the same section or reference alignment.</p>
-<div class="ws-comparison-picks"><label>Before <select class="ws-compare-before" aria-label="Before revision"${revisions.length?"":" disabled"}>${options(compareBefore)}</select></label><label>After <select class="ws-compare-after" aria-label="After revision"${revisions.length?"":" disabled"}>${options(compareAfter)}</select></label><button class="ws-compare"${revisions.length?"":" disabled"}>Compare revisions</button></div></div>`;
+<div class="ws-comparison-picks"><label>Before <select class="ws-compare-before" aria-label="Before revision"${revisions.length?"":" disabled"}>${options(compareBefore)}</select></label><label>After <select class="ws-compare-after" aria-label="After revision"${revisions.length?"":" disabled"}>${options(compareAfter)}</select></label><button class="ws-compare"${revisions.length?"":" disabled"}>Compare revisions</button><button class="ws-impact"${revisions.length?"":" disabled"}>Review new data</button></div><p>Review new data lists changed inputs and checks the before model's predictions against newly added borehole logs. Use section comparisons to inspect changes between the collars.</p></div>`;
   }
   function waterDraft(){
     return t!.groundwaterDraft??{mode:"observed" as const,depth:"",date:"",includeUndated:false};
@@ -485,9 +486,9 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
       catch(error){message=(error as Error).message;status.textContent=message}
       return;
     }
-    if(workspaceDocument&&b.classList.contains("ws-compare")){
+    if(workspaceDocument&&(b.classList.contains("ws-compare")||b.classList.contains("ws-impact"))){
       const before=workspaceDocument.revisions.find(r=>r.id===compareBefore),after=workspaceDocument.revisions.find(r=>r.id===compareAfter);
-      if(before&&after)showComparison(before,after,{download:o.download,beforeLabel:workspaceDocument.scenarios.find(c=>c.id===before.scenarioId)?.name,afterLabel:workspaceDocument.scenarios.find(c=>c.id===after.scenarioId)?.name});
+      if(before&&after)(b.classList.contains("ws-impact")?showDataImpact:showComparison)(before,after,{download:o.download,beforeLabel:workspaceDocument.scenarios.find(c=>c.id===before.scenarioId)?.name,afterLabel:workspaceDocument.scenarios.find(c=>c.id===after.scenarioId)?.name});
       return;
     }
     if(b.dataset.restore&&workspaceDocument){

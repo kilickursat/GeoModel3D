@@ -61,6 +61,18 @@ Differences are **after minus before**. Contacts are matched by unit ID, so chan
 
 Choose **Run comparison** after changing settings; earlier results and their CSV are invalidated. **Cancel** or closing the dialog stops its worker. The comparison runs locally and also works in the standalone HTML without downloading another script.
 
+### New-data impact review
+
+Choose the same **Before** and **After** saved revisions under **Scenarios**, then **Review new data**. Choose the earlier interpretation as Before. **Run impact review** lists added, removed, modified and unchanged borehole/CPT IDs. It compares new borehole IDs in After with the model built entirely from Before. Changing an existing borehole ID is reported as a removal and an addition; the app cannot establish their physical identity. Added IDs at a collar already used by the earlier model are flagged and excluded from forecast scoring.
+
+The collar map and ranked borehole table highlight the largest available contact forecast errors. Select a borehole to inspect its actual logged contacts, the before model's predicted elevations and the updated model's elevations at the same coordinates. **Prediction error = before prediction − newly logged elevation**; **model shift = after − before**. These signs answer different questions. An error of +2 m means the earlier model put the contact 2 m above the newly logged contact.
+
+Unit agreement reports matching metres over the logged depth covered by the earlier model, alongside total logged metres. Missing coverage is excluded from the compared length. Contacts are paired by stable unit ID. Gaps, partial starts and inferred contacts are not counted as observed boundaries. Outside the earlier model's footprint, predictions remain unavailable; its extent is not enlarged for the review. Coverage within an explicitly extended footprint may itself be inferred. Added CPTs appear in the change register; this review checks new borehole logs only.
+
+Changes to existing logs, units, rules, terrain, groundwater, extent or other assumptions are listed separately. A before/after shift includes all those changes; it does not isolate the effect of adding a particular borehole. This is a check against newly supplied logs, not a confidence interval or proof of accuracy. The two revisions need a common coordinate system and height datum, as for section comparisons.
+
+**Download impact CSV** includes contact values, availability, error/shift signs and the pinned revision IDs, dates and engine versions. **Compare along section** opens the existing comparison for the same pair, to inspect changes between collars. Cancel or close the review to stop its worker. Drafts and saved revisions are not changed.
+
 ### Groundwater policies
 
 Under **Project → Groundwater scenario**:

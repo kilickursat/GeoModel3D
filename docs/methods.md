@@ -93,6 +93,9 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 - `src/comparison.ts`: comparisons at fixed coordinates, matched by unit identity
 - `src/comparisonJob.ts`, `src/comparison.worker.ts`: cancellable inline comparison worker
 - `src/comparisonView.ts`: pinned-revision comparison controls and overlays
+- `src/impact.ts`: changed-input inventories and prior-model checks against newly added borehole logs
+- `src/impactJob.ts`, `src/impact.worker.ts`, `src/modelJob.ts`: cancelable local numerical jobs, with source-page images excluded
+- `src/impactView.ts`: new-data impact map, ranked boreholes, contact details and export
 - `src/workspace.ts`: versioned drafts, immutable project revisions, restore and workspace JSON
 - `src/storage.ts`: transactional browser saves and migration of earlier input-table saves
 - `src/main.ts`: three.js viewer and interface

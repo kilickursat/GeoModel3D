@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Added
+- New-data impact review for two saved revisions: an input-change register, mapped and ranked new boreholes, and checks of the before model's predictions against their logged contacts and units. Signed forecast errors and model shifts are kept separate; CSV identifies the pinned revisions. Other assumption changes and unavailable coverage are explicit. Runs locally in a cancelable worker, including in the standalone HTML.
 - Named scenarios in **Input data → Scenarios**, created from an unfinished draft or a fixed revision. Switching preserves each scenario's unfinished values, source evidence and independent revision head. Workspace format 3 includes all scenario drafts and reads earlier workspace formats.
 - Revision comparisons on the same straight section or reference alignment: overlaid contacts, signed elevation and groundwater differences, introduced/removed units, and optional unit/stress readouts at a chosen elevation. Downloadable CSV identifies both fixed revisions and sampling settings. Calculations run in a cancelable inline worker, including in the standalone file.
 - Groundwater scenarios: shallowest observed levels, an explicit depth override, or latest eligible readings as of a UTC day. Automatic CPT layers are recalculated consistently; reviewed and legacy interpretations stay fixed. Missing as-of groundwater withholds dependent results instead of inventing a dry case.

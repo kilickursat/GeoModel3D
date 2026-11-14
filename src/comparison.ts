@@ -42,7 +42,7 @@ function definition(s:string){
   // Repeated projection parameters can be order-dependent. Do not declare reordered ambiguous definitions equal.
   return new Set(keys).size===keys.length?tokens.sort().join(" "):trimmed;
 }
-function compatibleCrs(before:GeoProject,after:GeoProject){
+export function compatibleCrs(before:GeoProject,after:GeoProject){
   const a=projectCrs(before),b=projectCrs(after);
   if(a||b){
     if(!a||!b||definition(a.proj4)!==definition(b.proj4))throw new Error("The projects use different coordinate systems or projection definitions. Put both in the same system before comparing.");
