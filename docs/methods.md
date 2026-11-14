@@ -87,6 +87,8 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 - `src/tables.ts`, `src/input.ts`: the Input data tab (tables, live preview, checks)
 - `src/crs.ts`: coordinate systems (registry, suggestion and conversion)
 - `src/tiles.ts`: map and elevation tiles, and terrain resampling
+- `src/evidence.ts`: source records, correction/acceptance events and import validation
+- `src/evidenceView.ts`: source-page inspector, independent of the PDF reader
 - `src/workspace.ts`: versioned drafts, immutable project revisions, restore and workspace JSON
 - `src/storage.ts`: transactional browser saves and migration of earlier input-table saves
 - `src/main.ts`: three.js viewer and interface

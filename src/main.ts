@@ -23,6 +23,7 @@ import {applyUnitRules} from "./rules";
 import {reportHtml} from "./report";
 import {createInputWorkspace} from "./input";
 import {parseWorkspace} from "./workspace";
+import {showEvidence} from "./evidenceView";
 import {agreement,askAgreement,withdrawAgreement} from "./agreement";
 import {loadReader} from "./reader";
 import {modelCacheSize,removeModelCache} from "./modelcache";
@@ -847,6 +848,7 @@ ui.innerHTML=`<div class="topbar"></div><h1 class="title">GeoModel3D <span>${pkg
     <div class="check-actions"><button class="run-check">Cross-validate</button><span class="check-status" aria-live="polite"></span></div>
     <div class="check-results"></div></details>
   <details class="coords"><summary>Coordinates</summary><label class="crs"><input class="crs-input" list="crs-options" placeholder="EPSG code, name or country" spellcheck="false" autocomplete="off" aria-label="Coordinate system"></label><datalist id="crs-options"></datalist></details>
+  <details class="site-evidence" hidden><summary>Source evidence</summary><p>Original readings and subsequent edits, with the saved source pages.</p><div></div></details>
   <details class="notes" hidden><summary></summary><ul></ul></details>
   <p class="panel-hint"></p>
 </div>`;
@@ -1114,11 +1116,38 @@ function renderPanel(){
   toolbar.querySelector<HTMLButtonElement>(".fetch-terrain")!.disabled=!crs;
   renderRules();
   renderCptLayers();
+  renderSourceEvidence();
   toolbar.dataset.cpts=model.cpts.length?"yes":"";
   ui.querySelector(".legend")!.innerHTML=model.units.map((u,k)=>{
     const title=[u.name,u.erosive?"Erosive base: cuts down into older units":"",unitProperties(u)].filter(Boolean).join("\n");
     return `<label title="${esc(title)}"><input type="checkbox" data-unit="${esc(u.id)}"${view.hidden.has(u.id)?"":" checked"}><i style="background:${u.color}"></i><span class="name">${esc(u.name)}</span>${u.erosive?'<span class="tag">erosive</span>':""}<span class="vol">${model.triangles.length?fmtVolume(unitCubicMetres(model,k)):""}</span></label>`;
   }).join("");
+}
+function renderSourceEvidence(){
+  const box=ui.querySelector<HTMLDetailsElement>(".site-evidence")!,records=new Set(project.evidence?.records.map(r=>r.id)??[]);
+  const links:Array<{id:string;label:string}>=[];
+  for(const b of project.boreholes){
+    if(b.evidenceId&&records.has(b.evidenceId))links.push({id:b.evidenceId,label:`${b.id} · borehole`});
+    for(const i of b.intervals)if(i.evidenceId&&records.has(i.evidenceId))links.push({id:i.evidenceId,label:`${b.id} · ${fmt(i.from,2)}–${fmt(i.to,2)} m`});
+    for(const w of b.water??[])if(w.evidenceId&&records.has(w.evidenceId))links.push({id:w.evidenceId,label:`${b.id} · water ${fmt(w.depth,2)} m`});
+  }
+  box.hidden=!links.length;
+  box.querySelector("div")!.innerHTML=links.map(l=>`<button data-evidence="${esc(l.id)}">${esc(l.label)}</button>`).join("");
+}
+ui.addEventListener("click",e=>{
+  const b=(e.target as Element).closest<HTMLButtonElement>("[data-evidence]");
+  if(b)openProjectEvidence(b.dataset.evidence!,`Source evidence · ${b.textContent}`);
+});
+function openProjectEvidence(id:string,title:string){
+  if(!project.evidence)return;
+  const value=(n:number|undefined)=>n===undefined||!Number.isFinite(n)?"":String(n);
+  let currentValues:Record<string,string>|undefined;
+  for(const b of model.boreholes){
+    if(b.evidenceId===id)currentValues={id:b.id,x:value(b.x),y:value(b.y),z:value(b.z),lat:value(b.lat),lon:value(b.lon),depth:String(boreholeDepth(b))};
+    for(const i of b.intervals)if(i.evidenceId===id)currentValues={boreholeId:b.id,from:String(i.from),to:String(i.to),unit:i.unit,description:i.name??""};
+    for(const w of b.water??[])if(w.evidenceId===id)currentValues={boreholeId:b.id,depth:String(w.depth),date:w.date??""};
+  }
+  showEvidence(project.evidence,id,title,{currentValues});
 }
 function unitProperties(u:UnitDef){
   const p=[u.gamma!==undefined?`γ ${fmt(u.gamma,1)} kN/m³`:"",u.gammaSat!==undefined?`γsat ${fmt(u.gammaSat,1)} kN/m³`:""].filter(Boolean).join(" · ");
@@ -1497,6 +1526,10 @@ async function importFileList(list:FileList|File[]){
       return;
     }
     const result=importFiles(files,project);
+    const evidenceIds=new Set(result.project.evidence?.records.map(r=>r.id)??[]);
+    const references=[...result.project.boreholes.flatMap(b=>[b.evidenceId,...b.intervals.map(i=>i.evidenceId),...(b.water??[]).map(w=>w.evidenceId)]),
+      ...(result.project.cpts??[]).flatMap(c=>(c.layers??[]).map(l=>l.evidenceId))];
+    if(references.some(id=>id!==undefined&&!evidenceIds.has(id)))throw new Error("CSV evidence IDs require the matching source evidence. Import the complete project/workspace JSON, or remove the evidence_id column.");
     imported=result.project;
     // Lines or CPTs added to the site shown keep the view, and the first line is shown.
     const added=(!!result.alignments||!!result.cpts)&&result.project.boreholes===project.boreholes;
@@ -1529,7 +1562,7 @@ async function readPdfs(files:File[]){
   }
   try{
     const {readPdfs:read}=await loadReader();
-    await read(files,{onUse:(tables,message,notes)=>{setMode("input");workspace.open(tables,message,notes)},onClose:()=>invalidate()});
+    await read(files,{onUse:(tables,message,notes)=>{setMode("input");return workspace.open(tables,message,notes)},onClose:()=>invalidate()});
   }catch(err){sayPdf("The PDF reader could not start",[(err as Error).message],true)}
 }
 
@@ -1790,8 +1823,32 @@ renderer.domElement.addEventListener("pointerup",e=>{
   press=null;
   if(!p||p.id!==e.pointerId||performance.now()-p.t>=600||Math.hypot(e.clientX-p.x,e.clientY-p.y)>10)return;
   if(drawing)addDrawPoint(e.clientX,e.clientY);
+  else if(openPickedEvidence(e.clientX,e.clientY))return;
   else if(e.pointerType!=="mouse"){pointer={x:e.clientX,y:e.clientY,touch:true};pointerMoved=true}
 });
+
+// Source-backed logs can be inspected directly from a short click/tap on a visible borehole or its collar.
+function openPickedEvidence(x:number,y:number){
+  if(!project.evidence||!view.boreholes)return false;
+  raycaster.setFromCamera(toView(x,y),camera);
+  const kept=(h:THREE.Intersection)=>!cutting()||clipPlane.distanceToPoint(h.point)>=-1e-6;
+  const volume=solid()?raycaster.intersectObjects(volumeMeshes.filter(m=>m.visible)).find(kept)?.distance??Infinity:Infinity;
+  const face=sectionGroup.visible&&fence.visible?raycaster.intersectObject(fence)[0]?.distance??Infinity:Infinity;
+  const hidden=solid()?Math.min(volume,face)+1e-6:Infinity;
+  const hit=holeMesh?.visible?raycaster.intersectObject(holeMesh).find(h=>kept(h)&&h.distance<=hidden):undefined;
+  let picked=hit?.instanceId===undefined?null:holeInfo[hit.instanceId];
+  if(!picked){
+    const collar=collarNear(x,y,10),hole=collar?model.boreholes.findIndex(b=>b.id===collar.id):-1;
+    if(hole>=0){const bh=model.boreholes[hole],at=local(bh.x,bh.y,bh.z).multiply(world.scale);
+      if((!cutting()||clipPlane.distanceToPoint(at)>=-1e-6)&&at.clone().sub(camera.position).dot(camera.getWorldDirection(new THREE.Vector3()))>0&&at.distanceTo(camera.position)<=hidden+camera.position.distanceTo(controls.target)*0.02)picked={hole,interval:-1};
+    }
+  }
+  if(!picked)return false;
+  const b=model.boreholes[picked.hole],i=b.intervals[picked.interval],id=i?.evidenceId??b.evidenceId;
+  if(!id)return false;
+  hideTooltip();openProjectEvidence(id,`Source evidence · ${b.id}${i?` · ${fmt(i.from,2)}–${fmt(i.to,2)} m`:""}`);
+  return true;
+}
 
 // ---------- drawing a line ----------
 

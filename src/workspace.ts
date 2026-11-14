@@ -5,12 +5,13 @@ import {GeoProject} from "./schema";
 import {COLUMNS,EditorTables,emptyTables,tablesFromProject} from "./tables";
 import {importFiles,toProjectJson} from "./io";
 import {alignmentProblem} from "./alignment";
+import {EvidenceCollection,validateEvidence,EVIDENCE_MAX_IMAGE_BYTES,EVIDENCE_MAX_PAGE_IMAGE_BYTES} from "./evidence";
 
 export interface WorkspaceRevision {
   id:string; parentId?:string; createdAt:string; reason:string; engineVersion:string; project:GeoProject;
 }
 export interface WorkspaceDocument {
-  format:"geomodel3d-workspace"; version:1; id:string; savedAt:string;
+  format:"geomodel3d-workspace"; version:2; id:string; savedAt:string;
   draft:{tables:EditorTables;base?:GeoProject}; revisions:WorkspaceRevision[]; activeRevisionId?:string;
 }
 
@@ -31,12 +32,12 @@ const now=()=>new Date().toISOString();
 const identifier=()=>globalThis.crypto?.randomUUID?.()??`local-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
 
 export function createWorkspace(tables:EditorTables,base?:GeoProject):WorkspaceDocument{
-  return {format:"geomodel3d-workspace",version:1,id:identifier(),savedAt:now(),
+  return {format:"geomodel3d-workspace",version:2,id:identifier(),savedAt:now(),
     draft:{tables:clone(tables),...(base?{base:clone(base)}:{})},revisions:freeze([])};
 }
 
 export function updateDraft(doc:WorkspaceDocument,tables:EditorTables,base?:GeoProject):WorkspaceDocument{
-  return {...doc,savedAt:now(),revisions:history(doc.revisions),draft:{tables:clone(tables),...(base?{base:clone(base)}:{})}};
+  return {...doc,version:2,savedAt:now(),revisions:history(doc.revisions),draft:{tables:clone(tables),...(base?{base:clone(base)}:{})}};
 }
 
 // Compare project content, not object insertion order. JSON's null representation is intentional for missing CPT
@@ -97,7 +98,71 @@ function unique(items:RecordValue[],key:string,path:string){
   items.forEach((o,i)=>{const id=text(o[key],`${path}[${i}].${key}`,true);if(seen.has(id))invalid(path,`has duplicate ${key} ${id}`);seen.add(id)});
 }
 
-function parseTables(value:unknown):EditorTables{
+type ImageResolver=(value:unknown,path:string)=>unknown;
+// Transform only evidence source-page image slots. A raw description that happens to contain an image-reference
+// string is data, and must never be interpreted or changed by the workspace format.
+function mapEvidenceImages(value:unknown,image:ImageResolver,path:string):unknown{
+  if(!value||typeof value!=="object"||Array.isArray(value))return value;
+  const collection=value as RecordValue;
+  if(!Array.isArray(collection.sources))return value;
+  return {...collection,sources:collection.sources.map((source,i)=>{
+    if(!source||typeof source!=="object"||Array.isArray(source))return source;
+    const s=source as RecordValue;
+    if(!Array.isArray(s.pages))return source;
+    return {...s,pages:s.pages.map((page,j)=>{
+      if(!page||typeof page!=="object"||Array.isArray(page))return page;
+      const p=page as RecordValue;
+      return p.image===undefined?page:{...p,image:image(p.image,`${path}.sources[${i}].pages[${j}].image`)};
+    })};
+  })};
+}
+function evidenceCollection(value:unknown,path:string,image:ImageResolver):EvidenceCollection{
+  try{return validateEvidence(mapEvidenceImages(value,image,path))}catch(error){invalid(path,(error as Error).message)}
+}
+const IMAGE_REFERENCE="workspace-image:",PNG_PREFIX="data:image/png;base64,";
+function imageByteSize(value:string):number{
+  const payload=value.slice(PNG_PREFIX.length);
+  return payload.length/4*3-(payload.endsWith("==")?2:payload.endsWith("=")?1:0);
+}
+function workspaceImageResolver(d:RecordValue):ImageResolver{
+  if(d.version===1&&d.evidenceImages!==undefined)invalid("evidenceImages","is not supported by workspace version 1");
+  const pool=d.evidenceImages===undefined?{}:record(d.evidenceImages,"evidenceImages");
+  const seen=new Set<string>();let bytes=0;
+  const account=(value:unknown,path:string)=>{
+    if(typeof value!=="string"||!value.startsWith(PNG_PREFIX))invalid(path,"must contain a PNG data URL");
+    const size=imageByteSize(value);
+    if(size>EVIDENCE_MAX_PAGE_IMAGE_BYTES)invalid(path,"exceeds the 2 MiB page image limit");
+    if(!seen.has(value)){seen.add(value);bytes+=size}
+    if(bytes>EVIDENCE_MAX_IMAGE_BYTES)invalid("evidenceImages","exceeds the 32 MiB unique image limit");
+    return value;
+  };
+  for(const [id,value] of Object.entries(pool)){
+    if(!/^[A-Za-z0-9_-]{1,128}$/.test(id)||["__proto__","constructor","prototype"].includes(id))invalid("evidenceImages","contains an invalid image ID");
+    account(value,`evidenceImages.${id}`);
+  }
+  // Validate unused pool values too: arbitrary payloads must not hide in an otherwise valid workspace. Split into
+  // source-sized groups so the established per-source page limit does not become a smaller workspace pool limit.
+  const images=[...seen],sources=[];
+  for(let i=0;i<images.length;i+=2000)sources.push({id:`pool-${i}`,name:"Workspace images",pages:images.slice(i,i+2000).map((image,j)=>({page:j+1,width:1,height:1,image}))});
+  if(images.length)try{validateEvidence({version:1,sources,records:[]})}catch(error){invalid("evidenceImages",(error as Error).message)}
+  return (value,path)=>{
+    if(typeof value==="string"&&value.startsWith(IMAGE_REFERENCE)){
+      if(d.version===1)invalid(path,"contains an image reference unsupported by workspace version 1");
+      const id=value.slice(IMAGE_REFERENCE.length);
+      if(!Object.hasOwn(pool,id))invalid(path,"does not name a pooled workspace image");
+      return pool[id];
+    }
+    // Direct typed documents can contain expanded images; old version-1 saves also used that representation.
+    return account(value,path);
+  };
+}
+function evidenceReference(value:unknown,ids:ReadonlySet<string>,path:string){
+  if(value===undefined)return;
+  const id=text(value,`${path}.evidenceId`,true);
+  if(!ids.has(id))invalid(`${path}.evidenceId`,"does not name an evidence record in this project");
+}
+
+function parseTables(value:unknown,image:ImageResolver):EditorTables{
   const t=record(value,"draft.tables"),p=record(t.project,"draft.tables.project"),rows=record(t.rows,"draft.tables.rows");
   for(const key of Object.keys(emptyTables().project))text(p[key],`draft.tables.project.${key}`);
   for(const [name,columns] of Object.entries(COLUMNS)){
@@ -107,14 +172,31 @@ function parseTables(value:unknown):EditorTables{
       cells.forEach((cell,j)=>text(cell,`draft.tables.rows.${name}[${i}][${j}]`));
     });
   }
-  return clone(t) as unknown as EditorTables;
+  const parsed=clone(t) as unknown as EditorTables;
+  if(t.evidence!==undefined)parsed.evidence=evidenceCollection(t.evidence,"draft.tables.evidence",image);
+  const ids=new Set(parsed.evidence?.records.map(r=>r.id)??[]);
+  if(t.evidenceRows!==undefined){
+    const bindings=record(t.evidenceRows,"draft.tables.evidenceRows");
+    for(const [name,value] of Object.entries(bindings)){
+      if(!Object.hasOwn(COLUMNS,name))invalid(`draft.tables.evidenceRows.${name}`,"is not an input table");
+      const refs=list(value,`draft.tables.evidenceRows.${name}`);
+      if(refs.length!==(rows[name] as unknown[]).length)invalid(`draft.tables.evidenceRows.${name}`,"must have one binding for each row");
+      refs.forEach((ref,i)=>{
+        if(ref===null)return;
+        const id=text(ref,`draft.tables.evidenceRows.${name}[${i}]`,true);
+        if(!ids.has(id))invalid(`draft.tables.evidenceRows.${name}[${i}]`,"does not name an evidence record in these tables");
+      });
+    }
+  }
+  return parsed;
 }
 
-function intervals(value:unknown,path:string,allowUnassigned=false){
+function intervals(value:unknown,path:string,allowUnassigned=false,evidenceIds:ReadonlySet<string>=new Set()){
   for(const [i,row] of records(value,path).entries()){
     const at=`${path}[${i}]`,from=number(row.from,`${at}.from`),to=number(row.to,`${at}.to`);
     if(from<0||to<=from)invalid(at,"has inverted or negative depths");
     text(row.unit,`${at}.unit`,!allowUnassigned);optionalStrings(row,["name"],at);
+    evidenceReference(row.evidenceId,evidenceIds,at);
   }
 }
 function rules(value:unknown,path:string){
@@ -127,13 +209,15 @@ function rules(value:unknown,path:string){
 
 // A workspace is a lossless checkpoint, not an opportunity to repair or silently omit bad records. Validate before
 // invoking the ordinary importer, which intentionally accepts much looser standalone project files.
-function parseProject(value:unknown,path:string):GeoProject{
+function parseProject(value:unknown,path:string,image:ImageResolver):GeoProject{
   const p=clone(record(value,path));
   if(p.format!==undefined&&p.format!=="geomodel3d-project")invalid(`${path}.format`,"must be geomodel3d-project");
   if(p.version!==undefined&&p.version!==1)invalid(`${path}.version`,"is not supported");
   delete p.format;delete p.version;
   text(p.name,`${path}.name`,true);optionalStrings(p,["description","source","crs","crsCode","crsProj4"],path);
   optionalNumbers(p,["base","groundwaterDepth","margin"],path);optionalBoolean(p,"cptLayers",path);
+  if(p.evidence!==undefined)p.evidence=evidenceCollection(p.evidence,`${path}.evidence`,image);
+  const evidenceIds=new Set((p.evidence as EvidenceCollection|undefined)?.records.map(r=>r.id)??[]);
   const units=records(p.units,`${path}.units`),holes=records(p.boreholes,`${path}.boreholes`);
   unique(units,"id",`${path}.units`);unique(holes,"id",`${path}.boreholes`);
   for(const [i,u] of units.entries()){
@@ -144,7 +228,8 @@ function parseProject(value:unknown,path:string):GeoProject{
   for(const [i,b] of holes.entries()){
     const at=`${path}.boreholes[${i}]`;
     for(const k of ["x","y","z"])number(b[k],`${at}.${k}`);
-    optionalNumbers(b,["depth","lon","lat"],at);intervals(b.intervals,`${at}.intervals`);
+    optionalNumbers(b,["depth","lon","lat"],at);evidenceReference(b.evidenceId,evidenceIds,at);
+    intervals(b.intervals,`${at}.intervals`,false,evidenceIds);
     if(!(b.intervals as unknown[]).length)invalid(`${at}.intervals`,"must contain a log");
     for(const [key,required,optional] of [["spt",["depth","blows","penetration"],[]],["water",["depth"],[]],["tests",["depth","value"],["to"]]] as const){
       if(b[key]===undefined)continue;
@@ -152,7 +237,7 @@ function parseProject(value:unknown,path:string):GeoProject{
         const loc=`${at}.${key}[${j}]`;
         for(const k of required)number(r[k],`${loc}.${k}`);
         optionalNumbers(r,[...optional],loc);
-        if(key==="water")optionalStrings(r,["date"],loc);
+        if(key==="water"){optionalStrings(r,["date"],loc);evidenceReference(r.evidenceId,evidenceIds,loc)}
         if(key==="tests")text(r.property,`${loc}.property`,true);
       }
     }
@@ -182,7 +267,7 @@ function parseProject(value:unknown,path:string):GeoProject{
         if(values.length!==depth.length)invalid(`${at}.${key}`,"must have one value for each depth");
         c[key]=values.map((v,j)=>number(v,`${at}.${key}[${j}]`,true));
       }
-      if(c.layers!==undefined)intervals(c.layers,`${at}.layers`,true);
+      if(c.layers!==undefined)intervals(c.layers,`${at}.layers`,true,evidenceIds);
     }
   }
   if(p.terrain!==undefined){
@@ -204,13 +289,14 @@ function parseProject(value:unknown,path:string):GeoProject{
 export function parseWorkspace(value:unknown):WorkspaceDocument{
   const d=record(value,"document");
   if(d.format!=="geomodel3d-workspace")invalid("format","must be geomodel3d-workspace");
-  if(d.version!==1)invalid("version","is not supported");
+  if(d.version!==1&&d.version!==2)invalid("version","is not supported");
+  const image=workspaceImageResolver(d);
   const id=text(d.id,"id",true),savedAt=date(d.savedAt,"savedAt"),draft=record(d.draft,"draft");
   const revisions=records(d.revisions,"revisions").map((r,i):WorkspaceRevision=>{
     const at=`revisions[${i}]`;
     return {id:text(r.id,`${at}.id`,true),...(r.parentId===undefined?{}:{parentId:text(r.parentId,`${at}.parentId`,true)}),
       createdAt:date(r.createdAt,`${at}.createdAt`),reason:text(r.reason,`${at}.reason`),engineVersion:text(r.engineVersion,`${at}.engineVersion`,true),
-      project:parseProject(r.project,`${at}.project`)};
+      project:parseProject(r.project,`${at}.project`,image)};
   });
   const byId=new Map(revisions.map(r=>[r.id,r]));
   if(byId.size!==revisions.length)invalid("revisions","contains duplicate IDs");
@@ -228,26 +314,65 @@ export function parseWorkspace(value:unknown):WorkspaceDocument{
   const active=d.activeRevisionId===undefined?undefined:text(d.activeRevisionId,"activeRevisionId",true);
   if(active!==undefined&&!byId.has(active))invalid("activeRevisionId","does not name a checkpoint");
   if(revisions.length&&active===undefined)invalid("activeRevisionId","is required when checkpoints exist");
-  return {format:"geomodel3d-workspace",version:1,id,savedAt,
-    draft:{tables:parseTables(draft.tables),...(draft.base===undefined?{}:{base:parseProject(draft.base,"draft.base")})},revisions:freeze(revisions),
+  return {format:"geomodel3d-workspace",version:2,id,savedAt,
+    draft:{tables:parseTables(draft.tables,image),...(draft.base===undefined?{}:{base:parseProject(draft.base,"draft.base",image)})},revisions:freeze(revisions),
     ...(active===undefined?{}:{activeRevisionId:active})};
 }
 
-const revisionJson=new WeakMap<WorkspaceRevision,string>();
+// Content IDs are deterministic pool keys, not security fingerprints. A detected collision rejects the save
+// instead of aliasing two different images. Source-document SHA-256 digests remain separate evidence metadata.
+function imageId(image:string):string{
+  let a=0x811c9dc5,b=0x9e3779b9;
+  for(let i=0;i<image.length;i++){
+    const c=image.charCodeAt(i);a=Math.imul(a^c,0x01000193);b=Math.imul(b^c,0x85ebca6b);
+  }
+  return `png-${image.length.toString(36)}-${(a>>>0).toString(16)}-${(b>>>0).toString(16)}`;
+}
+interface PackedImages {
+  values:Map<string,string>;
+  add(image:unknown,path:string):string;
+  include(id:string,image:string):void;
+}
+function packedImages():PackedImages{
+  const values=new Map<string,string>(),byImage=new Map<string,string>();let bytes=0;
+  const include=(id:string,image:string)=>{
+    const existing=values.get(id);
+    if(existing!==undefined){if(existing!==image)throw new Error("Workspace image ID collision; the workspace was not saved.");return}
+    if(!image.startsWith(PNG_PREFIX))throw new Error("A workspace page preview must be a PNG data URL.");
+    const size=imageByteSize(image);
+    if(size>EVIDENCE_MAX_PAGE_IMAGE_BYTES)throw new Error("A workspace page preview exceeds the 2 MiB image limit.");
+    if(!byImage.has(image))bytes+=size;
+    if(bytes>EVIDENCE_MAX_IMAGE_BYTES)throw new Error("Workspace page previews exceed the 32 MiB unique image limit.");
+    values.set(id,image);byImage.set(image,id);
+  };
+  return {values,include,add(image,path){
+    if(typeof image!=="string")throw new Error(`Workspace ${path} must be a PNG data URL.`);
+    const known=byImage.get(image);if(known!==undefined)return IMAGE_REFERENCE+known;
+    const id=imageId(image);include(id,image);return IMAGE_REFERENCE+id;
+  }};
+}
+function packedProject(p:GeoProject,pool:PackedImages):unknown{
+  return JSON.parse(toProjectJson(p.evidence?{...p,evidence:mapEvidenceImages(p.evidence,pool.add,"project.evidence") as EvidenceCollection}:p));
+}
+interface PackedRevision { json:string;images:Map<string,string> }
+const revisionJson=new WeakMap<WorkspaceRevision,PackedRevision>();
 export function toWorkspaceJson(doc:WorkspaceDocument):string{
-  // Autosave serialises an already typed document. Validation/import preprocessing belongs at the read boundary,
-  // rather than reinterpreting every historical project on each keystroke.
-  const project=(p:GeoProject)=>JSON.parse(toProjectJson(p));
-  const metadata={format:doc.format,version:doc.version,id:doc.id,savedAt:doc.savedAt,
+  // Page PNGs are pooled once across current tables, their base project and all immutable revisions. Keeping
+  // revision JSON cached still avoids traversing large CPT and terrain histories on every autosave.
+  const pool=packedImages();
+  const metadata={format:doc.format,version:2,id:doc.id,savedAt:doc.savedAt,
     ...(doc.activeRevisionId===undefined?{}:{activeRevisionId:doc.activeRevisionId})};
-  const draft={tables:doc.draft.tables,...(doc.draft.base?{base:project(doc.draft.base)}:{})};
+  const tables=doc.draft.tables.evidence?{...doc.draft.tables,evidence:mapEvidenceImages(doc.draft.tables.evidence,pool.add,"draft.tables.evidence")}:doc.draft.tables;
+  const draft={tables,...(doc.draft.base?{base:packedProject(doc.draft.base,pool)}:{})};
   const revisions=doc.revisions.map(r=>{
-    const cached=revisionJson.get(r);
-    if(cached!==undefined)return cached;
-    const json=JSON.stringify({...r,project:project(r.project)},null,1);
-    if(frozen.has(r))revisionJson.set(r,json);
-    return json;
+    let packed=revisionJson.get(r);
+    if(packed===undefined){
+      const images=packedImages();
+      packed={json:JSON.stringify({...r,project:packedProject(r.project,images)},null,1),images:images.values};
+      if(frozen.has(r))revisionJson.set(r,packed);
+    }
+    for(const [id,image] of packed.images)pool.include(id,image);
+    return packed.json;
   });
-  // Concatenate already-encoded immutable revisions rather than traversing the whole history on each autosave.
-  return `${JSON.stringify(metadata,null,1).slice(0,-2)},\n "draft": ${JSON.stringify(draft,null,1)},\n "revisions": [${revisions.length?`\n${revisions.join(",\n")}\n`:""}]\n}\n`;
+  return `${JSON.stringify(metadata,null,1).slice(0,-2)},\n "evidenceImages": ${JSON.stringify(Object.fromEntries(pool.values))},\n "draft": ${JSON.stringify(draft,null,1)},\n "revisions": [${revisions.length?`\n${revisions.join(",\n")}\n`:""}]\n}\n`;
 }

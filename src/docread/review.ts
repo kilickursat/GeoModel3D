@@ -4,12 +4,13 @@
 // until they are edited or confirmed. The checks run as values are edited, and "Use these boreholes" hands the
 // boreholes to the Input data tables, which check them again as typed data.
 import type {Doc} from "./pdftext";
-import {DraftHole,Check,FIELDS,Field,checkDraft,draftTables,unitFor,pageRanges,num} from "./draft";
+import {DraftHole,Check,FIELDS,Field,checkDraft,draftTables,captureDraftEvidence,evidenceField,unitFor,pageRanges,num} from "./draft";
 import type {TextLine} from "./reconstruct";
 import {lithologyRules,japaneseLithologyRules} from "../rules";
 import type {EditorTables} from "../tables";
+import {newEvidenceId,changeEvidenceField,acceptEvidenceField,EvidenceSource,EvidenceRecord} from "../evidence";
 
-export interface ReviewHost { onUse(tables:EditorTables,message:string,notes:string[]):void; onClose():void }
+export interface ReviewHost { onUse(tables:EditorTables,message:string,notes:string[]):boolean|void; onClose():void }
 // A page no log was read from: a scanned image, a page that looked like a log but could not be read, or any other.
 export interface Unread { doc:number; page:number; id?:string; error:string; scanned?:boolean; log?:boolean }
 
@@ -19,11 +20,12 @@ const ZOOMS=[1,1.5,2,3,4];
 const RULE_UNITS=[...new Set([...lithologyRules,...japaneseLithologyRules].map(r=>r.unit))];
 
 export function createReview(host:ReviewHost){
-  const docs:Doc[]=[],sizes=new Map<string,{width:number;height:number}>(),closing:Array<()=>void>=[];
+  const docs:Doc[]=[],sources:EvidenceSource[]=[],sizes=new Map<string,{width:number;height:number}>(),closing:Array<()=>void>=[];
   let holes:DraftHole[]=[],checks:Check[]=[],unread:Unread[]=[],problems:string[]=[];
   let current=0,active="",edited=false,closed=false,ready=false,timer:ReturnType<typeof setTimeout>|undefined;
   const view={doc:0,page:1,zoom:0};
-  let job:{cancel():void}|null=null,shown="";
+  let job:{cancel():void}|null=null,shown="",saving=false;
+  let captureJob:{cancel():void}|null=null;
 
   const el=document.createElement("section");
   el.className="dr";
@@ -185,6 +187,17 @@ export function createReview(host:ReviewHost){
 
   // ---------- editing ----------
 
+  function accept(k:string){
+    const h=holes[current];
+    if(k.startsWith("f:")){
+      const f=k.slice(2) as Field,r=f==="water"?h.waterEvidence:h.evidence;
+      if(r)acceptEvidenceField(r,f==="water"?"depth":evidenceField(f));
+    }else{
+      const r=h.layers[Number(k.slice(2))]?.evidence;
+      // A layer's flagged check concerns its base depth; it does not certify every field on the row.
+      if(r)acceptEvidenceField(r,"to");
+    }
+  }
   function unflag(k:string){
     const h=holes[current];
     if(k.startsWith("f:"))delete h.flags[k.slice(2) as Field];
@@ -204,10 +217,10 @@ export function createReview(host:ReviewHost){
     if(boxEl){go(current,boxEl.dataset.key!);return}
     if(!b)return;
     if(b.classList.contains("dr-cancel")){cancel();return}
-    if(b.classList.contains("dr-use")){use();return}
+    if(b.classList.contains("dr-use")){void use();return}
     if(b.dataset.go!==undefined){go(Number(b.dataset.hole),b.dataset.go);return}
     if(b.dataset.hole!==undefined){select(Number(b.dataset.hole));return}
-    if(b.dataset.ok){unflag(b.dataset.ok);edited=true;recheck();return}
+    if(b.dataset.ok){accept(b.dataset.ok);unflag(b.dataset.ok);edited=true;recheck();return}
     if(b.dataset.page){view.doc=Number(b.dataset.doc);view.page=Number(b.dataset.page);showPage();scroller.scrollTo({top:0});return}
     if(b.classList.contains("dr-prev")||b.classList.contains("dr-next")){view.page+=b.classList.contains("dr-next")?1:-1;showPage();scroller.scrollTo({top:0});return}
     if(b.dataset.zoom!==undefined){const z=Number(b.dataset.zoom);view.zoom=z?Math.min(ZOOMS.length-1,Math.max(0,view.zoom+z)):0;showPage();return}
@@ -226,14 +239,18 @@ export function createReview(host:ReviewHost){
     if(!h)return;
     if(t.dataset.field){
       const f=t.dataset.field as Field;
+      const r=f==="water"?h.waterEvidence:h.evidence;
+      if(r)changeEvidenceField(r,f==="water"?"depth":evidenceField(f),t.value,"Edited in document review");
+      if(f==="id")for(const row of [h.waterEvidence,...h.layers.map(l=>l.evidence)])if(row)changeEvidenceField(row,"boreholeId",t.value,"Borehole renamed in document review");
       h.values[f]=t.value;
       if(h.flags[f])unflag(`f:${f}`);
     }else if(t.dataset.layer!==undefined){
       const k=Number(t.dataset.layer),l=h.layers[k],c=t.dataset.c as "from"|"to"|"unit"|"description";
+      if(l.evidence)changeEvidenceField(l.evidence,c,t.value,"Edited in document review");
       l[c]=t.value;
       if(c==="unit")l.autoUnit=false;
       // A unit the rules gave follows its description.
-      if(c==="description"&&l.autoUnit){l.unit=unitFor(t.value);const u=panel.querySelector<HTMLInputElement>(`input[data-layer="${k}"][data-c="unit"]`);if(u)u.value=l.unit}
+      if(c==="description"&&l.autoUnit){l.unit=unitFor(t.value);if(l.evidence)changeEvidenceField(l.evidence,"unit",l.unit,"Unit rules applied to the edited description");const u=panel.querySelector<HTMLInputElement>(`input[data-layer="${k}"][data-c="unit"]`);if(u)u.value=l.unit}
       if(t instanceof HTMLTextAreaElement)fit(t);
       if(c==="to"&&l.flag)unflag(`l:${k}`);
     }else return;
@@ -253,7 +270,47 @@ export function createReview(host:ReviewHost){
     if(edited&&!confirm("Close the review? The corrections made in it are lost."))return;
     close();
   }
-  function use(){
+  async function sourcePages(used:DraftHole[]):Promise<EvidenceSource[]>{
+    const selected=new Map<number,Set<number>>();
+    for(const h of used){
+      const pages=selected.get(h.doc)??new Set<number>();
+      for(const r of [h.evidence,h.values.water.trim()?h.waterEvidence:undefined,...h.layers.map(l=>l.evidence)])if(r)
+        for(const f of Object.values(r.fields))for(const box of f.boxes)pages.add(box.page);
+      if(!pages.size&&h.pages[0])pages.add(h.pages[0]);
+      selected.set(h.doc,pages);
+    }
+    const out:EvidenceSource[]=sources.map(s=>({...s,pages:[]})),max=1200;
+    let total=0;
+    for(const [doc,pages] of selected)for(const page of [...pages].sort((a,b)=>a-b)){
+      if(closed)throw new Error("The review was closed.");
+      const dimensions=sizes.get(key(doc,page));
+      if(!dimensions)throw new Error(`${docs[doc].name}, page ${page}: its dimensions are unavailable.`);
+      say(`Keeping source page ${page} of ${docs[doc].name}…`);
+      const scale=Math.min(1,max/Math.max(dimensions.width,dimensions.height));
+      const width=Math.max(1,Math.round(dimensions.width*scale)),height=Math.max(1,Math.round(dimensions.height*scale));
+      const canvas=document.createElement("canvas"),ratio=Math.min(window.devicePixelRatio||1,3);
+      // Doc.render multiplies CSS width by the display ratio. Divide it here so saved evidence stays bounded on
+      // phones as well as desktops, then resample explicitly to the target size.
+      const drawing=docs[doc].render(page,canvas,width/ratio);captureJob=drawing;await drawing.done;
+      if(closed)throw new Error("The review was closed.");
+      const snapshot=document.createElement("canvas");snapshot.width=width;snapshot.height=height;
+      const draw=()=>{const ctx=snapshot.getContext("2d")!;ctx.fillStyle="#fff";ctx.fillRect(0,0,snapshot.width,snapshot.height);ctx.drawImage(canvas,0,0,snapshot.width,snapshot.height)};
+      draw();let image=snapshot.toDataURL("image/png");
+      // High-detail photographs compress less well than log text. Reduce the snapshot, preserving its proportions,
+      // until it fits the portable evidence limit; the original document itself is never embedded.
+      while(image.length>1_350_000&&Math.max(snapshot.width,snapshot.height)>320){
+        snapshot.width=Math.max(1,Math.round(snapshot.width*0.75));snapshot.height=Math.max(1,Math.round(snapshot.height*0.75));draw();image=snapshot.toDataURL("image/png");
+      }
+      if(image.length>1_350_000)throw new Error(`${docs[doc].name}, page ${page}: the source snapshot is too large to save.`);
+      total+=(image.length-image.indexOf(",")-1)*0.75;
+      if(total>30*1024*1024)throw new Error("These source pages exceed 30 MB. Read fewer documents together.");
+      out[doc].pages.push({page,width:snapshot.width,height:snapshot.height,image});
+    }
+    captureJob=null;
+    return out;
+  }
+  async function use(){
+    if(saving)return;
     checks=checkDraft(holes);
     renderChecks();renderTabs();
     const errors=checks.filter(c=>c.level==="error");
@@ -262,13 +319,22 @@ export function createReview(host:ReviewHost){
     const notes=checks.filter(c=>c.level!=="error").map(c=>`${label(holes[c.hole])}: ${c.text}`);
     if(used.some(h=>Number.isFinite(num(h.values.x)??NaN)))notes.push("Positions read as eastings and northings are in a coordinate system the document does not name: give it under Project (an EPSG code or a name), or the model stays on a local grid");
     const names=[...new Set(used.map(h=>docs[h.doc].name))];
-    host.onUse(draftTables(holes,files),`${plural(used.length,"borehole")} read from ${names.join(", ")}: check the tables, then build the model.`,notes);
-    close();
+    saving=true;
+    const controls=[...el.querySelectorAll<HTMLInputElement|HTMLButtonElement|HTMLTextAreaElement>("input,button,textarea")].filter(c=>!c.classList.contains("dr-cancel"));
+    const disabled=controls.map(c=>c.disabled);controls.forEach(c=>c.disabled=true);
+    try{
+      const evidence=await sourcePages(used);
+      if(closed)return;
+      const accepted=host.onUse(draftTables(holes,files,evidence),`${plural(used.length,"borehole")} read from ${names.join(", ")}: check the tables, then build the model.`,notes);
+      if(accepted===false){say("Workspace replacement cancelled. Your review remains open.");return}
+      close();
+    }catch(error){if(!closed)say(`The source pages could not be kept: ${(error as Error).message} Your review is still open; retry or cancel.`)}
+    finally{saving=false;if(!closed)controls.forEach((c,i)=>c.disabled=disabled[i])}
   }
   function close(){
     if(closed)return;
     closed=true;
-    clearTimeout(timer);job?.cancel();
+    clearTimeout(timer);job?.cancel();captureJob?.cancel();
     for(const f of closing)f();
     for(const d of docs)void d.close();
     el.remove();
@@ -281,10 +347,11 @@ export function createReview(host:ReviewHost){
     progress(text:string){sub.textContent=text},
     // What to stop when the review closes (the reading model in the middle of a page).
     onClose(f:()=>void){closing.push(f)},
-    addDoc(d:Doc){docs.push(d);return docs.length-1},
+    addDoc(d:Doc,source?:EvidenceSource){docs.push(d);sources.push(source??{id:newEvidenceId(),name:d.name,pages:[]});return docs.length-1},
     size(doc:number,page:number,width:number,height:number){sizes.set(key(doc,page),{width,height})},
     show(read:DraftHole[],notRead:Unread[],failed:string[]){
       holes=read;unread=notRead;problems=failed;ready=true;
+      captureDraftEvidence(holes,sources,(doc,page)=>sizes.get(key(doc,page)));
       const pages=docs.reduce((s,d)=>s+d.pages,0);
       sub.textContent=docs.length?`${docs.map(d=>d.name).join(", ")} · ${plural(pages,"page")}`:"Nothing could be read";
       renderAll();

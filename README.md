@@ -27,6 +27,7 @@ GeoModel3D builds a layered ground model from borehole logs and cone penetration
 - Classifies CPTs by Robertson's soil behaviour type (2009). Their layers can build the model alongside the boreholes.
 - Gives active, at-rest and passive earth pressures (Rankine) down a borehole of your own case.
 - Checks the model by leaving each borehole out and predicting it from the others, so you can see how far to trust it between boreholes.
+- Keeps source text, highlighted page previews and correction history with PDF-derived values. Inspect them from the input tables or a source-backed borehole in the model; changed values require a new acceptance.
 - Keeps complete editing workspaces in the browser, with restorable project revisions and workspace JSON for transferring drafts and history.
 - Exports a PDF report, sections as SVG or CSV, the project as JSON, and the model as GLB or USDZ for augmented reality.
 

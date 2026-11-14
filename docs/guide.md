@@ -39,7 +39,7 @@ Good to know:
 - **Unit weights** give the stresses: γ above the water table and γsat below it. A unit without them takes the mean measured unit weight, or else 18 and 20 kN/m³, which the preview and the report say. **K0** gives σ′h, and **c′, φ′ and su** the earth pressures. E and k are design parameters, kept with the model and listed in the report.
 - **Pasting:** cells copied from a spreadsheet paste into any table, starting at the cell pasted into, and add rows as needed. Large tables are shown one borehole at a time.
 - **Nothing is uploaded.** The input workspace is saved in this browser, including terrain, CPTs, alignments, rules and parameters from its base project. The status under the editor says when a save has completed, or explains if browser storage is unavailable. Starting another case replaces the browser save.
-- **Save workspace** downloads the unfinished tables, complete base project and revision history. Import that file on its own to continue editing, including on another computer. Original PDF documents and their source highlighting are not included. **Save case (JSON)** and **Export → Project (JSON)** keep only the current project; **Download table (CSV)** saves one table.
+- **Save workspace** downloads the unfinished tables, complete base project and revision history. Import that file on its own to continue editing, including on another computer. Source evidence, highlighted page previews and correction history are included where available; original PDF/image files are not embedded. **Save case (JSON)** and **Export → Project (JSON)** keep only the current project; **Download table (CSV)** saves one table.
 - **Revisions:** opening a project records its baseline. **Build model** records a new revision when its project differs from the selected revision. Under **Revisions**, restore a project, then build it to show it in 3-D. Building changes after a restore creates a revision based on that earlier project; later revisions stay available. Unfinished edits are kept in the workspace draft but are not themselves build revisions.
 
 ## Reading borehole logs from PDFs
@@ -75,6 +75,18 @@ Edit any value or description, add a layer below another with **+**, delete one 
 - positions given as eastings and northings are in a coordinate system the document does not name: give it under **Project**, or the model stays on a local grid. Latitudes and longitudes are converted as for imported files.
 
 **Your documents stay with you.** A PDF or image is read in this browser and is not uploaded. The reader, the reading model and the files they need (fonts, character maps, image decoders) come from GeoModel3D's own site, and only after you agree. The offline file does not read documents: open the app at [kilickursat.github.io/GeoModel3D](https://kilickursat.github.io/GeoModel3D/) to read them.
+
+## Inspecting source evidence
+
+Logs accepted from the document review keep their original extracted values, the source text and page locations, extraction warnings, and any subsequent corrections. The source file's SHA-256 hash is retained when the browser can compute it. Only the pages used for these observations are kept as bounded PNG previews; the original PDF or image is not embedded.
+
+- In **Input data**, use **Evidence** beside a source-backed borehole, log or water-level row. Choose a value to see its original reading, the value currently in the table, source text, page highlights and history.
+- **Accept current value** explicitly records acceptance of the selected value only. Editing it later records a correction and requires checking it again. Clearing a warning by editing in the PDF review is a correction, not an acceptance; **Looks right** records an explicit acceptance of that warning's value.
+- In the **3-D model**, open **Source evidence** in the Site panel, or make a short click/tap on a visible source-backed borehole. These model inspectors are read-only. If unit rules, coordinate conversion or other processing changed the value, the inspector shows the actual model value and marks the difference from the recorded evidence.
+- **Save workspace** keeps the evidence with the unfinished tables and each project revision. **Save case (JSON)** and **Export → Project (JSON)** keep the current project's evidence. Source pages are shared within workspace files so repeated revisions do not repeat image data. Earlier workspace files remain readable.
+- The printable report lists linked source documents, pages, extraction methods, excerpts, originals where changed, current model values and review status. Deleted or unlinked observations are not included in that appendix.
+
+Page previews and source excerpts may contain information from your documents, so they are part of the files you export. They stay in this browser until you export them. Older projects and manually entered rows without evidence remain usable and do not acquire invented source records. Saved previews can be inspected in the standalone app, although that app still cannot read new documents.
 
 ## Groundwater, stresses and measured properties
 

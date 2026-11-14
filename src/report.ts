@@ -13,6 +13,7 @@ import {cptBehaviour,SBT_ZONES} from "./sbt";
 import {SectionField,unitWeights,unitOfReading} from "./fields";
 import {unitStatistics,measuredProperties,propertyDef,formatValue} from "./properties";
 import {CrossValidation} from "./validation";
+import {EvidenceField,EvidenceRecord} from "./evidence";
 
 export interface ReportOptions {
   paper:"A3"|"A4";
@@ -114,6 +115,11 @@ table.chainage td,table.chainage th{padding:0.5mm 1.4mm}
 .cpt-logs svg{width:100%;height:auto;display:block}
 .cpt-logs figcaption{font-size:0.8em;color:#5b6770;text-align:center}
 .sbt-key{display:flex;flex-wrap:wrap;gap:1mm 4mm;margin:0 0 2mm;font-size:0.85em}
+.evidence{font-size:0.85em;table-layout:fixed}
+.evidence td{overflow-wrap:anywhere}
+.evidence tr{break-inside:avoid}
+.evidence p{margin:0 0 1mm}
+.evidence-sources{padding-left:4mm;font-size:0.85em;overflow-wrap:anywhere}
 </style></head><body>
 <section class="page">
 <header><div><h1>${esc(p.name)}</h1><div class="desc">${esc(p.description??"")}</div></div>
@@ -136,7 +142,67 @@ ${o.validation?validationPage(o.validation,foot):""}
 <table><thead><tr><th>Borehole</th><th>Easting (m)</th><th>Northing (m)</th><th>Collar (m)</th><th>Depth (m)</th><th>Latitude</th><th>Longitude</th><th>Water (m deep)</th><th>SPT tests</th></tr></thead><tbody>${holes}</tbody></table>
 ${notes.length?`<h3>Notes on the model (${notes.length})</h3><ul class="notes">${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul>`:""}
 ${foot(rules?"Ground parameters, interpretation, boreholes and notes":"Ground parameters, boreholes and notes")}</section>
+${evidencePages(model,o.paper,foot)}
 </body></html>`;
+}
+
+// Only observations still attached to the current project are printed. Deleted-row evidence can remain in the
+// workspace for history, but must not look like a source of the model on this report.
+function evidencePages(model:GeoModel,paper:"A3"|"A4",foot:(part:string)=>string){
+  const collection=model.project.evidence;
+  if(!collection)return "";
+  const byId=new Map(collection.records.map(r=>[r.id,r])),sources=new Map(collection.sources.map(s=>[s.id,s]));
+  const rows:Array<{label:string;record:EvidenceRecord;values:Record<string,string>}> = [];
+  const value=(v:unknown)=>v===undefined||v===null?"":String(v);
+  const add=(id:string|undefined,label:string,values:Record<string,string>)=>{
+    const record=id?byId.get(id):undefined;
+    if(record)rows.push({label,record,values});
+  };
+  for(const b of model.boreholes){
+    add(b.evidenceId,b.id,{id:b.id,x:value(b.x),y:value(b.y),z:value(b.z),depth:value(boreholeDepth(b)),lat:value(b.lat),lon:value(b.lon)});
+    for(const i of b.intervals)add(i.evidenceId,`${b.id}, ${value(i.from)}–${value(i.to)} m`,
+      {boreholeId:b.id,from:value(i.from),to:value(i.to),unit:i.unit,description:i.name??""});
+    for(const w of b.water??[])add(w.evidenceId,`${b.id}, water`,{boreholeId:b.id,depth:value(w.depth),date:w.date??""});
+  }
+  if(!rows.length)return "";
+  const names:Record<string,string>={id:"Borehole",boreholeId:"Borehole",x:"Easting",y:"Northing",lat:"Latitude",lon:"Longitude",z:"Ground level",depth:"Depth",from:"From",to:"To",unit:"Unit",description:"Description",date:"Date"};
+  const fieldName=(key:string)=>Object.hasOwn(names,key)?names[key]:key;
+  const numeric=new Set(["x","y","lat","lon","z","depth","from","to"]);
+  // The editor can keep decimal commas and trailing zeros; numerical formatting alone does not change a review.
+  const same=(key:string,a:string,b:string)=>{
+    if(a.trim()===b.trim())return true;
+    if(!numeric.has(key)||!a.trim()||!b.trim())return false;
+    const left=Number(a.replace(",",".")),right=Number(b.replace(",","."));
+    return Number.isFinite(left)&&Number.isFinite(right)&&left===right;
+  };
+  const used=new Set(rows.map(r=>r.record.sourceId));
+  const sourceList=collection.sources.filter(s=>used.has(s.id)).map(s=>{
+    const pages=[...new Set(rows.filter(r=>r.record.sourceId===s.id).flatMap(r=>Object.values(r.record.fields).flatMap(f=>f.boxes.map(b=>b.page))))].sort((a,b)=>a-b);
+    return `<li><b>${esc(s.name)}</b>${pages.length?` · page${pages.length>1?"s":""} ${pages.join(", ")}`:" · page not recorded"}${s.sha256?`<br><span class="code">SHA-256 ${esc(s.sha256)}</span>`:""}</li>`;
+  }).join("");
+  const rowHtml=({label,record:r,values}:typeof rows[number])=>{
+    const fields=Object.entries(r.fields),method=r.method==="pdf-text"?"PDF text":r.method==="ocr"?"OCR":"Manual";
+    const pages=[...new Set(fields.flatMap(([,f])=>f.boxes.map(b=>b.page)))].sort((a,b)=>a-b);
+    const currentValue=(key:string,f:EvidenceField)=>Object.hasOwn(values,key)?values[key]:f.current;
+    const current=fields.map(([key,f])=>`<p><b>${esc(fieldName(key))}:</b> ${esc(currentValue(key,f))}</p>`).join("");
+    const original=fields.filter(([key,f])=>!same(key,currentValue(key,f),f.original))
+      .map(([key,f])=>`<p><b>${esc(fieldName(key))}:</b> ${esc(f.original)||"(not read)"}</p>`).join("");
+    const status=(key:string,f:EvidenceField)=>!same(key,currentValue(key,f),f.current)?"changed after review":f.status;
+    const groups=new Map<string,string[]>();
+    for(const [key,f] of fields){const state=status(key,f);groups.set(state,[...(groups.get(state)??[]),fieldName(key)])}
+    const review=[...groups].map(([state,keys])=>`<p><b>${esc(state==="accepted"?"Accepted":state==="corrected"?"Corrected, awaiting acceptance":state==="unreviewed"?"Unreviewed":"Changed after review")}:</b> ${esc(keys.join(", "))}</p>`).join("");
+    const last=fields.flatMap(([,f])=>f.events).map(e=>e.at).sort().at(-1);
+    const notes=[...new Set(fields.map(([,f])=>f.note).filter((n):n is string=>!!n))];
+    const excerpt=[...new Set(fields.flatMap(([,f])=>f.boxes.map(b=>b.text)))].join(" · ");
+    return `<tr><td><b>${esc(label)}</b><p>${esc(sources.get(r.sourceId)?.name??"Source unavailable")}${pages.length?` · p. ${pages.join(", ")}`:""}</p><p>${method}</p></td><td>${current}</td><td>${original||"—"}</td><td>${review}${last?`<p class="muted">Last action: ${esc(last)}</p>`:""}${notes.map(n=>`<p class="muted">Reader note: ${esc(n)}</p>`).join("")}</td><td>${esc(excerpt.length>350?excerpt.slice(0,350)+"…":excerpt)||"No source text recorded"}</td></tr>`;
+  };
+  const chunk=paper==="A3"?16:10;
+  const pages:string[]=[];
+  for(let start=0;start<rows.length;start+=chunk)pages.push(`<section class="page"><h2>Source evidence${start?" (continued)":""}</h2>
+${start?"":`<p class="muted">Evidence attached to the observations in this model. Current values come from this project; acceptance records a local review action. The workspace keeps any captured page previews and the complete correction history.</p><ul class="evidence-sources">${sourceList}</ul>`}
+<table class="evidence"><thead><tr><th>Observation and source</th><th>Current project values</th><th>Original extraction, where changed</th><th>Review status</th><th>Source text excerpt</th></tr></thead><tbody>${rows.slice(start,start+chunk).map(rowHtml).join("")}</tbody></table>
+${foot(`Source evidence · ${Math.floor(start/chunk)+1} of ${Math.ceil(rows.length/chunk)}`)}</section>`);
+  return pages.join("");
 }
 
 // The CPTs: the logs of those on the section, side by side at one scale over the model's units at each; every CPT with

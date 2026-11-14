@@ -12,6 +12,7 @@ import {isBroXml,readBroXml} from "./broXml";
 import {isDovXml,readDovXml,interpretationKinds,kindNames,formationOf,stratigraphicName,DovInterpretation} from "./dovXml";
 import {applyUnitRules,japaneseLithologyRules,lithologyRules} from "./rules";
 import {propertyFromHeader,propertyKey,propertyDef,implausibleTests} from "./properties";
+import {validateEvidence} from "./evidence";
 
 export interface TextFile { name:string; text:string }
 // `alignments` names the lines read, when alignment files were among those imported; `cpts` the CPTs added.
@@ -131,7 +132,8 @@ const ALIASES={
   erosive:["erosive","erosion","erosivebase","unconformity"],
   gamma:["gamma","unitweight","bulkunitweight","gammabulk","gammaknm3"],
   gammaSat:["gammasat","saturatedunitweight","gammasaturated","satunitweight"],
-  source:["source","reference","ref","provenance"]
+  source:["source","reference","ref","provenance"],
+  evidenceId:["evidenceid"]
 };
 type Field=keyof typeof ALIASES;
 function columns(header:string[]){
@@ -146,7 +148,7 @@ function num(v:string|undefined){
   return Number(/^-?\d+,\d+$/.test(s)?s.replace(",","."):s);
 }
 
-interface Collar { x:number; y:number; z:number; depth?:number; lon?:number; lat?:number; spt?:SptTest[]; water?:WaterLevel[]; tests?:TestResult[] }
+interface Collar { x:number; y:number; z:number; depth?:number; lon?:number; lat?:number; spt?:SptTest[]; water?:WaterLevel[]; tests?:TestResult[]; evidenceId?:string }
 // Tests and water readings per borehole, from tables other than the collars. `rules` group logged descriptions into
 // units when the intervals carry descriptions only. `cpts` holds the readings of each CPT, with its position where its
 // own rows give it, else that of its location (`loca`) or name in the collars.
@@ -240,18 +242,24 @@ function readCsvTable(file:TextFile,t:Tables){
   const c=columns(rows[0]),has=(...f:Field[])=>f.every(k=>c[k]!==undefined);
   const data=rows.slice(1);
   const cell=(r:string[],f:Field)=>c[f]===undefined?undefined:r[c[f]!]?.trim();
+  // Carry the source row's ID with the parsed record, before any filtering, sorting or duplicate handling. IDs are
+  // opaque strings: neither the borehole name nor the resulting array index identifies its source evidence.
+  const evidence=(r:string[])=>{
+    const id=c.evidenceId===undefined?undefined:r[c.evidenceId];
+    return id?.trim()?{evidenceId:id}:{};
+  };
   // Lengths in metres: converted where the header names another unit in brackets, such as "Depth From (ft)".
   const lengths=new Conversions(),header=(f:Field)=>rows[0][c[f]!].trim();
   const len=(r:string[],f:Field)=>c[f]===undefined?NaN:lengths.metres(num(cell(r,f)),header(f),bracketed(rows[0][c[f]!]),c[f]);
   const water=(r:string[])=>{
     const d=len(r,"water"),date=cell(r,"date");
-    return Number.isFinite(d)?[{depth:d,...(date?{date}:{})}]:undefined;
+    return Number.isFinite(d)?[{depth:d,...(date?{date}:{}),...evidence(r)}]:undefined;
   };
-  const collar=(r:string[]):Collar=>({x:len(r,"x"),y:len(r,"y"),z:len(r,"z"),depth:len(r,"depth"),lon:num(cell(r,"lon")),lat:num(cell(r,"lat")),water:water(r)});
+  const collar=(r:string[]):Collar=>({x:len(r,"x"),y:len(r,"y"),z:len(r,"z"),depth:len(r,"depth"),lon:num(cell(r,"lon")),lat:num(cell(r,"lat")),water:water(r),...evidence(r)});
   // Property columns are the columns not taken by an identifying field; in a table of located boreholes, "E" and "N"
   // are eastings and northings, elsewhere a modulus and SPT N-values.
   const located=has("x","y")||has("lat","lon");
-  const taken=new Set((["id","testDepth","testTo","unit","from","to","description","name","color","source","water","date",...(located?["x","y","z","lat","lon","depth"]:[])] as Field[]).map(f=>c[f]));
+  const taken=new Set((["id","testDepth","testTo","unit","from","to","description","name","color","source","water","date","evidenceId",...(located?["x","y","z","lat","lon","depth"]:[])] as Field[]).map(f=>c[f]));
   const props=rows[0].map((h,i)=>({i,p:propertyFromHeader(h)})).filter(q=>q.p&&!taken.has(q.i)) as Array<{i:number;p:{key:string;scale:number}}>;
   const described=c.description!==undefined&&c.description!==c.unit;
   if(has("id","from","to")&&(has("unit")||described)&&!props.length){
@@ -261,7 +269,7 @@ function readCsvTable(file:TextFile,t:Tables){
       if(!id){t.warnings.push(`${file.name}: row without a borehole id skipped`);continue}
       const from=len(r,"from"),to=len(r,"to"),unit=cell(r,"unit")??"",name=described?cell(r,"description"):undefined;
       if(!t.intervals.has(id))t.intervals.set(id,[]);
-      t.intervals.get(id)!.push({from,to,unit,...(name?{name}:{})});
+      t.intervals.get(id)!.push({from,to,unit,...(name?{name}:{}),...evidence(r)});
       if(combined&&!t.collars.has(id))t.collars.set(id,collar(r));
     }
     if(!has("unit"))t.rules=lithologyRules;
@@ -460,6 +468,13 @@ function checkProperties(units:UnitDef[],warnings:string[]){
 }
 function readProjectJson(doc:any,file:string):ImportResult{
   const t:Tables={collars:new Map(),intervals:new Map(),units:[],warnings:[]};
+  const evidence=doc.evidence===undefined?undefined:validateEvidence(doc.evidence);
+  const records=new Set(evidence?.records.map(r=>r.id));
+  const evidenceRef=(value:unknown):{evidenceId?:string}=>{
+    if(value===undefined)return {};
+    if(typeof value!=="string"||!value.trim()||!records.has(value))throw new Error(`${file}: evidence reference ${String(value)} does not name a record in this project's evidence.`);
+    return {evidenceId:value};
+  };
   for(const u of doc.units??[]){
     const id=String(u.id??u.name??"").trim();
     if(id)t.units.push(unitDef({...u,id}));
@@ -468,17 +483,18 @@ function readProjectJson(doc:any,file:string):ImportResult{
     const id=String(b.id??"").trim();
     if(!id)continue;
     const list=(v:unknown,keys:string[])=>Array.isArray(v)?v.filter(o=>o&&keys.every(k=>Number.isFinite(Number(o[k])))):undefined;
-    t.collars.set(id,{x:Number(b.x),y:Number(b.y),z:Number(b.z),depth:b.depth===undefined?undefined:Number(b.depth),
+    t.collars.set(id,{x:Number(b.x),y:Number(b.y),z:Number(b.z),depth:b.depth===undefined?undefined:Number(b.depth),...evidenceRef(b.evidenceId),
       lon:b.lon===undefined?undefined:Number(b.lon),lat:b.lat===undefined?undefined:Number(b.lat),
-      spt:list(b.spt,["depth","blows","penetration"]),water:list(b.water,["depth"]),
+      spt:list(b.spt,["depth","blows","penetration"]),water:list(b.water,["depth"])?.map((w:any)=>({depth:Number(w.depth),...(typeof w.date==="string"?{date:w.date}:{}),...evidenceRef(w.evidenceId)})),
       tests:list(b.tests,["depth","value"])?.filter((o:any)=>typeof o.property==="string"&&o.property.trim())
         .map((o:any)=>({depth:Number(o.depth),...(Number.isFinite(Number(o.to))&&o.to!==undefined&&o.to!==null?{to:Number(o.to)}:{}),property:propertyKey(o.property),value:Number(o.value)}))});
-    t.intervals.set(id,(b.intervals??[]).map((i:any)=>({from:Number(i.from),to:Number(i.to),unit:String(i.unit??"").trim(),...(typeof i.name==="string"?{name:i.name}:{})})));
+    t.intervals.set(id,(b.intervals??[]).map((i:any)=>({from:Number(i.from),to:Number(i.to),unit:String(i.unit??"").trim(),...(typeof i.name==="string"?{name:i.name}:{}),...evidenceRef(i.evidenceId)})));
   }
   const rules:UnitRule[]|undefined=Array.isArray(doc.rules)?doc.rules.filter((r:any)=>r&&typeof r.match==="string"&&typeof r.unit==="string"):undefined;
   const crs=doc.crsProj4?{name:doc.crs||doc.crsCode||"Custom",code:doc.crsCode,proj4:String(doc.crsProj4)}:doc.crsCode?findCrs(String(doc.crsCode)):undefined;
   if(doc.crsCode&&!crs)t.warnings.push(`${file}: coordinate system ${doc.crsCode} is not known here; the model is shown without a map`);
   const result=assemble(t,doc.name||file,doc.crs,!t.units.length,crs??undefined,rules);
+  if(evidence)result.project.evidence=evidence;
   if(doc.description)result.project.description=String(doc.description);
   if(doc.source)result.project.source=String(doc.source);
   if(Number.isFinite(doc.base))result.project.base=Number(doc.base);
@@ -506,7 +522,7 @@ function readProjectJson(doc:any,file:string):ImportResult{
       if(!id||!depth?.length||qc?.length!==depth.length||!Number.isFinite(Number(c?.x))||!Number.isFinite(Number(c?.y))){result.warnings.push(`${file}: CPT ${id||"without a name"} is incomplete and was left out`);continue}
       const same=(k:"fs"|"u2"|"rf"|"qt")=>{const v=list(c[k]);return v&&v.length===depth.length?{[k]:v}:{}};
       const layers=Array.isArray(c.layers)?c.layers.filter((l:any)=>l&&Number.isFinite(Number(l.from))&&Number.isFinite(Number(l.to))&&Number(l.to)>Number(l.from))
-        .map((l:any)=>({from:Number(l.from),to:Number(l.to),unit:String(l.unit??"").trim(),...(typeof l.name==="string"?{name:l.name}:{})})):undefined;
+        .map((l:any)=>({from:Number(l.from),to:Number(l.to),unit:String(l.unit??"").trim(),...(typeof l.name==="string"?{name:l.name}:{}),...evidenceRef(l.evidenceId)})):undefined;
       cpts.push({id,x:Number(c.x),y:Number(c.y),z:c.z===null||c.z===undefined?NaN:Number(c.z),
         ...(Number.isFinite(c.lon)&&Number.isFinite(c.lat)?{lon:Number(c.lon),lat:Number(c.lat)}:{}),depth,qc,...same("fs"),...same("u2"),...same("rf"),...same("qt"),
         ...(Number(c.a)>0&&Number(c.a)<=1?{a:Number(c.a)}:{}),...(Number(c.predrill)>0?{predrill:Number(c.predrill)}:{}),...(typeof c.date==="string"?{date:c.date}:{}),
@@ -528,7 +544,7 @@ function readProjectJson(doc:any,file:string):ImportResult{
 export function toProjectJson(p:GeoProject){
   const doc={format:"geomodel3d-project",version:1,name:p.name,description:p.description,source:p.source,crs:p.crs,crsCode:p.crsCode,crsProj4:p.crsProj4,
     base:p.base,groundwaterDepth:p.groundwaterDepth,margin:p.margin,units:p.units,rules:p.rules,boreholes:p.boreholes,alignments:p.alignments,
-    cpts:p.cpts,cptLayers:p.cptLayers,cptRules:p.cptRules,terrain:p.terrain};
+    cpts:p.cpts,cptLayers:p.cptLayers,cptRules:p.cptRules,terrain:p.terrain,evidence:p.evidence};
   // Long lists of numbers (the terrain grid, CPT readings) take one line each, and so does each layer of a CPT.
   return JSON.stringify(doc,null,1).replace(/"(z|depth|qc|fs|u2|rf|qt)": \[[^\]{}"]*\]/g,m=>m.replace(/\s+/g,""))
     .replace(/\{\s*"from": [^{}\]]*?"name": "[^"]*"\s*\}/g,m=>m.replace(/\n\s*/g,""))+"\n";
@@ -584,7 +600,7 @@ function assemble(t:Tables,name:string,crsName:string|undefined,inferUnits:boole
     }
     intervals.sort((p,q)=>p.from-q.from);
     if(!intervals.length){warnings.push(`${id}: no usable intervals; not placed`);continue}
-    const b:Borehole={id,x:collar.x,y:collar.y,z:collar.z,intervals};
+    const b:Borehole={id,x:collar.x,y:collar.y,z:collar.z,intervals,...(collar.evidenceId?{evidenceId:collar.evidenceId}:{})};
     if(collar.depth!==undefined&&Number.isFinite(collar.depth)&&collar.depth>boreholeDepth(b))b.depth=collar.depth;
     if(Number.isFinite(collar.lon)&&Number.isFinite(collar.lat)){b.lon=collar.lon;b.lat=collar.lat}
     const m=t.measured?.get(id),byDepth=(p:{depth:number},q:{depth:number})=>p.depth-q.depth;

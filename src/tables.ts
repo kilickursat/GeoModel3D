@@ -1,9 +1,10 @@
 // The data editor's tables: a project as rows of text a person can type or paste, and back. A project is rebuilt from
 // the tables through the CSV importer, so data typed in are checked exactly as imported files are.
-import {GeoProject,UnitRule,Borehole} from "./schema";
+import {GeoProject,UnitRule,Borehole,boreholeDepth} from "./schema";
 import {ImportResult,importFiles,toCsv} from "./io";
 import {Crs,projectCrs,findCrs,searchCrs,customCrs} from "./crs";
 import {applyUnitRules,lithologyRules} from "./rules";
+import type {EvidenceCollection} from "./evidence";
 
 export type TableName="boreholes"|"logs"|"water"|"spt"|"tests"|"units";
 // Column headers as shown, and as written to CSV (the importer's names).
@@ -34,24 +35,42 @@ export const COLUMNS:Record<TableName,Array<{label:string;csv:string;numeric?:bo
 export const DESIGN_KEYS=["c","phi","su","E","k","K0"];
 export const TABLE_NAMES:Record<TableName,string>={boreholes:"Boreholes",logs:"Logs",water:"Water levels",spt:"SPT",tests:"Tests",units:"Units"};
 export interface ProjectFields { name:string; description:string; source:string; crs:string; groundwaterDepth:string; base:string; margin:string }
-export interface EditorTables { project:ProjectFields; rows:Record<TableName,string[][]> }
+export interface EditorTables {
+  project:ProjectFields; rows:Record<TableName,string[][]>;
+  evidence?:EvidenceCollection;
+  // Entries move with their rows when the editor inserts, removes or reorders rows. null is an unsourced row.
+  evidenceRows?:Partial<Record<TableName,(string|null)[]>>;
+}
 
 const text=(v:unknown)=>v===undefined||v===null||(typeof v==="number"&&!Number.isFinite(v))?"":String(v);
 
 export function tablesFromProject(p:GeoProject):EditorTables{
   const crs=projectCrs(p);
   const rows:Record<TableName,string[][]>={boreholes:[],logs:[],water:[],spt:[],tests:[],units:[]};
+  const evidenceRows={boreholes:[] as (string|null)[],logs:[] as (string|null)[],water:[] as (string|null)[]};
+  const records=new Map(p.evidence?.records.map(r=>[r.id,r]));
   for(const b of p.boreholes){
-    rows.boreholes.push([b.id,text(b.x),text(b.y),text(b.lat),text(b.lon),text(b.z),text(b.depth)]);
-    for(const i of b.intervals)rows.logs.push([b.id,text(i.from),text(i.to),i.unit,i.name??""]);
-    for(const w of b.water??[])rows.water.push([b.id,text(w.depth),w.date??""]);
+    let depth=text(b.depth);
+    // The importer omits a redundant final depth. Restore its recorded text only when it still matches the actual
+    // deepest log; evidence from another interpretation must never extend this borehole on a subsequent build.
+    const recorded=b.evidenceId?records.get(b.evidenceId)?.fields.depth:undefined;
+    if(b.depth===undefined&&recorded?.original.trim()&&recorded.current.trim()){
+      const value=Number(recorded.current.trim().replace(",","."));
+      if(Number.isFinite(value)&&value===boreholeDepth(b))depth=recorded.current;
+    }
+    rows.boreholes.push([b.id,text(b.x),text(b.y),text(b.lat),text(b.lon),text(b.z),depth]);
+    evidenceRows.boreholes.push(b.evidenceId??null);
+    for(const i of b.intervals){rows.logs.push([b.id,text(i.from),text(i.to),i.unit,i.name??""]);evidenceRows.logs.push(i.evidenceId??null)}
+    for(const w of b.water??[]){rows.water.push([b.id,text(w.depth),w.date??""]);evidenceRows.water.push(w.evidenceId??null)}
     for(const t of b.spt??[])rows.spt.push([b.id,text(t.depth),text(t.blows),text(t.penetration)]);
     for(const t of b.tests??[])rows.tests.push([b.id,text(t.depth),text(t.to),t.property,text(t.value)]);
   }
   for(const u of p.units)rows.units.push([u.id,u.name,u.color,u.erosive?"yes":"",text(u.gamma),text(u.gammaSat),
     ...DESIGN_KEYS.map(k=>text(u.params?.[k])),u.source??""]);
   return {project:{name:p.name,description:p.description??"",source:p.source??"",crs:crs?(crs.code&&findCrs(crs.code)?crs.code:crs.proj4):p.crs??"",
-    groundwaterDepth:text(p.groundwaterDepth),base:text(p.base),margin:text(p.margin)},rows};
+    groundwaterDepth:text(p.groundwaterDepth),base:text(p.base),margin:text(p.margin)},rows,
+    ...(p.evidence?{evidence:structuredClone(p.evidence)}:{}),
+    ...(Object.values(evidenceRows).some(ids=>ids.some(id=>id!==null))?{evidenceRows}:{})};
 }
 export function emptyTables():EditorTables{
   return {project:{name:"New project",description:"",source:"",crs:"",groundwaterDepth:"",base:"",margin:""},
@@ -97,13 +116,21 @@ export function crsFromText(value:string):Crs|undefined{
   return found.length===1?found[0]:undefined;
 }
 const filled=(r:string[])=>r.some(c=>c.trim()!=="");
-const csvOf=(name:TableName,rows:string[][])=>({name:`${name}.csv`,text:toCsv([COLUMNS[name].map(c=>c.csv),...rows.filter(filled)])});
+const csvOf=(name:TableName,rows:string[][],evidenceRows?:(string|null)[])=>({name:`${name}.csv`,text:toCsv([
+  [...COLUMNS[name].map(c=>c.csv),...(evidenceRows?["evidence_id"]:[])],
+  ...rows.flatMap((row,i)=>filled(row)?[[...row,...(evidenceRows?[evidenceRows[i]??""]:[])]]:[])
+])});
 export const tableCsv=(t:EditorTables,name:TableName)=>csvOf(name,t.rows[name]).text;
 
 // A project from the tables. What the tables do not show (terrain, unit rules, other unit parameters, lines and CPTs) is
 // kept from the project being edited; terrain, lines and CPTs only while its coordinate system stays the same.
 export function projectFromTables(t:EditorTables,base?:GeoProject):ImportResult{
   const crs=crsFromText(t.project.crs);
+  const evidence=t.evidence??base?.evidence,recordIds=new Set(evidence?.records.map(r=>r.id));
+  for(const [name,ids] of Object.entries(t.evidenceRows??{}) as Array<[TableName,(string|null)[]]>){
+    if(!Array.isArray(ids)||ids.length!==t.rows[name]?.length)throw new Error(`Evidence links for ${name} do not match the editor rows.`);
+    for(const id of ids)if(id!==null&&(typeof id!=="string"||!recordIds.has(id)))throw new Error(`Evidence reference ${String(id)} does not name a record in this project's evidence.`);
+  }
   // A single borehole needs no position, and its ground level may be left at 0 m: a case for one log.
   const holes=t.rows.boreholes.filter(filled),notes:string[]=[];
   const rows={...t.rows,boreholes:t.rows.boreholes.map(r=>{
@@ -113,8 +140,10 @@ export function projectFromTables(t:EditorTables,base?:GeoProject):ImportResult{
     if(!q[5].trim()){q[5]="0";notes.push(`${q[0]}: no ground level given; 0 m used, so elevations are minus depths`)}
     return q;
   })};
-  const files=(Object.keys(COLUMNS) as TableName[]).filter(n=>n==="boreholes"||n==="logs"||rows[n].some(filled)).map(n=>csvOf(n,rows[n]));
+  const files=(Object.keys(COLUMNS) as TableName[]).filter(n=>n==="boreholes"||n==="logs"||rows[n].some(filled))
+    .map(n=>csvOf(n,rows[n],t.evidenceRows?.[n]));
   const result=importFiles(files,undefined,crs);
+  if(evidence)result.project.evidence=structuredClone(evidence);
   result.warnings.push(...notes);
   const p=result.project,f=t.project,num=(s:string)=>s.trim()===""?undefined:Number(s.replace(",","."));
   p.name=f.name.trim()||"Untitled project";

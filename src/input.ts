@@ -6,6 +6,8 @@
 import {GeoProject} from "./schema";
 import {WorkspaceDocument,createWorkspace,updateDraft,checkpoint,restoreRevision,toWorkspaceJson} from "./workspace";
 import {createWorkspaceStore} from "./storage";
+import {changeEvidenceField,acceptEvidenceField,evidenceRecord} from "./evidence";
+import {showEvidence} from "./evidenceView";
 import {ImportResult,toProjectJson} from "./io";
 import {properties} from "./properties";
 import {buildGeologicalModel,GeoModel} from "./model";
@@ -67,7 +69,7 @@ export interface InputOptions {
 // elsewhere (the boreholes read from PDFs), with their notes; status() shows a message in the bar at the bottom.
 export interface InputWorkspace {
   element:HTMLElement; show():void; edit(project:GeoProject,message:string,notes?:string[]):void;
-  open(tables:EditorTables,message:string,notes?:string[]):void;
+  open(tables:EditorTables,message:string,notes?:string[]):boolean;
   openWorkspace(document:WorkspaceDocument,message:string):void; status(message:string):void;
 }
 
@@ -76,7 +78,7 @@ export function createInputWorkspace(o:InputOptions):InputWorkspace{
   let step:Step="start",filter="",selected="",message="",imported:string[]=[];
   let preview:{result?:ImportResult;model?:GeoModel;error?:string}={};
   let timer:ReturnType<typeof setTimeout>|undefined;
-  let view:View="stress";
+  let view:View="stress",navMarkup="";
   const store=createWorkspaceStore();
   let workspaceDocument:WorkspaceDocument|null=null,saved:WorkspaceDocument|null=null,loading=true;
   let saveMessage="Loading saved workspace…",pendingSave:WorkspaceDocument|null=null,saving=false,saveTimer:ReturnType<typeof setTimeout>|undefined;
@@ -141,22 +143,47 @@ export function createInputWorkspace(o:InputOptions):InputWorkspace{
   const edited=()=>!!t&&!!origin&&JSON.stringify(t)!==JSON.stringify(origin);
 
   function begin(tables:EditorTables,from:GeoProject|undefined,first:Step,text:string,notes:string[]=[],resume?:WorkspaceDocument){
-    if(!resume&&(edited()||saved||workspaceDocument?.revisions.length)&&!confirm("Opening this case replaces the saved workspace in this browser. Use Save workspace first to keep its draft and history. Continue?"))return;
+    if(!resume&&(edited()||saved||workspaceDocument?.revisions.length)&&!confirm("Opening this case replaces the saved workspace in this browser. Use Save workspace first to keep its draft and history. Continue?"))return false;
     t=copy(tables);origin=copy(tables);base=from?structuredClone(from):undefined;originBase=base?structuredClone(base):undefined;
     workspaceDocument=resume?structuredClone(resume):createWorkspace(t,base);
     if(from&&!resume)workspaceDocument=checkpoint(workspaceDocument,from,"Opened project");
     step=first;filter="";selected="";message=text;imported=notes;
-    render();refresh(true);
+    render();refresh(true);return true;
+  }
+
+  function sourceRecord(name:TableName,row:number){
+    const id=t?.evidenceRows?.[name]?.[row];
+    return id&&t?.evidence?evidenceRecord(t.evidence,id):undefined;
+  }
+  function evidenceFieldKey(name:TableName,column:number){
+    const csv=COLUMNS[name][column].csv;
+    return csv==="hole_id"?(name==="boreholes"?"id":"boreholeId"):csv==="water_depth"?"depth":csv;
+  }
+  function rowValues(name:TableName,row:number){
+    return Object.fromEntries(COLUMNS[name].map((_,c)=>[evidenceFieldKey(name,c),t!.rows[name][row][c]]));
+  }
+  function setTableCell(name:TableName,row:number,column:number,value:string){
+    if(!t)return;
+    const before=t.rows[name][row][column];
+    t.rows[name][row][column]=value;
+    if(before===value)return;
+    const record=sourceRecord(name,row);
+    if(record)changeEvidenceField(record,evidenceFieldKey(name,column),value,"Edited in Input data");
+  }
+  function addTableRow(name:TableName,row:string[]){
+    if(!t)return;
+    t.rows[name].push(row);t.evidenceRows?.[name]?.push(null);
   }
 
   // ---------- views ----------
 
   function renderNav(){
-    nav.innerHTML=STEPS.map((s,i)=>{
+    const markup=STEPS.map((s,i)=>{
       const label=s==="start"?"Start":s==="project"?"Project":s==="history"?"Revisions":TABLE_NAMES[s];
       const n=s==="start"||s==="project"?"":s==="history"?`<span>${workspaceDocument?.revisions.length??0}</span>`:`<span>${count(s)}</span>`;
       return `<button data-step="${s}"${s===step?' aria-current="step"':""}${!t&&s!=="start"?" disabled":""}><i>${i||""}</i>${label}${n}</button>`;
     }).join("");
+    if(markup!==navMarkup){nav.innerHTML=markup;navMarkup=markup}
   }
   function render(){
     body.innerHTML=step==="start"?startView():step==="project"?projectView():step==="history"?historyView():tableView(step);
@@ -228,7 +255,7 @@ ${field("margin","Model extent beyond the boreholes (m)","The model reaches this
 <span class="ed-help">${HELP[name]} Paste cells copied from a spreadsheet into any cell.</span></div>
 <div class="ed-table-wrap"><table class="ed-table"><thead><tr><th></th>${cols.map(c=>`<th${c.hint?` title="${esc(c.hint)}"`:""}>${esc(c.label)}</th>`).join("")}<th></th></tr></thead><tbody>${
       rows.map(({r,i},k)=>`<tr data-r="${i}"><td class="ed-n">${name==="units"?`<button class="ed-up" aria-label="Move up"${i===0?" disabled":""}>▲</button><button class="ed-down" aria-label="Move down"${i===t!.rows.units.length-1?" disabled":""}>▼</button>`:k+1}</td>${
-        r.map((v,c)=>`<td>${cell(name,i,c,v)}</td>`).join("")}<td><button class="ed-del" aria-label="Delete row">×</button></td></tr>`).join("")
+        r.map((v,c)=>`<td>${cell(name,i,c,v)}</td>`).join("")}<td>${sourceRecord(name,i)?`<button class="ed-evidence" aria-label="View evidence for row ${i+1}">Evidence</button>`:""}<button class="ed-del" aria-label="Delete row">×</button></td></tr>`).join("")
     }</tbody></table>${all>rows.length?`<p class="ed-more">Showing ${rows.length} of ${all} rows: choose a borehole above to see its rows.</p>`:""}${!all?'<p class="ed-more">No rows yet: add one, or paste cells.</p>':""}</div>`;
   }
 
@@ -405,8 +432,11 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
       return;
     }
     if(b.classList.contains("ws-workspace")&&workspaceDocument){
-      workspaceDocument=updateDraft(workspaceDocument,t,base);persist(true);
-      o.download(`${slug(t.project.name)}.workspace.geomodel3d.json`,toWorkspaceJson(workspaceDocument),"application/json");return;
+      try{
+        workspaceDocument=updateDraft(workspaceDocument,t,base);persist(true);
+        o.download(`${slug(t.project.name)}.workspace.geomodel3d.json`,toWorkspaceJson(workspaceDocument),"application/json");
+      }catch(error){message=`Workspace export failed: ${(error as Error).message}`;status.textContent=message;status.title=message}
+      return;
     }
     if(b.classList.contains("ws-build")){
       try{
@@ -424,13 +454,29 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
     if(b.classList.contains("ws-discard")){if(origin&&confirm("Discard the edits made since this case was opened?")){t=copy(origin);base=originBase?structuredClone(originBase):undefined;message="Edits discarded";render();refresh(true)}return}
     if(step==="start"||step==="project"||step==="history")return;
     const name=step,row=Number(b.closest("tr")?.dataset.r);
+    if(b.classList.contains("ed-evidence")){
+      const record=sourceRecord(name,row);
+      if(record&&t.evidence){
+        const currentValues=rowValues(name,row);
+        showEvidence(t.evidence,record.id,`Source evidence · ${TABLE_NAMES[name]}, row ${row+1}`,{currentValues,onAccept:key=>{
+          if(Object.hasOwn(currentValues,key))changeEvidenceField(record,key,currentValues[key],"Current input value reviewed against the source");
+          acceptEvidenceField(record,key);refresh();
+        }});
+      }
+      return;
+    }
     if(b.classList.contains("ws-csv"))o.download(`${slug(t.project.name)}-${name}.csv`,tableCsv(t,name),"text/csv");
-    else if(b.classList.contains("ed-add")){t.rows[name].push(blankRow(name));render();refresh();body.querySelector<HTMLInputElement>("tbody tr:last-child input")?.focus()}
-    else if(b.classList.contains("ed-del")){t.rows[name].splice(row,1);render();refresh()}
+    else if(b.classList.contains("ed-add")){addTableRow(name,blankRow(name));render();refresh();body.querySelector<HTMLInputElement>("tbody tr:last-child input")?.focus()}
+    else if(b.classList.contains("ed-del")){t.rows[name].splice(row,1);t.evidenceRows?.[name]?.splice(row,1);render();refresh()}
     else if(b.classList.contains("ed-up")||b.classList.contains("ed-down")){
       const to=row+(b.classList.contains("ed-up")?-1:1),u=t.rows.units;
-      [u[row],u[to]]=[u[to],u[row]];render();refresh();
-    }else if(b.classList.contains("ed-fill")){const n=fillUnits(t,base?.rules);message=`${n} unit${n===1?"":"s"} filled from the descriptions`;render();refresh()}
+      [u[row],u[to]]=[u[to],u[row]];
+      const refs=t.evidenceRows?.units;if(refs)[refs[row],refs[to]]=[refs[to],refs[row]];
+      render();refresh();
+    }else if(b.classList.contains("ed-fill")){
+      const before=t.rows.logs.map(r=>r[3]),n=fillUnits(t,base?.rules);
+      t.rows.logs.forEach((r,i)=>{if(r[3]!==before[i]){const record=sourceRecord("logs",i);if(record)changeEvidenceField(record,"unit",r[3],"Assigned by unit rules in Input data")}});
+      message=`${n} unit${n===1?"":"s"} filled from the descriptions`;render();refresh()}
   });
   el.addEventListener("input",e=>{
     const f=e.target as HTMLInputElement|HTMLTextAreaElement;
@@ -438,7 +484,7 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
     if(f.dataset.field){t.project[f.dataset.field as keyof EditorTables["project"]]=f.value;refresh();return}
     if(f.dataset.r===undefined||step==="start"||step==="project"||step==="history")return;
     const v=f instanceof HTMLInputElement&&f.type==="checkbox"?(f.checked?"yes":""):f.value;
-    t.rows[step][Number(f.dataset.r)][Number(f.dataset.c)]=v;
+    setTableCell(step,Number(f.dataset.r),Number(f.dataset.c),v);
     if(f instanceof HTMLInputElement&&f.type==="color"){f.classList.remove("ed-blank");f.title=v}
     refresh();
   });
@@ -465,8 +511,8 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
     const shown=shownRows(name).rows.map(q=>q.i),c0=Number(f.dataset.c),p0=shown.indexOf(Number(f.dataset.r));
     lines.forEach((cells,k)=>{
       let r=shown[p0+k];
-      if(r===undefined){t!.rows[name].push(blankRow(name));r=t!.rows[name].length-1}
-      cells.forEach((v,j)=>{if(c0+j<COLUMNS[name].length)t!.rows[name][r][c0+j]=v.trim()});
+      if(r===undefined){addTableRow(name,blankRow(name));r=t!.rows[name].length-1}
+      cells.forEach((v,j)=>{if(c0+j<COLUMNS[name].length)setTableCell(name,r,c0+j,v.trim())});
     });
     message=`${lines.length} row${lines.length===1?"":"s"} pasted`;
     render();refresh();
@@ -476,7 +522,7 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
     element:el,
     show(){if(!t&&step!=="start")step="start";render();refresh(true)},
     edit(project,text,notes){begin(tablesFromProject(project),project,"boreholes",text,notes)},
-    open(tables,text,notes){begin(tables,undefined,"boreholes",text,notes)},
+    open(tables,text,notes){return begin(tables,undefined,"boreholes",text,notes)},
     openWorkspace(doc,text){
       if((edited()||saved&&saved.id!==doc.id)&&!confirm("Replace the saved workspace with this file? Use Save workspace first to keep the current draft and history."))return;
       begin(doc.draft.tables,doc.draft.base,"history",text,[],doc);

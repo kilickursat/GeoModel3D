@@ -130,7 +130,7 @@ describe("workspace validation",()=>{
   const document=()=>JSON.parse(toWorkspaceJson(checkpoint(createWorkspace(tablesFromProject(site()),site()),site(),"Build")));
   it.each([
     ["format",(d:any)=>{d.format="geomodel3d-project"}],
-    ["version",(d:any)=>{d.version=2}],
+    ["version",(d:any)=>{d.version=99}],
     ["id",(d:any)=>{d.id=""}],
     ["savedAt",(d:any)=>{d.savedAt="yesterday"}],
     ["activeRevisionId",(d:any)=>{d.activeRevisionId="missing"}],
