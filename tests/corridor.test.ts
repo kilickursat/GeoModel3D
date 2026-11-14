@@ -98,10 +98,13 @@ describe("corridor station screening",()=>{
 
   it("only counts admitted CPT layer logs as nearest support",()=>{
     const p=project();p.cpts=[{id:"CPT-mid",x:5,y:5,z:10,depth:[1,2],qc:[2,4],layersSource:"reviewed",layers:[{from:0,to:4,unit:"clay"},{from:4,to:20,unit:"sand"}]}];
-    const ignored=station(analyzeCorridor(p,line(),{step:5}),110);
+    const report=analyzeCorridor(p,line(),{step:5}),ignored=station(report,110);
     expect(ignored.nearestLog!.kind).toBe("borehole");expect(ignored.nearestLog!.distance).toBeGreaterThan(7);
+    expect(report.usedLogs.every(log=>log.kind==="borehole")).toBe(true);expect(report.modelBase).toBe(-10);
     p.cptLayers=true;
-    expect(station(analyzeCorridor(p,line(),{step:5}),110).nearestLog).toEqual({id:"CPT-mid",kind:"cpt",distance:0});
+    const included=analyzeCorridor(p,line(),{step:5});
+    expect(station(included,110).nearestLog).toEqual({id:"CPT-mid",kind:"cpt",distance:0});
+    expect(included.usedLogs).toContainEqual({id:"CPT-mid",kind:"cpt",x:5,y:5});
   });
 
   it("uses supplied chainages without treating them as plan distance",()=>{

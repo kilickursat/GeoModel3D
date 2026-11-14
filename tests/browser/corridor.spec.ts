@@ -102,7 +102,7 @@ test("corridor dashboard screens fixed stations, invalidates exports and returns
   expect(middle.flags).toContain("low-cover");expect(middle.flags).toContain("water-above-design");expect(middle.flags).toContain("distant-support");
   expect(middle.project_name).toBe("Corridor design");expect(middle.alignment_name).toBe("River corridor");
   expect(middle.requested_step_m).toBe("10");expect(middle.min_cover_screen_m).toBe("5");expect(middle.max_support_distance_screen_m).toBe("10");
-  expect(middle.engine_version).toBe("0.19.1");expect(middle.scenario_label).toBe("Baseline");
+  expect(middle.engine_version).toBe(JSON.parse(readFileSync(resolve("package.json"),"utf8")).version);expect(middle.scenario_label).toBe("Baseline");
   expect(Number.isFinite(Date.parse(middle.snapshot_captured_at))).toBe(true);
   expect(JSON.parse(middle.alignment_geometry)).toEqual(project().alignments[0].points);
   expect(JSON.parse(middle.design_levels)).toEqual(project().alignments[0].design);

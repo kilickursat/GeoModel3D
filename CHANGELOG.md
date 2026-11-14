@@ -2,7 +2,10 @@
 
 ## Unreleased
 
+## 0.20.0 — 2026-11-14
+
 ### Added
+- Investigation planner from the corridor dashboard: deterministic proposals from sampled gaps, location-count budgets, physical spacing, optional flag priorities and geometric depth targets. CSV and plan JSON preserve the snapshot and method; proposed locations never become measured logs. Works locally in a cancelable worker and in the standalone file.
 - Corridor dashboard along a project alignment: sampled ground/design/water profiles, units at design levels, cover and water head, nearest used-log distances, screening flags and CSV. User thresholds, unknown data and model gaps stay explicit. Changing settings invalidates the results; calculations are cancelable and work in the standalone file.
 - New-data impact review for two saved revisions: an input-change register, mapped and ranked new boreholes, and checks of the before model's predictions against their logged contacts and units. Signed forecast errors and model shifts are kept separate; CSV identifies the pinned revisions. Other assumption changes and unavailable coverage are explicit. Runs locally in a cancelable worker, including in the standalone HTML.
 - Named scenarios in **Input data → Scenarios**, created from an unfinished draft or a fixed revision. Switching preserves each scenario's unfinished values, source evidence and independent revision head. Workspace format 3 includes all scenario drafts and reads earlier workspace formats.
@@ -16,6 +19,9 @@
 - Project revisions in **Input data → Revisions**. Opening a project records its baseline; **Build model** records changed projects. Restore an earlier revision without removing later ones, then build a new branch of the history.
 - **Save workspace** exports the unfinished draft and revision history as workspace JSON. Import one workspace file to continue it on another browser; existing project JSON still contains just one project.
 - Repeatable desktop, mobile and standalone-file UI checks with Playwright (`npm run test:ui`).
+
+### Changed
+- The app header shows the full package version, including patch releases. Release metadata, the lockfile and software citation are updated to 0.20.0.
 
 ### Fixed
 - Alignment sections retain distinct model crossings when supplied chainages begin at a very large value, including when their scale differs from physical line distance.

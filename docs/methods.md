@@ -73,6 +73,8 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 - `src/alignment.ts`: sections along an alignment, chainage, cross-sections square to the line, lines crossing straight sections, and the table by chainage
 - `src/corridor.ts`: bounded station sampling, design-level readouts and corridor screening flags
 - `src/corridorView.ts`, `src/corridorJob.ts`, `src/corridor.worker.ts`: corridor dashboard and cancelable offline calculation worker
+- `src/investigation.ts`: deterministic farthest-first selection of candidate investigation locations, spacing exclusions and geometric depth targets
+- `src/investigationView.ts`, `src/investigationJob.ts`, `src/investigation.worker.ts`: pinned investigation-plan review and export, with a cancelable offline worker
 - `src/landxml.ts`: LandXML and J-LandXML alignments (straights, arcs, clothoids, design profiles)
 - `src/cpt.ts`: cone penetration tests: GEF, BRO and DOV readers, the friction ratio, readings at a depth and averages over depth
 - `src/sbt.ts`: the soil behaviour type of CPTs (Robertson 2009) and the layers it gives

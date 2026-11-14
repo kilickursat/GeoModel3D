@@ -3,6 +3,7 @@ import type {Alignment,GeoProject} from "./schema";
 import type {CorridorFlag,CorridorOptions,CorridorPosition,CorridorReport,CorridorStation} from "./corridor";
 import {corridorCsv} from "./corridor";
 import {createCorridorJob} from "./corridorJob";
+import {showInvestigationPlanner} from "./investigationView";
 import {parseCsv,toCsv} from "./io";
 import pkg from "../package.json";
 import "./corridor.css";
@@ -32,7 +33,7 @@ export function showCorridor(source:GeoProject,line:Alignment,options:CorridorVi
   dialog.innerHTML=`<header class="corridor-header"><h2 id="${heading}">Corridor dashboard</h2><button type="button" class="corridor-close" aria-label="Close corridor dashboard">Close</button></header>
 <div class="corridor-body"><div class="corridor-context"><b>${esc(options.projectLabel?`${options.projectLabel} · ${project.name}`:project.name)}</b><span>Alignment: ${esc(alignment.name)}</span><small>Snapshot opened ${esc(new Date(capturedAt).toLocaleString())} · GeoModel3D ${esc(engineVersion)}</small></div>
 <p>Review ground, design levels and nearby used logs along this alignment. Flags describe screening conditions at sampled stations; they are not safety or design acceptance criteria.</p>
-<form class="corridor-controls" novalidate><label>Station spacing (chainage m)<input class="corridor-step" type="number" min="0" step="any" required value="${finite(options.initialStep)&&options.initialStep!>0?options.initialStep:10}"></label><label>Minimum cover screen (m), optional<input class="corridor-min-cover" type="number" min="0" step="any" value="5" placeholder="Off"></label><label>Maximum used-log distance screen (m), optional<input class="corridor-max-distance" type="number" min="0" step="any" value="100" placeholder="Off"></label><p class="corridor-setting-note">The 5 m cover and 100 m distance screens are editable starting values. Clear either field to disable that screen. Log distance is measured in plan and does not measure confidence.</p><div class="corridor-actions"><button type="submit" class="corridor-run">Run dashboard</button><button type="button" class="corridor-cancel" hidden>Cancel</button><button type="button" class="corridor-csv" disabled>Download corridor CSV</button></div></form>
+<form class="corridor-controls" novalidate><label>Station spacing (chainage m)<input class="corridor-step" type="number" min="0" step="any" required value="${finite(options.initialStep)&&options.initialStep!>0?options.initialStep:10}"></label><label>Minimum cover screen (m), optional<input class="corridor-min-cover" type="number" min="0" step="any" value="5" placeholder="Off"></label><label>Maximum used-log distance screen (m), optional<input class="corridor-max-distance" type="number" min="0" step="any" value="100" placeholder="Off"></label><p class="corridor-setting-note">The 5 m cover and 100 m distance screens are editable starting values. Clear either field to disable that screen. Log distance is measured in plan and does not measure confidence.</p><div class="corridor-actions"><button type="submit" class="corridor-run">Run dashboard</button><button type="button" class="corridor-cancel" hidden>Cancel</button><button type="button" class="corridor-csv" disabled>Download corridor CSV</button><button type="button" class="corridor-plan">Plan investigation</button></div></form>
 <p class="corridor-status" role="status">Choose screening settings, then run the dashboard.</p><p class="corridor-error" role="alert" hidden></p><div class="corridor-results" hidden></div></div>`;
   const $=<T extends HTMLElement>(selector:string)=>dialog.querySelector<T>(selector)!;
   const closeButton=$<HTMLButtonElement>(".corridor-close"),runButton=$<HTMLButtonElement>(".corridor-run"),cancelButton=$<HTMLButtonElement>(".corridor-cancel"),csvButton=$<HTMLButtonElement>(".corridor-csv");
@@ -146,6 +147,14 @@ export function showCorridor(source:GeoProject,line:Alignment,options:CorridorVi
   controls.addEventListener("submit",event=>{event.preventDefault();void run()});
   controls.addEventListener("input",()=>reset());controls.addEventListener("change",()=>reset());
   cancelButton.onclick=()=>{reset("Corridor dashboard canceled.");runButton.focus({preventScroll:true})};csvButton.onclick=exportCsv;closeButton.onclick=close;
+  $<HTMLButtonElement>(".corridor-plan").onclick=()=>{
+    let initial:CorridorOptions;
+    try{initial=settings()}catch(err){error.textContent=(err as Error).message;error.hidden=false;status.textContent="Fix the settings before opening the planner.";return}
+    close();
+    showInvestigationPlanner(project,alignment,{download:options.download,projectLabel:options.projectLabel,engineVersion,
+      initialStep:initial.step,initialMinCover:initial.minCover,initialMaxSupportDistance:initial.maxSupportDistance,
+      onSelectChainage:options.onSelectChainage});
+  };
   results.addEventListener("change",event=>{
     const select=event.target as HTMLSelectElement;
     if(select.classList.contains("corridor-station"))choose(Number(select.value));

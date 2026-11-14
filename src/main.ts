@@ -832,7 +832,7 @@ const ui=document.createElement("div");
 ui.className="ui";
 // On a small screen each panel opens as a sheet, with a title, buttons of its own and a close button.
 const sheetHead=(title:string,buttons="")=>`<div class="sheet-head"><b>${title}</b>${buttons}<button class="sheet-close" aria-label="Close">×</button></div>`;
-ui.innerHTML=`<div class="topbar"></div><h1 class="title">GeoModel3D <span>${pkg.version.split(".").slice(0,2).join(".")}</span></h1>
+ui.innerHTML=`<div class="topbar"></div><h1 class="title">GeoModel3D <span>${pkg.version}</span></h1>
 <button class="site-name" aria-controls="sheet-site"></button>
 <div class="panel" id="sheet-site">
   ${sheetHead("Site")}

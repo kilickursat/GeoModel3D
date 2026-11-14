@@ -33,6 +33,9 @@ export default defineConfig({
     {name:"corridor",testMatch:/corridor\.spec\.ts$/,grepInvert:/mobile corridor dashboard|standalone corridor dashboard/,use:{...devices["Desktop Chrome"],viewport:{width:1440,height:1000}}},
     {name:"corridor-mobile",testMatch:/corridor\.spec\.ts$/,grep:/mobile corridor dashboard/,use:{...devices["Pixel 7"]}},
     {name:"corridor-offline",testMatch:/corridor\.spec\.ts$/,grep:/standalone corridor dashboard/,use:{...devices["Desktop Chrome"]}},
+    {name:"investigation",testMatch:/investigation\.spec\.ts$/,grepInvert:/mobile investigation planner|standalone investigation planner/,use:{...devices["Desktop Chrome"],viewport:{width:1440,height:1000}}},
+    {name:"investigation-mobile",testMatch:/investigation\.spec\.ts$/,grep:/mobile investigation planner/,use:{...devices["Pixel 7"]}},
+    {name:"investigation-offline",testMatch:/investigation\.spec\.ts$/,grep:/standalone investigation planner/,use:{...devices["Desktop Chrome"]}},
     {name:"offline",testMatch:/offline\.spec\.ts$/,use:{...devices["Desktop Chrome"]}}
   ],
   webServer:{command:"npm run dev -- --host 127.0.0.1 --port 4173 --strictPort",url:"http://127.0.0.1:4173",reuseExistingServer:!process.env.CI,timeout:30_000}

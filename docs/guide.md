@@ -230,6 +230,22 @@ Select a station to inspect it, or **View at chainage** to move the existing mod
 
 The station list retains alignment ends, vertices, design knots and model entry/exit boundaries, with explicit gaps. Work is limited to 2,001 stations and regular spacing may be increased, as reported. Supplied chainages are retained even if their scale differs from the line's physical length. Results and extrema describe the sampled stations; hazards and extrema between them can be missed. Counts are station counts, not percentages of route length. Groundwater head is an elevation difference, not pressure or a flow calculation. A short distance to a used log does not measure confidence, and being inside a model with an extended margin does not establish observation support. Use common horizontal and height datums for the model and design.
 
+### Investigation planner
+
+Open **Corridor → Plan investigation**, choose a location budget, minimum spacing and candidate spacing, then **Generate plan**. A dashboard calculation is not required first. The planner pins the displayed project and alignment; the corridor's current sampling and cover/distance screens are carried into its controls. Budget means a count of proposed locations, not money. Defaults are five locations and 20 m minimum spacing.
+
+The default method picks the eligible sampled station furthest in plan from logs used by the model and earlier proposals, repeating until the budget is filled or spacing rules prevent further choices. Equal distances retain increasing chainage order. This greedy method does not claim to find an optimal investigation programme or predict statistical information gain. The map and location details explain every selection.
+
+Minimum spacing is a horizontal distance in project coordinates, regardless of the chainage scale. It applies to every recorded borehole/CPT collar, including logs excluded from the model, and to earlier proposals. Coincident locations within 1 mm are always excluded. Repeated positions on a looping alignment are considered once. The planner reports excluded candidates and a budget shortfall rather than forcing locations into gaps that cannot meet the settings.
+
+**Prioritize known screening flags** considers stations with cover, water-above-design, design-position or log-distance flags before other eligible stations, then uses the same distance rule. Missing data are not assigned an assumed hazard severity. **Include stations outside the model** explicitly permits extension proposals; their ground, geological predictions and depth stay unavailable. If there are no used baseline logs, the first geometric seed is nearest the chainage midpoint and the baseline distance proxy is unavailable.
+
+Depth is optional. With **Depth below design**, the geometric target is model ground minus design bottom (or top when no bottom is supplied), plus the entered extension. A target at or above ground does not produce a fictitious zero-depth hole. Missing ground or design leaves depth unavailable; termination below the model base is identified. These are geometric targets, not prescribed investigation depths or surveyed proposal elevations.
+
+The two maximum-gap summaries use the same initial eligible station grid. The second treats proposed positions as hypothetical distance points; the geological model has not improved and no drilling has occurred. Candidate spacing is bounded to 2,001 stations through the corridor sampler, and unsampled locations may differ. The planner does not account for field access or construction constraints.
+
+**Download proposal CSV** and **Download plan JSON** preserve selected positions, reasons, settings, exclusions, snapshot time, scenario label, engine version and coordinate-system metadata. JSON is a planning archive, not a measured project or workspace. **View at chainage** moves the original model's alignment marker to a proposal. Generating or exporting a plan does not add boreholes or alter drafts, revisions or measurements. Changing settings invalidates results and exports; cancel or close stops the worker. The planner also works in the standalone HTML.
+
 ## Cone penetration tests
 
 CPTs come with the boreholes or are added to the site shown, from the files above. The Maasvlakte site has 26 BRO CPTs.

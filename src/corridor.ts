@@ -11,6 +11,7 @@ export interface CorridorOptions { step?:number;minCover?:number;maxSupportDista
 export type CorridorPosition="inside"|"above-ground"|"below-model"|"outside-model";
 export type CorridorFlag="outside-model"|"missing-design"|"above-ground"|"below-model"|"low-cover"|"water-above-design"|"water-unknown"|"distant-support"|"no-support";
 export interface CorridorUnit { id:string;name:string;color:string }
+export interface CorridorLog { id:string;kind:"borehole"|"cpt";x:number;y:number }
 export interface CorridorStation {
   chainage:number;x:number;y:number;inside:boolean;ground?:number;water?:number;top?:number;bottom?:number;
   cover?:number;waterHead?:number;topPosition?:CorridorPosition;bottomPosition?:CorridorPosition;
@@ -22,6 +23,7 @@ export interface CorridorReport {
   format:"geomodel3d-corridor";version:1;projectName:string;alignment:Alignment;
   options:{step:number;minCover?:number;maxSupportDistance?:number;maxSamples:number};
   range:{start:number;end:number;actualStep:number};units:CorridorUnit[];stations:CorridorStation[];
+  usedLogs:CorridorLog[];modelBase?:number;
   summary:{stationCount:number;insideCount:number;designCount:number;flaggedStationCount:number;counts:Record<CorridorFlag,number>;
     minCover?:CorridorExtremum;maxWaterHead?:CorridorExtremum;maxLogDistance?:CorridorExtremum};
   notes:string[];
@@ -56,7 +58,7 @@ export function analyzeCorridor(project:GeoProject,alignment:Alignment,options:C
   const segments=Math.max(1,Math.min(Math.ceil(length/step),cap-mandatory.length+1)),actualStep=length/segments;
   const positions=unique([...mandatory,...Array.from({length:segments-1},(_,i)=>start+(i+1)*actualStep)]);
   const units=model.units.map(({id,name,color})=>({id,name,color}));
-  const usedLogs=[...model.boreholes.map(b=>({...b,kind:"borehole" as const})),...model.cptLogs.map(c=>({...c,kind:"cpt" as const}))];
+  const usedLogs:CorridorLog[]=[...model.boreholes.map(({id,x,y})=>({id,x,y,kind:"borehole" as const})),...model.cptLogs.map(({id,x,y})=>({id,x,y,kind:"cpt" as const}))];
   const position=(z:number[],e:number):{position:CorridorPosition;unit?:CorridorUnit}=>{
     if(e>z[0]+1e-9)return {position:"above-ground"};
     for(let k=0;k<units.length;k++)if(e>=z[k+1]-1e-9&&z[k]-z[k+1]>1e-9)return {position:"inside",unit:units[k]};
@@ -109,7 +111,7 @@ export function analyzeCorridor(project:GeoProject,alignment:Alignment,options:C
   const minCover=extremum(stations,s=>s.cover,true),maxWaterHead=extremum(stations,s=>s.waterHead),maxLogDistance=extremum(stations,s=>s.nearestLog?.distance);
   return {format:"geomodel3d-corridor",version:1,projectName:project.name,alignment:structuredClone(alignment),
     options:{step,maxSamples:cap,...(options.minCover===undefined?{}:{minCover:options.minCover}),...(options.maxSupportDistance===undefined?{}:{maxSupportDistance:options.maxSupportDistance})},
-    range:{start,end,actualStep},units,stations,
+    range:{start,end,actualStep},units,stations,usedLogs,...(model.triangles.length&&finite(model.base)?{modelBase:model.base}:{}),
     summary:{stationCount:stations.length,insideCount:stations.filter(s=>s.inside).length,designCount:stations.filter(s=>s.top!==undefined).length,
       flaggedStationCount:stations.filter(s=>s.flags.length).length,counts,...(minCover?{minCover}:{}),...(maxWaterHead?{maxWaterHead}:{}),...(maxLogDistance?{maxLogDistance}:{})},notes};
 }
