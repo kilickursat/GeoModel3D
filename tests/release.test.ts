@@ -53,24 +53,38 @@ function publication(initial:Record<string,unknown>={}){
   const dir=fixture(),bin=join(dir,"bin"),stateFile=join(dir,"github-state.json");
   mkdirSync(bin);mkdirSync(join(dir,"dist"));
   writeFileSync(join(dir,"dist/geomodel3d-offline.html"),"<!doctype html><title>GeoModel3D 0.21.0</title>");
-  writeFileSync(stateFile,JSON.stringify({remoteCommit:builtCommit,latest:"v0.20.0",mutations:[],uploadAttempts:[],...initial}));
+  const state={remoteCommit:builtCommit,latest:"v0.20.0",mutations:[],uploadAttempts:[],apiCalls:[],...initial} as Record<string,any>;
+  if(state.release)state.release={id:1,tag_name:"v0.21.0",...state.release};
+  writeFileSync(stateFile,JSON.stringify(state));
   writeFileSync(join(bin,"git"),`#!${process.execPath}\nif(JSON.stringify(process.argv.slice(2))!==JSON.stringify(["rev-parse","HEAD"]))process.exit(90);console.log(${JSON.stringify(builtCommit)});\n`,{mode:0o755});
   writeFileSync(join(bin,"gh"),`#!${process.execPath}
 const fs=require("node:fs"),path=require("node:path"),crypto=require("node:crypto");
 const stateFile=process.env.GH_TEST_STATE,state=JSON.parse(fs.readFileSync(stateFile,"utf8")),args=process.argv.slice(2);
 function finish(value,error){fs.writeFileSync(stateFile,JSON.stringify(state));if(error){console.error(error);process.exit(1)}if(value!==undefined)console.log(JSON.stringify(value));process.exit(0)}
 if(args[0]==="api"){
-  const endpoint=args[1];
+  const endpoint=args[1],url=new URL(endpoint,"https://example.invalid/");state.apiCalls.push(endpoint);
   if(endpoint.includes("/git/ref/tags/"))finish({object:{type:"tag",sha:"annotated-tag"}});
   if(endpoint.includes("/git/tags/"))finish({object:{type:"commit",sha:state.remoteCommit}});
   if(endpoint.endsWith("/releases/latest"))finish(state.latest?{tag_name:state.latest}:undefined,state.latest?undefined:"gh: Not Found (HTTP 404)");
-  if(endpoint.includes("/releases/tags/"))finish(state.release,state.release?undefined:"gh: Not Found (HTTP 404)");
+  // GitHub's by-tag endpoint intentionally excludes draft releases, even for an authenticated owner.
+  if(endpoint.includes("/releases/tags/")){
+    const published=state.release&&!state.release.draft;finish(published?state.release:undefined,published?undefined:"gh: Not Found (HTTP 404)");
+  }
+  const listed=[...(state.listedReleases??[]),...(state.release?[state.release]:[])];
+  if(url.pathname.endsWith("/releases")){
+    const page=Number(url.searchParams.get("page")??1),perPage=Number(url.searchParams.get("per_page")??100);
+    finish(listed.slice((page-1)*perPage,page*perPage));
+  }
+  const id=Number(url.pathname.split("/").at(-1));
+  if(url.pathname.includes("/releases/")&&Number.isInteger(id)){
+    const release=listed.find(release=>release.id===id);finish(release,release?undefined:"gh: Not Found (HTTP 404)");
+  }
   finish(undefined,"Unexpected API endpoint");
 }
 if(args[0]!=="release")finish(undefined,"Unexpected command");
 if(args[1]==="create"){
   state.mutations.push("create");
-  state.release={draft:true,tag_name:args[2],assets:[],html_url:"https://example.invalid/draft",body:fs.readFileSync(args[args.indexOf("--notes-file")+1],"utf8")};finish();
+  state.release={id:1,draft:true,tag_name:args[2],assets:[],html_url:"https://example.invalid/draft",body:fs.readFileSync(args[args.indexOf("--notes-file")+1],"utf8")};finish();
 }
 if(args[1]==="upload"){
   const file=args[3],name=path.basename(file);state.uploadAttempts.push(name);
@@ -99,6 +113,8 @@ describe("release publication lifecycle",()=>{
       const done=p.state();expect(done.release.draft).toBe(false);expect(done.markedLatest).toBe(true);
       expect(done.uploadAttempts).toEqual(["geomodel3d-offline.html","SHA256SUMS.txt","SHA256SUMS.txt"]);
       expect(done.mutations).toEqual(["create","upload:geomodel3d-offline.html","upload:SHA256SUMS.txt","publish"]);
+      expect(done.apiCalls.some((path:string)=>path.includes("/releases?per_page=100&page=1"))).toBe(true);
+      expect(done.apiCalls.filter((path:string)=>path.endsWith("/releases/1")).length).toBeGreaterThanOrEqual(3);
       expect(JSON.parse(resumed.stdout)).toMatchObject({created:false,draft:false,url:done.release.html_url});
     }finally{rmSync(p.dir,{recursive:true,force:true})}
   });
@@ -133,9 +149,28 @@ describe("release publication lifecycle",()=>{
     const existing={draft:false,body:"Published notes",assets:[{name:"SHA256SUMS.txt",state:"uploaded",digest:"sha256:conflicting"}]};
     const p=publication({release:existing});
     try{
+      const before=p.state().release;
       const result=p.run();expect(result.status).toBe(1);expect(result.stderr).toContain("Existing SHA256SUMS.txt");
       expect(p.state().mutations).toEqual([]);expect(p.state().uploadAttempts).toEqual([]);
-      expect(p.state().release).toEqual(existing);
+      expect(p.state().release).toEqual(before);
+    }finally{rmSync(p.dir,{recursive:true,force:true})}
+  });
+  it("finds and resumes an owned draft on a second authenticated release-list page",()=>{
+    const unrelated=Array.from({length:100},(_,i)=>({id:100+i,tag_name:`v0.1.${i}`,draft:false}));
+    const p=publication({listedReleases:unrelated,release:{id:445261559,draft:true,assets:[],body:`Owned interrupted draft\n<!-- geomodel3d-release-assets:v0.21.0:${builtCommit} -->`}});
+    try{
+      const result=p.run();expect(result.status,result.stderr).toBe(0);
+      const done=p.state();expect(done.release.id).toBe(445261559);expect(done.release.draft).toBe(false);
+      expect(done.apiCalls.some((path:string)=>path.includes("/releases?per_page=100&page=2"))).toBe(true);
+      expect(done.apiCalls.some((path:string)=>path.endsWith("/releases/445261559"))).toBe(true);
+      expect(done.mutations).toEqual(["upload:geomodel3d-offline.html","upload:SHA256SUMS.txt","publish"]);
+    }finally{rmSync(p.dir,{recursive:true,force:true})}
+  });
+  it("rejects multiple matching draft releases instead of creating or uploading to an ambiguous release",()=>{
+    const p=publication({listedReleases:[{id:2,tag_name:"v0.21.0",draft:true,assets:[]}],release:{draft:true,assets:[],body:"An existing draft"}});
+    try{
+      const result=p.run();expect(result.status).toBe(1);expect(result.stderr).toMatch(/ambiguous|multiple|more than one|duplicate/i);
+      expect(p.state().mutations).toEqual([]);expect(p.state().uploadAttempts).toEqual([]);
     }finally{rmSync(p.dir,{recursive:true,force:true})}
   });
 });

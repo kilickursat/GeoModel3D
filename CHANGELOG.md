@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Fixed
+- Release uploads discover authenticated draft releases through the release list and refresh them by ID, so a draft can receive assets and resume after an interrupted upload before publication.
+
 ## 0.21.0 — 2026-11-14
 
 ### Added
