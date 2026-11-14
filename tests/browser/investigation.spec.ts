@@ -5,6 +5,7 @@ import {resolve} from "node:path";
 import {build,downloadJson,importJson,openInput,prepare,saved} from "./helpers";
 
 type Variant="inside"|"outside"|"unknown";
+const appVersion=JSON.parse(readFileSync(resolve("package.json"),"utf8")).version as string;
 function project(variant:Variant="inside"){
   const outside=variant==="outside",first=outside?940:1000,last=outside?1160:1100;
   return {format:"geomodel3d-project",version:1,name:`Investigation ${variant}`,crs:"Local survey grid",base:-5,
@@ -64,7 +65,7 @@ async function planDownload(page:Page){return JSON.parse((await downloadText(pag
 test("investigation planner proposes spaced locations, exports pinned plans and preserves measured data",async({page},testInfo)=>{
   test.setTimeout(90_000);
   const workspace=await openProject(page),dialog=await planner(page,false);
-  await expect(page.locator(".title span")).toHaveText("0.20.0");
+  await expect(page.locator(".title span")).toHaveText(appVersion);
   await dialog.locator(".planner-run").evaluate((button:HTMLButtonElement)=>{button.click();document.querySelector<HTMLButtonElement>(".planner-cancel")!.click()});
   await expect(dialog.locator(".planner-status")).toContainText(/cancel/i);await expect(dialog.locator(".planner-csv")).toBeDisabled();
   const canceled=await page.evaluate(async project=>{
@@ -80,13 +81,13 @@ test("investigation planner proposes spaced locations, exports pinned plans and 
   expect(Number(rows[1].x_m)).toBeCloseTo(20,6);
   for(const row of rows){expect(row.proposed_depth_m).toBe("");expect(row.reasons).not.toBe("");expect(Number(row.nearest_recorded_distance_m)).toBeGreaterThanOrEqual(20-1e-6)}
   expect(Math.hypot(Number(rows[0].x_m)-Number(rows[1].x_m),Number(rows[0].y_m)-Number(rows[1].y_m))).toBeGreaterThanOrEqual(20);
-  expect(rows[0].engine_version).toBe("0.20.0");expect(rows[0].scenario_label).toBe("Baseline");expect(Number.isFinite(Date.parse(rows[0].snapshot_captured_at))).toBe(true);
+  expect(rows[0].engine_version).toBe(appVersion);expect(rows[0].scenario_label).toBe("Baseline");expect(Number.isFinite(Date.parse(rows[0].snapshot_captured_at))).toBe(true);
   expect(rows[0].location_budget).toBe("2");expect(rows[0].minimum_spacing_m).toBe("20");expect(rows[0].eligible_candidate_count).toBe("5");
   expect(JSON.parse(rows[0].crs).name).toBe("Local survey grid");expect(JSON.parse(rows[0].alignment_geometry)).toEqual(project().alignments[0].points);
   const plan=await planDownload(page);expect(plan.format).toBe("geomodel3d-investigation-plan");expect(plan.proposals).toHaveLength(2);expect(plan.options.budget).toBe(2);
   expect(plan.usedLogs).toHaveLength(4);expect(plan.recordedLogs).toHaveLength(5);expect(plan.summary.eligibleCount).toBe(5);
   expect(plan.summary.maxGapBefore).toBeCloseTo(Math.hypot(50,10),6);expect(plan.summary.maxGapAfter).toBeCloseTo(10,6);
-  expect(plan.crs.name).toBe("Local survey grid");expect(plan.engineVersion).toBe("0.20.0");expect(plan.scenarioLabel).toBe("Baseline");
+  expect(plan.crs.name).toBe("Local survey grid");expect(plan.engineVersion).toBe(appVersion);expect(plan.scenarioLabel).toBe("Baseline");
   expect(plan.proposals[0].proposedDepth).toBeUndefined();expect(plan.proposals[0].x).toBeCloseTo(50,6);
   await page.screenshot({path:testInfo.outputPath("investigation-planner-desktop.png"),fullPage:true});
   await dialog.locator(".planner-sites").scrollIntoViewIfNeeded();await page.screenshot({path:testInfo.outputPath("investigation-planner-proposals.png"),fullPage:true});
@@ -136,7 +137,7 @@ test("standalone investigation planner runs the inline worker with networking di
   await page.route("**/*",route=>route.request().isNavigationRequest()?route.fulfill({status:200,contentType:"text/html",body:html}):route.abort());
   await context.setOffline(true);page.on("pageerror",error=>errors.push(error.message));
   await page.goto("http://127.0.0.1:4173/standalone-investigation.html?backend=webgl#input");await loadProject(page);
-  await expect(page.locator(".title span")).toHaveText("0.20.0");
+  await expect(page.locator(".title span")).toHaveText(appVersion);
   const dialog=await planner(page);await expect(dialog.locator(".planner-csv")).toBeEnabled();
   const rows=(await csvDownload(page)).rows.filter(row=>row.proposal_id);expect(rows).toHaveLength(2);expect(Number(rows[0].x_m)).toBeCloseTo(50,6);
   expect(Number(rows[0].nearest_used_log_distance_m)).toBeCloseTo(Math.hypot(50,10),6);expect(rows[0].proposed_depth_m).toBe("");

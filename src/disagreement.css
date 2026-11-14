@@ -1,0 +1,70 @@
+/* Scenario spreads, sampled errors and held-out diagnostics remain distinct within the same pinned review. */
+.disagreement-dialog{position:fixed;inset:0;width:min(1200px,calc(100% - 24px));max-width:calc(100% - 24px);height:min(960px,calc(100dvh - 24px));max-height:calc(100dvh - 24px);margin:auto;padding:0;border:1px solid var(--border-strong);border-radius:10px;background:var(--surface);color:var(--text);box-shadow:var(--shadow);overflow:hidden}
+.disagreement-dialog::backdrop{background:rgba(20,30,40,.4)}
+.disagreement-dialog[open]{display:flex;flex-direction:column}
+.disagreement-header{display:flex;align-items:center;justify-content:space-between;gap:14px;flex:none;padding:14px 16px;border-bottom:1px solid var(--border)}
+.disagreement-header h2{font-size:17px;margin:0;overflow-wrap:anywhere}
+.disagreement-dialog button{border:1px solid var(--border-strong);border-radius:var(--radius);padding:6px 10px;background:var(--surface);color:var(--text);cursor:pointer;line-height:1.3}
+.disagreement-dialog button:hover:not(:disabled){background:var(--surface-2)}
+.disagreement-dialog button:disabled{opacity:.45;cursor:default}
+.disagreement-dialog .disagreement-run{background:var(--accent);border-color:var(--accent);color:white;font-weight:600}
+.disagreement-body{min-height:0;overflow:auto;padding:16px;overscroll-behavior:contain;overflow-wrap:anywhere}
+.disagreement-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:12px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.disagreement-controls label,.disagreement-heldout-label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--text-2);min-width:0}
+.disagreement-controls .disagreement-reference-label{grid-column:1/-1}
+.disagreement-controls .disagreement-alternatives-label{grid-column:1/-1}
+.disagreement-controls small,.disagreement-caption,.disagreement-path,.disagreement-validation-summary{color:var(--text-2)}
+.disagreement-dialog input,.disagreement-dialog select{font:inherit;font-size:13px;color:var(--text);background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius);padding:6px 8px;max-width:100%;min-width:0}
+.disagreement-alternatives{min-height:88px}
+.disagreement-actions{display:flex;flex-wrap:wrap;gap:8px;grid-column:1/-1}
+.disagreement-status{min-height:20px;color:var(--text-2)}
+.disagreement-error,.disagreement-guidance{padding:9px 12px;border-left:3px solid var(--danger);background:var(--surface-2);color:var(--danger)}
+.disagreement-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0 0 12px}
+.disagreement-summary>div{border:1px solid var(--border);border-radius:var(--radius);padding:10px;min-width:0}
+.disagreement-summary dt{font-size:11px;color:var(--text-2)}
+.disagreement-summary dd{margin:4px 0 0;font-size:16px;font-weight:600}
+.disagreement-results h3{font-size:14px;margin:20px 0 8px}
+.disagreement-results h4{font-size:13px;margin:14px 0 6px}
+.disagreement-map{background:white;border:1px solid var(--border);border-radius:var(--radius);max-width:100%}
+.disagreement-map svg{display:block;width:100%}
+.disagreement-map-legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:11px;color:var(--text-2)}
+.disagreement-map-legend span{display:inline-flex;align-items:center;gap:6px}
+.disagreement-map-legend span::before{content:"";display:inline-block;width:10px;height:10px;background:#1f6fd1}
+.disagreement-map-legend .disagreement-high-key::before{background:#c35a17}
+.disagreement-map-legend .disagreement-missing-key::before{background:white;border:1px solid #9aa4ad;border-radius:50%}
+.disagreement-map-legend .disagreement-observation-key::before{background:#af2d8d;transform:rotate(45deg);border:1px solid #382447}
+.disagreement-observation{cursor:pointer}
+.disagreement-observation[aria-pressed="true"] path{stroke:black;stroke-width:3}
+.disagreement-observation:focus{outline:none}
+.disagreement-observation:focus path{stroke:black;stroke-width:3;stroke-dasharray:2 1}
+.disagreement-caption{font-size:12px}
+.disagreement-section-legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:12px;color:var(--text-2);margin:12px 0}
+.disagreement-section-legend span{display:inline-flex;align-items:center;gap:7px}
+.disagreement-section-legend span::before{content:"";width:24px;border-top:3px dashed #1f6fd1}
+.disagreement-section-legend span+span::before{height:10px;border:1px solid #739bc8;background:#d5e4f7}
+.disagreement-section{max-width:100%;overflow:auto;background:white;border:1px solid var(--border);border-radius:var(--radius)}
+.disagreement-section svg{display:block;width:100%;min-width:760px}
+.disagreement-table-wrap{max-width:100%;overflow:auto;border:1px solid var(--border);border-radius:var(--radius);margin:10px 0 16px}
+.disagreement-dialog table{width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}
+.disagreement-dialog th,.disagreement-dialog td{padding:7px 10px;border-bottom:1px solid var(--border);text-align:right;white-space:nowrap}
+.disagreement-dialog th:first-child,.disagreement-dialog td:first-child{text-align:left}
+.disagreement-dialog thead th{background:var(--surface-2);font-weight:600}
+.disagreement-dialog tbody th{font-weight:500}
+.disagreement-dialog .disagreement-row-button{padding:4px 7px;color:var(--accent);font-weight:600}
+.disagreement-selected-row{background:var(--surface-2)}
+.disagreement-heldout-label{align-items:flex-start}
+.disagreement-holdout{min-width:180px}
+.disagreement-heldout-selected{padding:0 12px 4px;border-left:3px solid #9072a5;background:var(--surface-2);margin-top:10px}
+.disagreement-heldout-selected ul,.disagreement-methods ul,.disagreement-identities ul{padding-left:20px;color:var(--text-2)}
+.disagreement-methods{border-top:1px solid var(--border);padding-top:12px;margin-top:18px}
+.disagreement-identities summary,.disagreement-methods summary{font-weight:600;cursor:pointer}
+.disagreement-planning-note{color:var(--text-2);font-size:12px}
+@media(max-width:700px){
+  .disagreement-dialog{width:calc(100% - 12px);max-width:calc(100% - 12px);height:calc(100dvh - 12px);max-height:calc(100dvh - 12px);border-radius:8px}
+  .disagreement-header,.disagreement-body{padding:12px}
+  .disagreement-controls{grid-template-columns:minmax(0,1fr)}
+  .disagreement-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .disagreement-dialog button,.disagreement-dialog input,.disagreement-dialog select{min-height:36px}
+  .disagreement-actions button{flex:1 1 150px}
+  .disagreement-map-legend span{flex:1 1 140px}
+}

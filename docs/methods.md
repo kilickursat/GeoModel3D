@@ -97,6 +97,9 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 - `src/comparison.ts`: comparisons at fixed coordinates, matched by unit identity
 - `src/comparisonJob.ts`, `src/comparison.worker.ts`: cancellable inline comparison worker
 - `src/comparisonView.ts`: pinned-revision comparison controls and overlays
+- `src/disagreement.ts`: complete selected-interpretation contact envelopes on fixed map/path samples
+- `src/disagreementValidation.ts`: observed-contact validation with identity/location holdouts across every interpretation
+- `src/disagreementView.ts`, `src/disagreementJob.ts`, `src/disagreement.worker.ts`: pinned maps, section ranges, empirical checks and cancelable offline analysis
 - `src/impact.ts`: changed-input inventories and prior-model checks against newly added borehole logs
 - `src/impactJob.ts`, `src/impact.worker.ts`, `src/modelJob.ts`: cancelable local numerical jobs, with source-page images excluded
 - `src/impactView.ts`: new-data impact map, ranked boreholes, contact details and export
@@ -104,6 +107,7 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 - `src/storage.ts`: transactional browser saves and migration of earlier input-table saves
 - `src/main.ts`: three.js viewer and interface
 - `scripts/`: the generators of the synthetic datasets, of the real sites (Sakae, Antwerp, Maasvlakte, Creswick) and of the coordinate system registry and DOV code list, the cross-validation of the real sites, their models for augmented reality, and the offline single-file build
+- `scripts/release-assets.mjs`, `.github/workflows/release.yml`: tag/version validation and immutable release-asset upload
 
 ## Development
 

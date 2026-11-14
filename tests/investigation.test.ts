@@ -164,3 +164,87 @@ describe("investigation location planning",()=>{
     expect(()=>planInvestigation({...p,boreholes:[...p.boreholes,p.boreholes[0]]},a)).toThrow(/IDs must be unique/);
   });
 });
+
+describe("selected-interpretation investigation priority",()=>{
+  function cases(p=project(),varying=false){
+    const alternative=structuredClone(p);alternative.name="Alternative";
+    for(const hole of alternative.boreholes){
+      const top=varying?2+2*hole.x/100:4;
+      hole.intervals[0].to=top;hole.intervals[1].from=top;
+    }
+    return [{id:"before",label:"Reference",project:p},{id:"after",label:"Alternative",project:alternative}];
+  }
+
+  it("ranks exact candidate contact ranges before the geometric gap, then breaks ties by the existing rule",()=>{
+    const p=project(),selected=cases(p,true),copy=structuredClone([p,selected]);
+    const ordinary=planInvestigation(p,line(),{budget:1,minSpacing:0,step:10});
+    const result=planInvestigation(p,line(),{budget:1,minSpacing:0,step:10,prioritizeDisagreement:true,disagreementContext:{cases:selected,unitId:"sand"}});
+    expect(ordinary.proposals[0].x).toBe(50);expect(result.proposals[0].x).toBe(100);
+    expect(result.proposals[0].modelRange).toMatchObject({unitId:"sand",min:6,max:8,width:2,count:2,total:2,caseIds:["before","after"]});
+    expect(result.proposals[0].reasons[0]).toMatch(/Largest remaining complete selected-interpretation range/);
+    expect(result.proposals[0].reasons[1]).toMatch(/used to break range ties/);
+    expect([p,selected]).toEqual(copy);
+    const uniform=planInvestigation(p,line(),{budget:1,minSpacing:0,step:10,prioritizeDisagreement:true,disagreementContext:{cases:cases(p),unitId:"sand"}});
+    expect(uniform.proposals[0].x).toBe(50);expect(uniform.proposals[0].modelRange!.width).toBeCloseTo(2,9);
+  });
+
+  it("treats a complete zero range as valid but excludes missing cases instead of treating them as zero",()=>{
+    const p=project(),identical=[{id:"one",project:p},{id:"two",project:structuredClone(p)}];
+    const zero=planInvestigation(p,line(),{budget:1,minSpacing:0,step:10,prioritizeDisagreement:true,disagreementContext:{cases:identical,unitId:"sand"}});
+    expect(zero.proposals[0]).toMatchObject({x:50,modelRange:{width:0,count:2,total:2}});expect(zero.summary.excludedDisagreement).toBe(0);
+    const selected=cases(p);selected[1].project.boreholes.forEach(h=>h.x+=50);
+    const partial=planInvestigation(p,line(),{budget:1,minSpacing:0,step:10,prioritizeDisagreement:true,disagreementContext:{cases:selected,unitId:"sand"}});
+    expect(partial.summary.excludedDisagreement).toBeGreaterThan(0);expect(partial.proposals[0].x).toBe(50);
+    const missing=partial.candidates.find(c=>c.exclusion==="missing-disagreement")!;
+    expect(missing.missingCaseIds).toEqual(["after"]);
+    expect(partial.proposals.every(q=>q.modelRange?.count===q.modelRange?.total)).toBe(true);
+    selected[1].project.units=selected[1].project.units.filter(u=>u.id!=="sand");
+    const empty=planInvestigation(p,line(),{budget:2,minSpacing:0,prioritizeDisagreement:true,disagreementContext:{cases:selected,unitId:"sand"}});
+    expect(empty.proposals).toEqual([]);expect(empty.summary.budgetShortfall).toBe(2);expect(empty.summary.excludedDisagreement).toBeGreaterThan(0);
+    const rows=parseCsv(investigationCsv(empty)),header=rows[0];
+    expect(rows[1][header.indexOf("model_range_width_m")]).toBe("");
+    expect(rows[1][header.indexOf("disagreement_contact_id")]).toBe("sand");
+  });
+
+  it("preserves physical spacing from collars in every selected case, including moved IDs and unused CPTs",()=>{
+    const p=project(),selected=cases(p);
+    selected[1].project.cpts=[{id:"Alternative-only",x:50,y:10,z:10,depth:[1,2],qc:[1,2]}];
+    selected[1].project.boreholes[0].x=1;
+    const result=planInvestigation(p,line(),{budget:2,minSpacing:20,step:10,prioritizeDisagreement:true,disagreementContext:{cases:selected,unitId:"sand"}});
+    expect(result.recordedLogs).toContainEqual({id:"Alternative-only",kind:"cpt",x:50,y:10});
+    expect(result.recordedLogs.filter(log=>log.id==="BH0")).toHaveLength(2);
+    expect(result.usedLogs).not.toContainEqual({id:"Alternative-only",kind:"cpt",x:50,y:10});
+    expect(result.proposals.every(site=>Math.hypot(site.x-50,site.y-10)>=20-1e-9)).toBe(true);
+    expect(result.candidates.find(c=>result.corridor.stations[c.stationIndex].x===50)).toMatchObject({exclusion:"near-recorded"});
+  });
+
+  it("rejects stale/foreign snapshots, incompatible grids, invalid priorities and contacts",()=>{
+    const p=project(),selected=cases(p),context={cases:selected,unitId:"sand"};
+    const stale=structuredClone(p);stale.boreholes[0].z+=1;
+    expect(()=>planInvestigation(stale,line(),{prioritizeDisagreement:true,disagreementContext:context})).toThrow(/reference snapshot must match/);
+    expect(()=>planInvestigation(p,line(),{prioritizeDisagreement:true})).toThrow(/needs selected saved cases/);
+    expect(()=>planInvestigation(p,line(),{prioritizeDisagreement:true,prioritizeFlags:true,disagreementContext:context})).toThrow(/either/);
+    expect(()=>planInvestigation(p,line(),{prioritizeDisagreement:true,disagreementContext:{cases:selected,unitId:"unknown"}})).toThrow(/absent from the reference/);
+    selected[1].project.crs="Another grid";
+    expect(()=>planInvestigation(p,line(),{prioritizeDisagreement:true,disagreementContext:context})).toThrow(/different local grids/);
+    expect(()=>planInvestigation(p,line(),{prioritizeDisagreement:"yes" as unknown as boolean})).toThrow(/boolean/);
+  });
+
+  it("keeps source projects out of plans/CSV while retaining case identities and exact range metadata",()=>{
+    const p=project(),selected=cases(p);
+    (selected[1].project as any).evidence={privatePreview:"DO_NOT_EXPORT_SOURCE_PAGES"};
+    const result=planInvestigation(p,line(),{budget:1,minSpacing:0,prioritizeDisagreement:true,disagreementContext:{cases:selected,unitId:"sand"}});
+    expect(result.disagreement).toEqual({unitId:"sand",caseIds:["before","after"],caseLabels:["Reference","Alternative"]});
+    expect((result.options as any).disagreementContext).toBeUndefined();
+    expect(JSON.stringify(result)).not.toContain("DO_NOT_EXPORT_SOURCE_PAGES");
+    const rows=parseCsv(investigationCsv(result)),header=rows[0],value=(name:string)=>rows[1][header.indexOf(name)];
+    expect(value("ranking_method")).toBe("selected-interpretation-range");expect(value("disagreement_contact_id")).toBe("sand");
+    expect(JSON.parse(value("disagreement_case_ids"))).toEqual(["before","after"]);
+    expect(Number(value("model_range_width_m"))).toBeCloseTo(2,9);
+    expect(value("model_range_count")).toBe("2");expect(value("model_range_total")).toBe("2");
+    const evidenceOnly=structuredClone(p);evidenceOnly.boreholes[0].evidenceId="source-id";
+    expect(()=>planInvestigation(evidenceOnly,line(),{budget:1,prioritizeDisagreement:true,disagreementContext:{cases:cases(p),unitId:"sand"}})).not.toThrow();
+    const normal=planInvestigation(p,line(),{budget:1,minSpacing:0,disagreementContext:{cases:selected,unitId:"sand"}});
+    expect(normal.proposals[0].x).toBe(50);expect(normal.disagreement).toBeUndefined();expect(normal.proposals[0].modelRange).toBeUndefined();
+  });
+});

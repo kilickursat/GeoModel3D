@@ -1,7 +1,7 @@
 import type {GeoProject} from "./schema";
 
 // Source images and review text are not calculation inputs. Avoid cloning them into numerical workers.
-function calculationProject(project:GeoProject):GeoProject{
+export function calculationProject(project:GeoProject):GeoProject{
   const {evidence,...rest}=project;
   return {...rest,boreholes:project.boreholes.map(({evidenceId,...b})=>({...b,
     intervals:b.intervals.map(({evidenceId,...i})=>i),
@@ -46,4 +46,7 @@ export function createModelJob<T>(makeWorker:()=>Worker,before:GeoProject,after:
 }
 export function createProjectJob<T>(makeWorker:()=>Worker,project:GeoProject,options:unknown,label:string):ModelJob<T>{
   return workerJob(makeWorker,()=>({project:calculationProject(project),options}),label);
+}
+export function createProjectsJob<T>(makeWorker:()=>Worker,projects:GeoProject[],options:unknown,label:string):ModelJob<T>{
+  return workerJob(makeWorker,()=>({projects:projects.map(calculationProject),options}),label);
 }

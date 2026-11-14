@@ -36,6 +36,9 @@ export default defineConfig({
     {name:"investigation",testMatch:/investigation\.spec\.ts$/,grepInvert:/mobile investigation planner|standalone investigation planner/,use:{...devices["Desktop Chrome"],viewport:{width:1440,height:1000}}},
     {name:"investigation-mobile",testMatch:/investigation\.spec\.ts$/,grep:/mobile investigation planner/,use:{...devices["Pixel 7"]}},
     {name:"investigation-offline",testMatch:/investigation\.spec\.ts$/,grep:/standalone investigation planner/,use:{...devices["Desktop Chrome"]}},
+    {name:"disagreement",testMatch:/disagreement\.spec\.ts$/,grepInvert:/mobile model disagreement|standalone model disagreement/,use:{...devices["Desktop Chrome"],viewport:{width:1440,height:1000}}},
+    {name:"disagreement-mobile",testMatch:/disagreement\.spec\.ts$/,grep:/mobile model disagreement/,use:{...devices["Pixel 7"]}},
+    {name:"disagreement-offline",testMatch:/disagreement\.spec\.ts$/,grep:/standalone model disagreement/,use:{...devices["Desktop Chrome"]}},
     {name:"offline",testMatch:/offline\.spec\.ts$/,use:{...devices["Desktop Chrome"]}}
   ],
   webServer:{command:"npm run dev -- --host 127.0.0.1 --port 4173 --strictPort",url:"http://127.0.0.1:4173",reuseExistingServer:!process.env.CI,timeout:30_000}
