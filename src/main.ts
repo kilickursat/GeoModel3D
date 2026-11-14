@@ -22,6 +22,7 @@ import {fetchTerrain,elevationSources,mapSources,covers,tileUrl,parseGsiTile,dec
 import {applyUnitRules} from "./rules";
 import {reportHtml} from "./report";
 import {createInputWorkspace} from "./input";
+import {parseWorkspace} from "./workspace";
 import {agreement,askAgreement,withdrawAgreement} from "./agreement";
 import {loadReader} from "./reader";
 import {modelCacheSize,removeModelCache} from "./modelcache";
@@ -1485,6 +1486,16 @@ async function importFileList(list:FileList|File[]){
   if(!others.length)return;
   try{
     const files=await Promise.all(others.map(async f=>({name:f.name,text:decodeText(new Uint8Array(await f.arrayBuffer()))})));
+    const documents=files.map(f=>{
+      try{return JSON.parse(f.text)}catch{return null}
+    }).filter(d=>d?.format==="geomodel3d-workspace");
+    if(documents.length){
+      if(documents.length!==1||files.length!==1)throw new Error("Import one workspace file at a time; add other files after opening it.");
+      const document=parseWorkspace(documents[0]);
+      workspace.openWorkspace(document,"Workspace imported with its draft and project revisions. Build model to show the selected case.");
+      setMode("input");
+      return;
+    }
     const result=importFiles(files,project);
     imported=result.project;
     // Lines or CPTs added to the site shown keep the view, and the first line is shown.
@@ -1495,6 +1506,7 @@ async function importFileList(list:FileList|File[]){
     // Files picked from the input tab open there, for review before building.
     if(document.body.dataset.mode==="input")workspace.edit(result.project,`Imported ${files.map(f=>f.name).join(", ")}: check the tables, then build the model.${result.warnings.length?` ${result.warnings.length} note${result.warnings.length===1?"":"s"} under Checks.`:""}`,result.warnings);
   }catch(err){
+    if(document.body.dataset.mode==="input")workspace.status(`Import failed: ${(err as Error).message}`);
     showNotice("Import failed",[(err as Error).message],true);
   }
 }

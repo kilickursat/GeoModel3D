@@ -4,6 +4,8 @@
 // the log of one borehole with the stresses down it, and what the importer and the model report. The tables become CSV
 // and go through the importer, so typed data are checked exactly as imported files are.
 import {GeoProject} from "./schema";
+import {WorkspaceDocument,createWorkspace,updateDraft,checkpoint,restoreRevision,toWorkspaceJson} from "./workspace";
+import {createWorkspaceStore} from "./storage";
 import {ImportResult,toProjectJson} from "./io";
 import {properties} from "./properties";
 import {buildGeologicalModel,GeoModel} from "./model";
@@ -11,11 +13,10 @@ import {stressAt,unitWeights,UnitWeight,ASSUMED_WEIGHT,earthPressure,pressurePro
 import {convexHull} from "./terrain";
 import {COLUMNS,TABLE_NAMES,TableName,EditorTables,tablesFromProject,projectFromTables,emptyTables,exampleTables,fillUnits,tableCsv} from "./tables";
 
-type Step="start"|"project"|TableName;
-const STEPS:Step[]=["start","project","boreholes","logs","water","spt","tests","units"];
+type Step="start"|"project"|"history"|TableName;
+const STEPS:Step[]=["start","project","boreholes","logs","water","spt","tests","units","history"];
 const PER_HOLE:TableName[]=["logs","water","spt","tests"];
 const MAX_ROWS=400;
-const STORE="geomodel3d.input.v1";
 const esc=(s:string)=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]!));
 const fmt=(v:number,d=0)=>v.toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:d});
 const copy=(t:EditorTables):EditorTables=>JSON.parse(JSON.stringify(t));
@@ -52,23 +53,6 @@ const HELP:Record<TableName,string>={
   units:"Top to bottom in stratigraphic order (▲ ▼ reorder). γ and γsat give the stresses, or else the mean measured unit weight, or else 18 and 20 kN/m³ are assumed; K0 gives the horizontal effective stress; c′, φ′ and su give the earth pressures; E and k are design parameters, kept with the model and reported."
 };
 
-interface Saved { tables:EditorTables; savedAt:string }
-// The case being typed is kept in this browser, so a reload does not lose it; storage may be unavailable (private
-// windows, blocked site data), and the workspace then works for as long as the page is open.
-function readSaved():Saved|null{
-  try{
-    const s=JSON.parse(localStorage.getItem(STORE)??"null");
-    if(!s?.tables?.rows||!s.tables.project)return null;
-    for(const name of Object.keys(COLUMNS) as TableName[]){
-      const rows=Array.isArray(s.tables.rows[name])?s.tables.rows[name]:[];
-      s.tables.rows[name]=rows.map((r:unknown[])=>COLUMNS[name].map((_,c)=>String((Array.isArray(r)?r[c]:"")??"")));
-    }
-    s.tables.project={...emptyTables().project,...s.tables.project};
-    return s as Saved;
-  }catch{return null}
-}
-function writeSaved(t:EditorTables){try{localStorage.setItem(STORE,JSON.stringify({tables:t,savedAt:new Date().toISOString()}))}catch{/* not kept */}}
-
 export interface InputOptions {
   // The dataset shown in the model tab.
   current():GeoProject;
@@ -83,15 +67,20 @@ export interface InputOptions {
 // elsewhere (the boreholes read from PDFs), with their notes; status() shows a message in the bar at the bottom.
 export interface InputWorkspace {
   element:HTMLElement; show():void; edit(project:GeoProject,message:string,notes?:string[]):void;
-  open(tables:EditorTables,message:string,notes?:string[]):void; status(message:string):void;
+  open(tables:EditorTables,message:string,notes?:string[]):void;
+  openWorkspace(document:WorkspaceDocument,message:string):void; status(message:string):void;
 }
 
 export function createInputWorkspace(o:InputOptions):InputWorkspace{
-  let t:EditorTables|null=null,origin:EditorTables|null=null,base:GeoProject|undefined;
+  let t:EditorTables|null=null,origin:EditorTables|null=null,base:GeoProject|undefined,originBase:GeoProject|undefined;
   let step:Step="start",filter="",selected="",message="",imported:string[]=[];
   let preview:{result?:ImportResult;model?:GeoModel;error?:string}={};
   let timer:ReturnType<typeof setTimeout>|undefined;
   let view:View="stress";
+  const store=createWorkspaceStore();
+  let workspaceDocument:WorkspaceDocument|null=null,saved:WorkspaceDocument|null=null,loading=true;
+  let saveMessage="Loading saved workspace…",pendingSave:WorkspaceDocument|null=null,saving=false,saveTimer:ReturnType<typeof setTimeout>|undefined;
+  let savingFinished=Promise.resolve();
   let profile:{z:number[];water?:number;weights:UnitWeight[];params:Array<Record<string,number>|undefined>;drainage:Drainage;series:Series[];top:number;depth:number;frame:number[];units:string[]}|null=null;
 
   const el=document.createElement("section");
@@ -108,19 +97,55 @@ export function createInputWorkspace(o:InputOptions):InputWorkspace{
     <div class="ws-column"></div></div>
   <div class="ws-card"><div class="ws-card-head"><span>Checks</span></div><div class="ws-checks" aria-live="polite"></div></div>
 </aside></div>
-<footer class="ws-foot"><span class="ws-status" aria-live="polite"></span><button class="ws-csv">Download table (CSV)</button><button class="ws-json" title="A project file you can import again">Save case (JSON)</button><button class="ws-discard">Discard edits</button><button class="ws-build">Build model</button></footer>
+<footer class="ws-foot"><div class="ws-messages"><span class="ws-status" aria-live="polite"></span><span class="ws-save-status" role="status"></span></div><button class="ws-csv">Download table (CSV)</button><button class="ws-json" title="A project file you can import again">Save case (JSON)</button><button class="ws-workspace" title="The draft, complete projects and revision history">Save workspace</button><button class="ws-discard">Discard edits</button><button class="ws-build">Build model</button></footer>
 <datalist id="ws-properties">${properties.map(p=>`<option value="${p.key}">${esc(p.name)}${p.unit?` (${esc(p.unit)})`:""}</option>`).join("")}</datalist>
 <datalist id="ws-holes"></datalist><datalist id="ws-units"></datalist>`;
   const nav=el.querySelector<HTMLElement>(".ws-steps")!,body=el.querySelector<HTMLDivElement>(".ws-body")!;
   const plan=el.querySelector<HTMLDivElement>(".ws-plan")!,column=el.querySelector<HTMLDivElement>(".ws-column")!,checks=el.querySelector<HTMLDivElement>(".ws-checks")!;
   const holeSelect=el.querySelector<HTMLSelectElement>(".ws-hole")!,status=el.querySelector<HTMLSpanElement>(".ws-status")!;
 
+  const ready=store.load().then(value=>{saved=value;saveMessage=value?"Saved workspace available":""}).catch(error=>{
+    saveMessage=`Browser storage unavailable: ${(error as Error).message}. Export a workspace to keep your work.`;
+  }).finally(()=>{loading=false;if(step==="start")render();else renderSaveStatus()});
+  function renderSaveStatus(){el.querySelector<HTMLElement>(".ws-save-status")!.textContent=saveMessage}
+  // Keep the newest pending draft while a transaction is active; rapid typing need not queue copies of all history.
+  function persist(immediate=false){
+    if(!workspaceDocument||!t)return;
+    workspaceDocument=updateDraft(workspaceDocument,t,base);
+    pendingSave=workspaceDocument;
+    saveMessage="Saving in this browser…";renderSaveStatus();
+    clearTimeout(saveTimer);
+    if(immediate)void flushSaves();else saveTimer=setTimeout(()=>void flushSaves(),600);
+  }
+  function flushSaves():Promise<void>{
+    clearTimeout(saveTimer);
+    if(saving)return savingFinished;
+    saving=true;
+    return savingFinished=(async()=>{
+      await ready;
+      while(pendingSave){
+        const snapshot:WorkspaceDocument=pendingSave;pendingSave=null;
+        try{
+          await store.save(snapshot);saved=snapshot;
+          if(workspaceDocument===snapshot)saveMessage="Saved in this browser";
+        }catch(error){
+          if(workspaceDocument===snapshot)saveMessage=`Not saved in this browser: ${(error as Error).message}. Use Save workspace.`;
+        }
+        renderSaveStatus();
+      }
+    })().finally(()=>{saving=false});
+  }
+
   const holes=()=>t?[...new Set(t.rows.boreholes.map(r=>r[0].trim()).filter(Boolean))]:[];
   const count=(name:TableName)=>t?t.rows[name].filter(r=>r.some(c=>c.trim())).length:0;
   const edited=()=>!!t&&!!origin&&JSON.stringify(t)!==JSON.stringify(origin);
 
-  function begin(tables:EditorTables,from:GeoProject|undefined,first:Step,text:string,notes:string[]=[]){
-    t=tables;origin=copy(tables);base=from;step=first;filter="";selected="";message=text;imported=notes;
+  function begin(tables:EditorTables,from:GeoProject|undefined,first:Step,text:string,notes:string[]=[],resume?:WorkspaceDocument){
+    if(!resume&&(edited()||saved||workspaceDocument?.revisions.length)&&!confirm("Opening this case replaces the saved workspace in this browser. Use Save workspace first to keep its draft and history. Continue?"))return;
+    t=copy(tables);origin=copy(tables);base=from?structuredClone(from):undefined;originBase=base?structuredClone(base):undefined;
+    workspaceDocument=resume?structuredClone(resume):createWorkspace(t,base);
+    if(from&&!resume)workspaceDocument=checkpoint(workspaceDocument,from,"Opened project");
+    step=first;filter="";selected="";message=text;imported=notes;
     render();refresh(true);
   }
 
@@ -128,17 +153,17 @@ export function createInputWorkspace(o:InputOptions):InputWorkspace{
 
   function renderNav(){
     nav.innerHTML=STEPS.map((s,i)=>{
-      const label=s==="start"?"Start":s==="project"?"Project":TABLE_NAMES[s];
-      const n=s==="start"||s==="project"?"":`<span>${count(s)}</span>`;
+      const label=s==="start"?"Start":s==="project"?"Project":s==="history"?"Revisions":TABLE_NAMES[s];
+      const n=s==="start"||s==="project"?"":s==="history"?`<span>${workspaceDocument?.revisions.length??0}</span>`:`<span>${count(s)}</span>`;
       return `<button data-step="${s}"${s===step?' aria-current="step"':""}${!t&&s!=="start"?" disabled":""}><i>${i||""}</i>${label}${n}</button>`;
     }).join("");
   }
   function render(){
-    body.innerHTML=step==="start"?startView():step==="project"?projectView():tableView(step);
-    el.querySelector<HTMLButtonElement>(".ws-csv")!.hidden=step==="start"||step==="project";
-    for(const b of el.querySelectorAll<HTMLButtonElement>(".ws-json,.ws-discard,.ws-build"))b.disabled=!t;
+    body.innerHTML=step==="start"?startView():step==="project"?projectView():step==="history"?historyView():tableView(step);
+    el.querySelector<HTMLButtonElement>(".ws-csv")!.hidden=step==="start"||step==="project"||step==="history";
+    for(const b of el.querySelectorAll<HTMLButtonElement>(".ws-json,.ws-workspace,.ws-discard,.ws-build"))b.disabled=!t;
     renderLists();
-    status.textContent=message;
+    status.textContent=message;status.title=message;renderSaveStatus();
   }
   // The step counts and the lists of boreholes and units offered while typing, without redrawing the table being typed
   // in (that would take the cursor out of it).
@@ -150,8 +175,8 @@ export function createInputWorkspace(o:InputOptions):InputWorkspace{
     if(pick)pick.innerHTML=`<option value="">All</option>${holes().map(h=>`<option${h===filter?" selected":""}>${esc(h)}</option>`).join("")}`;
   }
   function startView(){
-    const saved=readSaved(),current=o.current();
-    const choice=(key:string,title:string,text:string)=>`<button class="ws-choice" data-start="${key}"><b>${title}</b><span>${text}</span></button>`;
+    const current=o.current();
+    const choice=(key:string,title:string,text:string)=>`<button class="ws-choice" data-start="${key}"${loading?" disabled":""}><b>${title}</b><span>${text}</span></button>`;
     return `<div class="ws-start"><h2>Enter your own data</h2>
 <p>Type in or paste your boreholes, logs, water levels, tests and units, then <b>Build model</b>. Nothing is uploaded: the data stay in this browser.</p>
 <div class="ws-choices">${[
@@ -160,9 +185,14 @@ export function createInputWorkspace(o:InputOptions):InputWorkspace{
       choice("current","Edit the site shown",`The tables of ${esc(current.name)}.`),
       choice("import","Import files…","CSV, AGS4, borehole XML or project JSON."),
       ...(o.onReadPdf?[choice("pdf","Read logs from PDFs…","Borehole logs in PDFs, scanned or not, or in images, read in this browser. You check every value before it is used.")]:[]),
-      ...(saved?[choice("saved","Continue the saved case",`${esc(saved.tables.project.name)}, kept in this browser since ${esc(new Date(saved.savedAt).toLocaleString())}.`)]:[])
+      ...(saved?[choice("saved","Continue the saved case",`${esc(saved.draft.tables.project.name)}, kept in this browser since ${esc(new Date(saved.savedAt).toLocaleString())}.`)]:[])
     ].join("")}</div>
-<p class="ws-note">${t?`Open now: <b>${esc(t.project.name)}</b>; starting another case replaces it. `:""}What you type is kept in this browser until you start another case. Save case (JSON) keeps a copy.</p></div>`;
+<p class="ws-note">${t?`Open now: <b>${esc(t.project.name)}</b>; starting another case replaces it. `:""}Build model records a revision. Save workspace keeps the draft, complete projects and revision history in a file; Save case (JSON) keeps only the current project.</p></div>`;
+  }
+  function historyView(){
+    const revisions=workspaceDocument?.revisions??[],active=workspaceDocument?.activeRevisionId;
+    return `<div class="ws-history"><h2>Project revisions</h2><p>Build model records a complete project. Restore a revision to edit or build it again; later revisions stay available.</p>
+      ${revisions.length?`<ol>${revisions.map((r,i)=>`<li><div><b>${i+1}. ${esc(r.project.name)}</b>${r.id===active?' <span class="ws-active">Selected</span>':""}<p>${esc(r.reason)} · ${esc(new Date(r.createdAt).toLocaleString())} · GeoModel3D ${esc(r.engineVersion)}</p>${r.parentId?`<small>Based on revision ${revisions.findIndex(p=>p.id===r.parentId)+1}</small>`:""}</div><button data-restore="${esc(r.id)}">Restore revision ${i+1}</button></li>`).join("")}</ol>`:'<p>No revisions yet. Build the model to record the first one.</p>'}</div>`;
   }
   function projectView(){
     const f=t!.project,field=(key:keyof typeof f,label:string,hint:string,attrs="")=>
@@ -206,6 +236,7 @@ ${field("margin","Model extent beyond the boreholes (m)","The model reaches this
 
   function refresh(now=false){
     clearTimeout(timer);
+    if(t)persist(now);
     const run=()=>{
       if(t){
         try{
@@ -214,8 +245,6 @@ ${field("margin","Model extent beyond the boreholes (m)","The model reaches this
           const p:GeoProject={...result.project,terrain:undefined};
           preview={result,...(p.boreholes.length?{model:buildGeologicalModel(p)}:{})};
         }catch(e){preview={error:(e as Error).message}}
-        // Kept once something has been typed: opening a dataset only to look at it leaves the saved case alone.
-        if(edited())writeSaved(t);
       }else preview={};
       renderNav();
       renderPreview();
@@ -344,22 +373,24 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
   // ---------- events ----------
 
   const blankRow=(name:TableName)=>{const r=COLUMNS[name].map(()=>"");if(PER_HOLE.includes(name)&&filter)r[0]=filter;return r};
-  function choose(key:string){
+  async function choose(key:string){
+    await ready;
+    if(key==="saved")await flushSaves();
     if(key==="import"){o.onImport();return}
     if(key==="pdf"){o.onReadPdf?.();return}
-    if(edited()&&!confirm("Replace the open case? Its edits are lost unless you saved them (Save case)."))return;
-    const current=o.current(),saved=readSaved();
+    if(key==="saved"&&edited()&&!confirm("Replace the open edits with the saved workspace?"))return;
+    const current=o.current();
     if(key==="new")begin(emptyTables(),undefined,"project","A new case: name it and say where it is, then fill in the tables.");
     else if(key==="example")begin(exampleTables(),undefined,"boreholes","The worked example: change any cell and the preview follows; Build model shows it in 3-D.");
     else if(key==="current")begin(tablesFromProject(current),current,"boreholes",`The tables of ${current.name}: change or add to them, then build the model.`);
-    else if(key==="saved"&&saved)begin(saved.tables,undefined,"boreholes","Your saved case.");
+    else if(key==="saved"&&saved)begin(saved.draft.tables,saved.draft.base,"boreholes","Your saved workspace.",[],saved);
   }
   el.addEventListener("click",e=>{
     const target=e.target as Element,b=target.closest("button"),pt=target.closest<SVGGElement>(".ws-pt");
     if(pt){selected=pt.dataset.hole!;if(PER_HOLE.includes(step as TableName)){filter=selected;render()}renderPreview();return}
     if(!b)return;
     if(b.dataset.view){view=b.dataset.view as View;renderPreview();return}
-    if(b.dataset.start){choose(b.dataset.start);return}
+    if(b.dataset.start){void choose(b.dataset.start);return}
     if(b.dataset.step){
       step=b.dataset.step as Step;
       // A large table opens on the first borehole that has rows in it.
@@ -367,16 +398,31 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
       render();return;
     }
     if(!t)return;
+    if(b.dataset.restore&&workspaceDocument){
+      if(edited()&&!confirm("Replace these edits with the selected revision? Save workspace first to keep an unfinished draft."))return;
+      const restored=restoreRevision(workspaceDocument,b.dataset.restore);
+      begin(restored.draft.tables,restored.draft.base,"history","Revision restored. Build model shows it in 3-D.",[],restored);
+      return;
+    }
+    if(b.classList.contains("ws-workspace")&&workspaceDocument){
+      workspaceDocument=updateDraft(workspaceDocument,t,base);persist(true);
+      o.download(`${slug(t.project.name)}.workspace.geomodel3d.json`,toWorkspaceJson(workspaceDocument),"application/json");return;
+    }
     if(b.classList.contains("ws-build")){
-      try{o.onBuild(projectFromTables(t,base));message=""}catch(err){message=(err as Error).message;status.textContent=message}
+      try{
+        const result=projectFromTables(t,base);
+        o.onBuild(result);
+        workspaceDocument=checkpoint(updateDraft(workspaceDocument!,t,base),result.project,"Built model");
+        base=structuredClone(result.project);persist(true);message="";
+      }catch(err){message=(err as Error).message;status.textContent=message}
       return;
     }
     if(b.classList.contains("ws-json")){
       try{o.download(`${slug(t.project.name)}.geomodel3d.json`,toProjectJson(projectFromTables(t,base).project),"application/json")}catch(err){message=(err as Error).message;status.textContent=message}
       return;
     }
-    if(b.classList.contains("ws-discard")){if(origin&&confirm("Discard the edits made since this case was opened?")){t=copy(origin);message="Edits discarded";render();refresh(true)}return}
-    if(step==="start"||step==="project")return;
+    if(b.classList.contains("ws-discard")){if(origin&&confirm("Discard the edits made since this case was opened?")){t=copy(origin);base=originBase?structuredClone(originBase):undefined;message="Edits discarded";render();refresh(true)}return}
+    if(step==="start"||step==="project"||step==="history")return;
     const name=step,row=Number(b.closest("tr")?.dataset.r);
     if(b.classList.contains("ws-csv"))o.download(`${slug(t.project.name)}-${name}.csv`,tableCsv(t,name),"text/csv");
     else if(b.classList.contains("ed-add")){t.rows[name].push(blankRow(name));render();refresh();body.querySelector<HTMLInputElement>("tbody tr:last-child input")?.focus()}
@@ -390,7 +436,7 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
     const f=e.target as HTMLInputElement|HTMLTextAreaElement;
     if(!t)return;
     if(f.dataset.field){t.project[f.dataset.field as keyof EditorTables["project"]]=f.value;refresh();return}
-    if(f.dataset.r===undefined||step==="start"||step==="project")return;
+    if(f.dataset.r===undefined||step==="start"||step==="project"||step==="history")return;
     const v=f instanceof HTMLInputElement&&f.type==="checkbox"?(f.checked?"yes":""):f.value;
     t.rows[step][Number(f.dataset.r)][Number(f.dataset.c)]=v;
     if(f instanceof HTMLInputElement&&f.type==="color"){f.classList.remove("ed-blank");f.title=v}
@@ -405,7 +451,7 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
   // The preview follows the row being edited.
   el.addEventListener("focusin",e=>{
     const f=e.target as HTMLInputElement;
-    if(!t||f.dataset.r===undefined||step==="start"||step==="project"||step==="units")return;
+    if(!t||f.dataset.r===undefined||step==="start"||step==="project"||step==="history"||step==="units")return;
     const id=t.rows[step][Number(f.dataset.r)]?.[0]?.trim();
     if(id&&id!==selected&&preview.model?.boreholes.some(b=>b.id===id)){selected=id;renderPreview()}
   });
@@ -413,7 +459,7 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
   // rows where needed.
   el.addEventListener("paste",e=>{
     const f=e.target as HTMLInputElement,text=e.clipboardData?.getData("text/plain")??"";
-    if(!t||f.dataset.r===undefined||step==="start"||step==="project"||!/[\t\n]/.test(text.trim()))return;
+    if(!t||f.dataset.r===undefined||step==="start"||step==="project"||step==="history"||!/[\t\n]/.test(text.trim()))return;
     e.preventDefault();
     const name=step,lines=text.replace(/\r/g,"").replace(/\n+$/,"").split("\n").map(l=>l.split("\t"));
     const shown=shownRows(name).rows.map(q=>q.i),c0=Number(f.dataset.c),p0=shown.indexOf(Number(f.dataset.r));
@@ -431,6 +477,10 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
     show(){if(!t&&step!=="start")step="start";render();refresh(true)},
     edit(project,text,notes){begin(tablesFromProject(project),project,"boreholes",text,notes)},
     open(tables,text,notes){begin(tables,undefined,"boreholes",text,notes)},
-    status(text){message=text;el.querySelector(".ws-status")!.textContent=text}
+    openWorkspace(doc,text){
+      if((edited()||saved&&saved.id!==doc.id)&&!confirm("Replace the saved workspace with this file? Use Save workspace first to keep the current draft and history."))return;
+      begin(doc.draft.tables,doc.draft.base,"history",text,[],doc);
+    },
+    status(text){message=text;status.textContent=text;status.title=text}
   };
 }

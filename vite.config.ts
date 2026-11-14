@@ -35,5 +35,5 @@ export default defineConfig({
   // The reading model's worker (src/docread/ocr.worker.ts) is a module: ONNX Runtime Web is one.
   worker:{format:"es"},
   // Geometry tests build full models; allow slower CI machines.
-  test:{testTimeout:20000}
+  test:{include:["tests/**/*.test.ts"],testTimeout:20000}
 });

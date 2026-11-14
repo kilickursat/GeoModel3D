@@ -87,6 +87,8 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 - `src/tables.ts`, `src/input.ts`: the Input data tab (tables, live preview, checks)
 - `src/crs.ts`: coordinate systems (registry, suggestion and conversion)
 - `src/tiles.ts`: map and elevation tiles, and terrain resampling
+- `src/workspace.ts`: versioned drafts, immutable project revisions, restore and workspace JSON
+- `src/storage.ts`: transactional browser saves and migration of earlier input-table saves
 - `src/main.ts`: three.js viewer and interface
 - `scripts/`: the generators of the synthetic datasets, of the real sites (Sakae, Antwerp, Maasvlakte, Creswick) and of the coordinate system registry and DOV code list, the cross-validation of the real sites, their models for augmented reality, and the offline single-file build
 
@@ -96,6 +98,8 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 npm ci
 npm test         # unit tests (vitest)
 npm run build    # type-check, then build dist/ and dist/geomodel3d-offline.html
+npx playwright install chromium  # once, for UI checks
+npm run test:ui  # desktop, mobile and standalone bundle checks (after build)
 ```
 
 `npm run dev` starts Vite's development server. Where a local server cannot be used, build and open `dist/geomodel3d-offline.html` instead. [CONTRIBUTING.md](../CONTRIBUTING.md) explains how to submit a change.

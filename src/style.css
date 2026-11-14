@@ -299,6 +299,15 @@ body[data-mode="input"] :is(.panel,.section-control,.section-view,.view-menu,.no
 .ws-choice span{color:var(--text-2);line-height:1.45}
 .ws-foot{display:flex;align-items:center;gap:8px;padding:10px 16px;border-top:1px solid var(--border)}
 .ws-status{flex:1;min-width:0;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ws-messages{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.ws-save-status{font-size:11px;color:var(--text-2);overflow-wrap:anywhere}
+.ws-history{max-width:850px}
+.ws-history ol{list-style:none;padding:0;display:flex;flex-direction:column;gap:10px}
+.ws-history li{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:12px;border:1px solid var(--border);border-radius:var(--radius)}
+.ws-history li>div{min-width:0;overflow-wrap:anywhere;flex:1 1 200px}
+.ws-history li p{margin:5px 0;color:var(--text-2)}
+.ws-history button{padding:6px 10px;cursor:pointer;border:1px solid var(--border-strong);border-radius:var(--radius);background:var(--surface)}
+.ws-active{display:inline-block;margin-left:8px;color:var(--accent);font-size:12px}
 .ws-foot button:disabled{opacity:.4;cursor:default}
 /* Tables and forms of the input tab */
 .ed-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px;color:var(--text-2)}
@@ -338,7 +347,7 @@ body[data-mode="input"] :is(.panel,.section-control,.section-view,.view-menu,.no
   .ed-form label{grid-template-columns:1fr}
   .ed-form small{grid-column:1}
   .ws-foot{flex-wrap:wrap}
-  .ws-status{flex:1 1 100%}
+  .ws-messages{flex:1 1 100%}
 }
 
 /* Reading PDFs: the agreement asked first, and the review of the boreholes read, over everything else. Values to check

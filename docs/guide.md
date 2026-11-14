@@ -12,7 +12,7 @@ The **Input data** tab, next to **3-D model** at the top of the page, is where y
 - **Edit the site shown:** the tables of the model on screen, to change or add to;
 - **Import files…:** CSV, AGS4, borehole XML or project JSON, opened here for review before building;
 - **Read logs from PDFs…:** borehole logs in PDF reports, scanned or not, or in images, checked beside the page before use ([Reading borehole logs from PDFs](#reading-borehole-logs-from-pdfs));
-- **Continue the saved case:** what you typed before, if this browser kept it.
+- **Continue the saved case:** the last workspace, with its complete base project, unfinished tables and revisions, if this browser kept it.
 
 Then fill in the steps:
 
@@ -25,6 +25,7 @@ Then fill in the steps:
 | SPT | Borehole, depth, blows, penetration |
 | Tests | Borehole, depth, to, property, value: any laboratory or in-situ result |
 | Units | Unit, name, colour, erosive, γ, γsat, c′, φ′, su, E, k, K0, source, in stratigraphic order (▲ ▼ to reorder) |
+| Revisions | Complete projects recorded when opened or built; restore an earlier project while retaining later revisions |
 
 While you type, the preview shows:
 - **the boreholes in plan**, with the outline of the model; click a borehole to show it;
@@ -37,7 +38,9 @@ Good to know:
 - **One borehole is enough.** A single borehole needs neither a position nor a ground level (0, 0 and 0 m are used, and said so). One or two boreholes, or boreholes in a line, are modelled over an extent around them; set **Model extent beyond the boreholes** to choose it, or to extend any model beyond its outermost boreholes.
 - **Unit weights** give the stresses: γ above the water table and γsat below it. A unit without them takes the mean measured unit weight, or else 18 and 20 kN/m³, which the preview and the report say. **K0** gives σ′h, and **c′, φ′ and su** the earth pressures. E and k are design parameters, kept with the model and listed in the report.
 - **Pasting:** cells copied from a spreadsheet paste into any table, starting at the cell pasted into, and add rows as needed. Large tables are shown one borehole at a time.
-- **Nothing is uploaded.** What you type is kept in this browser, so a reload does not lose it, until you type in another case. **Save case (JSON)** keeps a copy you can import again, and **Download table (CSV)** saves a table as CSV.
+- **Nothing is uploaded.** The input workspace is saved in this browser, including terrain, CPTs, alignments, rules and parameters from its base project. The status under the editor says when a save has completed, or explains if browser storage is unavailable. Starting another case replaces the browser save.
+- **Save workspace** downloads the unfinished tables, complete base project and revision history. Import that file on its own to continue editing, including on another computer. Original PDF documents and their source highlighting are not included. **Save case (JSON)** and **Export → Project (JSON)** keep only the current project; **Download table (CSV)** saves one table.
+- **Revisions:** opening a project records its baseline. **Build model** records a new revision when its project differs from the selected revision. Under **Revisions**, restore a project, then build it to show it in 3-D. Building changes after a restore creates a revision based on that earlier project; later revisions stay available. Unfinished edits are kept in the workspace draft but are not themselves build revisions.
 
 ## Reading borehole logs from PDFs
 

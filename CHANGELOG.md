@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- Complete browser workspace saves, including the input tables and their base project: terrain, CPTs, alignments, rules and parameters. Existing saved input tables migrate on first use; storage failures are shown beside the save status.
+- Project revisions in **Input data → Revisions**. Opening a project records its baseline; **Build model** records changed projects. Restore an earlier revision without removing later ones, then build a new branch of the history.
+- **Save workspace** exports the unfinished draft and revision history as workspace JSON. Import one workspace file to continue it on another browser; existing project JSON still contains just one project.
+- Repeatable desktop, mobile and standalone-file UI checks with Playwright (`npm run test:ui`).
+
 ## 0.19.1 — 2026-11-06
 
 ### Changed
