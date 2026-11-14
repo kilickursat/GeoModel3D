@@ -24,6 +24,9 @@ export default defineConfig({
     {name:"mobile",testMatch:/mobile\.spec\.ts$/,use:{...devices["Pixel 7"]}},
     {name:"evidence",testMatch:/evidence\.spec\.ts$/,grepInvert:/mobile evidence inspector/,use:{...devices["Desktop Chrome"],viewport:{width:1440,height:1000}}},
     {name:"evidence-mobile",testMatch:/evidence\.spec\.ts$/,grep:/mobile evidence inspector/,use:{...devices["Pixel 7"]}},
+    {name:"scenarios",testMatch:/scenarios\.spec\.ts$/,grepInvert:/mobile scenario comparison|standalone scenario workspace/,use:{...devices["Desktop Chrome"],viewport:{width:1440,height:1000}}},
+    {name:"scenarios-mobile",testMatch:/scenarios\.spec\.ts$/,grep:/mobile scenario comparison/,use:{...devices["Pixel 7"]}},
+    {name:"scenarios-offline",testMatch:/scenarios\.spec\.ts$/,grep:/standalone scenario workspace/,use:{...devices["Desktop Chrome"]}},
     {name:"offline",testMatch:/offline\.spec\.ts$/,use:{...devices["Desktop Chrome"]}}
   ],
   webServer:{command:"npm run dev -- --host 127.0.0.1 --port 4173 --strictPort",url:"http://127.0.0.1:4173",reuseExistingServer:!process.env.CI,timeout:30_000}

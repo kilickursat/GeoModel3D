@@ -2,6 +2,7 @@ import proj4 from "proj4";
 import {Borehole,GeoProject,Interval,UnitDef,UnitRule,SptTest,WaterLevel,TestResult,Alignment,AlignmentPoint,DesignLevel,Cpt,boreholeDepth,sptN,cptDepth} from "./schema";
 import {CptRead,CptRow,cptReadings,pressureKpa,frictionRatio,isGef,readGef,isBroCpt,readBroCpt,isDovCpt,readDovCpt} from "./cpt";
 import {classifiedLayers,soilBehaviour,waterTableAt,layerUnits} from "./sbt";
+import {parseGroundwater} from "./groundwater";
 import {TerrainGrid,isTerrainFile,readTerrain} from "./terrain";
 import {Crs,findCrs,projectCrs,suggestCrs,toProjected,toGeographic,searchCrs} from "./crs";
 import {alignmentProblem,chainages,designAt} from "./alignment";
@@ -499,6 +500,7 @@ function readProjectJson(doc:any,file:string):ImportResult{
   if(doc.source)result.project.source=String(doc.source);
   if(Number.isFinite(doc.base))result.project.base=Number(doc.base);
   if(Number.isFinite(doc.groundwaterDepth))result.project.groundwaterDepth=Number(doc.groundwaterDepth);
+  if(doc.groundwater!==undefined)result.project.groundwater=parseGroundwater(doc.groundwater);
   if(Number.isFinite(doc.margin)&&doc.margin>0)result.project.margin=Number(doc.margin);
   // Alignments: lines with a problem are left out, and named in the notes.
   if(Array.isArray(doc.alignments)){
@@ -523,10 +525,11 @@ function readProjectJson(doc:any,file:string):ImportResult{
       const same=(k:"fs"|"u2"|"rf"|"qt")=>{const v=list(c[k]);return v&&v.length===depth.length?{[k]:v}:{}};
       const layers=Array.isArray(c.layers)?c.layers.filter((l:any)=>l&&Number.isFinite(Number(l.from))&&Number.isFinite(Number(l.to))&&Number(l.to)>Number(l.from))
         .map((l:any)=>({from:Number(l.from),to:Number(l.to),unit:String(l.unit??"").trim(),...(typeof l.name==="string"?{name:l.name}:{}),...evidenceRef(l.evidenceId)})):undefined;
+      if(c.layersSource!==undefined&&c.layersSource!=="automatic"&&c.layersSource!=="reviewed")throw new Error(`${file}: CPT ${id} has an unsupported layersSource`);
       cpts.push({id,x:Number(c.x),y:Number(c.y),z:c.z===null||c.z===undefined?NaN:Number(c.z),
         ...(Number.isFinite(c.lon)&&Number.isFinite(c.lat)?{lon:Number(c.lon),lat:Number(c.lat)}:{}),depth,qc,...same("fs"),...same("u2"),...same("rf"),...same("qt"),
         ...(Number(c.a)>0&&Number(c.a)<=1?{a:Number(c.a)}:{}),...(Number(c.predrill)>0?{predrill:Number(c.predrill)}:{}),...(typeof c.date==="string"?{date:c.date}:{}),
-        ...(layers?{layers}:{})});
+        ...(layers?{layers}:{}),...(c.layersSource?{layersSource:c.layersSource}:{})});
     }
     if(cpts.length)result.project.cpts=cpts;
   }
@@ -543,7 +546,7 @@ function readProjectJson(doc:any,file:string):ImportResult{
 // JSON has no NaN, so terrain cells without data are written as null.
 export function toProjectJson(p:GeoProject){
   const doc={format:"geomodel3d-project",version:1,name:p.name,description:p.description,source:p.source,crs:p.crs,crsCode:p.crsCode,crsProj4:p.crsProj4,
-    base:p.base,groundwaterDepth:p.groundwaterDepth,margin:p.margin,units:p.units,rules:p.rules,boreholes:p.boreholes,alignments:p.alignments,
+    base:p.base,groundwaterDepth:p.groundwaterDepth,groundwater:p.groundwater,margin:p.margin,units:p.units,rules:p.rules,boreholes:p.boreholes,alignments:p.alignments,
     cpts:p.cpts,cptLayers:p.cptLayers,cptRules:p.cptRules,terrain:p.terrain,evidence:p.evidence};
   // Long lists of numbers (the terrain grid, CPT readings) take one line each, and so does each layer of a CPT.
   return JSON.stringify(doc,null,1).replace(/"(z|depth|qc|fs|u2|rf|qt)": \[[^\]{}"]*\]/g,m=>m.replace(/\s+/g,""))
@@ -707,6 +710,7 @@ export function classifyCpts(project:GeoProject,cpts:Cpt[]){
   for(const c of cpts){
     const r=classifiedLayers(project,c);
     c.layers=r.layers;
+    c.layersSource="automatic";
     from[r.behaviour.qtFrom]++;
     readings+=c.depth.length;unclassified+=r.behaviour.unclassified;
     if(!c.fs?.some(Number.isFinite))noFs++;

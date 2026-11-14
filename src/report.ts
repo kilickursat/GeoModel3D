@@ -14,6 +14,7 @@ import {SectionField,unitWeights,unitOfReading} from "./fields";
 import {unitStatistics,measuredProperties,propertyDef,formatValue} from "./properties";
 import {CrossValidation} from "./validation";
 import {EvidenceField,EvidenceRecord} from "./evidence";
+import {groundwaterSummary} from "./groundwater";
 
 export interface ReportOptions {
   paper:"A3"|"A4";
@@ -48,7 +49,7 @@ export function reportHtml(model:GeoModel,section:Section,o:ReportOptions){
     ["Footprint",model.triangles.length?`${fmt(footprintArea(model)/1e4,2)} ha`:"—"],
     ["Ground",p.terrain?`Terrain: ${p.terrain.source??"terrain grid"}, ${fmt(p.terrain.dx,1)} m cells`:"Surface through the collars"],
     ["Data",p.source??"—"],
-    ["Groundwater",model.water?model.water.source.replace(/^./,c=>c.toUpperCase()):"Not given"],
+    ["Groundwater",model.water?model.water.source.replace(/^./,c=>c.toUpperCase()):p.groundwater?.mode==="as-of"?groundwaterSummary({...p,boreholes:model.boreholes}):"Not given"],
     ["3-D view","Vertical exaggeration ×"+fmt(o.ve,1)],
     ["Date",o.date],
     ["Software",`GeoModel3D ${o.version}`]
@@ -139,7 +140,7 @@ ${foot(`Section: ${o.field.name.toLowerCase()}`)}</section>`:""}
 ${model.cpts.length?cptPage(model,section,o.sectionBuffer,foot):""}
 ${o.validation?validationPage(o.validation,foot):""}
 <section class="page">${params}${rules}<h2>Boreholes</h2>
-<table><thead><tr><th>Borehole</th><th>Easting (m)</th><th>Northing (m)</th><th>Collar (m)</th><th>Depth (m)</th><th>Latitude</th><th>Longitude</th><th>Water (m deep)</th><th>SPT tests</th></tr></thead><tbody>${holes}</tbody></table>
+<table><thead><tr><th>Borehole</th><th>Easting (m)</th><th>Northing (m)</th><th>Collar (m)</th><th>Depth (m)</th><th>Latitude</th><th>Longitude</th><th>Shallowest logged water (all dates, m deep)</th><th>SPT tests</th></tr></thead><tbody>${holes}</tbody></table>
 ${notes.length?`<h3>Notes on the model (${notes.length})</h3><ul class="notes">${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul>`:""}
 ${foot(rules?"Ground parameters, interpretation, boreholes and notes":"Ground parameters, boreholes and notes")}</section>
 ${evidencePages(model,o.paper,foot)}
@@ -215,7 +216,8 @@ function cptPage(model:GeoModel,section:Section,buffer:number,foot:(part:string)
     const qcMax=cptScale(Math.max(...shown.flatMap(({c})=>c.qc.filter(Number.isFinite)),1));
     logs=`<div class="cpt-logs">${shown.map(({p,c})=>{
       const z=sampleModel(model,c.x,c.y),units=z?model.units.map((u,k)=>({top:z[k],bottom:z[k+1],color:u.color,name:u.name})).filter(b=>b.top-b.bottom>1e-6):[];
-      return `<figure>${cptLogSvg(c,{width:300,height:620,theme:"light",units,zones:cptBehaviour(model.project,c).zone,qcMax,zRange:[top+pad,bottom-pad],title:true})}<figcaption>${section.alignment?`chainage ${fmt(p.s)} m`:`${fmt(p.s-section.s[0])} m along`}, ${fmt(Math.abs(p.offset))} m ${p.offset>=0?"right":"left"}</figcaption></figure>`;
+      const behaviour=cptBehaviour(model.project,c),unavailable=behaviour.notes.find(n=>n.startsWith("No eligible groundwater"));
+      return `<figure>${cptLogSvg(c,{width:300,height:620,theme:"light",units,zones:behaviour.zone,qcMax,zRange:[top+pad,bottom-pad],title:true})}<figcaption>${section.alignment?`chainage ${fmt(p.s)} m`:`${fmt(p.s-section.s[0])} m along`}, ${fmt(Math.abs(p.offset))} m ${p.offset>=0?"right":"left"}${unavailable?`<br>${esc(unavailable)}`:""}</figcaption></figure>`;
     }).join("")}</div><p class="sbt-key">${SBT_ZONES.slice().reverse().map(z=>`<span><i class="swatch" style="background:${z.color}"></i>${z.zone} ${esc(z.name)}</span>`).join("")}</p>
 <p class="muted">Soil behaviour type (SBT) by Robertson (2009): the index Ic of the normalised cone resistance and friction ratio, with the unit weight from the CPT (Robertson &amp; Cabal 2010) and the water table of the project. Cone resistance qc and friction ratio Rf (fs/qc where the data give no ratio) against elevation in metres; behind them the units of the model where each CPT stands${model.cptLogs.length?", built with the CPT layers":", which the CPTs did not log"}.${section.cpts.length>shown.length?` The first ${shown.length} of the ${section.cpts.length} CPTs on the section.`:""}</p>`;
   }else logs=`<p class="muted">No CPT lies within ${fmt(buffer)} m of the section.</p>`;

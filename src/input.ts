@@ -4,10 +4,11 @@
 // the log of one borehole with the stresses down it, and what the importer and the model report. The tables become CSV
 // and go through the importer, so typed data are checked exactly as imported files are.
 import {GeoProject} from "./schema";
-import {WorkspaceDocument,createWorkspace,updateDraft,checkpoint,restoreRevision,toWorkspaceJson} from "./workspace";
+import {WorkspaceDocument,createWorkspace,updateDraft,checkpoint,restoreRevision,toWorkspaceJson,createScenario,switchScenario,renameScenario} from "./workspace";
 import {createWorkspaceStore} from "./storage";
 import {changeEvidenceField,acceptEvidenceField,evidenceRecord} from "./evidence";
 import {showEvidence} from "./evidenceView";
+import {showComparison} from "./comparisonView";
 import {ImportResult,toProjectJson} from "./io";
 import {properties} from "./properties";
 import {buildGeologicalModel,GeoModel} from "./model";
@@ -15,8 +16,8 @@ import {stressAt,unitWeights,UnitWeight,ASSUMED_WEIGHT,earthPressure,pressurePro
 import {convexHull} from "./terrain";
 import {COLUMNS,TABLE_NAMES,TableName,EditorTables,tablesFromProject,projectFromTables,emptyTables,exampleTables,fillUnits,tableCsv} from "./tables";
 
-type Step="start"|"project"|"history"|TableName;
-const STEPS:Step[]=["start","project","boreholes","logs","water","spt","tests","units","history"];
+type Step="start"|"project"|"history"|"scenarios"|TableName;
+const STEPS:Step[]=["start","project","boreholes","logs","water","spt","tests","units","scenarios","history"];
 const PER_HOLE:TableName[]=["logs","water","spt","tests"];
 const MAX_ROWS=400;
 const esc=(s:string)=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]!));
@@ -49,16 +50,19 @@ const PRESSURE_SERIES:Record<Drainage,Series[]>={drained:pressureSeries(true),un
 const HELP:Record<TableName,string>={
   boreholes:"One row per borehole: an easting and northing, or a latitude and longitude, and the ground level of the collar. The final depth is needed only where the hole went deeper than its log.",
   logs:"Depths in metres below the collar. A unit not yet in the Units table is added at the bottom of the column.",
-  water:"Depths to water below the collar; the shallowest reading of each borehole sets the water table there.",
+  water:"Recorded depths to water below the collar. The groundwater policy under Project selects readings for this scenario; the observations themselves are kept unchanged.",
   spt:"N-values: the blows for 300 mm, or the blows and the penetration where the test stopped short.",
   tests:"One value per row, from the laboratory or in situ. Property: a key from the list (w, gamma, su, qu, c, phi, E, k, qc…) or any other name, in the units the list gives. Depths in metres.",
   units:"Top to bottom in stratigraphic order (▲ ▼ reorder). γ and γsat give the stresses, or else the mean measured unit weight, or else 18 and 20 kN/m³ are assumed; K0 gives the horizontal effective stress; c′, φ′ and su give the earth pressures; E and k are design parameters, kept with the model and reported."
 };
 
+export interface InputModelContext { workspaceId:string;scenarioId:string;name:string }
 export interface InputOptions {
   // The dataset shown in the model tab.
   current():GeoProject;
-  onBuild(result:ImportResult):void;
+  onBuild(result:ImportResult,context?:InputModelContext):void;
+  currentContext?():InputModelContext|undefined;
+  onScenarioRename?(context:InputModelContext):void;
   // Opens the file picker; imported files come back through edit().
   onImport():void;
   // Opens the picker for PDFs, where they can be read; boreholes read from them come back through open().
@@ -78,7 +82,7 @@ export function createInputWorkspace(o:InputOptions):InputWorkspace{
   let step:Step="start",filter="",selected="",message="",imported:string[]=[];
   let preview:{result?:ImportResult;model?:GeoModel;error?:string}={};
   let timer:ReturnType<typeof setTimeout>|undefined;
-  let view:View="stress",navMarkup="";
+  let view:View="stress",navMarkup="",compareBefore="",compareAfter="";
   const store=createWorkspaceStore();
   let workspaceDocument:WorkspaceDocument|null=null,saved:WorkspaceDocument|null=null,loading=true;
   let saveMessage="Loading saved workspace…",pendingSave:WorkspaceDocument|null=null,saving=false,saveTimer:ReturnType<typeof setTimeout>|undefined;
@@ -99,7 +103,7 @@ export function createInputWorkspace(o:InputOptions):InputWorkspace{
     <div class="ws-column"></div></div>
   <div class="ws-card"><div class="ws-card-head"><span>Checks</span></div><div class="ws-checks" aria-live="polite"></div></div>
 </aside></div>
-<footer class="ws-foot"><div class="ws-messages"><span class="ws-status" aria-live="polite"></span><span class="ws-save-status" role="status"></span></div><button class="ws-csv">Download table (CSV)</button><button class="ws-json" title="A project file you can import again">Save case (JSON)</button><button class="ws-workspace" title="The draft, complete projects and revision history">Save workspace</button><button class="ws-discard">Discard edits</button><button class="ws-build">Build model</button></footer>
+<footer class="ws-foot"><div class="ws-messages"><span class="ws-current-scenario"></span><span class="ws-status" aria-live="polite"></span><span class="ws-save-status" role="status"></span></div><button class="ws-csv">Download table (CSV)</button><button class="ws-json" title="A project file you can import again">Save case (JSON)</button><button class="ws-workspace" title="The draft, complete projects and revision history">Save workspace</button><button class="ws-discard">Discard edits</button><button class="ws-build">Build model</button></footer>
 <datalist id="ws-properties">${properties.map(p=>`<option value="${p.key}">${esc(p.name)}${p.unit?` (${esc(p.unit)})`:""}</option>`).join("")}</datalist>
 <datalist id="ws-holes"></datalist><datalist id="ws-units"></datalist>`;
   const nav=el.querySelector<HTMLElement>(".ws-steps")!,body=el.querySelector<HTMLDivElement>(".ws-body")!;
@@ -109,7 +113,11 @@ export function createInputWorkspace(o:InputOptions):InputWorkspace{
   const ready=store.load().then(value=>{saved=value;saveMessage=value?"Saved workspace available":""}).catch(error=>{
     saveMessage=`Browser storage unavailable: ${(error as Error).message}. Export a workspace to keep your work.`;
   }).finally(()=>{loading=false;if(step==="start")render();else renderSaveStatus()});
-  function renderSaveStatus(){el.querySelector<HTMLElement>(".ws-save-status")!.textContent=saveMessage}
+  function renderSaveStatus(){
+    el.querySelector<HTMLElement>(".ws-save-status")!.textContent=saveMessage;
+    const scenario=workspaceDocument?.scenarios.find(s=>s.id===workspaceDocument?.activeScenarioId);
+    el.querySelector<HTMLElement>(".ws-current-scenario")!.textContent=t&&scenario?`Scenario: ${scenario.name}`:"";
+  }
   // Keep the newest pending draft while a transaction is active; rapid typing need not queue copies of all history.
   function persist(immediate=false){
     if(!workspaceDocument||!t)return;
@@ -179,15 +187,15 @@ export function createInputWorkspace(o:InputOptions):InputWorkspace{
 
   function renderNav(){
     const markup=STEPS.map((s,i)=>{
-      const label=s==="start"?"Start":s==="project"?"Project":s==="history"?"Revisions":TABLE_NAMES[s];
-      const n=s==="start"||s==="project"?"":s==="history"?`<span>${workspaceDocument?.revisions.length??0}</span>`:`<span>${count(s)}</span>`;
+      const label=s==="start"?"Start":s==="project"?"Project":s==="history"?"Revisions":s==="scenarios"?"Scenarios":TABLE_NAMES[s];
+      const n=s==="start"||s==="project"?"":s==="history"?`<span>${workspaceDocument?.revisions.length??0}</span>`:s==="scenarios"?`<span>${workspaceDocument?.scenarios.length??0}</span>`:`<span>${count(s)}</span>`;
       return `<button data-step="${s}"${s===step?' aria-current="step"':""}${!t&&s!=="start"?" disabled":""}><i>${i||""}</i>${label}${n}</button>`;
     }).join("");
     if(markup!==navMarkup){nav.innerHTML=markup;navMarkup=markup}
   }
   function render(){
-    body.innerHTML=step==="start"?startView():step==="project"?projectView():step==="history"?historyView():tableView(step);
-    el.querySelector<HTMLButtonElement>(".ws-csv")!.hidden=step==="start"||step==="project"||step==="history";
+    body.innerHTML=step==="start"?startView():step==="project"?projectView():step==="history"?historyView():step==="scenarios"?scenariosView():tableView(step);
+    el.querySelector<HTMLButtonElement>(".ws-csv")!.hidden=step==="start"||step==="project"||step==="history"||step==="scenarios";
     for(const b of el.querySelectorAll<HTMLButtonElement>(".ws-json,.ws-workspace,.ws-discard,.ws-build"))b.disabled=!t;
     renderLists();
     status.textContent=message;status.title=message;renderSaveStatus();
@@ -221,6 +229,25 @@ export function createInputWorkspace(o:InputOptions):InputWorkspace{
     return `<div class="ws-history"><h2>Project revisions</h2><p>Build model records a complete project. Restore a revision to edit or build it again; later revisions stay available.</p>
       ${revisions.length?`<ol>${revisions.map((r,i)=>`<li><div><b>${i+1}. ${esc(r.project.name)}</b>${r.id===active?' <span class="ws-active">Selected</span>':""}<p>${esc(r.reason)} · ${esc(new Date(r.createdAt).toLocaleString())} · GeoModel3D ${esc(r.engineVersion)}</p>${r.parentId?`<small>Based on revision ${revisions.findIndex(p=>p.id===r.parentId)+1}</small>`:""}</div><button data-restore="${esc(r.id)}">Restore revision ${i+1}</button></li>`).join("")}</ol>`:'<p>No revisions yet. Build the model to record the first one.</p>'}</div>`;
   }
+  function scenariosView(){
+    const doc=workspaceDocument!,active=doc.scenarios.find(s=>s.id===doc.activeScenarioId)!,revisions=doc.revisions;
+    const label=(id:string)=>{const i=revisions.findIndex(r=>r.id===id),r=revisions[i],scenario=doc.scenarios.find(s=>s.id===r?.scenarioId);
+      return r?`${scenario?.name??"Revision"} · ${i+1} · ${r.project.name}`:"Not built"};
+    const options=(selected:string)=>revisions.map(r=>`<option value="${esc(r.id)}"${r.id===selected?" selected":""}>${esc(label(r.id))}</option>`).join("");
+    if(!revisions.some(r=>r.id===compareBefore))compareBefore=revisions[0]?.id??"";
+    if(!revisions.some(r=>r.id===compareAfter))compareAfter=active.headRevisionId??revisions.at(-1)?.id??"";
+    return `<div class="ws-scenarios"><h2>Scenarios</h2><p>Each scenario keeps its own unfinished tables and complete project. Switching saves your draft; building records a revision only in the selected scenario.</p>
+<label>Active scenario <select class="ws-scenario-select" aria-label="Active scenario">${doc.scenarios.map(c=>`<option value="${esc(c.id)}"${c.id===active.id?" selected":""}>${esc(c.name)}</option>`).join("")}</select></label>
+<div class="ws-scenario-actions"><label>Scenario name <input class="ws-scenario-name" name="scenario-name" placeholder="e.g. High groundwater" maxlength="100"></label>
+<label>Create from <select class="ws-scenario-from" aria-label="Create scenario from"><option value="">Current draft</option>${options("")}</select></label>
+<button class="ws-scenario-create">Create scenario</button><button class="ws-scenario-rename">Rename scenario</button></div>
+<ul class="ws-scenario-list">${doc.scenarios.map(c=>`<li><b>${esc(c.name)}</b>${c.id===active.id?' <span class="ws-active">Selected</span>':""}<p>${esc(c.headRevisionId?label(c.headRevisionId):"No built revision yet")}</p>${c.fromRevisionId?`<small>Started from ${esc(label(c.fromRevisionId))}</small>`:""}</li>`).join("")}</ul>
+<h3>Compare saved revisions</h3><p>Choose two fixed revisions. Unbuilt edits are kept in their scenario but are excluded from this comparison. Both models use the same section or reference alignment.</p>
+<div class="ws-comparison-picks"><label>Before <select class="ws-compare-before" aria-label="Before revision"${revisions.length?"":" disabled"}>${options(compareBefore)}</select></label><label>After <select class="ws-compare-after" aria-label="After revision"${revisions.length?"":" disabled"}>${options(compareAfter)}</select></label><button class="ws-compare"${revisions.length?"":" disabled"}>Compare revisions</button></div></div>`;
+  }
+  function waterDraft(){
+    return t!.groundwaterDraft??{mode:"observed" as const,depth:"",date:"",includeUndated:false};
+  }
   function projectView(){
     const f=t!.project,field=(key:keyof typeof f,label:string,hint:string,attrs="")=>
       `<label><span>${label}</span><input data-field="${key}" value="${esc(f[key])}" ${attrs}><small>${hint}</small></label>`;
@@ -229,7 +256,12 @@ ${field("name","Name","Shown in the dataset list and on reports")}
 <label><span>Description</span><textarea data-field="description" rows="3">${esc(f.description)}</textarea><small>What the data are and where they come from</small></label>
 ${field("source","Data source","Credited at the bottom of the view and on reports")}
 ${field("crs","Coordinate system","An EPSG code (such as 32654), a system's name, or a PROJ definition. Eastings and northings are in it, and latitudes and longitudes are converted to it. Leave it empty, or type any other name, for a local grid that is not placed on a map",'list="crs-options" spellcheck="false" autocomplete="off"')}
-${field("groundwaterDepth","Assumed groundwater depth (m)","Below ground, used where no borehole has a water level; leave it empty when unknown, and pore pressures are then zero",'inputmode="decimal"')}
+${field("groundwaterDepth","Fallback groundwater depth (m)","Used with Observed levels only when no borehole records water. Leave it empty when unknown; comparison water-dependent results are then unavailable",'inputmode="decimal"')}
+<fieldset class="ws-groundwater"><legend>Groundwater scenario</legend><label><span>Water levels</span><select class="ws-groundwater-mode" data-gw="mode" aria-label="Groundwater policy">${[["observed","Observed levels"],["assumed-depth","Assumed depth override"],["as-of","Observations as of a date"]].map(([value,label])=>`<option value="${value}"${waterDraft().mode===value?" selected":""}>${label}</option>`).join("")}</select></label>
+<label><span>Override depth below ground (m)</span><input class="ws-groundwater-depth" data-gw="depth" value="${esc(waterDraft().depth)}" inputmode="decimal"${waterDraft().mode==="assumed-depth"?"":" disabled"}></label>
+<label><span>As of (UTC day, YYYY-MM-DD)</span><input class="ws-groundwater-date" data-gw="date" value="${esc(waterDraft().date)}" placeholder="YYYY-MM-DD"${waterDraft().mode==="as-of"?"":" disabled"}></label>
+<label><input class="ws-groundwater-undated" data-gw="includeUndated" type="checkbox"${waterDraft().includeUndated?" checked":""}${waterDraft().mode==="as-of"?"":" disabled"}>Use undated readings where no dated reading qualifies</label>
+<small>Observed levels use the shallowest reading per borehole, with the fallback depth only when none is logged. An override replaces measured water for this scenario. As-of selection uses the latest eligible dated reading per borehole and never uses future readings or the fallback depth.</small></fieldset>
 ${field("base","Model base (m)","Elevation of the flat base of the model; empty for the deepest end of hole",'inputmode="decimal"')}
 ${field("margin","Model extent beyond the boreholes (m)","The model reaches this far beyond the outermost boreholes, its layers carried on from them; empty to end at the boreholes. One or two boreholes, or boreholes in a line, always get an extent",'inputmode="decimal"')}
 </div>`;
@@ -321,6 +353,8 @@ ${holes.map(b=>{const on=b.id===sel,x=X(b.x),y=Y(b.y);return `<g class="ws-pt" d
 
   // The log of one borehole as the model has it there, and the stresses or the earth pressures down it.
   function columnView(m:GeoModel,i:number){
+    if(m.project.groundwater?.mode==="as-of"&&!m.water)return '<p class="ws-empty">No groundwater observation qualifies for this date. Water-dependent stresses and earth pressures are unavailable; choose a different policy or add eligible observations.</p>';
+
     const K=m.units.length,z=m.horizons.map(h=>h.z[i]),top=z[0],bottom=z[K],depth=Math.max(top-bottom,1e-6);
     const w=m.water?.z[i],water=w!==undefined&&Number.isFinite(w)?w:undefined;
     const weights=unitWeights(m),params=m.units.map(u=>u.params),drainage:Drainage=view==="undrained"?"undrained":"drained";
@@ -409,7 +443,15 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
     const current=o.current();
     if(key==="new")begin(emptyTables(),undefined,"project","A new case: name it and say where it is, then fill in the tables.");
     else if(key==="example")begin(exampleTables(),undefined,"boreholes","The worked example: change any cell and the preview follows; Build model shows it in 3-D.");
-    else if(key==="current")begin(tablesFromProject(current),current,"boreholes",`The tables of ${current.name}: change or add to them, then build the model.`);
+    else if(key==="current"){
+      const context=o.currentContext?.(),tables=tablesFromProject(current);
+      if(workspaceDocument&&context?.workspaceId===workspaceDocument.id&&workspaceDocument.scenarios.some(c=>c.id===context.scenarioId)){
+        let doc=updateDraft(workspaceDocument,t!,base);
+        if(doc.activeScenarioId!==context.scenarioId)doc=switchScenario(doc,context.scenarioId);
+        if(JSON.stringify(doc.draft.tables)!==JSON.stringify(tables)&&!confirm("Replace the displayed model's scenario draft with the model shown? Saved revisions and other scenarios are kept."))return;
+        doc=updateDraft(doc,tables,current);begin(tables,current,"boreholes",`Editing the model in scenario ${context.name}.`,[],doc);
+      }else begin(tables,current,"boreholes",`The tables of ${current.name}: change or add to them, then build the model.`);
+    }
     else if(key==="saved"&&saved)begin(saved.draft.tables,saved.draft.base,"boreholes","Your saved workspace.",[],saved);
   }
   el.addEventListener("click",e=>{
@@ -425,6 +467,29 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
       render();return;
     }
     if(!t)return;
+    if(workspaceDocument&&b.classList.contains("ws-scenario-create")){
+      try{
+        const name=body.querySelector<HTMLInputElement>(".ws-scenario-name")!.value,from=body.querySelector<HTMLSelectElement>(".ws-scenario-from")!.value;
+        const doc=createScenario(updateDraft(workspaceDocument,t,base),name,from||undefined);
+        begin(doc.draft.tables,doc.draft.base,"scenarios",`Scenario ${name.trim()} created. Edit its tables, then build it.`,[],doc);
+      }catch(error){message=(error as Error).message;status.textContent=message}
+      return;
+    }
+    if(workspaceDocument&&b.classList.contains("ws-scenario-rename")){
+      try{
+        workspaceDocument=renameScenario(updateDraft(workspaceDocument,t,base),workspaceDocument.activeScenarioId,body.querySelector<HTMLInputElement>(".ws-scenario-name")!.value);
+        const scenario=workspaceDocument.scenarios.find(c=>c.id===workspaceDocument!.activeScenarioId)!;
+        o.onScenarioRename?.({workspaceId:workspaceDocument.id,scenarioId:scenario.id,name:scenario.name});
+        render();persist(true);
+      }
+      catch(error){message=(error as Error).message;status.textContent=message}
+      return;
+    }
+    if(workspaceDocument&&b.classList.contains("ws-compare")){
+      const before=workspaceDocument.revisions.find(r=>r.id===compareBefore),after=workspaceDocument.revisions.find(r=>r.id===compareAfter);
+      if(before&&after)showComparison(before,after,{download:o.download,beforeLabel:workspaceDocument.scenarios.find(c=>c.id===before.scenarioId)?.name,afterLabel:workspaceDocument.scenarios.find(c=>c.id===after.scenarioId)?.name});
+      return;
+    }
     if(b.dataset.restore&&workspaceDocument){
       if(edited()&&!confirm("Replace these edits with the selected revision? Save workspace first to keep an unfinished draft."))return;
       const restored=restoreRevision(workspaceDocument,b.dataset.restore);
@@ -441,7 +506,8 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
     if(b.classList.contains("ws-build")){
       try{
         const result=projectFromTables(t,base);
-        o.onBuild(result);
+        const scenario=workspaceDocument!.scenarios.find(s=>s.id===workspaceDocument!.activeScenarioId)!;
+        o.onBuild(result,{workspaceId:workspaceDocument!.id,scenarioId:scenario.id,name:scenario.name});
         workspaceDocument=checkpoint(updateDraft(workspaceDocument!,t,base),result.project,"Built model");
         base=structuredClone(result.project);persist(true);message="";
       }catch(err){message=(err as Error).message;status.textContent=message}
@@ -452,7 +518,7 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
       return;
     }
     if(b.classList.contains("ws-discard")){if(origin&&confirm("Discard the edits made since this case was opened?")){t=copy(origin);base=originBase?structuredClone(originBase):undefined;message="Edits discarded";render();refresh(true)}return}
-    if(step==="start"||step==="project"||step==="history")return;
+    if(step==="start"||step==="project"||step==="history"||step==="scenarios")return;
     const name=step,row=Number(b.closest("tr")?.dataset.r);
     if(b.classList.contains("ed-evidence")){
       const record=sourceRecord(name,row);
@@ -481,8 +547,14 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
   el.addEventListener("input",e=>{
     const f=e.target as HTMLInputElement|HTMLTextAreaElement;
     if(!t)return;
+    if(f.dataset.gw&&f.dataset.gw!=="mode"){
+      const draft={...waterDraft()};
+      if(f.dataset.gw==="includeUndated")draft.includeUndated=(f as HTMLInputElement).checked;
+      else if(f.dataset.gw==="depth"||f.dataset.gw==="date")draft[f.dataset.gw]=f.value;
+      t.groundwaterDraft=draft;refresh();return;
+    }
     if(f.dataset.field){t.project[f.dataset.field as keyof EditorTables["project"]]=f.value;refresh();return}
-    if(f.dataset.r===undefined||step==="start"||step==="project"||step==="history")return;
+    if(f.dataset.r===undefined||step==="start"||step==="project"||step==="history"||step==="scenarios")return;
     const v=f instanceof HTMLInputElement&&f.type==="checkbox"?(f.checked?"yes":""):f.value;
     setTableCell(step,Number(f.dataset.r),Number(f.dataset.c),v);
     if(f instanceof HTMLInputElement&&f.type==="color"){f.classList.remove("ed-blank");f.title=v}
@@ -490,6 +562,22 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
   });
   el.addEventListener("change",e=>{
     const f=e.target as HTMLSelectElement;
+    if(f.classList.contains("ws-scenario-select")&&workspaceDocument&&t){
+      try{
+        const doc=switchScenario(updateDraft(workspaceDocument,t,base),f.value);
+        begin(doc.draft.tables,doc.draft.base,"scenarios","Scenario opened. Its unfinished edits are preserved; Build model shows it in 3-D.",[],doc);
+      }catch(error){message=(error as Error).message;status.textContent=message}
+      return;
+    }
+    if(f.classList.contains("ws-compare-before")){compareBefore=f.value;return}
+    if(f.classList.contains("ws-compare-after")){compareAfter=f.value;return}
+    if(f.dataset.gw==="mode"&&t){
+      t.groundwaterDraft={...waterDraft(),mode:f.value as "observed"|"assumed-depth"|"as-of"};
+      body.querySelector<HTMLInputElement>(".ws-groundwater-depth")!.disabled=f.value!=="assumed-depth";
+      body.querySelector<HTMLInputElement>(".ws-groundwater-date")!.disabled=f.value!=="as-of";
+      body.querySelector<HTMLInputElement>(".ws-groundwater-undated")!.disabled=f.value!=="as-of";
+      refresh();return;
+    }
     if(f===holeSelect){selected=f.value;renderPreview();return}
     if(f.classList.contains("ed-filter")){filter=f.value;if(filter)selected=filter;render();renderPreview()}
     else if((f as HTMLElement).dataset?.c==="0")renderLists();
@@ -497,7 +585,7 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
   // The preview follows the row being edited.
   el.addEventListener("focusin",e=>{
     const f=e.target as HTMLInputElement;
-    if(!t||f.dataset.r===undefined||step==="start"||step==="project"||step==="history"||step==="units")return;
+    if(!t||f.dataset.r===undefined||step==="start"||step==="project"||step==="history"||step==="scenarios"||step==="units")return;
     const id=t.rows[step][Number(f.dataset.r)]?.[0]?.trim();
     if(id&&id!==selected&&preview.model?.boreholes.some(b=>b.id===id)){selected=id;renderPreview()}
   });
@@ -505,7 +593,7 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
   // rows where needed.
   el.addEventListener("paste",e=>{
     const f=e.target as HTMLInputElement,text=e.clipboardData?.getData("text/plain")??"";
-    if(!t||f.dataset.r===undefined||step==="start"||step==="project"||step==="history"||!/[\t\n]/.test(text.trim()))return;
+    if(!t||f.dataset.r===undefined||step==="start"||step==="project"||step==="history"||step==="scenarios"||!/[\t\n]/.test(text.trim()))return;
     e.preventDefault();
     const name=step,lines=text.replace(/\r/g,"").replace(/\n+$/,"").split("\n").map(l=>l.split("\t"));
     const shown=shownRows(name).rows.map(q=>q.i),c0=Number(f.dataset.c),p0=shown.indexOf(Number(f.dataset.r));

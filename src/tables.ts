@@ -5,6 +5,7 @@ import {ImportResult,importFiles,toCsv} from "./io";
 import {Crs,projectCrs,findCrs,searchCrs,customCrs} from "./crs";
 import {applyUnitRules,lithologyRules} from "./rules";
 import type {EvidenceCollection} from "./evidence";
+import {parseGroundwater} from "./groundwater";
 
 export type TableName="boreholes"|"logs"|"water"|"spt"|"tests"|"units";
 // Column headers as shown, and as written to CSV (the importer's names).
@@ -40,6 +41,7 @@ export interface EditorTables {
   evidence?:EvidenceCollection;
   // Entries move with their rows when the editor inserts, removes or reorders rows. null is an unsourced row.
   evidenceRows?:Partial<Record<TableName,(string|null)[]>>;
+  groundwaterDraft?:{mode:"observed"|"assumed-depth"|"as-of";depth:string;date:string;includeUndated:boolean};
 }
 
 const text=(v:unknown)=>v===undefined||v===null||(typeof v==="number"&&!Number.isFinite(v))?"":String(v);
@@ -69,6 +71,8 @@ export function tablesFromProject(p:GeoProject):EditorTables{
     ...DESIGN_KEYS.map(k=>text(u.params?.[k])),u.source??""]);
   return {project:{name:p.name,description:p.description??"",source:p.source??"",crs:crs?(crs.code&&findCrs(crs.code)?crs.code:crs.proj4):p.crs??"",
     groundwaterDepth:text(p.groundwaterDepth),base:text(p.base),margin:text(p.margin)},rows,
+    ...(p.groundwater?{groundwaterDraft:{mode:p.groundwater.mode,depth:p.groundwater.mode==="assumed-depth"?String(p.groundwater.depth):"",
+      date:p.groundwater.mode==="as-of"?p.groundwater.date:"",includeUndated:p.groundwater.mode==="as-of"&&!!p.groundwater.includeUndated}}:{}),
     ...(p.evidence?{evidence:structuredClone(p.evidence)}:{}),
     ...(Object.values(evidenceRows).some(ids=>ids.some(id=>id!==null))?{evidenceRows}:{})};
 }
@@ -160,6 +164,7 @@ export function projectFromTables(t:EditorTables,base?:GeoProject):ImportResult{
     if(p.crs)result.warnings.push(`Coordinate system “${p.crs}” is not a known one: the model is not georeferenced (no terrain or map). Type an EPSG code or paste a PROJ definition to place it`);
   }
   if(base){
+    if(base.groundwater)p.groundwater=structuredClone(base.groundwater);
     if(base.rules)p.rules=base.rules;
     if(projectCrs(base)?.proj4===crs?.proj4){
       if(base.terrain)p.terrain=base.terrain;
@@ -178,6 +183,11 @@ export function projectFromTables(t:EditorTables,base?:GeoProject):ImportResult{
       const extra=Object.entries(before.get(u.id)?.params??{}).filter(([k])=>!DESIGN_KEYS.includes(k));
       if(extra.length)u.params={...Object.fromEntries(extra),...u.params};
     }
+  }
+  if(t.groundwaterDraft){
+    const g=t.groundwaterDraft;
+    p.groundwater=parseGroundwater(g.mode==="assumed-depth"?{mode:g.mode,depth:g.depth.trim()?Number(g.depth.trim().replace(",",".")):NaN}:
+      g.mode==="as-of"?{mode:g.mode,date:g.date.trim(),includeUndated:g.includeUndated}:{mode:g.mode});
   }
   return result;
 }

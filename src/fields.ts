@@ -212,6 +212,7 @@ export function columnAt(section:Section,s:number){
 }
 export function sectionField(model:GeoModel,section:Section,key:string):SectionField|null{
   if(section.s.length<2)return null;
+  if(isStressField(key)&&model.project.groundwater?.mode==="as-of"&&!model.water)return null;
   const info=fieldName(key),K=model.units.length,notes:string[]=[];
   const unitOf=(z:number[],e:number)=>{for(let k=0;k<K;k++)if(e<=z[k]+1e-9&&e>=z[k+1]-1e-9&&z[k]-z[k+1]>1e-9)return k;return -1};
   const unitAtSZ=(s:number,e:number)=>{const c=columnAt(section,s);return c?unitOf(c.z,e):-1};
@@ -316,7 +317,8 @@ export const scaleLabel=(c:ColourScale,v:number)=>(c.log?`1e${Math.round(v)}`:St
 // The fields that can be shown for a model: the stresses, then each measured property.
 export function availableFields(model:GeoModel){
   const k0=model.units.some(u=>u.params?.K0!==undefined),measured=measuredProperties(model.boreholes);
-  const fromCpts:string[]=[...CPT_KEYS.filter(k=>!measured.includes(k)&&model.cpts.some(c=>cptKeys(c).includes(k))),...(model.cpts.some(c=>c.fs?.some(Number.isFinite))?["Ic"]:[])];
-  return [...STRESS_FIELDS.filter(f=>f.key!=="sh"||k0).map(f=>({key:f.key as string,label:`${f.name} ${f.symbol} (${f.unit})`})),
+  const asOf=model.project.groundwater?.mode==="as-of";
+  const fromCpts:string[]=[...CPT_KEYS.filter(k=>!measured.includes(k)&&model.cpts.some(c=>cptKeys(c).includes(k))),...(model.cpts.some(c=>c.fs?.some(Number.isFinite)&&(!asOf||cptBehaviour(model.project,c).ic.some(Number.isFinite)))?["Ic"]:[])];
+  return [...STRESS_FIELDS.filter(f=>(!asOf||!!model.water)&&(f.key!=="sh"||k0)).map(f=>({key:f.key as string,label:`${f.name} ${f.symbol} (${f.unit})`})),
     ...[...measured,...fromCpts].map(k=>{const p=propertyDef(k);return {key:k,label:`${p.name}${p.symbol!==p.name?" "+p.symbol:""}${p.unit?` (${p.unit})`:""}${fromCpts.includes(k)?", CPT":""}`}})];
 }

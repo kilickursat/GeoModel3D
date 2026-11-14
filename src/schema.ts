@@ -42,7 +42,11 @@ export interface Cpt {
   id:string; x:number; y:number; z:number; lon?:number; lat?:number;
   depth:number[]; qc:number[]; fs?:number[]; u2?:number[]; rf?:number[]; qt?:number[]; a?:number;
   predrill?:number; date?:string; layers?:Interval[];
+  // Only automatic interpretations may be regenerated. Legacy unmarked and reviewed logs are fixed.
+  layersSource?:"automatic"|"reviewed";
 }
+
+export type GroundwaterPolicy={mode:"observed"}|{mode:"assumed-depth";depth:number}|{mode:"as-of";date:string;includeUndated?:boolean};
 
 // x, y are in the system named by `crs`; `crsCode` (e.g. EPSG:6677) or the PROJ definition `crsProj4` georeferences it.
 // `source` credits where the data come from. `groundwaterDepth` is an assumed depth of the water table below ground,
@@ -51,7 +55,7 @@ export interface Cpt {
 // as the boreholes' logs; `cptRules` give those layers their units (else the unit rules do).
 export interface GeoProject {
   name:string; description?:string; source?:string; crs?:string; crsCode?:string; crsProj4?:string; base?:number;
-  groundwaterDepth?:number; margin?:number;
+  groundwaterDepth?:number; groundwater?:GroundwaterPolicy; margin?:number;
   units:UnitDef[]; rules?:UnitRule[]; boreholes:Borehole[]; terrain?:TerrainGrid; alignments?:Alignment[]; cpts?:Cpt[];
   cptLayers?:boolean; cptRules?:UnitRule[];
   evidence?:EvidenceCollection;

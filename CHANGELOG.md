@@ -3,6 +3,9 @@
 ## Unreleased
 
 ### Added
+- Named scenarios in **Input data → Scenarios**, created from an unfinished draft or a fixed revision. Switching preserves each scenario's unfinished values, source evidence and independent revision head. Workspace format 3 includes all scenario drafts and reads earlier workspace formats.
+- Revision comparisons on the same straight section or reference alignment: overlaid contacts, signed elevation and groundwater differences, introduced/removed units, and optional unit/stress readouts at a chosen elevation. Downloadable CSV identifies both fixed revisions and sampling settings. Calculations run in a cancelable inline worker, including in the standalone file.
+- Groundwater scenarios: shallowest observed levels, an explicit depth override, or latest eligible readings as of a UTC day. Automatic CPT layers are recalculated consistently; reviewed and legacy interpretations stay fixed. Missing as-of groundwater withholds dependent results instead of inventing a dry case.
 - Persistent source evidence for boreholes read from PDFs and images: original extracted values, page text and boxes, extraction notes, correction history and explicit per-value acceptance. Source-page previews and document hashes stay on the device and are included in project/workspace JSON.
 - **Evidence** beside source-backed input rows, and **Source evidence** in the model's Site panel. A short click or tap on a visible source-backed borehole opens its evidence; the inspector shows the saved page and highlights for each value. It also works with saved previews in the standalone file.
 - **Accept current value** in the input evidence inspector records a new acceptance; subsequent edits invalidate it. Values changed by import, unit rules or coordinate conversion are shown as different from the recorded evidence. Printable reports include a source-evidence appendix.

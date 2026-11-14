@@ -221,7 +221,7 @@ describe("importing CPTs",()=>{
     ].join("\r\n");
     const r=importFiles([{name:"site.ags",text:ags}]);
     expect(r.project.boreholes.map(b=>b.id)).toEqual(["BH1","BH2","BH4"]);
-    expect(r.project.cpts).toEqual([{id:"CPT1",x:523165,y:178470,z:21.3,depth:[1,5],qc:[0.8,15],fs:[20,90],u2:[30,40],rf:[2.5,0.6],layers:expect.any(Array)}]);
+    expect(r.project.cpts).toEqual([{id:"CPT1",x:523165,y:178470,z:21.3,depth:[1,5],qc:[0.8,15],fs:[20,90],u2:[30,40],rf:[2.5,0.6],layersSource:"automatic",layers:expect.any(Array)}]);
     expect(r.warnings.join(" ")).not.toMatch(/CPT1: collar without intervals/);
     // CPTs alone, in MPa as AGS 4.1 gives them, join the project shown.
     const alone=ags.split("\r\n").filter(l=>!/^"(DATA|HEADING|UNIT|TYPE|GROUP)","(BH|GEOL|LOCA_ID","GEOL)/.test(l)||/"GROUP","(?!GEOL)/.test(l)).join("\r\n")

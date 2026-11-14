@@ -21,7 +21,7 @@ import {Crs,crsRegistry,projectCrs,findCrs,customCrs,searchCrs,suggestCrs,toProj
 import {fetchTerrain,elevationSources,mapSources,covers,tileUrl,parseGsiTile,decodeTerrarium,mapTiles,tileXY,ElevationSource,TileSource} from "./tiles";
 import {applyUnitRules} from "./rules";
 import {reportHtml} from "./report";
-import {createInputWorkspace} from "./input";
+import {createInputWorkspace,InputModelContext} from "./input";
 import {parseWorkspace} from "./workspace";
 import {showEvidence} from "./evidenceView";
 import {agreement,askAgreement,withdrawAgreement} from "./agreement";
@@ -1087,7 +1087,7 @@ function renderPanel(){
   const projects=[...sampleProjects,...(imported?[imported]:[])];
   datasetSelect.innerHTML=projects.map((p,i)=>`<option value="${i}"${p===project?" selected":""}>${esc(i>=sampleProjects.length?"Your data: "+p.name:p.name)}</option>`).join("")+
     `<option value="input">Enter your own data…</option>`;
-  siteName.textContent=project.name;
+  siteName.textContent=project.name+(workspaceContext?` · ${workspaceContext.name}`:"");
   const desc=ui.querySelector<HTMLDivElement>(".desc")!,more=ui.querySelector<HTMLButtonElement>(".desc-more")!;
   desc.textContent=project.description??"";
   desc.classList.remove("open");
@@ -1186,7 +1186,7 @@ function renderRules(){
     if(unmatched.size)notes.push(`No rule matches: ${listed(unmatched)}`);
   }else{
     notes.push("The first rule that matches a CPT layer's soil and the elevation of its top gives its unit.");
-    if(!project.cptRules&&project.cpts?.some(c=>c.layers?.some(l=>l.unit)))notes.push("The site's own interpretation gives the units now; rules applied here replace it.");
+    if(!project.cptRules&&project.cpts?.some(c=>c.layers?.some(l=>l.unit)))notes.push("Reviewed and legacy CPT interpretations stay fixed. These rules update automatically classified CPT layers.");
   }
   if(layered){const u=unmatchedLayers(project.cpts);if(u.size)notes.push(`CPT layers with no unit, left out: ${listed(u)}`)}
   box.querySelector(".rule-note")!.textContent=notes.join(" ");
@@ -1209,7 +1209,7 @@ function applyRules(){
     if(r.unmatched.size)notes.push(`Descriptions that no rule assigns to a unit are modelled as units of their own: ${[...r.unmatched].map(([n,c])=>`${n} (${c})`).join(", ")}`);
   }
   // The CPT layers follow the rules applied, unless the project has rules of their own for them.
-  const cpts=target==="cptRules"||!project.cptRules?project.cpts?.map(c=>c.layers?{...c,layers:layerUnits(c.layers,c.z,rules)}:c):project.cpts;
+  const cpts=target==="cptRules"||!project.cptRules?project.cpts?.map(c=>c.layers&&c.layersSource==="automatic"?{...c,layers:layerUnits(c.layers,c.z,rules)}:c):project.cpts;
   const used=new Set([...boreholes.flatMap(b=>b.intervals.map(i=>i.unit)),...(cpts??[]).flatMap(c=>(c.layers??[]).map(l=>l.unit))].filter(Boolean));
   const kept=project.units.filter(u=>used.has(u.id)),added=[...used].filter(id=>!kept.some(u=>u.id===id));
   if(added.length)notes.push(`New units added at the bottom of the column: ${added.join(", ")}`);
@@ -1457,6 +1457,7 @@ function showNotice(title:string,lines:string[],error=false){
   fold.onclick=()=>fold.setAttribute("aria-expanded",String(!notice.classList.toggle("folded")));
 }
 
+let workspaceContext:InputModelContext|undefined;
 let currentNotes:string[]=[];
 function renderNotes(){
   const box=ui.querySelector<HTMLDetailsElement>(".notes")!;
@@ -1465,10 +1466,11 @@ function renderNotes(){
   box.querySelector("ul")!.innerHTML=currentNotes.map(n=>`<li>${esc(n)}</li>`).join("");
 }
 // keepView rebuilds the same site (new terrain or rules) without moving the camera or resetting the controls.
-function loadProject(p:GeoProject,importWarnings:string[]=[],keepView=false){
-  const before={...origin};
-  project=p;
-  model=buildGeologicalModel(p);
+function loadProject(p:GeoProject,importWarnings:string[]=[],keepView=false,context:InputModelContext|null=workspaceContext??null){
+  // Validate/rebuild before changing the displayed project or its scenario identity.
+  const nextModel=buildGeologicalModel(p),before={...origin};
+  model=nextModel;project=model.project;workspaceContext=context??undefined;
+  if(!sampleProjects.includes(p))imported=project;
   weights=unitWeights(model);
   if(!keepView){view.hidden.clear();view.field="units";view.alignment=-1}
   if(view.alignment>=(p.alignments?.length??0))view.alignment=-1;
@@ -1530,14 +1532,16 @@ async function importFileList(list:FileList|File[]){
     const references=[...result.project.boreholes.flatMap(b=>[b.evidenceId,...b.intervals.map(i=>i.evidenceId),...(b.water??[]).map(w=>w.evidenceId)]),
       ...(result.project.cpts??[]).flatMap(c=>(c.layers??[]).map(l=>l.evidenceId))];
     if(references.some(id=>id!==undefined&&!evidenceIds.has(id)))throw new Error("CSV evidence IDs require the matching source evidence. Import the complete project/workspace JSON, or remove the evidence_id column.");
-    imported=result.project;
+    // Input imports are staged for editing, including incomplete scenarios that cannot yet build.
+    if(document.body.dataset.mode==="input"){
+      workspace.edit(result.project,`Imported ${files.map(f=>f.name).join(", ")}: check the tables, then build the model.${result.warnings.length?` ${result.warnings.length} note${result.warnings.length===1?"":"s"} under Checks.`:""}`,result.warnings);
+      return;
+    }
     // Lines or CPTs added to the site shown keep the view, and the first line is shown.
     const added=(!!result.alignments||!!result.cpts)&&result.project.boreholes===project.boreholes;
-    loadProject(result.project,result.warnings,added);
+    loadProject(result.project,result.warnings,added,null);
     const first=result.alignments?.[0],index=first===undefined?-1:result.project.alignments?.findIndex(a=>a.name===first)??-1;
     if(index>=0&&document.body.dataset.mode!=="input")showLine(index);
-    // Files picked from the input tab open there, for review before building.
-    if(document.body.dataset.mode==="input")workspace.edit(result.project,`Imported ${files.map(f=>f.name).join(", ")}: check the tables, then build the model.${result.warnings.length?` ${result.warnings.length} note${result.warnings.length===1?"":"s"} under Checks.`:""}`,result.warnings);
   }catch(err){
     if(document.body.dataset.mode==="input")workspace.status(`Import failed: ${(err as Error).message}`);
     showNotice("Import failed",[(err as Error).message],true);
@@ -1676,16 +1680,20 @@ async function printReport(paper:"A3"|"A4"){
 
 datasetSelect.onchange=()=>{
   if(datasetSelect.value==="input"){datasetSelect.value=String([...sampleProjects,...(imported?[imported]:[])].indexOf(project));setMode("input");return}
-  const i=Number(datasetSelect.value);loadProject(i<sampleProjects.length?sampleProjects[i]:imported!);
+  const i=Number(datasetSelect.value);loadProject(i<sampleProjects.length?sampleProjects[i]:imported!,[],false,null);
 };
 toolbar.querySelector<HTMLButtonElement>(".import")!.onclick=()=>fileInput.click();
 
 const workspace=createInputWorkspace({
   current:()=>project,
+  currentContext:()=>workspaceContext,
+  onScenarioRename:context=>{
+    if(workspaceContext?.workspaceId===context.workspaceId&&workspaceContext.scenarioId===context.scenarioId){workspaceContext=context;siteName.textContent=project.name+` · ${context.name}`}
+  },
   download,
   onImport:()=>fileInput.click(),
   ...(pdfReading?{onReadPdf:()=>pdfInput.click()}:{}),
-  onBuild:r=>{imported=r.project;setMode("model");loadProject(r.project,r.warnings)}
+  onBuild:(r,context)=>{loadProject(r.project,r.warnings,false,context??null);setMode("model")}
 });
 app.appendChild(workspace.element);
 function setMode(mode:"model"|"input"){
@@ -1964,7 +1972,7 @@ function holeHtml(hole:number,interval:number){
   const what=iv?`${esc(model.units.find(u=>u.id===iv.unit)?.name??iv.unit)} ${fmt(iv.from,2)}–${fmt(iv.to,2)} m`:"not logged";
   const spt=iv?(bh.spt??[]).filter(t=>t.depth>=iv.from&&t.depth<iv.to).map(t=>t.penetration>=300?String(t.blows):`${t.blows}/${fmt(t.penetration/10)} cm`):[];
   const logged=[iv?.name&&iv.name!==iv.unit?esc(iv.name):"",spt.length?`N ${spt.join(", ")}`:""].filter(Boolean).join(" · ");
-  const water=bh.water?.length?` · water ${fmt(Math.min(...bh.water.map(w=>w.depth)),2)} m deep`:"";
+  const water=bh.water?.length?` · shallowest logged water ${fmt(Math.min(...bh.water.map(w=>w.depth)),2)} m deep (all dates)`:"";
   const where=bh.lat!==undefined&&bh.lon!==undefined?` (${fmt(bh.lat,5)}°, ${fmt(bh.lon,5)}°)`:"";
   return `<b>${esc(bh.id)}</b> · ${what}${logged?`<span>${logged}</span>`:""}<span>collar E ${fmt(bh.x,1)} N ${fmt(bh.y,1)}${where} · ${fmt(bh.z,2)} m · final depth ${fmt(boreholeDepth(bh),1)} m${water}</span>${validationLine(bh.id)}`;
 }
@@ -2102,7 +2110,7 @@ function sectionReadout(along:number,e:number){
   let k=-1;
   for(let i=0;i<model.units.length;i++)if(e<=c.z[i]+1e-6&&e>=c.z[i+1]-1e-6&&c.z[i]-c.z[i+1]>1e-9){k=i;break}
   if(k<0)return "";
-  const st=stressAt(c.z,c.water,weights,e),assumed=weights.some(w=>w.source==="assumed");
+  const st=model.project.groundwater?.mode==="as-of"&&!model.water?undefined:stressAt(c.z,c.water,weights,e),assumed=weights.some(w=>w.source==="assumed");
   let html=`<b>${esc(model.units[k].name)}</b> · ${section.alignment?`chainage ${fmt(along,1)} m, `:""}${fmt(c.z[0]-e,1)} m deep, elevation ${fmt(e,1)} m`;
   // Along a line, its design levels there and the cover above them.
   const d=section.alignment?designAt(section.alignment.design,along):{};

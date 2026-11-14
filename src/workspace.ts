@@ -5,14 +5,22 @@ import {GeoProject} from "./schema";
 import {COLUMNS,EditorTables,emptyTables,tablesFromProject} from "./tables";
 import {importFiles,toProjectJson} from "./io";
 import {alignmentProblem} from "./alignment";
+import {parseGroundwater} from "./groundwater";
 import {EvidenceCollection,validateEvidence,EVIDENCE_MAX_IMAGE_BYTES,EVIDENCE_MAX_PAGE_IMAGE_BYTES} from "./evidence";
 
 export interface WorkspaceRevision {
-  id:string; parentId?:string; createdAt:string; reason:string; engineVersion:string; project:GeoProject;
+  id:string; parentId?:string; createdAt:string; reason:string; engineVersion:string; project:GeoProject; scenarioId?:string;
+}
+export interface WorkspaceDraft { tables:EditorTables;base?:GeoProject }
+export interface WorkspaceScenario {
+  id:string; name:string; createdAt:string; parentScenarioId?:string; fromRevisionId?:string; headRevisionId?:string;
+  // Only inactive scenarios store a draft here. The active one lives in WorkspaceDocument.draft.
+  draft?:WorkspaceDraft;
 }
 export interface WorkspaceDocument {
-  format:"geomodel3d-workspace"; version:2; id:string; savedAt:string;
-  draft:{tables:EditorTables;base?:GeoProject}; revisions:WorkspaceRevision[]; activeRevisionId?:string;
+  format:"geomodel3d-workspace"; version:3; id:string; savedAt:string;
+  draft:WorkspaceDraft; revisions:WorkspaceRevision[]; activeRevisionId?:string;
+  scenarios:WorkspaceScenario[]; activeScenarioId:string;
 }
 
 const clone=<T>(value:T):T=>structuredClone(value);
@@ -27,17 +35,72 @@ function freeze<T>(value:T):T{
   return value;
 }
 const history=(revisions:WorkspaceRevision[])=>frozen.has(revisions)?revisions:freeze(clone(revisions));
+const scenarioHistory=(scenarios:WorkspaceScenario[])=>frozen.has(scenarios)?scenarios:freeze(clone(scenarios));
 const now=()=>new Date().toISOString();
 // randomUUID requires a secure context in some browsers; the standalone file can still make local identifiers.
 const identifier=()=>globalThis.crypto?.randomUUID?.()??`local-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
 
 export function createWorkspace(tables:EditorTables,base?:GeoProject):WorkspaceDocument{
-  return {format:"geomodel3d-workspace",version:2,id:identifier(),savedAt:now(),
-    draft:{tables:clone(tables),...(base?{base:clone(base)}:{})},revisions:freeze([])};
+  const id=identifier(),at=now(),baseline=id+":baseline";
+  return {format:"geomodel3d-workspace",version:3,id,savedAt:at,
+    draft:{tables:clone(tables),...(base?{base:clone(base)}:{})},revisions:freeze([]),
+    scenarios:freeze([{id:baseline,name:"Baseline",createdAt:at}]),activeScenarioId:baseline};
 }
 
 export function updateDraft(doc:WorkspaceDocument,tables:EditorTables,base?:GeoProject):WorkspaceDocument{
-  return {...doc,version:2,savedAt:now(),revisions:history(doc.revisions),draft:{tables:clone(tables),...(base?{base:clone(base)}:{})}};
+  return {...doc,version:3,savedAt:now(),revisions:history(doc.revisions),scenarios:scenarioHistory(doc.scenarios),
+    draft:{tables:clone(tables),...(base?{base:clone(base)}:{})}};
+}
+function setActiveHead(doc:WorkspaceDocument,id:string|undefined){
+  if(id===undefined)delete doc.activeRevisionId;else doc.activeRevisionId=id;
+  doc.scenarios=freeze(doc.scenarios.map(s=>{
+    if(s.id!==doc.activeScenarioId)return s;
+    const next={...s};delete next.draft;
+    if(id===undefined)delete next.headRevisionId;else next.headRevisionId=id;
+    return next;
+  }));
+}
+function scenarioName(name:string,scenarios:WorkspaceScenario[],except?:string):string{
+  if(typeof name!=="string")throw new Error("A scenario name must be text.");
+  const value=name.trim();
+  if(!value||value.length>100)throw new Error("A scenario name must contain 1 to 100 characters.");
+  if(scenarios.some(s=>s.id!==except&&s.name.toLowerCase()===value.toLowerCase()))throw new Error("A scenario with that name already exists.");
+  return value;
+}
+export function createScenario(doc:WorkspaceDocument,name:string,fromRevisionId?:string):WorkspaceDocument{
+  const next=updateDraft(doc,doc.draft.tables,doc.draft.base),label=scenarioName(name,next.scenarios);
+  const revision=fromRevisionId===undefined?undefined:next.revisions.find(r=>r.id===fromRevisionId);
+  if(fromRevisionId!==undefined&&!revision)throw new Error("That checkpoint is not in this workspace.");
+  let id=identifier();while(next.scenarios.some(s=>s.id===id))id=identifier();
+  const draft=revision?{tables:tablesFromProject(revision.project),base:clone(revision.project)}:clone(next.draft);
+  const head=revision?.id??next.activeRevisionId;
+  const scenario:WorkspaceScenario={id,name:label,createdAt:now(),parentScenarioId:next.activeScenarioId,
+    ...(head?{fromRevisionId:head,headRevisionId:head}:{})};
+  next.scenarios=freeze([...next.scenarios.map(s=>s.id===next.activeScenarioId?{...s,draft:freeze(next.draft)}:s),scenario]);
+  next.activeScenarioId=id;next.draft=draft;
+  if(head===undefined)delete next.activeRevisionId;else next.activeRevisionId=head;
+  return next;
+}
+export function switchScenario(doc:WorkspaceDocument,id:string):WorkspaceDocument{
+  const next=updateDraft(doc,doc.draft.tables,doc.draft.base),target=next.scenarios.find(s=>s.id===id);
+  if(!target)throw new Error("That scenario is not in this workspace.");
+  if(id===next.activeScenarioId)return next;
+  if(!target.draft)throw new Error("That inactive scenario has no saved draft.");
+  const draft=clone(target.draft);
+  next.scenarios=freeze(next.scenarios.map(s=>{
+    if(s.id===next.activeScenarioId)return {...s,draft:freeze(next.draft)};
+    if(s.id===id){const active={...s};delete active.draft;return active}
+    return s;
+  }));
+  next.activeScenarioId=id;next.draft=draft;
+  if(target.headRevisionId===undefined)delete next.activeRevisionId;else next.activeRevisionId=target.headRevisionId;
+  return next;
+}
+export function renameScenario(doc:WorkspaceDocument,id:string,name:string):WorkspaceDocument{
+  if(!doc.scenarios.some(s=>s.id===id))throw new Error("That scenario is not in this workspace.");
+  const next=updateDraft(doc,doc.draft.tables,doc.draft.base),label=scenarioName(name,next.scenarios,id);
+  next.scenarios=freeze(next.scenarios.map(s=>s.id===id?{...s,name:label}:s));
+  return next;
 }
 
 // Compare project content, not object insertion order. JSON's null representation is intentional for missing CPT
@@ -55,8 +118,8 @@ export function checkpoint(doc:WorkspaceDocument,project:GeoProject,reason:strin
   let id=identifier();
   while(next.revisions.some(r=>r.id===id))id=identifier();
   next.revisions=freeze([...next.revisions,{id,...(active?{parentId:active.id}:{}),createdAt:now(),reason,
-    engineVersion:pkg.version,project:clone(project)}]);
-  next.activeRevisionId=id;
+    engineVersion:pkg.version,project:clone(project),scenarioId:next.activeScenarioId}]);
+  setActiveHead(next,id);
   return next;
 }
 
@@ -64,7 +127,7 @@ export function restoreRevision(doc:WorkspaceDocument,id:string):WorkspaceDocume
   const revision=doc.revisions.find(r=>r.id===id);
   if(!revision)throw new Error("That checkpoint is not in this workspace.");
   const next=updateDraft(doc,tablesFromProject(revision.project),revision.project);
-  next.activeRevisionId=id;
+  setActiveHead(next,id);
   return next;
 }
 
@@ -162,29 +225,35 @@ function evidenceReference(value:unknown,ids:ReadonlySet<string>,path:string){
   if(!ids.has(id))invalid(`${path}.evidenceId`,"does not name an evidence record in this project");
 }
 
-function parseTables(value:unknown,image:ImageResolver):EditorTables{
-  const t=record(value,"draft.tables"),p=record(t.project,"draft.tables.project"),rows=record(t.rows,"draft.tables.rows");
-  for(const key of Object.keys(emptyTables().project))text(p[key],`draft.tables.project.${key}`);
+function parseTables(value:unknown,image:ImageResolver,path="draft.tables"):EditorTables{
+  const t=record(value,path),p=record(t.project,`${path}.project`),rows=record(t.rows,`${path}.rows`);
+  for(const key of Object.keys(emptyTables().project))text(p[key],`${path}.project.${key}`);
   for(const [name,columns] of Object.entries(COLUMNS)){
-    list(rows[name],`draft.tables.rows.${name}`).forEach((row,i)=>{
-      const cells=list(row,`draft.tables.rows.${name}[${i}]`);
-      if(cells.length!==columns.length)invalid(`draft.tables.rows.${name}[${i}]`,`must have ${columns.length} cells`);
-      cells.forEach((cell,j)=>text(cell,`draft.tables.rows.${name}[${i}][${j}]`));
+    list(rows[name],`${path}.rows.${name}`).forEach((row,i)=>{
+      const cells=list(row,`${path}.rows.${name}[${i}]`);
+      if(cells.length!==columns.length)invalid(`${path}.rows.${name}[${i}]`,`must have ${columns.length} cells`);
+      cells.forEach((cell,j)=>text(cell,`${path}.rows.${name}[${i}][${j}]`));
     });
   }
+  if(t.groundwaterDraft!==undefined){
+    const policy=record(t.groundwaterDraft,`${path}.groundwaterDraft`);
+    if(policy.mode!=="observed"&&policy.mode!=="assumed-depth"&&policy.mode!=="as-of")invalid(`${path}.groundwaterDraft.mode`,"must be observed, assumed-depth or as-of");
+    text(policy.depth,`${path}.groundwaterDraft.depth`);text(policy.date,`${path}.groundwaterDraft.date`);
+    if(typeof policy.includeUndated!=="boolean")invalid(`${path}.groundwaterDraft.includeUndated`,"must be a boolean");
+  }
   const parsed=clone(t) as unknown as EditorTables;
-  if(t.evidence!==undefined)parsed.evidence=evidenceCollection(t.evidence,"draft.tables.evidence",image);
+  if(t.evidence!==undefined)parsed.evidence=evidenceCollection(t.evidence,`${path}.evidence`,image);
   const ids=new Set(parsed.evidence?.records.map(r=>r.id)??[]);
   if(t.evidenceRows!==undefined){
-    const bindings=record(t.evidenceRows,"draft.tables.evidenceRows");
+    const bindings=record(t.evidenceRows,`${path}.evidenceRows`);
     for(const [name,value] of Object.entries(bindings)){
-      if(!Object.hasOwn(COLUMNS,name))invalid(`draft.tables.evidenceRows.${name}`,"is not an input table");
-      const refs=list(value,`draft.tables.evidenceRows.${name}`);
-      if(refs.length!==(rows[name] as unknown[]).length)invalid(`draft.tables.evidenceRows.${name}`,"must have one binding for each row");
+      if(!Object.hasOwn(COLUMNS,name))invalid(`${path}.evidenceRows.${name}`,"is not an input table");
+      const refs=list(value,`${path}.evidenceRows.${name}`);
+      if(refs.length!==(rows[name] as unknown[]).length)invalid(`${path}.evidenceRows.${name}`,"must have one binding for each row");
       refs.forEach((ref,i)=>{
         if(ref===null)return;
-        const id=text(ref,`draft.tables.evidenceRows.${name}[${i}]`,true);
-        if(!ids.has(id))invalid(`draft.tables.evidenceRows.${name}[${i}]`,"does not name an evidence record in these tables");
+        const id=text(ref,`${path}.evidenceRows.${name}[${i}]`,true);
+        if(!ids.has(id))invalid(`${path}.evidenceRows.${name}[${i}]`,"does not name an evidence record in these tables");
       });
     }
   }
@@ -216,6 +285,7 @@ function parseProject(value:unknown,path:string,image:ImageResolver):GeoProject{
   delete p.format;delete p.version;
   text(p.name,`${path}.name`,true);optionalStrings(p,["description","source","crs","crsCode","crsProj4"],path);
   optionalNumbers(p,["base","groundwaterDepth","margin"],path);optionalBoolean(p,"cptLayers",path);
+  if(p.groundwater!==undefined)try{p.groundwater=parseGroundwater(p.groundwater)}catch(error){invalid(`${path}.groundwater`,(error as Error).message)}
   if(p.evidence!==undefined)p.evidence=evidenceCollection(p.evidence,`${path}.evidence`,image);
   const evidenceIds=new Set((p.evidence as EvidenceCollection|undefined)?.records.map(r=>r.id)??[]);
   const units=records(p.units,`${path}.units`),holes=records(p.boreholes,`${path}.boreholes`);
@@ -259,6 +329,7 @@ function parseProject(value:unknown,path:string,image:ImageResolver):GeoProject{
       const at=`${path}.cpts[${i}]`;
       number(c.x,`${at}.x`);number(c.y,`${at}.y`);c.z=number(c.z,`${at}.z`,true);
       optionalNumbers(c,["lon","lat","a","predrill"],at);optionalStrings(c,["date"],at);
+      if(c.layersSource!==undefined&&c.layersSource!=="automatic"&&c.layersSource!=="reviewed")invalid(`${at}.layersSource`,"must be automatic or reviewed");
       const depth=list(c.depth,`${at}.depth`).map((d,j)=>number(d,`${at}.depth[${j}]`));
       if(!depth.length||depth.some((d,j)=>d<0||j>0&&d<=depth[j-1]))invalid(`${at}.depth`,"must increase from a nonnegative depth");
       for(const key of ["qc","fs","u2","rf","qt"]){
@@ -286,17 +357,23 @@ function parseProject(value:unknown,path:string,image:ImageResolver):GeoProject{
   return project;
 }
 
+function parseDraft(value:unknown,image:ImageResolver,path:string):WorkspaceDraft{
+  const draft=record(value,path);
+  return {tables:parseTables(draft.tables,image,`${path}.tables`),...(draft.base===undefined?{}:{base:parseProject(draft.base,`${path}.base`,image)})};
+}
 export function parseWorkspace(value:unknown):WorkspaceDocument{
   const d=record(value,"document");
   if(d.format!=="geomodel3d-workspace")invalid("format","must be geomodel3d-workspace");
-  if(d.version!==1&&d.version!==2)invalid("version","is not supported");
-  const image=workspaceImageResolver(d);
-  const id=text(d.id,"id",true),savedAt=date(d.savedAt,"savedAt"),draft=record(d.draft,"draft");
+  if(d.version!==1&&d.version!==2&&d.version!==3)invalid("version","is not supported");
+  const legacy=d.version!==3;
+  if(legacy&&(Object.hasOwn(d,"scenarios")||Object.hasOwn(d,"activeScenarioId")))invalid("version","cannot declare a legacy format while containing scenario metadata");
+  const image=workspaceImageResolver(d),id=text(d.id,"id",true),savedAt=date(d.savedAt,"savedAt"),baseline=id+":baseline";
   const revisions=records(d.revisions,"revisions").map((r,i):WorkspaceRevision=>{
     const at=`revisions[${i}]`;
     return {id:text(r.id,`${at}.id`,true),...(r.parentId===undefined?{}:{parentId:text(r.parentId,`${at}.parentId`,true)}),
       createdAt:date(r.createdAt,`${at}.createdAt`),reason:text(r.reason,`${at}.reason`),engineVersion:text(r.engineVersion,`${at}.engineVersion`,true),
-      project:parseProject(r.project,`${at}.project`,image)};
+      project:parseProject(r.project,`${at}.project`,image),
+      ...(legacy?{scenarioId:baseline}:r.scenarioId===undefined?{}:{scenarioId:text(r.scenarioId,`${at}.scenarioId`,true)})};
   });
   const byId=new Map(revisions.map(r=>[r.id,r]));
   if(byId.size!==revisions.length)invalid("revisions","contains duplicate IDs");
@@ -313,10 +390,53 @@ export function parseWorkspace(value:unknown):WorkspaceDocument{
   }
   const active=d.activeRevisionId===undefined?undefined:text(d.activeRevisionId,"activeRevisionId",true);
   if(active!==undefined&&!byId.has(active))invalid("activeRevisionId","does not name a checkpoint");
-  if(revisions.length&&active===undefined)invalid("activeRevisionId","is required when checkpoints exist");
-  return {format:"geomodel3d-workspace",version:2,id,savedAt,
-    draft:{tables:parseTables(draft.tables,image),...(draft.base===undefined?{}:{base:parseProject(draft.base,"draft.base",image)})},revisions:freeze(revisions),
-    ...(active===undefined?{}:{activeRevisionId:active})};
+  if(legacy&&revisions.length&&active===undefined)invalid("activeRevisionId","is required when checkpoints exist");
+  const draft=parseDraft(d.draft,image,"draft");
+  let scenarios:WorkspaceScenario[],activeScenarioId:string;
+  if(legacy){
+    activeScenarioId=baseline;
+    scenarios=[{id:baseline,name:"Baseline",createdAt:revisions[0]?.createdAt??savedAt,...(active?{headRevisionId:active}:{})}];
+  }else{
+    const names=new Set<string>();
+    activeScenarioId=text(d.activeScenarioId,"activeScenarioId",true);
+    const inputs=records(d.scenarios,"scenarios"),scenarioIds=inputs.map((s,i)=>text(s.id,`scenarios[${i}].id`,true));
+    if(new Set(scenarioIds).size!==scenarioIds.length)invalid("scenarios","contains duplicate IDs");
+    if(!scenarioIds.includes(activeScenarioId))invalid("activeScenarioId","does not name a scenario");
+    scenarios=inputs.map((s,i):WorkspaceScenario=>{
+      const at=`scenarios[${i}]`,scenarioId=text(s.id,`${at}.id`,true),name=text(s.name,`${at}.name`,true).trim();
+      if(!name||name.length>100)invalid(`${at}.name`,"must contain 1 to 100 characters");
+      if(names.has(name.toLowerCase()))invalid(`${at}.name`,"duplicates another scenario name");names.add(name.toLowerCase());
+      const head=s.headRevisionId===undefined?undefined:text(s.headRevisionId,`${at}.headRevisionId`,true);
+      if(head!==undefined&&!byId.has(head))invalid(`${at}.headRevisionId`,"does not name a checkpoint");
+      const from=s.fromRevisionId===undefined?undefined:text(s.fromRevisionId,`${at}.fromRevisionId`,true);
+      if(from!==undefined&&!byId.has(from))invalid(`${at}.fromRevisionId`,"does not name a checkpoint");
+      const isActive=scenarioId===activeScenarioId;
+      if(isActive&&Object.hasOwn(s,"draft"))invalid(`${at}.draft`,"must be omitted for the active scenario");
+      if(!isActive&&s.draft===undefined)invalid(`${at}.draft`,"is required for an inactive scenario");
+      return {id:scenarioId,name,createdAt:date(s.createdAt,`${at}.createdAt`),
+        ...(s.parentScenarioId===undefined?{}:{parentScenarioId:text(s.parentScenarioId,`${at}.parentScenarioId`,true)}),
+        ...(from===undefined?{}:{fromRevisionId:from}),...(head===undefined?{}:{headRevisionId:head}),
+        ...(isActive?{}:{draft:freeze(parseDraft(s.draft,image,`${at}.draft`))})};
+    });
+    const byScenario=new Map(scenarios.map(s=>[s.id,s]));
+    if(byScenario.size!==scenarios.length)invalid("scenarios","contains duplicate IDs");
+    const selected=byScenario.get(activeScenarioId);
+    if(!selected)invalid("activeScenarioId","does not name a scenario");
+    if(selected.headRevisionId!==active)invalid("activeRevisionId","does not match the active scenario head");
+    for(const scenario of scenarios)if(scenario.parentScenarioId!==undefined&&!byScenario.has(scenario.parentScenarioId))invalid(`scenario ${scenario.id}`,"has an unknown parent");
+    const completeScenarios=new Set<string>();
+    for(const scenario of scenarios){
+      const visiting=new Set<string>();let s:WorkspaceScenario|undefined=scenario;
+      while(s&&!completeScenarios.has(s.id)){
+        if(visiting.has(s.id))invalid("scenarios","contains a cycle");
+        visiting.add(s.id);s=s.parentScenarioId?byScenario.get(s.parentScenarioId):undefined;
+      }
+      for(const id of visiting)completeScenarios.add(id);
+    }
+    for(const revision of revisions)if(revision.scenarioId!==undefined&&!byScenario.has(revision.scenarioId))invalid(`revision ${revision.id}.scenarioId`,"does not name a scenario");
+  }
+  return {format:"geomodel3d-workspace",version:3,id,savedAt,draft,revisions:freeze(revisions),
+    scenarios:freeze(scenarios),activeScenarioId,...(active===undefined?{}:{activeRevisionId:active})};
 }
 
 // Content IDs are deterministic pool keys, not security fingerprints. A detected collision rejects the save
@@ -354,16 +474,19 @@ function packedImages():PackedImages{
 function packedProject(p:GeoProject,pool:PackedImages):unknown{
   return JSON.parse(toProjectJson(p.evidence?{...p,evidence:mapEvidenceImages(p.evidence,pool.add,"project.evidence") as EvidenceCollection}:p));
 }
-interface PackedRevision { json:string;images:Map<string,string> }
-const revisionJson=new WeakMap<WorkspaceRevision,PackedRevision>();
+function packedDraft(draft:WorkspaceDraft,pool:PackedImages,path:string):unknown{
+  const tables=draft.tables.evidence?{...draft.tables,evidence:mapEvidenceImages(draft.tables.evidence,pool.add,`${path}.tables.evidence`)}:draft.tables;
+  return {tables,...(draft.base?{base:packedProject(draft.base,pool)}:{})};
+}
+interface PackedSnapshot { json:string;images:Map<string,string> }
+const revisionJson=new WeakMap<WorkspaceRevision,PackedSnapshot>(),scenarioJson=new WeakMap<WorkspaceScenario,PackedSnapshot>();
 export function toWorkspaceJson(doc:WorkspaceDocument):string{
-  // Page PNGs are pooled once across current tables, their base project and all immutable revisions. Keeping
-  // revision JSON cached still avoids traversing large CPT and terrain histories on every autosave.
+  // Page PNGs are pooled once across active/inactive drafts and immutable revisions. Cached immutable JSON keeps
+  // large CPT/terrain histories out of the autosave hot path even after an engineer adds more scenarios.
   const pool=packedImages();
-  const metadata={format:doc.format,version:2,id:doc.id,savedAt:doc.savedAt,
+  const metadata={format:doc.format,version:3,id:doc.id,savedAt:doc.savedAt,activeScenarioId:doc.activeScenarioId,
     ...(doc.activeRevisionId===undefined?{}:{activeRevisionId:doc.activeRevisionId})};
-  const tables=doc.draft.tables.evidence?{...doc.draft.tables,evidence:mapEvidenceImages(doc.draft.tables.evidence,pool.add,"draft.tables.evidence")}:doc.draft.tables;
-  const draft={tables,...(doc.draft.base?{base:packedProject(doc.draft.base,pool)}:{})};
+  const draft=packedDraft(doc.draft,pool,"draft");
   const revisions=doc.revisions.map(r=>{
     let packed=revisionJson.get(r);
     if(packed===undefined){
@@ -374,5 +497,15 @@ export function toWorkspaceJson(doc:WorkspaceDocument):string{
     for(const [id,image] of packed.images)pool.include(id,image);
     return packed.json;
   });
-  return `${JSON.stringify(metadata,null,1).slice(0,-2)},\n "evidenceImages": ${JSON.stringify(Object.fromEntries(pool.values))},\n "draft": ${JSON.stringify(draft,null,1)},\n "revisions": [${revisions.length?`\n${revisions.join(",\n")}\n`:""}]\n}\n`;
+  const scenarios=doc.scenarios.map(s=>{
+    let packed=scenarioJson.get(s);
+    if(packed===undefined){
+      const images=packedImages();
+      packed={json:JSON.stringify({...s,...(s.draft?{draft:packedDraft(s.draft,images,`scenario ${s.id}.draft`)}:{})},null,1),images:images.values};
+      if(frozen.has(s))scenarioJson.set(s,packed);
+    }
+    for(const [id,image] of packed.images)pool.include(id,image);
+    return packed.json;
+  });
+  return `${JSON.stringify(metadata,null,1).slice(0,-2)},\n "evidenceImages": ${JSON.stringify(Object.fromEntries(pool.values))},\n "draft": ${JSON.stringify(draft,null,1)},\n "revisions": [${revisions.length?`\n${revisions.join(",\n")}\n`:""}],\n "scenarios": [${scenarios.length?`\n${scenarios.join(",\n")}\n`:""}]\n}\n`;
 }

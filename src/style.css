@@ -596,3 +596,17 @@ body[data-mode="input"] :is(.panel,.section-control,.section-view,.view-menu,.no
 .site-evidence>div{display:flex;flex-direction:column;align-items:stretch;gap:5px;max-height:260px;overflow:auto}
 .site-evidence button,.ed-evidence{border:1px solid var(--border-strong);border-radius:var(--radius);background:var(--surface);padding:5px 8px;cursor:pointer;text-align:left;color:var(--accent)}
 .site-evidence p{color:var(--text-2);font-size:12px}
+
+.ws-current-scenario{font-weight:600;font-size:12px;color:var(--text)}
+.ws-scenarios{max-width:900px}
+.ws-scenarios label{display:flex;flex-direction:column;gap:5px;min-width:0}
+.ws-scenarios input,.ws-scenarios select{max-width:100%;padding:6px;border:1px solid var(--border-strong);border-radius:var(--radius);background:var(--surface);color:var(--text)}
+.ws-scenarios button{padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius);background:var(--surface);cursor:pointer;color:var(--text)}
+.ws-scenario-actions,.ws-comparison-picks{display:flex;flex-wrap:wrap;align-items:end;gap:10px;margin:16px 0}
+.ws-scenario-actions label,.ws-comparison-picks label{flex:1 1 210px;min-width:0}
+.ws-scenario-list{padding:0;list-style:none;display:grid;gap:8px}
+.ws-scenario-list li{padding:10px;border:1px solid var(--border);border-radius:var(--radius);overflow-wrap:anywhere}
+.ws-scenario-list p{margin:4px 0;color:var(--text-2)}
+.ws-groundwater{display:grid;gap:10px;border:1px solid var(--border);border-radius:var(--radius);padding:12px;min-width:0}
+.ws-groundwater legend{font-weight:600}
+.ws-groundwater label:has(input[type=checkbox]){display:block}

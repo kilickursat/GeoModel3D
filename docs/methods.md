@@ -89,6 +89,10 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 - `src/tiles.ts`: map and elevation tiles, and terrain resampling
 - `src/evidence.ts`: source records, correction/acceptance events and import validation
 - `src/evidenceView.ts`: source-page inspector, independent of the PDF reader
+- `src/groundwater.ts`: shared observation selection and groundwater policies
+- `src/comparison.ts`: comparisons at fixed coordinates, matched by unit identity
+- `src/comparisonJob.ts`, `src/comparison.worker.ts`: cancellable inline comparison worker
+- `src/comparisonView.ts`: pinned-revision comparison controls and overlays
 - `src/workspace.ts`: versioned drafts, immutable project revisions, restore and workspace JSON
 - `src/storage.ts`: transactional browser saves and migration of earlier input-table saves
 - `src/main.ts`: three.js viewer and interface

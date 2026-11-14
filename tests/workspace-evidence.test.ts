@@ -95,7 +95,7 @@ describe("workspace source evidence",()=>{
     const renamed={...p,name:"Second interpretation"};
     const document=checkpoint(first,renamed,"Second");
     const json=toWorkspaceJson(document),wire=JSON.parse(json);
-    expect(wire.version).toBe(2);
+    expect(wire.version).toBe(3);
     expect(Object.values(wire.evidenceImages)).toEqual([png]);
     expect(json.split(png)).toHaveLength(2);
     expect(wire.draft.tables.evidence.sources[0].pages[0].image).toMatch(/^workspace-image:/);
@@ -106,10 +106,14 @@ describe("workspace source evidence",()=>{
   it("migrates version-1 inline images without treating evidence text as image references",()=>{
     const p=project();p.evidence!.records[0].fields.id.note="workspace-image:missing-is-only-text";
     const document=checkpoint(createWorkspace(tablesFromProject(p),p),p,"Legacy evidence");
-    const legacy=JSON.parse(JSON.stringify({...document,version:1}));
+    const legacy=JSON.parse(JSON.stringify({...document,version:1}));delete legacy.scenarios;delete legacy.activeScenarioId;
     const migrated=parseWorkspace(legacy);
-    expect(migrated).toEqual(document);
-    expect(migrated.version).toBe(2);
+    expect(migrated.draft).toEqual(document.draft);
+    expect(migrated.revisions).toEqual(document.revisions);
+    expect(migrated.activeRevisionId).toBe(document.activeRevisionId);
+    expect(migrated.scenarios).toHaveLength(1);
+    expect(migrated.scenarios[0].name).toBe("Baseline");
+    expect(migrated.version).toBe(3);
     expect(migrated.draft.tables.evidence!.records[0].fields.id.note).toBe("workspace-image:missing-is-only-text");
     expect(JSON.parse(toWorkspaceJson(migrated)).evidenceImages).toBeDefined();
   });
@@ -120,7 +124,7 @@ describe("workspace source evidence",()=>{
     expect(()=>parseWorkspace(missing)).toThrow(/does not name a pooled workspace image/);
     const unsafe=JSON.parse(toWorkspaceJson(document));unsafe.evidenceImages.unused="https://example.com/leak.png";
     expect(()=>parseWorkspace(unsafe)).toThrow(/PNG data URL/);
-    const legacy=JSON.parse(toWorkspaceJson(document));legacy.version=1;delete legacy.evidenceImages;
+    const legacy=JSON.parse(toWorkspaceJson(document));legacy.version=1;delete legacy.evidenceImages;delete legacy.scenarios;delete legacy.activeScenarioId;
     expect(()=>parseWorkspace(legacy)).toThrow(/image reference unsupported by workspace version 1/);
   });
 

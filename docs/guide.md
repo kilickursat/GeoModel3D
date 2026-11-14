@@ -25,6 +25,7 @@ Then fill in the steps:
 | SPT | Borehole, depth, blows, penetration |
 | Tests | Borehole, depth, to, property, value: any laboratory or in-situ result |
 | Units | Unit, name, colour, erosive, γ, γsat, c′, φ′, su, E, k, K0, source, in stratigraphic order (▲ ▼ to reorder) |
+| Scenarios | Independent named interpretations, their unfinished drafts, and fixed-revision comparisons |
 | Revisions | Complete projects recorded when opened or built; restore an earlier project while retaining later revisions |
 
 While you type, the preview shows:
@@ -41,6 +42,34 @@ Good to know:
 - **Nothing is uploaded.** The input workspace is saved in this browser, including terrain, CPTs, alignments, rules and parameters from its base project. The status under the editor says when a save has completed, or explains if browser storage is unavailable. Starting another case replaces the browser save.
 - **Save workspace** downloads the unfinished tables, complete base project and revision history. Import that file on its own to continue editing, including on another computer. Source evidence, highlighted page previews and correction history are included where available; original PDF/image files are not embedded. **Save case (JSON)** and **Export → Project (JSON)** keep only the current project; **Download table (CSV)** saves one table.
 - **Revisions:** opening a project records its baseline. **Build model** records a new revision when its project differs from the selected revision. Under **Revisions**, restore a project, then build it to show it in 3-D. Building changes after a restore creates a revision based on that earlier project; later revisions stay available. Unfinished edits are kept in the workspace draft but are not themselves build revisions.
+
+## Scenarios and comparisons
+
+Under **Input data → Scenarios**, give a case a name and choose **Create scenario**. **Current draft** copies unfinished entries exactly; selecting a revision starts from that complete saved project. The previous scenario keeps its draft, including invalid values that still need editing. The active scenario is named under the editor.
+
+Use **Active scenario** to switch and **Rename scenario** to change its name. **Build model** records a revision only in that scenario. Restoring a revision moves the selected scenario back to it; building further changes creates a new branch without changing other scenarios or removing later revisions. The model title names the scenario it was built from. **Save workspace** retains every scenario, including unfinished values and source evidence; project JSON contains only one project. Workspace formats 1 and 2 open as a Baseline scenario in format 3.
+
+**Compare saved revisions** pins two revisions. Unbuilt edits are excluded. The comparison dialog offers:
+
+- a straight section fixed in the before revision's coordinate system, or one alignment from that revision used unchanged for both models;
+- sample spacing and an optional readout elevation;
+- one shared plot with before/after contacts, a contact-difference table, and introduced or removed units;
+- ground and water elevation differences, and available unit/stress values at the chosen level;
+- a CSV carrying both revision IDs, dates, engine versions and path settings.
+
+Differences are **after minus before**. Contacts are matched by unit ID, so changing the order of units never pairs unrelated layers. Areas outside either model, absent contacts and unknown water remain unavailable. The models must share a compatible coordinate system; elevations are used as supplied, so use a common height datum. Sampling is limited to 2,001 locations, with gaps kept visible. This comparison does not estimate volume changes or statistical uncertainty.
+
+Choose **Run comparison** after changing settings; earlier results and their CSV are invalidated. **Cancel** or closing the dialog stops its worker. The comparison runs locally and also works in the standalone HTML without downloading another script.
+
+### Groundwater policies
+
+Under **Project → Groundwater scenario**:
+
+- **Observed levels** uses the shallowest reading per borehole. The fallback groundwater depth applies only when no borehole records water, preserving existing projects' behavior.
+- **Assumed depth override** replaces observed water with a depth below local ground for this scenario. Negative depth represents water above ground.
+- **Observations as of a date** selects the most recent eligible reading for each borehole through the end of that UTC day. Future observations are excluded. **Use undated readings** explicitly permits a fallback where that borehole has no eligible dated reading; the legacy fallback depth is not used.
+
+These choices select or assume water levels; they do not simulate groundwater flow. Original observations and their evidence are unchanged. An as-of case with no eligible groundwater leaves water-dependent comparison and preview results unavailable. Automatic CPT classification needs eligible groundwater for such a case and blocks a build when it cannot be determined. Existing reviewed or legacy CPT layer interpretations remain fixed and are identified as such; new automatic classifications refresh when their groundwater/rules change.
 
 ## Reading borehole logs from PDFs
 
@@ -98,7 +127,7 @@ Page previews and source excerpts may contain information from your documents, s
 Colours are bands of one hue, with a legend that states what the field rests on.
 
 How the fields are computed:
-- **Water table:** it runs through the shallowest water level logged in each borehole, interpolated between boreholes and kept at or below the ground. Where no borehole has a water level, the project's assumed groundwater depth is used. It is drawn blue on sections, with ▽ at the logged levels.
+- **Water table:** the selected groundwater policy gives the levels. Observed and as-of measurements are interpolated between boreholes and kept at or below ground; a depth override follows the ground. Sections show the selected readings, while raw logged-water columns are labeled separately. See [Groundwater policies](#groundwater-policies).
 - **Stresses:**
   - σv sums unit weight × thickness from the ground down, using γ above the water table and γsat below it.
   - u is hydrostatic below the water table, and σ′v = σv − u.
