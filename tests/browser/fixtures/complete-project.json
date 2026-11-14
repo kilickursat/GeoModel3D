@@ -1,0 +1,24 @@
+{
+  "format":"geomodel3d-project",
+  "version":1,
+  "name":"River crossing investigation",
+  "description":"Synthetic browser regression fixture with logs, CPT, terrain and an alignment.",
+  "source":"Synthetic test data",
+  "crs":"Local survey grid",
+  "base":-5,
+  "groundwaterDepth":2,
+  "units":[
+    {"id":"fill","name":"Made ground","color":"#9a5b4f","gamma":18,"gammaSat":20,"params":{"phi":28,"K0":0.5,"customStiffness":42},"source":"Synthetic parameters"},
+    {"id":"sand","name":"River sand","color":"#d9b871","gamma":19,"gammaSat":21,"params":{"phi":34,"K0":0.45}}
+  ],
+  "rules":[{"match":"made ground","unit":"fill"},{"match":"sand","unit":"sand"}],
+  "boreholes":[
+    {"id":"BH-01","x":0,"y":0,"z":10,"depth":12,"intervals":[{"from":0,"to":2,"unit":"fill","name":"Made ground"},{"from":2,"to":12,"unit":"sand","name":"Sand"}],"water":[{"depth":2,"date":"2026-01-15"}],"spt":[{"depth":4,"blows":18,"penetration":300}],"tests":[{"depth":5,"property":"gamma","value":19}]},
+    {"id":"BH-02","x":40,"y":0,"z":10,"depth":12,"intervals":[{"from":0,"to":3,"unit":"fill","name":"Made ground"},{"from":3,"to":12,"unit":"sand","name":"Sand"}],"water":[{"depth":2.5}]},
+    {"id":"BH-03","x":0,"y":40,"z":10,"depth":12,"intervals":[{"from":0,"to":1,"unit":"fill","name":"Made ground"},{"from":1,"to":12,"unit":"sand","name":"Sand"}]}
+  ],
+  "terrain":{"x0":-5,"y0":-5,"dx":25,"dy":25,"ncols":3,"nrows":3,"z":[10,10,10,10,10,10,10,10,null],"source":"Synthetic survey terrain"},
+  "cpts":[{"id":"CPT-01","x":10,"y":10,"z":10,"depth":[0.5,1,2,4,8],"qc":[1,2,null,10,12],"fs":[20,25,null,100,110],"u2":[0,0,null,15,40],"a":0.8,"date":"2026-01-16"}],
+  "cptRules":[{"match":"sand","unit":"sand"}],
+  "alignments":[{"name":"Crossing centreline","source":"Synthetic design","points":[{"x":5,"y":5},{"x":25,"y":5}],"start":100,"design":[{"chainage":100,"top":6,"bottom":4},{"chainage":120,"top":5,"bottom":3}]}]
+}

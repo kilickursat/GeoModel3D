@@ -21,7 +21,10 @@ import {Crs,crsRegistry,projectCrs,findCrs,customCrs,searchCrs,suggestCrs,toProj
 import {fetchTerrain,elevationSources,mapSources,covers,tileUrl,parseGsiTile,decodeTerrarium,mapTiles,tileXY,ElevationSource,TileSource} from "./tiles";
 import {applyUnitRules} from "./rules";
 import {reportHtml} from "./report";
-import {createInputWorkspace} from "./input";
+import {createInputWorkspace,InputModelContext} from "./input";
+import {parseWorkspace} from "./workspace";
+import {showEvidence} from "./evidenceView";
+import {showCorridor} from "./corridorView";
 import {agreement,askAgreement,withdrawAgreement} from "./agreement";
 import {loadReader} from "./reader";
 import {modelCacheSize,removeModelCache} from "./modelcache";
@@ -829,7 +832,7 @@ const ui=document.createElement("div");
 ui.className="ui";
 // On a small screen each panel opens as a sheet, with a title, buttons of its own and a close button.
 const sheetHead=(title:string,buttons="")=>`<div class="sheet-head"><b>${title}</b>${buttons}<button class="sheet-close" aria-label="Close">×</button></div>`;
-ui.innerHTML=`<div class="topbar"></div><h1 class="title">GeoModel3D <span>${pkg.version.split(".").slice(0,2).join(".")}</span></h1>
+ui.innerHTML=`<div class="topbar"></div><h1 class="title">GeoModel3D <span>${pkg.version}</span></h1>
 <button class="site-name" aria-controls="sheet-site"></button>
 <div class="panel" id="sheet-site">
   ${sheetHead("Site")}
@@ -846,6 +849,7 @@ ui.innerHTML=`<div class="topbar"></div><h1 class="title">GeoModel3D <span>${pkg
     <div class="check-actions"><button class="run-check">Cross-validate</button><span class="check-status" aria-live="polite"></span></div>
     <div class="check-results"></div></details>
   <details class="coords"><summary>Coordinates</summary><label class="crs"><input class="crs-input" list="crs-options" placeholder="EPSG code, name or country" spellcheck="false" autocomplete="off" aria-label="Coordinate system"></label><datalist id="crs-options"></datalist></details>
+  <details class="site-evidence" hidden><summary>Source evidence</summary><p>Original readings and subsequent edits, with the saved source pages.</p><div></div></details>
   <details class="notes" hidden><summary></summary><ul></ul></details>
   <p class="panel-hint"></p>
 </div>`;
@@ -934,7 +938,7 @@ addEventListener("pointerdown",e=>{
   if(!t.closest(".view-menu"))openViewMenu(false);
   for(const d of document.querySelectorAll<HTMLDetailsElement>("details.menu[open]"))if(!d.contains(t))d.open=false;
 });
-addEventListener("keydown",e=>{if(e.key==="Escape"){openViewMenu(false);for(const d of document.querySelectorAll<HTMLDetailsElement>("details.menu[open]"))d.open=false}});
+addEventListener("keydown",e=>{if(!e.defaultPrevented&&e.key==="Escape"){openViewMenu(false);for(const d of document.querySelectorAll<HTMLDetailsElement>("details.menu[open]"))d.open=false}});
 
 const controlsBar=document.createElement("div");
 controlsBar.className="section-control";
@@ -945,8 +949,9 @@ controlsBar.innerHTML=`${sheetHead("Section",'<button class="panel-toggle" aria-
 <label class="line-pick" title="A straight section, or one along a line such as a tunnel or road"><select class="line-select" aria-label="Section line"></select></label>
 <label class="straight-only" title="Direction of the section, clockwise from north"><span>Direction</span><input type="range" class="azimuth" min="0" max="179" step="1"><output class="azimuth-out"></output></label>
 <label class="straight-only" title="Position of the section across the model"><span>Position</span><input type="range" class="offset" step="1"><output class="offset-out"></output></label>
-<label class="along-only"><span>Chainage</span><input type="range" class="chainage" step="any"><output class="chainage-out"></output></label>
+<label class="along-only"><span>Chainage</span><input type="range" class="chainage" aria-label="Chainage" step="any"><output class="chainage-out"></output></label>
 <button class="along-only cross-here" title="A straight section square to the line at this chainage">Cross-section</button>
+<button class="corridor-open" title="Open the corridor dashboard for the selected line, or the first project alignment">Corridor</button>
 <label class="along-only step-pick"><span>Table</span><select class="table-step" aria-label="Table by chainage, a row every">${[1,2,5,10,20,25,50,100].map(v=>`<option value="${v}"${v===10?" selected":""}>every ${v} m</option>`).join("")}</select></label>
 <label class="field-pick"><span>Colour</span><select class="field-select" aria-label="Colour the section by"></select></label>
 <label class="cut-pick straight-only" title="Removes the part of the model in front of the section"><input type="checkbox" data-view="cut"><span>Cut</span></label>
@@ -1062,7 +1067,7 @@ dock.addEventListener("click",e=>{
 });
 siteName.onclick=()=>setSheet(sheetOpen()==="site"?"":"site");
 app.addEventListener("click",e=>{if((e.target as Element).closest(".sheet-close"))setSheet("")});
-addEventListener("keydown",e=>{if(e.key==="Escape"&&compact()&&sheetOpen())setSheet("")});
+addEventListener("keydown",e=>{if(!e.defaultPrevented&&e.key==="Escape"&&compact()&&sheetOpen())setSheet("")});
 // A sheet from the bottom follows a finger that pulls its title down, and closes when let go far enough down.
 app.addEventListener("pointerdown",e=>{
   const head=(e.target as Element).closest(".sheet-head"),sheet=sheetElement();
@@ -1084,7 +1089,7 @@ function renderPanel(){
   const projects=[...sampleProjects,...(imported?[imported]:[])];
   datasetSelect.innerHTML=projects.map((p,i)=>`<option value="${i}"${p===project?" selected":""}>${esc(i>=sampleProjects.length?"Your data: "+p.name:p.name)}</option>`).join("")+
     `<option value="input">Enter your own data…</option>`;
-  siteName.textContent=project.name;
+  siteName.textContent=project.name+(workspaceContext?` · ${workspaceContext.name}`:"");
   const desc=ui.querySelector<HTMLDivElement>(".desc")!,more=ui.querySelector<HTMLButtonElement>(".desc-more")!;
   desc.textContent=project.description??"";
   desc.classList.remove("open");
@@ -1113,11 +1118,38 @@ function renderPanel(){
   toolbar.querySelector<HTMLButtonElement>(".fetch-terrain")!.disabled=!crs;
   renderRules();
   renderCptLayers();
+  renderSourceEvidence();
   toolbar.dataset.cpts=model.cpts.length?"yes":"";
   ui.querySelector(".legend")!.innerHTML=model.units.map((u,k)=>{
     const title=[u.name,u.erosive?"Erosive base: cuts down into older units":"",unitProperties(u)].filter(Boolean).join("\n");
     return `<label title="${esc(title)}"><input type="checkbox" data-unit="${esc(u.id)}"${view.hidden.has(u.id)?"":" checked"}><i style="background:${u.color}"></i><span class="name">${esc(u.name)}</span>${u.erosive?'<span class="tag">erosive</span>':""}<span class="vol">${model.triangles.length?fmtVolume(unitCubicMetres(model,k)):""}</span></label>`;
   }).join("");
+}
+function renderSourceEvidence(){
+  const box=ui.querySelector<HTMLDetailsElement>(".site-evidence")!,records=new Set(project.evidence?.records.map(r=>r.id)??[]);
+  const links:Array<{id:string;label:string}>=[];
+  for(const b of project.boreholes){
+    if(b.evidenceId&&records.has(b.evidenceId))links.push({id:b.evidenceId,label:`${b.id} · borehole`});
+    for(const i of b.intervals)if(i.evidenceId&&records.has(i.evidenceId))links.push({id:i.evidenceId,label:`${b.id} · ${fmt(i.from,2)}–${fmt(i.to,2)} m`});
+    for(const w of b.water??[])if(w.evidenceId&&records.has(w.evidenceId))links.push({id:w.evidenceId,label:`${b.id} · water ${fmt(w.depth,2)} m`});
+  }
+  box.hidden=!links.length;
+  box.querySelector("div")!.innerHTML=links.map(l=>`<button data-evidence="${esc(l.id)}">${esc(l.label)}</button>`).join("");
+}
+ui.addEventListener("click",e=>{
+  const b=(e.target as Element).closest<HTMLButtonElement>("[data-evidence]");
+  if(b)openProjectEvidence(b.dataset.evidence!,`Source evidence · ${b.textContent}`);
+});
+function openProjectEvidence(id:string,title:string){
+  if(!project.evidence)return;
+  const value=(n:number|undefined)=>n===undefined||!Number.isFinite(n)?"":String(n);
+  let currentValues:Record<string,string>|undefined;
+  for(const b of model.boreholes){
+    if(b.evidenceId===id)currentValues={id:b.id,x:value(b.x),y:value(b.y),z:value(b.z),lat:value(b.lat),lon:value(b.lon),depth:String(boreholeDepth(b))};
+    for(const i of b.intervals)if(i.evidenceId===id)currentValues={boreholeId:b.id,from:String(i.from),to:String(i.to),unit:i.unit,description:i.name??""};
+    for(const w of b.water??[])if(w.evidenceId===id)currentValues={boreholeId:b.id,depth:String(w.depth),date:w.date??""};
+  }
+  showEvidence(project.evidence,id,title,{currentValues});
 }
 function unitProperties(u:UnitDef){
   const p=[u.gamma!==undefined?`γ ${fmt(u.gamma,1)} kN/m³`:"",u.gammaSat!==undefined?`γsat ${fmt(u.gammaSat,1)} kN/m³`:""].filter(Boolean).join(" · ");
@@ -1156,7 +1188,7 @@ function renderRules(){
     if(unmatched.size)notes.push(`No rule matches: ${listed(unmatched)}`);
   }else{
     notes.push("The first rule that matches a CPT layer's soil and the elevation of its top gives its unit.");
-    if(!project.cptRules&&project.cpts?.some(c=>c.layers?.some(l=>l.unit)))notes.push("The site's own interpretation gives the units now; rules applied here replace it.");
+    if(!project.cptRules&&project.cpts?.some(c=>c.layers?.some(l=>l.unit)))notes.push("Reviewed and legacy CPT interpretations stay fixed. These rules update automatically classified CPT layers.");
   }
   if(layered){const u=unmatchedLayers(project.cpts);if(u.size)notes.push(`CPT layers with no unit, left out: ${listed(u)}`)}
   box.querySelector(".rule-note")!.textContent=notes.join(" ");
@@ -1179,7 +1211,7 @@ function applyRules(){
     if(r.unmatched.size)notes.push(`Descriptions that no rule assigns to a unit are modelled as units of their own: ${[...r.unmatched].map(([n,c])=>`${n} (${c})`).join(", ")}`);
   }
   // The CPT layers follow the rules applied, unless the project has rules of their own for them.
-  const cpts=target==="cptRules"||!project.cptRules?project.cpts?.map(c=>c.layers?{...c,layers:layerUnits(c.layers,c.z,rules)}:c):project.cpts;
+  const cpts=target==="cptRules"||!project.cptRules?project.cpts?.map(c=>c.layers&&c.layersSource==="automatic"?{...c,layers:layerUnits(c.layers,c.z,rules)}:c):project.cpts;
   const used=new Set([...boreholes.flatMap(b=>b.intervals.map(i=>i.unit)),...(cpts??[]).flatMap(c=>(c.layers??[]).map(l=>l.unit))].filter(Boolean));
   const kept=project.units.filter(u=>used.has(u.id)),added=[...used].filter(id=>!kept.some(u=>u.id===id));
   if(added.length)notes.push(`New units added at the bottom of the column: ${added.join(", ")}`);
@@ -1219,6 +1251,7 @@ function syncControls(){
   controlsBar.dataset.line=along;
   sectionView.dataset.line=along;
   toolbar.dataset.line=along;
+  controlsBar.querySelector<HTMLButtonElement>(".corridor-open")!.hidden=!(project.alignments?.length);
   if(line){
     const ch=chainages(line),c0=ch[0],c1=ch[ch.length-1];
     view.chainage=Math.min(Math.max(view.chainage,c0),c1);
@@ -1427,6 +1460,7 @@ function showNotice(title:string,lines:string[],error=false){
   fold.onclick=()=>fold.setAttribute("aria-expanded",String(!notice.classList.toggle("folded")));
 }
 
+let workspaceContext:InputModelContext|undefined;
 let currentNotes:string[]=[];
 function renderNotes(){
   const box=ui.querySelector<HTMLDetailsElement>(".notes")!;
@@ -1435,10 +1469,11 @@ function renderNotes(){
   box.querySelector("ul")!.innerHTML=currentNotes.map(n=>`<li>${esc(n)}</li>`).join("");
 }
 // keepView rebuilds the same site (new terrain or rules) without moving the camera or resetting the controls.
-function loadProject(p:GeoProject,importWarnings:string[]=[],keepView=false){
-  const before={...origin};
-  project=p;
-  model=buildGeologicalModel(p);
+function loadProject(p:GeoProject,importWarnings:string[]=[],keepView=false,context:InputModelContext|null=workspaceContext??null){
+  // Validate/rebuild before changing the displayed project or its scenario identity.
+  const nextModel=buildGeologicalModel(p),before={...origin};
+  model=nextModel;project=model.project;workspaceContext=context??undefined;
+  if(!sampleProjects.includes(p))imported=project;
   weights=unitWeights(model);
   if(!keepView){view.hidden.clear();view.field="units";view.alignment=-1}
   if(view.alignment>=(p.alignments?.length??0))view.alignment=-1;
@@ -1485,16 +1520,33 @@ async function importFileList(list:FileList|File[]){
   if(!others.length)return;
   try{
     const files=await Promise.all(others.map(async f=>({name:f.name,text:decodeText(new Uint8Array(await f.arrayBuffer()))})));
+    const documents=files.map(f=>{
+      try{return JSON.parse(f.text)}catch{return null}
+    }).filter(d=>d?.format==="geomodel3d-workspace");
+    if(documents.length){
+      if(documents.length!==1||files.length!==1)throw new Error("Import one workspace file at a time; add other files after opening it.");
+      const document=parseWorkspace(documents[0]);
+      workspace.openWorkspace(document,"Workspace imported with its draft and project revisions. Build model to show the selected case.");
+      setMode("input");
+      return;
+    }
     const result=importFiles(files,project);
-    imported=result.project;
+    const evidenceIds=new Set(result.project.evidence?.records.map(r=>r.id)??[]);
+    const references=[...result.project.boreholes.flatMap(b=>[b.evidenceId,...b.intervals.map(i=>i.evidenceId),...(b.water??[]).map(w=>w.evidenceId)]),
+      ...(result.project.cpts??[]).flatMap(c=>(c.layers??[]).map(l=>l.evidenceId))];
+    if(references.some(id=>id!==undefined&&!evidenceIds.has(id)))throw new Error("CSV evidence IDs require the matching source evidence. Import the complete project/workspace JSON, or remove the evidence_id column.");
+    // Input imports are staged for editing, including incomplete scenarios that cannot yet build.
+    if(document.body.dataset.mode==="input"){
+      workspace.edit(result.project,`Imported ${files.map(f=>f.name).join(", ")}: check the tables, then build the model.${result.warnings.length?` ${result.warnings.length} note${result.warnings.length===1?"":"s"} under Checks.`:""}`,result.warnings);
+      return;
+    }
     // Lines or CPTs added to the site shown keep the view, and the first line is shown.
     const added=(!!result.alignments||!!result.cpts)&&result.project.boreholes===project.boreholes;
-    loadProject(result.project,result.warnings,added);
+    loadProject(result.project,result.warnings,added,null);
     const first=result.alignments?.[0],index=first===undefined?-1:result.project.alignments?.findIndex(a=>a.name===first)??-1;
     if(index>=0&&document.body.dataset.mode!=="input")showLine(index);
-    // Files picked from the input tab open there, for review before building.
-    if(document.body.dataset.mode==="input")workspace.edit(result.project,`Imported ${files.map(f=>f.name).join(", ")}: check the tables, then build the model.${result.warnings.length?` ${result.warnings.length} note${result.warnings.length===1?"":"s"} under Checks.`:""}`,result.warnings);
   }catch(err){
+    if(document.body.dataset.mode==="input")workspace.status(`Import failed: ${(err as Error).message}`);
     showNotice("Import failed",[(err as Error).message],true);
   }
 }
@@ -1517,7 +1569,7 @@ async function readPdfs(files:File[]){
   }
   try{
     const {readPdfs:read}=await loadReader();
-    await read(files,{onUse:(tables,message,notes)=>{setMode("input");workspace.open(tables,message,notes)},onClose:()=>invalidate()});
+    await read(files,{onUse:(tables,message,notes)=>{setMode("input");return workspace.open(tables,message,notes)},onClose:()=>invalidate()});
   }catch(err){sayPdf("The PDF reader could not start",[(err as Error).message],true)}
 }
 
@@ -1631,16 +1683,20 @@ async function printReport(paper:"A3"|"A4"){
 
 datasetSelect.onchange=()=>{
   if(datasetSelect.value==="input"){datasetSelect.value=String([...sampleProjects,...(imported?[imported]:[])].indexOf(project));setMode("input");return}
-  const i=Number(datasetSelect.value);loadProject(i<sampleProjects.length?sampleProjects[i]:imported!);
+  const i=Number(datasetSelect.value);loadProject(i<sampleProjects.length?sampleProjects[i]:imported!,[],false,null);
 };
 toolbar.querySelector<HTMLButtonElement>(".import")!.onclick=()=>fileInput.click();
 
 const workspace=createInputWorkspace({
   current:()=>project,
+  currentContext:()=>workspaceContext,
+  onScenarioRename:context=>{
+    if(workspaceContext?.workspaceId===context.workspaceId&&workspaceContext.scenarioId===context.scenarioId){workspaceContext=context;siteName.textContent=project.name+` · ${context.name}`}
+  },
   download,
   onImport:()=>fileInput.click(),
   ...(pdfReading?{onReadPdf:()=>pdfInput.click()}:{}),
-  onBuild:r=>{imported=r.project;setMode("model");loadProject(r.project,r.warnings)}
+  onBuild:(r,context)=>{loadProject(r.project,r.warnings,false,context??null);setMode("model")}
 });
 app.appendChild(workspace.element);
 function setMode(mode:"model"|"input"){
@@ -1742,6 +1798,18 @@ controlsBar.querySelector<HTMLButtonElement>(".cross-here")!.onclick=()=>{
   faceAcross({x:c.x-dir.x,y:c.y-dir.y},{x:c.x+dir.x,y:c.y+dir.y},c);
   renderLineOptions();syncControls();updateSection();
 };
+controlsBar.querySelector<HTMLButtonElement>(".corridor-open")!.onclick=()=>{
+  const pinnedProject=project,line=lineOf()??project.alignments?.[0];
+  if(!line)return;
+  const index=project.alignments!.indexOf(line);
+  showCorridor(project,line,{download,projectLabel:workspaceContext?.name,engineVersion:pkg.version,initialStep:view.step,
+    onSelectChainage:chainage=>{
+      if(project!==pinnedProject||project.alignments?.[index]!==line){
+        showNotice("Corridor snapshot",["The displayed project changed while the dashboard was open. Open its corridor dashboard again to move the marker."],true);return;
+      }
+      showLine(index);view.chainage=chainage;syncControls();placeMarker();renderSectionPanel();
+    }});
+};
 controlsBar.querySelector<HTMLSelectElement>(".table-step")!.onchange=e=>{view.step=Number((e.target as HTMLSelectElement).value)};
 sectionView.querySelector<HTMLButtonElement>(".close")!.onclick=()=>{view.panel=false;syncControls()};
 
@@ -1778,8 +1846,32 @@ renderer.domElement.addEventListener("pointerup",e=>{
   press=null;
   if(!p||p.id!==e.pointerId||performance.now()-p.t>=600||Math.hypot(e.clientX-p.x,e.clientY-p.y)>10)return;
   if(drawing)addDrawPoint(e.clientX,e.clientY);
+  else if(openPickedEvidence(e.clientX,e.clientY))return;
   else if(e.pointerType!=="mouse"){pointer={x:e.clientX,y:e.clientY,touch:true};pointerMoved=true}
 });
+
+// Source-backed logs can be inspected directly from a short click/tap on a visible borehole or its collar.
+function openPickedEvidence(x:number,y:number){
+  if(!project.evidence||!view.boreholes)return false;
+  raycaster.setFromCamera(toView(x,y),camera);
+  const kept=(h:THREE.Intersection)=>!cutting()||clipPlane.distanceToPoint(h.point)>=-1e-6;
+  const volume=solid()?raycaster.intersectObjects(volumeMeshes.filter(m=>m.visible)).find(kept)?.distance??Infinity:Infinity;
+  const face=sectionGroup.visible&&fence.visible?raycaster.intersectObject(fence)[0]?.distance??Infinity:Infinity;
+  const hidden=solid()?Math.min(volume,face)+1e-6:Infinity;
+  const hit=holeMesh?.visible?raycaster.intersectObject(holeMesh).find(h=>kept(h)&&h.distance<=hidden):undefined;
+  let picked=hit?.instanceId===undefined?null:holeInfo[hit.instanceId];
+  if(!picked){
+    const collar=collarNear(x,y,10),hole=collar?model.boreholes.findIndex(b=>b.id===collar.id):-1;
+    if(hole>=0){const bh=model.boreholes[hole],at=local(bh.x,bh.y,bh.z).multiply(world.scale);
+      if((!cutting()||clipPlane.distanceToPoint(at)>=-1e-6)&&at.clone().sub(camera.position).dot(camera.getWorldDirection(new THREE.Vector3()))>0&&at.distanceTo(camera.position)<=hidden+camera.position.distanceTo(controls.target)*0.02)picked={hole,interval:-1};
+    }
+  }
+  if(!picked)return false;
+  const b=model.boreholes[picked.hole],i=b.intervals[picked.interval],id=i?.evidenceId??b.evidenceId;
+  if(!id)return false;
+  hideTooltip();openProjectEvidence(id,`Source evidence · ${b.id}${i?` · ${fmt(i.from,2)}–${fmt(i.to,2)} m`:""}`);
+  return true;
+}
 
 // ---------- drawing a line ----------
 
@@ -1882,7 +1974,7 @@ drawBar.querySelector<HTMLButtonElement>(".draw-top")!.onclick=viewFromAbove;
 drawBar.querySelector<HTMLButtonElement>(".draw-cancel")!.onclick=cancelDraw;
 drawBar.querySelector<HTMLButtonElement>(".draw-done")!.onclick=finishDraw;
 addEventListener("keydown",e=>{
-  if(!drawing||(e.target as Element|null)?.closest?.("input,select,textarea"))return;
+  if(e.defaultPrevented||!drawing||(e.target as Element|null)?.closest?.("input,select,textarea"))return;
   if(e.key==="Escape")cancelDraw();
   else if(e.key==="Enter")finishDraw();
   else if(e.key==="Backspace"||e.key==="Delete")undoDraw();
@@ -1895,7 +1987,7 @@ function holeHtml(hole:number,interval:number){
   const what=iv?`${esc(model.units.find(u=>u.id===iv.unit)?.name??iv.unit)} ${fmt(iv.from,2)}–${fmt(iv.to,2)} m`:"not logged";
   const spt=iv?(bh.spt??[]).filter(t=>t.depth>=iv.from&&t.depth<iv.to).map(t=>t.penetration>=300?String(t.blows):`${t.blows}/${fmt(t.penetration/10)} cm`):[];
   const logged=[iv?.name&&iv.name!==iv.unit?esc(iv.name):"",spt.length?`N ${spt.join(", ")}`:""].filter(Boolean).join(" · ");
-  const water=bh.water?.length?` · water ${fmt(Math.min(...bh.water.map(w=>w.depth)),2)} m deep`:"";
+  const water=bh.water?.length?` · shallowest logged water ${fmt(Math.min(...bh.water.map(w=>w.depth)),2)} m deep (all dates)`:"";
   const where=bh.lat!==undefined&&bh.lon!==undefined?` (${fmt(bh.lat,5)}°, ${fmt(bh.lon,5)}°)`:"";
   return `<b>${esc(bh.id)}</b> · ${what}${logged?`<span>${logged}</span>`:""}<span>collar E ${fmt(bh.x,1)} N ${fmt(bh.y,1)}${where} · ${fmt(bh.z,2)} m · final depth ${fmt(boreholeDepth(bh),1)} m${water}</span>${validationLine(bh.id)}`;
 }
@@ -2033,7 +2125,7 @@ function sectionReadout(along:number,e:number){
   let k=-1;
   for(let i=0;i<model.units.length;i++)if(e<=c.z[i]+1e-6&&e>=c.z[i+1]-1e-6&&c.z[i]-c.z[i+1]>1e-9){k=i;break}
   if(k<0)return "";
-  const st=stressAt(c.z,c.water,weights,e),assumed=weights.some(w=>w.source==="assumed");
+  const st=model.project.groundwater?.mode==="as-of"&&!model.water?undefined:stressAt(c.z,c.water,weights,e),assumed=weights.some(w=>w.source==="assumed");
   let html=`<b>${esc(model.units[k].name)}</b> · ${section.alignment?`chainage ${fmt(along,1)} m, `:""}${fmt(c.z[0]-e,1)} m deep, elevation ${fmt(e,1)} m`;
   // Along a line, its design levels there and the cover above them.
   const d=section.alignment?designAt(section.alignment.design,along):{};

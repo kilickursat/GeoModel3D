@@ -6,6 +6,7 @@
 // From the classified readings come a CPT's layers: the log it gives.
 import {Cpt,GeoProject,Interval,UnitRule} from "./schema";
 import {rulePattern} from "./rules";
+import {groundwaterAt} from "./groundwater";
 
 // Atmospheric pressure, the reference stress of the normalisation, and the unit weight of water (as for the stresses
 // on sections), in kPa and kN/m³.
@@ -44,7 +45,7 @@ export interface SoilBehaviour {
 // - Qtn = ((qt − σv0)/pa)(pa/σ′v0)^n, with (pa/σ′v0)^n at most 1.7 (Robertson & Wride 1998); Fr = fs/(qt − σv0) in
 //   percent; Ic = √((3.47 − log Qtn)² + (log Fr + 1.22)²); n = 0.381 Ic + 0.05 σ′v0/pa − 0.15, at most 1, from n = 1
 //   until it changes by less than 10⁻⁶.
-export function soilBehaviour(c:Cpt,water?:number):SoilBehaviour{
+export function soilBehaviour(c:Cpt,water?:number,unavailableReason?:string):SoilBehaviour{
   const N=c.depth.length,notes:string[]=[],a=c.a;
   const out:SoilBehaviour={qt:[],gamma:[],sv:[],u0:[],s:[],n:[],Qtn:[],Fr:[],ic:[],zone:[],qtFrom:"qc",unclassified:N,notes};
   let given=0,corrected=0;
@@ -58,6 +59,13 @@ export function soilBehaviour(c:Cpt,water?:number):SoilBehaviour{
   if(given)notes.push("qt as the file gives it");
   else if(corrected)notes.push(`qt = qc + u2 (1 − a), with the net area ratio a = ${a}`);
   else notes.push(c.u2?.some(Number.isFinite)?"qt taken as qc: the file gives no net area ratio":"qt taken as qc: no pore pressure u2 was measured");
+  // An explicit time scenario with no eligible groundwater is missing information, never a dry-ground assumption.
+  // Keep raw/corrected cone resistance visible, but do not manufacture stresses or an SBT interpretation.
+  if(unavailableReason){
+    notes.push(unavailableReason);
+    for(const k of ["gamma","sv","u0","s","n","Qtn","Fr","ic","zone"] as const)out[k]=new Array(N).fill(NaN);
+    return out;
+  }
   if(!c.fs?.some(Number.isFinite)){
     notes.push("no sleeve friction: the soil behaviour type cannot be found");
     for(const k of ["gamma","sv","u0","s","n","Qtn","Fr","ic","zone"] as const)out[k]=new Array(N).fill(NaN);
@@ -165,33 +173,36 @@ export function joinLayers(layers:Interval[]):Interval[]{
   return out;
 }
 
-// The water table at a point, as the model takes it: through the shallowest water level of each borehole, by inverse
-// distance, kept at or below the ground there; else the project's assumed depth below the ground; else none.
-export function waterTableAt(p:GeoProject,x:number,y:number,ground:number):number|undefined{
-  let num=0,den=0,exact:number|undefined;
-  for(const b of p.boreholes){
-    if(!b.water?.length||![b.x,b.y,b.z].every(Number.isFinite))continue;
-    const v=b.z-Math.min(...b.water.map(w=>w.depth)),d2=(b.x-x)**2+(b.y-y)**2;
-    if(d2<1e-12){exact=v;break}
-    num+=v/d2;den+=1/d2;
-  }
-  if(exact!==undefined||den>0)return Math.min(exact??num/den,ground);
-  if(p.groundwaterDepth!==undefined&&Number.isFinite(p.groundwaterDepth))return ground-p.groundwaterDepth;
-  return undefined;
-}
+// Backward-compatible name for the shared groundwater policy; CPTs query all project boreholes.
+export const waterTableAt=groundwaterAt;
 
 // A CPT's soil behaviour type with the project's water table, kept for each project and CPT.
-const kept=new WeakMap<GeoProject,WeakMap<Cpt,SoilBehaviour>>();
+const kept=new WeakMap<GeoProject,WeakMap<Cpt,{water:number|undefined;inputs:unknown[];behaviour:SoilBehaviour}>>();
 export function cptBehaviour(p:GeoProject,c:Cpt){
   let m=kept.get(p);
   if(!m){m=new WeakMap();kept.set(p,m)}
+  // Re-evaluate the selected water even if the project or its observations were edited in place.
+  const water=Number.isFinite(c.z)?waterTableAt(p,c.x,c.y,c.z):undefined;
+  const unavailable=p.groundwater?.mode==="as-of"&&water===undefined?
+    `No eligible groundwater as of ${p.groundwater.date} for CPT ${c.id}: stresses and soil behaviour type are unavailable` : undefined;
+  const inputs=[c.z,c.a,c.predrill,c.depth,c.qc,c.fs,c.u2,c.rf,c.qt,unavailable];
   let b=m.get(c);
-  if(!b){b=soilBehaviour(c,Number.isFinite(c.z)?waterTableAt(p,c.x,c.y,c.z):undefined);m.set(c,b)}
-  return b;
+  if(!b||!Object.is(b.water,water)||inputs.some((v,i)=>!Object.is(v,b!.inputs[i]))){
+    b={water,inputs,behaviour:soilBehaviour(c,water,unavailable)};m.set(c,b);
+  }
+  return b.behaviour;
 }
 // A CPT's layers with their units, as the project's rules for CPT layers give them (else its unit rules).
 export function classifiedLayers(p:GeoProject,c:Cpt){
-  const b=soilBehaviour(c,Number.isFinite(c.z)?waterTableAt(p,c.x,c.y,c.z):undefined);
+  if(p.groundwater?.mode==="as-of"&&(!Number.isFinite(c.z)||waterTableAt(p,c.x,c.y,c.z)===undefined))
+    throw new Error(`No eligible groundwater as of ${p.groundwater.date} for CPT ${c.id}: automatic CPT classification is unavailable. Supply eligible observations, explicitly allow undated readings, or choose an assumed-depth override.`);
+  const b=cptBehaviour(p,c);
   const rules=p.cptRules??p.rules;
   return {behaviour:b,layers:rules?layerUnits(cptLayers(c,b),c.z,rules):cptLayers(c,b)};
+}
+
+// Interpretations are derived for this build; an immutable saved project and reviewed logs are never rewritten.
+export function refreshAutomaticCptLayers(p:GeoProject):GeoProject{
+  if(!p.cpts?.some(c=>c.layersSource==="automatic"))return p;
+  return {...p,cpts:p.cpts.map(c=>c.layersSource==="automatic"?{...c,layers:classifiedLayers(p,c).layers}:c)};
 }

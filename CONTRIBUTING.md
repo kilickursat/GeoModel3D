@@ -39,6 +39,12 @@ The modelling kernel (`src/model.ts`, `src/fields.ts`, `src/io.ts` and the other
 
 By contributing, you agree that your contribution is licensed under Apache-2.0, like the rest of the project.
 
+## Release versions
+
+Include a version update when preparing a feature release. Keep `package.json` and the root package entries in `package-lock.json` in sync, update the version and release date in `CITATION.cff` and the README citation, and move the release notes from **Unreleased** to the matching version and date. The app header, reports and new workspace revisions read the package version.
+
+Check the full version in the built app, including the standalone HTML. A commit or feature-branch push does not change the version by itself. GitHub Pages publishes the build from `main`; a feature branch's version becomes live after its changes reach `main` and deployment succeeds.
+
 ## How the code is written
 
 - **TypeScript, in the style around it.** Match the naming, the compact layout and the comment density of the file you are editing. Comments say why, in full sentences.

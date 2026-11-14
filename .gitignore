@@ -4,3 +4,5 @@ dist/
 .DS_Store
 .cache/
 public/ocr/
+playwright-report/
+test-results/

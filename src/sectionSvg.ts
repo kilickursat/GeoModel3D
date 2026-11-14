@@ -5,6 +5,7 @@ import {SectionField,columnAt,withTheme,scaleLabel} from "./fields";
 import {chainageTable,unitLabel,Crossing} from "./alignment";
 import {frictionRatio,thinned,cptScale,RF_SCALE} from "./cpt";
 import {cptDepth} from "./schema";
+import {selectedGroundwater} from "./groundwater";
 
 // roundVe draws at a round vertical exaggeration (1, 2, 2.5, 5, 10…), as drawings state it, instead of filling the height.
 // Units whose ids are in `hidden` are left unfilled and out of the legend, as in the 3-D view; borehole logs keep them.
@@ -140,7 +141,9 @@ export function sectionSvg(model:GeoModel,s:Section,o:SectionSvgOptions){
     }
   });
 
-  // The water table, and the shallowest water level of each borehole (▽).
+  // The water table, and actual observations selected by its scenario (▽). Explicit assumptions have no
+  // observation markers, and future readings must never appear as if selected in an as-of scenario.
+  const selectedWater=new Map(selectedGroundwater({...model.project,boreholes:model.boreholes}).map(r=>[r.boreholeId,r]));
   if(s.water){
     let d="";
     s.water.forEach((w,j)=>{if(Number.isFinite(w))d+=`${d&&Number.isFinite(s.water![j-1])&&joined(s,j-1)?"L":"M"}${X(s.s[j]).toFixed(2)},${Y(w).toFixed(2)}`});
@@ -190,9 +193,10 @@ export function sectionSvg(model:GeoModel,s:Section,o:SectionSvgOptions){
       out.push(`<rect x="${(x-3).toFixed(2)}" y="${Y(b.z-i.from).toFixed(2)}" width="6" height="${Math.max(Y(b.z-i.to)-Y(b.z-i.from),0.5).toFixed(2)}" fill="${u?.color??"#999999"}" stroke="${t.hole}" stroke-width="0.6"/>`);
     }
     out.push(`<line x1="${x.toFixed(2)}" x2="${x.toFixed(2)}" y1="${Y(p.top).toFixed(2)}" y2="${Y(p.bottom).toFixed(2)}" stroke="${t.line}" stroke-width="0.6" stroke-opacity="0.6"/>`);
-    if(b.water?.length){
-      const wy=Y(b.z-Math.min(...b.water.map(w=>w.depth)));
-      out.push(`<path d="M${(x+4).toFixed(2)},${(wy-5).toFixed(2)}h9l-4.5,6z" fill="none" stroke="${t.water}" stroke-width="1.1"/><line x1="${(x+4).toFixed(2)}" x2="${(x+13).toFixed(2)}" y1="${(wy+3).toFixed(2)}" y2="${(wy+3).toFixed(2)}" stroke="${t.water}" stroke-width="1.1"/>`);
+    const reading=selectedWater.get(b.id);
+    if(reading){
+      const wy=Y(reading.elevation),observation=reading.observation;
+      out.push(`<g class="water-observation"><title>${esc(`${b.id}: selected water observation ${observation.depth} m below collar${observation.date?` on ${observation.date}`:" (undated)"}`)}</title><path d="M${(x+4).toFixed(2)},${(wy-5).toFixed(2)}h9l-4.5,6z" fill="none" stroke="${t.water}" stroke-width="1.1"/><line x1="${(x+4).toFixed(2)}" x2="${(x+13).toFixed(2)}" y1="${(wy+3).toFixed(2)}" y2="${(wy+3).toFixed(2)}" stroke="${t.water}" stroke-width="1.1"/></g>`);
     }
     out.push(`${named.has(p.index)?`<text x="${named.get(p.index)!.toFixed(2)}" y="${(Y(p.top)-5).toFixed(2)}" text-anchor="middle" font-size="9.5" fill="${t.text}">${esc(b.id)}</text>`:""}</g>`);
   }

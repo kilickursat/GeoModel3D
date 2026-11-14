@@ -1,0 +1,75 @@
+/* Proposed sites are kept distinct from existing observations, including on narrow mobile screens. */
+.planner-dialog{position:fixed;inset:0;width:min(1180px,calc(100% - 24px));max-width:calc(100% - 24px);height:min(940px,calc(100dvh - 24px));max-height:calc(100dvh - 24px);margin:auto;padding:0;border:1px solid var(--border-strong);border-radius:10px;background:var(--surface);color:var(--text);box-shadow:var(--shadow);overflow:hidden}
+.planner-dialog::backdrop{background:rgba(20,30,40,.4)}
+.planner-dialog[open]{display:flex;flex-direction:column}
+.planner-header{display:flex;align-items:center;justify-content:space-between;gap:14px;flex:none;padding:14px 16px;border-bottom:1px solid var(--border)}
+.planner-header h2{font-size:17px;margin:0;overflow-wrap:anywhere}
+.planner-dialog button{border:1px solid var(--border-strong);border-radius:var(--radius);padding:6px 10px;background:var(--surface);color:var(--text);cursor:pointer;line-height:1.3}
+.planner-dialog button:hover:not(:disabled){background:var(--surface-2)}
+.planner-dialog button:disabled{opacity:.45;cursor:default}
+.planner-dialog .planner-run{background:var(--accent);border-color:var(--accent);color:white;font-weight:600}
+.planner-dialog .planner-run:hover:not(:disabled){background:#1a5fb4}
+.planner-body{min-height:0;overflow:auto;padding:16px;overscroll-behavior:contain;overflow-wrap:anywhere}
+.planner-context{display:flex;flex-direction:column;gap:5px;padding:12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface-2)}
+.planner-context small,.planner-caption,.planner-location,.planner-setting-note,.planner-proxy-note{color:var(--text-2)}
+.planner-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 14px;padding:12px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.planner-controls label,.planner-site-actions label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--text-2)}
+.planner-dialog input,.planner-dialog select{font:inherit;font-size:13px;color:var(--text);background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius);padding:6px 8px;max-width:100%;min-width:0}
+.planner-controls .planner-check{flex-direction:row;align-items:center;gap:8px;color:var(--text);grid-column:span 1}
+.planner-check input{flex:none;width:17px;height:17px;padding:0}
+.planner-setting-note{grid-column:1/-1;margin:0;font-size:12px}
+.planner-actions{display:flex;flex-wrap:wrap;gap:8px;grid-column:1/-1}
+.planner-status{min-height:20px;color:var(--text-2)}
+.planner-error{padding:9px 12px;border-left:3px solid var(--danger);background:var(--surface-2);color:var(--danger)}
+.planner-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0 0 12px}
+.planner-summary>div{border:1px solid var(--border);border-radius:var(--radius);padding:10px;min-width:0}
+.planner-summary dt{font-size:11px;color:var(--text-2)}
+.planner-summary dd{margin:4px 0 0;font-size:15px;font-weight:600}
+.planner-results h3{font-size:14px;margin:20px 0 8px}
+.planner-proxy-note,.planner-caption{font-size:12px}
+.planner-shortfall,.planner-depth-note{padding:9px 12px;border-left:3px solid #bd975a;background:#fff7e9;color:#725322}
+.planner-exclusions summary,.planner-methods summary{font-weight:600;cursor:pointer}
+.planner-map{max-width:100%;border:1px solid var(--border);border-radius:var(--radius);background:white;overflow:hidden}
+.planner-map svg{display:block;width:100%}
+.planner-map-site{cursor:pointer}
+.planner-map-site[aria-pressed="true"] circle{stroke:#18222c;stroke-width:3}
+.planner-map-site:focus{outline:none}
+.planner-map-site:focus circle{stroke:#18222c;stroke-width:4;stroke-dasharray:2 1}
+.planner-map-key{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:11px;color:var(--text-2)}
+.planner-map-key span{display:inline-flex;align-items:center;gap:6px}
+.planner-map-key span::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;background:#5c6b78;border:1px solid #5c6b78}
+.planner-map-key .planner-recorded-key::before{background:white}
+.planner-map-key .planner-proposed-key::before{background:#1f6fd1;border-color:#1f6fd1}
+.planner-map-key .planner-line-key::before{width:20px;height:0;border:0;border-top:2px solid #918273;border-radius:0}
+.planner-table-wrap{max-width:100%;overflow:auto;border:1px solid var(--border);border-radius:var(--radius);margin:8px 0 14px}
+.planner-sites{border-collapse:collapse;font-size:12px;width:100%;font-variant-numeric:tabular-nums}
+.planner-sites th,.planner-sites td{border-bottom:1px solid var(--border);padding:7px 10px;text-align:right;white-space:nowrap}
+.planner-sites thead th{background:var(--surface-2);font-weight:600}
+.planner-sites th:first-child,.planner-sites td:first-child{text-align:left}
+.planner-sites tbody th{font-weight:500}
+.planner-sites button{padding:4px 7px;color:var(--accent);font-weight:600}
+.planner-sites .planner-selected-row{background:var(--surface-2)}
+.planner-detail{border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:14px 0}
+.planner-site-actions{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.planner-site{min-width:220px}
+.planner-reasons{padding-left:20px}
+.planner-readouts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:14px 0}
+.planner-readouts dt{font-size:11px;color:var(--text-2)}
+.planner-readouts dd{font-size:13px;margin:4px 0 0}
+.planner-selected-flags{display:flex;flex-wrap:wrap;gap:6px;font-size:12px}
+.planner-flag{display:inline-block;border:1px solid #d6b889;border-radius:4px;padding:3px 5px;background:#fff7e9;color:#725322;font-size:11px;white-space:nowrap}
+.planner-methods{border-top:1px solid var(--border);padding-top:12px;margin-top:18px}
+.planner-methods ul{padding-left:20px;color:var(--text-2)}
+@media(max-width:700px){
+  .planner-dialog{width:calc(100% - 12px);max-width:calc(100% - 12px);height:calc(100dvh - 12px);max-height:calc(100dvh - 12px);border-radius:8px}
+  .planner-header,.planner-body{padding:12px}
+  .planner-controls{grid-template-columns:minmax(0,1fr)}
+  .planner-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .planner-readouts{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .planner-dialog button,.planner-dialog input:not([type=checkbox]),.planner-dialog select{min-height:36px}
+  .planner-check input{width:20px;height:20px}
+  .planner-actions button{flex:1 1 140px}
+  .planner-site-actions{align-items:stretch}
+  .planner-site-actions label{flex:1 1 200px}
+  .planner-map-key span{flex:1 1 140px}
+}

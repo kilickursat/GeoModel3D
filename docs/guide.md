@@ -12,7 +12,7 @@ The **Input data** tab, next to **3-D model** at the top of the page, is where y
 - **Edit the site shown:** the tables of the model on screen, to change or add to;
 - **Import files…:** CSV, AGS4, borehole XML or project JSON, opened here for review before building;
 - **Read logs from PDFs…:** borehole logs in PDF reports, scanned or not, or in images, checked beside the page before use ([Reading borehole logs from PDFs](#reading-borehole-logs-from-pdfs));
-- **Continue the saved case:** what you typed before, if this browser kept it.
+- **Continue the saved case:** the last workspace, with its complete base project, unfinished tables and revisions, if this browser kept it.
 
 Then fill in the steps:
 
@@ -25,6 +25,8 @@ Then fill in the steps:
 | SPT | Borehole, depth, blows, penetration |
 | Tests | Borehole, depth, to, property, value: any laboratory or in-situ result |
 | Units | Unit, name, colour, erosive, γ, γsat, c′, φ′, su, E, k, K0, source, in stratigraphic order (▲ ▼ to reorder) |
+| Scenarios | Independent named interpretations, their unfinished drafts, and fixed-revision comparisons |
+| Revisions | Complete projects recorded when opened or built; restore an earlier project while retaining later revisions |
 
 While you type, the preview shows:
 - **the boreholes in plan**, with the outline of the model; click a borehole to show it;
@@ -37,7 +39,49 @@ Good to know:
 - **One borehole is enough.** A single borehole needs neither a position nor a ground level (0, 0 and 0 m are used, and said so). One or two boreholes, or boreholes in a line, are modelled over an extent around them; set **Model extent beyond the boreholes** to choose it, or to extend any model beyond its outermost boreholes.
 - **Unit weights** give the stresses: γ above the water table and γsat below it. A unit without them takes the mean measured unit weight, or else 18 and 20 kN/m³, which the preview and the report say. **K0** gives σ′h, and **c′, φ′ and su** the earth pressures. E and k are design parameters, kept with the model and listed in the report.
 - **Pasting:** cells copied from a spreadsheet paste into any table, starting at the cell pasted into, and add rows as needed. Large tables are shown one borehole at a time.
-- **Nothing is uploaded.** What you type is kept in this browser, so a reload does not lose it, until you type in another case. **Save case (JSON)** keeps a copy you can import again, and **Download table (CSV)** saves a table as CSV.
+- **Nothing is uploaded.** The input workspace is saved in this browser, including terrain, CPTs, alignments, rules and parameters from its base project. The status under the editor says when a save has completed, or explains if browser storage is unavailable. Starting another case replaces the browser save.
+- **Save workspace** downloads the unfinished tables, complete base project and revision history. Import that file on its own to continue editing, including on another computer. Source evidence, highlighted page previews and correction history are included where available; original PDF/image files are not embedded. **Save case (JSON)** and **Export → Project (JSON)** keep only the current project; **Download table (CSV)** saves one table.
+- **Revisions:** opening a project records its baseline. **Build model** records a new revision when its project differs from the selected revision. Under **Revisions**, restore a project, then build it to show it in 3-D. Building changes after a restore creates a revision based on that earlier project; later revisions stay available. Unfinished edits are kept in the workspace draft but are not themselves build revisions.
+
+## Scenarios and comparisons
+
+Under **Input data → Scenarios**, give a case a name and choose **Create scenario**. **Current draft** copies unfinished entries exactly; selecting a revision starts from that complete saved project. The previous scenario keeps its draft, including invalid values that still need editing. The active scenario is named under the editor.
+
+Use **Active scenario** to switch and **Rename scenario** to change its name. **Build model** records a revision only in that scenario. Restoring a revision moves the selected scenario back to it; building further changes creates a new branch without changing other scenarios or removing later revisions. The model title names the scenario it was built from. **Save workspace** retains every scenario, including unfinished values and source evidence; project JSON contains only one project. Workspace formats 1 and 2 open as a Baseline scenario in format 3.
+
+**Compare saved revisions** pins two revisions. Unbuilt edits are excluded. The comparison dialog offers:
+
+- a straight section fixed in the before revision's coordinate system, or one alignment from that revision used unchanged for both models;
+- sample spacing and an optional readout elevation;
+- one shared plot with before/after contacts, a contact-difference table, and introduced or removed units;
+- ground and water elevation differences, and available unit/stress values at the chosen level;
+- a CSV carrying both revision IDs, dates, engine versions and path settings.
+
+Differences are **after minus before**. Contacts are matched by unit ID, so changing the order of units never pairs unrelated layers. Areas outside either model, absent contacts and unknown water remain unavailable. The models must share a compatible coordinate system; elevations are used as supplied, so use a common height datum. Sampling is limited to 2,001 locations, with gaps kept visible. This comparison does not estimate volume changes or statistical uncertainty.
+
+Choose **Run comparison** after changing settings; earlier results and their CSV are invalidated. **Cancel** or closing the dialog stops its worker. The comparison runs locally and also works in the standalone HTML without downloading another script.
+
+### New-data impact review
+
+Choose the same **Before** and **After** saved revisions under **Scenarios**, then **Review new data**. Choose the earlier interpretation as Before. **Run impact review** lists added, removed, modified and unchanged borehole/CPT IDs. It compares new borehole IDs in After with the model built entirely from Before. Changing an existing borehole ID is reported as a removal and an addition; the app cannot establish their physical identity. Added IDs at a collar already used by the earlier model are flagged and excluded from forecast scoring.
+
+The collar map and ranked borehole table highlight the largest available contact forecast errors. Select a borehole to inspect its actual logged contacts, the before model's predicted elevations and the updated model's elevations at the same coordinates. **Prediction error = before prediction − newly logged elevation**; **model shift = after − before**. These signs answer different questions. An error of +2 m means the earlier model put the contact 2 m above the newly logged contact.
+
+Unit agreement reports matching metres over the logged depth covered by the earlier model, alongside total logged metres. Missing coverage is excluded from the compared length. Contacts are paired by stable unit ID. Gaps, partial starts and inferred contacts are not counted as observed boundaries. Outside the earlier model's footprint, predictions remain unavailable; its extent is not enlarged for the review. Coverage within an explicitly extended footprint may itself be inferred. Added CPTs appear in the change register; this review checks new borehole logs only.
+
+Changes to existing logs, units, rules, terrain, groundwater, extent or other assumptions are listed separately. A before/after shift includes all those changes; it does not isolate the effect of adding a particular borehole. This is a check against newly supplied logs, not a confidence interval or proof of accuracy. The two revisions need a common coordinate system and height datum, as for section comparisons.
+
+**Download impact CSV** includes contact values, availability, error/shift signs and the pinned revision IDs, dates and engine versions. **Compare along section** opens the existing comparison for the same pair, to inspect changes between collars. Cancel or close the review to stop its worker. Drafts and saved revisions are not changed.
+
+### Groundwater policies
+
+Under **Project → Groundwater scenario**:
+
+- **Observed levels** uses the shallowest reading per borehole. The fallback groundwater depth applies only when no borehole records water, preserving existing projects' behavior.
+- **Assumed depth override** replaces observed water with a depth below local ground for this scenario. Negative depth represents water above ground.
+- **Observations as of a date** selects the most recent eligible reading for each borehole through the end of that UTC day. Future observations are excluded. **Use undated readings** explicitly permits a fallback where that borehole has no eligible dated reading; the legacy fallback depth is not used.
+
+These choices select or assume water levels; they do not simulate groundwater flow. Original observations and their evidence are unchanged. An as-of case with no eligible groundwater leaves water-dependent comparison and preview results unavailable. Automatic CPT classification needs eligible groundwater for such a case and blocks a build when it cannot be determined. Existing reviewed or legacy CPT layer interpretations remain fixed and are identified as such; new automatic classifications refresh when their groundwater/rules change.
 
 ## Reading borehole logs from PDFs
 
@@ -73,6 +117,18 @@ Edit any value or description, add a layer below another with **+**, delete one 
 
 **Your documents stay with you.** A PDF or image is read in this browser and is not uploaded. The reader, the reading model and the files they need (fonts, character maps, image decoders) come from GeoModel3D's own site, and only after you agree. The offline file does not read documents: open the app at [kilickursat.github.io/GeoModel3D](https://kilickursat.github.io/GeoModel3D/) to read them.
 
+## Inspecting source evidence
+
+Logs accepted from the document review keep their original extracted values, the source text and page locations, extraction warnings, and any subsequent corrections. The source file's SHA-256 hash is retained when the browser can compute it. Only the pages used for these observations are kept as bounded PNG previews; the original PDF or image is not embedded.
+
+- In **Input data**, use **Evidence** beside a source-backed borehole, log or water-level row. Choose a value to see its original reading, the value currently in the table, source text, page highlights and history.
+- **Accept current value** explicitly records acceptance of the selected value only. Editing it later records a correction and requires checking it again. Clearing a warning by editing in the PDF review is a correction, not an acceptance; **Looks right** records an explicit acceptance of that warning's value.
+- In the **3-D model**, open **Source evidence** in the Site panel, or make a short click/tap on a visible source-backed borehole. These model inspectors are read-only. If unit rules, coordinate conversion or other processing changed the value, the inspector shows the actual model value and marks the difference from the recorded evidence.
+- **Save workspace** keeps the evidence with the unfinished tables and each project revision. **Save case (JSON)** and **Export → Project (JSON)** keep the current project's evidence. Source pages are shared within workspace files so repeated revisions do not repeat image data. Earlier workspace files remain readable.
+- The printable report lists linked source documents, pages, extraction methods, excerpts, originals where changed, current model values and review status. Deleted or unlinked observations are not included in that appendix.
+
+Page previews and source excerpts may contain information from your documents, so they are part of the files you export. They stay in this browser until you export them. Older projects and manually entered rows without evidence remain usable and do not acquire invented source records. Saved previews can be inspected in the standalone app, although that app still cannot read new documents.
+
 ## Groundwater, stresses and measured properties
 
 **Colour**, on the section bar, colours the 2-D section, and the section face in 3-D where the model is cut or see-through, by one of:
@@ -83,7 +139,7 @@ Edit any value or description, add a layer below another with **+**, delete one 
 Colours are bands of one hue, with a legend that states what the field rests on.
 
 How the fields are computed:
-- **Water table:** it runs through the shallowest water level logged in each borehole, interpolated between boreholes and kept at or below the ground. Where no borehole has a water level, the project's assumed groundwater depth is used. It is drawn blue on sections, with ▽ at the logged levels.
+- **Water table:** the selected groundwater policy gives the levels. Observed and as-of measurements are interpolated between boreholes and kept at or below ground; a depth override follows the ground. Sections show the selected readings, while raw logged-water columns are labeled separately. See [Groundwater policies](#groundwater-policies).
 - **Stresses:**
   - σv sums unit weight × thickness from the ground down, using γ above the water table and γsat below it.
   - u is hydrostatic below the water table, and σ′v = σv − u.
@@ -155,6 +211,40 @@ A section can follow a line instead of running straight: a tunnel, a road, a rai
   **Export → Chainage table (CSV)** writes it, and the PDF report gets a page of it.
 
 Boreholes and CPTs within the section's reach of the line are projected onto it at their nearest point; those beyond its ends are left out. The profile is exact, as a straight section is: it has a sample wherever the line crosses an edge of the triangulation and at each point of the line, so the horizons are linear between samples. A straight line gives exactly the straight section, and the tests hold it to that. Where a line leaves the model and comes back, the profile has a gap, which the report names.
+
+### Corridor dashboard
+
+With a project that has alignments, choose **Corridor** on the Section bar. It uses the selected alignment, or the first project alignment while the section is Straight. On a phone, open the **Section** sheet first. The dashboard pins the displayed model, alignment and design levels when opened; unfinished input edits are excluded.
+
+Choose the station spacing and optional cover/distance screens, then **Run dashboard**. The cover screen starts at 5 m and the nearest-log distance screen at 100 m, shown in the controls; clear a threshold to disable that screen. These are user settings, not limits from a design standard. Changing settings removes the earlier results and disables their CSV until rerun.
+
+The dashboard shows:
+
+- a shared elevation plot for ground, groundwater, design top and available design bottom;
+- sampled cover (**ground − design top**) and water head (**water − design top**), in metres;
+- the units at design top and bottom, or explicit above-ground/below-model positions;
+- the nearest borehole or CPT layer log actually used by the geological model, with horizontal distance;
+- station flags for missing coverage/design/water, design levels outside the model, water above design, and the selected cover/distance screens.
+
+Select a station to inspect it, or **View at chainage** to move the existing model's alignment marker there. **Download corridor CSV** preserves station values, flags, settings, alignment geometry/design, snapshot time, engine version and scenario label where available. Cancel or close stops the worker. The dashboard runs locally and in the standalone HTML.
+
+The station list retains alignment ends, vertices, design knots and model entry/exit boundaries, with explicit gaps. Work is limited to 2,001 stations and regular spacing may be increased, as reported. Supplied chainages are retained even if their scale differs from the line's physical length. Results and extrema describe the sampled stations; hazards and extrema between them can be missed. Counts are station counts, not percentages of route length. Groundwater head is an elevation difference, not pressure or a flow calculation. A short distance to a used log does not measure confidence, and being inside a model with an extended margin does not establish observation support. Use common horizontal and height datums for the model and design.
+
+### Investigation planner
+
+Open **Corridor → Plan investigation**, choose a location budget, minimum spacing and candidate spacing, then **Generate plan**. A dashboard calculation is not required first. The planner pins the displayed project and alignment; the corridor's current sampling and cover/distance screens are carried into its controls. Budget means a count of proposed locations, not money. Defaults are five locations and 20 m minimum spacing.
+
+The default method picks the eligible sampled station furthest in plan from logs used by the model and earlier proposals, repeating until the budget is filled or spacing rules prevent further choices. Equal distances retain increasing chainage order. This greedy method does not claim to find an optimal investigation programme or predict statistical information gain. The map and location details explain every selection.
+
+Minimum spacing is a horizontal distance in project coordinates, regardless of the chainage scale. It applies to every recorded borehole/CPT collar, including logs excluded from the model, and to earlier proposals. Coincident locations within 1 mm are always excluded. Repeated positions on a looping alignment are considered once. The planner reports excluded candidates and a budget shortfall rather than forcing locations into gaps that cannot meet the settings.
+
+**Prioritize known screening flags** considers stations with cover, water-above-design, design-position or log-distance flags before other eligible stations, then uses the same distance rule. Missing data are not assigned an assumed hazard severity. **Include stations outside the model** explicitly permits extension proposals; their ground, geological predictions and depth stay unavailable. If there are no used baseline logs, the first geometric seed is nearest the chainage midpoint and the baseline distance proxy is unavailable.
+
+Depth is optional. With **Depth below design**, the geometric target is model ground minus design bottom (or top when no bottom is supplied), plus the entered extension. A target at or above ground does not produce a fictitious zero-depth hole. Missing ground or design leaves depth unavailable; termination below the model base is identified. These are geometric targets, not prescribed investigation depths or surveyed proposal elevations.
+
+The two maximum-gap summaries use the same initial eligible station grid. The second treats proposed positions as hypothetical distance points; the geological model has not improved and no drilling has occurred. Candidate spacing is bounded to 2,001 stations through the corridor sampler, and unsampled locations may differ. The planner does not account for field access or construction constraints.
+
+**Download proposal CSV** and **Download plan JSON** preserve selected positions, reasons, settings, exclusions, snapshot time, scenario label, engine version and coordinate-system metadata. JSON is a planning archive, not a measured project or workspace. **View at chainage** moves the original model's alignment marker to a proposal. Generating or exporting a plan does not add boreholes or alter drafts, revisions or measurements. Changing settings invalidates results and exports; cancel or close stops the worker. The planner also works in the standalone HTML.
 
 ## Cone penetration tests
 

@@ -59,6 +59,20 @@ describe("sections along an alignment",()=>{
     expect(s.s[s.s.length-1]).toBeLessThanOrEqual(2160+1e-9);
   });
 
+  it("preserves model crossings and columns with large supplied chainage offsets",()=>{
+    const model=buildGeologicalModel({name:"Chainage precision",units:[{id:"sand",name:"Sand",color:"#ccc"}],
+      boreholes:[[0,0,10],[40,0,14],[40,40,10],[0,40,14]].map(([x,y,z],i)=>({id:`BH${i}`,x,y,z,
+        intervals:[{from:0,to:10,unit:"sand"}]}))});
+    // Supplied chainages span twice the line's physical length. Both scale and absolute start must be retained.
+    const line=(start:number):Alignment=>({name:"Scaled stations",points:[{x:-10,y:20,chainage:start},{x:50,y:20,chainage:start+120}]});
+    const low=alignmentSection(model,line(0)),high=alignmentSection(model,line(1e9));
+    expect(low.s.length).toBeGreaterThan(2);expect(high.s.length).toBe(low.s.length);
+    high.s.forEach((c,i)=>expect(c-1e9).toBeCloseTo(low.s[i],6));
+    expect(high.z).toEqual(low.z);
+    const direct=sampleModel(model,20,20)!,column=columnAt(high,1e9+60)!;
+    expect(column).not.toBeNull();column.z.forEach((z,k)=>expect(z).toBeCloseTo(direct[k],8));
+  });
+
   it("break where the line leaves the model and comes back",()=>{
     const ref=buildGeologicalModel(referenceProject);
     const line:Alignment={name:"loop",points:[{x:30,y:40},{x:-50,y:40},{x:-50,y:60},{x:30,y:60}]};

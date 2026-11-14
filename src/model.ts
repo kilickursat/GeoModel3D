@@ -2,6 +2,8 @@ import {Borehole,GeoProject,UnitDef,Cpt,boreholeDepth,cptDepth} from "./schema";
 import {delaunay,Triangle,XY,triangleArea,uniqueEdges} from "./tin";
 import {TINSurface,GeologicalVolume} from "./volume";
 import {TerrainGrid,terrainZ,convexHull,boundaryResidual} from "./terrain";
+import {groundwaterField} from "./groundwater";
+import {refreshAutomaticCptLayers} from "./sbt";
 
 // horizons[0] is the ground surface, horizons[k] the base of units[k-1]; the last one is the model base.
 export interface Horizon { id:string; name:string; z:Float64Array; observed:Uint8Array }
@@ -273,6 +275,11 @@ function refinementSpacing(nodes:XY[],triangles:Triangle[],terrain?:TerrainGrid,
 // 80,000 triangles).
 export function buildGeologicalModel(project:GeoProject,options:{probe?:XY;triangles?:number}={}):GeoModel{
   const warnings:string[]=[];
+  project=refreshAutomaticCptLayers(project);
+  if(project.groundwater&&project.groundwater.mode!=="observed"){
+    const fixed=(project.cpts??[]).filter(c=>c.layers?.length&&c.layersSource!=="automatic");
+    if(fixed.length)warnings.push(`${fixed.length} CPT layer interpretation${fixed.length===1?" is":"s are"} fixed (reviewed or legacy): groundwater scenario changes affect computed CPT behaviour but do not reclassify these layers`);
+  }
   // The logs: the boreholes', then, where the project builds the model with them, the CPTs' layers that have units.
   const layered=project.cptLayers?modelCptLogs(project,warnings):[];
   const declared=new Set(project.units.map(u=>u.id)),used=new Set<string>(),unknown=new Set<string>();
@@ -448,18 +455,11 @@ export function buildGeologicalModel(project:GeoProject,options:{probe?:XY;trian
     terrainAt=(x,y)=>terrainZ(t,x,y)+field(x,y);
   }
 
-  // Groundwater: the water table through the shallowest water level logged in each borehole, interpolated by inverse
-  // distance and kept at or below the ground; where no borehole records one, the project's assumed depth below ground.
-  const readings:Array<{x:number;y:number;v:number}>=[];
-  for(const b of boreholes)if(b.water?.length)readings.push({x:b.x,y:b.y,v:b.z-Math.min(...b.water.map(w=>w.depth))});
-  let W:number[]|undefined,waterSource="";
-  if(readings.length){
-    W=mesh.nodes.map((p,n)=>Math.min(idw(readings,p),z[0][n]));
-    waterSource=`water levels logged in ${readings.length} of ${fromBoreholes} boreholes (the shallowest reading of each), interpolated between them`;
-  }else if(project.groundwaterDepth!==undefined&&Number.isFinite(project.groundwaterDepth)){
-    W=Array.from(z[0],g=>g-project.groundwaterDepth!);
-    waterSource=`assumed ${fmt(project.groundwaterDepth)} m below ground (no water level is logged)`;
-  }
+  // Apply the shared scenario to the real boreholes admitted to this model. CPT behaviour uses all project
+  // boreholes, as before; a discarded/outside log can therefore inform a CPT without entering the model's water TIN.
+  const water=groundwaterField({...project,boreholes:boreholes.slice(0,fromBoreholes)});
+  const W=water.available?mesh.nodes.map((p,n)=>water.at(p.x,p.y,z[0][n])!):undefined,waterSource=water.summary;
+  if(!water.available&&project.groundwater?.mode==="as-of")warnings.push(water.summary);
 
   // Stratigraphic ordering: each horizon lies at or below the one above and at or above the model base. This
   // cuts older units at the ground (erosion by the present topography) and at erosive unit bases. The lines where a

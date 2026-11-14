@@ -141,7 +141,10 @@ export function alignmentSection(model:GeoModel,a:Alignment,buffer=Infinity):Sec
     for(const v of leg){
       const s=Math.min(L,Math.max(0,v.s)),c=s>=L?ch[i+1]:ch[i]+s/L*(ch[i+1]-ch[i]);
       const last=samples[samples.length-1];
-      if(last&&c-last.s<=eps*Math.max(1,Math.abs(c)))continue;
+      // Convert the geometric tolerance into this leg's chainage scale. Its absolute station number must not
+      // merge distinct crossings, even when supplied chainages begin at a very large value.
+      const tolerance=eps*(ch[i+1]-ch[i])/L+Number.EPSILON*Math.max(1,Math.abs(c),Math.abs(last?.s??0))*4;
+      if(last&&c-last.s<=tolerance)continue;
       samples.push({...v,s:c});
     }
   }

@@ -8,6 +8,7 @@ import {readDocument,textLine} from "./reconstruct";
 import {draftHoles,DraftHole} from "./draft";
 import {createReview,ReviewHost,Unread} from "./review";
 import {createOcr,Ocr} from "./ocrclient";
+import {newEvidenceId,EvidenceSource} from "../evidence";
 
 export const isImage=(f:File)=>/\.(png|jpe?g|webp)$/i.test(f.name)||/^image\/(png|jpeg|webp)$/.test(f.type);
 const mb=(n:number)=>(n/1e6).toFixed(n<1e7?1:0);
@@ -37,10 +38,18 @@ export async function readPdfs(files:File[],host:ReviewHost){
     if(review.closed)return;
     review.progress(`Opening ${f.name}…`);
     let d:Doc,pdf:Awaited<ReturnType<typeof openPdf>>|undefined,image:Awaited<ReturnType<typeof openImage>>|undefined;
-    try{if(isImage(f))d=image=await openImage(f.name,f);else d=pdf=await openPdf(f.name,new Uint8Array(await f.arrayBuffer()))}
+    let source:EvidenceSource;
+    try{
+      const bytes=await f.arrayBuffer();
+      let sha256:string|undefined;
+      // PDF.js may transfer and detach its input buffer, so fingerprint the original bytes before opening it.
+      if(globalThis.crypto?.subtle)try{sha256=[...new Uint8Array(await crypto.subtle.digest("SHA-256",bytes))].map(n=>n.toString(16).padStart(2,"0")).join("")}catch{/* Metadata and source excerpts still remain available. */}
+      source={id:newEvidenceId(),name:f.name,size:f.size,...(sha256?{sha256}:{}),pages:[]};
+      if(isImage(f))d=image=await openImage(f.name,f);else d=pdf=await openPdf(f.name,new Uint8Array(bytes));
+    }
     catch(err){problems.push(`${f.name}: not read, as ${(err as Error).message}.`);continue}
     if(review.closed){void d.close();return}
-    const doc=review.addDoc(d),pages:PageText[]=[],scan:number[]=[];
+    const doc=review.addDoc(d,source),pages:PageText[]=[],scan:number[]=[];
     if(image){review.size(doc,1,image.width,image.height);scan.push(1)}
     else if(pdf)for(let n=1;n<=pdf.pages;n++){
       if(review.closed)return;

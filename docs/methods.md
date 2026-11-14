@@ -71,6 +71,10 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 - `src/validation.ts`: leave-one-out cross-validation
 - `src/ar.ts`: models for augmented reality (USDZ and GLB)
 - `src/alignment.ts`: sections along an alignment, chainage, cross-sections square to the line, lines crossing straight sections, and the table by chainage
+- `src/corridor.ts`: bounded station sampling, design-level readouts and corridor screening flags
+- `src/corridorView.ts`, `src/corridorJob.ts`, `src/corridor.worker.ts`: corridor dashboard and cancelable offline calculation worker
+- `src/investigation.ts`: deterministic farthest-first selection of candidate investigation locations, spacing exclusions and geometric depth targets
+- `src/investigationView.ts`, `src/investigationJob.ts`, `src/investigation.worker.ts`: pinned investigation-plan review and export, with a cancelable offline worker
 - `src/landxml.ts`: LandXML and J-LandXML alignments (straights, arcs, clothoids, design profiles)
 - `src/cpt.ts`: cone penetration tests: GEF, BRO and DOV readers, the friction ratio, readings at a depth and averages over depth
 - `src/sbt.ts`: the soil behaviour type of CPTs (Robertson 2009) and the layers it gives
@@ -87,6 +91,17 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 - `src/tables.ts`, `src/input.ts`: the Input data tab (tables, live preview, checks)
 - `src/crs.ts`: coordinate systems (registry, suggestion and conversion)
 - `src/tiles.ts`: map and elevation tiles, and terrain resampling
+- `src/evidence.ts`: source records, correction/acceptance events and import validation
+- `src/evidenceView.ts`: source-page inspector, independent of the PDF reader
+- `src/groundwater.ts`: shared observation selection and groundwater policies
+- `src/comparison.ts`: comparisons at fixed coordinates, matched by unit identity
+- `src/comparisonJob.ts`, `src/comparison.worker.ts`: cancellable inline comparison worker
+- `src/comparisonView.ts`: pinned-revision comparison controls and overlays
+- `src/impact.ts`: changed-input inventories and prior-model checks against newly added borehole logs
+- `src/impactJob.ts`, `src/impact.worker.ts`, `src/modelJob.ts`: cancelable local numerical jobs, with source-page images excluded
+- `src/impactView.ts`: new-data impact map, ranked boreholes, contact details and export
+- `src/workspace.ts`: versioned drafts, immutable project revisions, restore and workspace JSON
+- `src/storage.ts`: transactional browser saves and migration of earlier input-table saves
 - `src/main.ts`: three.js viewer and interface
 - `scripts/`: the generators of the synthetic datasets, of the real sites (Sakae, Antwerp, Maasvlakte, Creswick) and of the coordinate system registry and DOV code list, the cross-validation of the real sites, their models for augmented reality, and the offline single-file build
 
@@ -96,6 +111,8 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 npm ci
 npm test         # unit tests (vitest)
 npm run build    # type-check, then build dist/ and dist/geomodel3d-offline.html
+npx playwright install chromium  # once, for UI checks
+npm run test:ui  # desktop, mobile and standalone bundle checks (after build)
 ```
 
 `npm run dev` starts Vite's development server. Where a local server cannot be used, build and open `dist/geomodel3d-offline.html` instead. [CONTRIBUTING.md](../CONTRIBUTING.md) explains how to submit a change.

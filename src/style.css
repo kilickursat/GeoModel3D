@@ -245,7 +245,7 @@ body[data-drawing="on"] .notice{display:none}
   .section-control input[type=range]{min-width:48px}
   .section-control .step-pick span,.section-control .field-pick>span{display:none}
 }
-@media (max-width:960px) and (min-width:901px) and (min-height:521px),(max-width:960px) and (min-width:901px) and (pointer:fine){
+@media (max-width:1050px) and (min-width:901px) and (min-height:521px),(max-width:1050px) and (min-width:901px) and (pointer:fine){
   .section-control label:has(input[type=range])>span,.section-control .step-pick{display:none}
 }
 
@@ -299,6 +299,15 @@ body[data-mode="input"] :is(.panel,.section-control,.section-view,.view-menu,.no
 .ws-choice span{color:var(--text-2);line-height:1.45}
 .ws-foot{display:flex;align-items:center;gap:8px;padding:10px 16px;border-top:1px solid var(--border)}
 .ws-status{flex:1;min-width:0;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ws-messages{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.ws-save-status{font-size:11px;color:var(--text-2);overflow-wrap:anywhere}
+.ws-history{max-width:850px}
+.ws-history ol{list-style:none;padding:0;display:flex;flex-direction:column;gap:10px}
+.ws-history li{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:12px;border:1px solid var(--border);border-radius:var(--radius)}
+.ws-history li>div{min-width:0;overflow-wrap:anywhere;flex:1 1 200px}
+.ws-history li p{margin:5px 0;color:var(--text-2)}
+.ws-history button{padding:6px 10px;cursor:pointer;border:1px solid var(--border-strong);border-radius:var(--radius);background:var(--surface)}
+.ws-active{display:inline-block;margin-left:8px;color:var(--accent);font-size:12px}
 .ws-foot button:disabled{opacity:.4;cursor:default}
 /* Tables and forms of the input tab */
 .ed-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px;color:var(--text-2)}
@@ -338,7 +347,7 @@ body[data-mode="input"] :is(.panel,.section-control,.section-view,.view-menu,.no
   .ed-form label{grid-template-columns:1fr}
   .ed-form small{grid-column:1}
   .ws-foot{flex-wrap:wrap}
-  .ws-status{flex:1 1 100%}
+  .ws-messages{flex:1 1 100%}
 }
 
 /* Reading PDFs: the agreement asked first, and the review of the boreholes read, over everything else. Values to check
@@ -522,7 +531,7 @@ body[data-mode="input"] :is(.panel,.section-control,.section-view,.view-menu,.no
   .section-control .bar-title,.section-control .bar-gap,.section-control .bar-export,.section-control>.panel-toggle{display:none}
   .section-control label,.section-control .line-pick,.section-control .field-pick,.section-control .step-pick{flex:none;max-width:none;min-height:46px;gap:12px}
   .section-control label:has(input[type=range]){flex:none;max-width:none}
-  .section-control .cross-here{padding:10px 14px;font-size:14px;text-align:center}
+  .section-control .cross-here,.section-control .corridor-open{padding:10px 14px;font-size:14px;text-align:center}
   .section-control label>span{flex:none;width:76px}
   .section-control .cut-pick>span,.section-control .flip-pick>span{width:auto}
   .section-control input[type=range]{min-width:0;height:30px}
@@ -583,3 +592,21 @@ body[data-mode="input"] :is(.panel,.section-control,.section-view,.view-menu,.no
 @media (pointer:coarse){
   .workspace :is(input:not([type=checkbox]):not([type=color]),select,textarea){font-size:16px}
 }
+
+.site-evidence>div{display:flex;flex-direction:column;align-items:stretch;gap:5px;max-height:260px;overflow:auto}
+.site-evidence button,.ed-evidence{border:1px solid var(--border-strong);border-radius:var(--radius);background:var(--surface);padding:5px 8px;cursor:pointer;text-align:left;color:var(--accent)}
+.site-evidence p{color:var(--text-2);font-size:12px}
+
+.ws-current-scenario{font-weight:600;font-size:12px;color:var(--text)}
+.ws-scenarios{max-width:900px}
+.ws-scenarios label{display:flex;flex-direction:column;gap:5px;min-width:0}
+.ws-scenarios input,.ws-scenarios select{max-width:100%;padding:6px;border:1px solid var(--border-strong);border-radius:var(--radius);background:var(--surface);color:var(--text)}
+.ws-scenarios button{padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius);background:var(--surface);cursor:pointer;color:var(--text)}
+.ws-scenario-actions,.ws-comparison-picks{display:flex;flex-wrap:wrap;align-items:end;gap:10px;margin:16px 0}
+.ws-scenario-actions label,.ws-comparison-picks label{flex:1 1 210px;min-width:0}
+.ws-scenario-list{padding:0;list-style:none;display:grid;gap:8px}
+.ws-scenario-list li{padding:10px;border:1px solid var(--border);border-radius:var(--radius);overflow-wrap:anywhere}
+.ws-scenario-list p{margin:4px 0;color:var(--text-2)}
+.ws-groundwater{display:grid;gap:10px;border:1px solid var(--border);border-radius:var(--radius);padding:12px;min-width:0}
+.ws-groundwater legend{font-weight:600}
+.ws-groundwater label:has(input[type=checkbox]){display:block}

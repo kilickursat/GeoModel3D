@@ -1,0 +1,64 @@
+/* Pinned-revision comparisons have one shared plot and keep their tables within the modal on narrow screens. */
+.cmp-dialog{position:fixed;inset:0;width:min(1180px,calc(100% - 24px));max-width:calc(100% - 24px);height:min(940px,calc(100dvh - 24px));max-height:calc(100dvh - 24px);margin:auto;padding:0;border:1px solid var(--border-strong);border-radius:10px;background:var(--surface);color:var(--text);box-shadow:var(--shadow);overflow:hidden}
+.cmp-dialog::backdrop{background:rgba(20,30,40,.4)}
+.cmp-dialog[open]{display:flex;flex-direction:column}
+.cmp-header{display:flex;align-items:center;justify-content:space-between;gap:14px;flex:none;padding:14px 16px;border-bottom:1px solid var(--border)}
+.cmp-header h2{font-size:17px;margin:0;overflow-wrap:anywhere}
+.cmp-dialog button{border:1px solid var(--border-strong);border-radius:var(--radius);padding:6px 10px;background:var(--surface);cursor:pointer;line-height:1.3}
+.cmp-dialog button:hover:not(:disabled){background:var(--surface-2)}
+.cmp-dialog button:disabled{opacity:.45;cursor:default}
+.cmp-dialog .cmp-run{background:var(--accent);border-color:var(--accent);color:white;font-weight:600}
+.cmp-dialog .cmp-run:hover:not(:disabled){background:#1a5fb4}
+.cmp-body{min-height:0;overflow:auto;padding:16px;overscroll-behavior:contain}
+.cmp-revisions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.cmp-revision{display:flex;flex-direction:column;gap:4px;padding:10px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);overflow-wrap:anywhere;min-width:0}
+.cmp-revision span{font-size:11px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--text-2)}
+.cmp-revision small{color:var(--text-2)}
+.cmp-controls{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;padding:14px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.cmp-controls label,.cmp-plot-head label{display:flex;flex-direction:column;gap:4px;min-width:0;font-size:12px;color:var(--text-2)}
+.cmp-controls input,.cmp-controls select,.cmp-plot-head select{font:inherit;font-size:13px;color:var(--text);background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius);padding:6px 8px;min-width:0;max-width:100%}
+.cmp-controls input{width:145px}
+.cmp-controls select{max-width:280px}
+.cmp-actions{display:flex;flex-wrap:wrap;gap:8px;flex-basis:100%}
+.cmp-status{min-height:20px;color:var(--text-2)}
+.cmp-error{padding:9px 12px;border-left:3px solid var(--danger);background:var(--surface-2);color:var(--danger);overflow-wrap:anywhere}
+.cmp-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0 0 12px}
+.cmp-summary>div{border:1px solid var(--border);border-radius:var(--radius);padding:10px;min-width:0}
+.cmp-summary dt{font-size:11px;color:var(--text-2)}
+.cmp-summary dd{margin:4px 0 0;font-size:16px;font-weight:600;overflow-wrap:anywhere}
+.cmp-notes{color:var(--text-2);overflow-wrap:anywhere}
+.cmp-notes ul{padding-left:20px}
+.cmp-plot-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:18px}
+.cmp-plot-head select{max-width:100%;width:300px}
+.cmp-legend{display:flex;flex-wrap:wrap;gap:16px;font-size:12px}
+.cmp-before-key,.cmp-after-key{display:inline-flex;align-items:center;gap:7px}
+.cmp-before-key::before,.cmp-after-key::before{content:"";width:26px;display:inline-block;border-top:3px dashed #1f6fd1}
+.cmp-after-key::before{border-top-style:solid;border-top-color:#c35a17}
+.cmp-plot{margin-top:10px;border:1px solid var(--border);border-radius:var(--radius);overflow:auto;max-width:100%;background:white}
+.cmp-plot svg{display:block;width:100%;min-width:720px}
+.cmp-unavailable{padding:20px;color:var(--text-2)}
+.cmp-caption{font-size:12px;color:var(--text-2)}
+.cmp-results h3{font-size:14px;margin:20px 0 8px}
+.cmp-table-wrap{max-width:100%;overflow:auto;border:1px solid var(--border);border-radius:var(--radius);margin:8px 0 14px}
+.cmp-dialog table{border-collapse:collapse;font-size:12px;width:100%;font-variant-numeric:tabular-nums}
+.cmp-dialog th,.cmp-dialog td{border-bottom:1px solid var(--border);padding:7px 10px;text-align:right;white-space:nowrap}
+.cmp-dialog thead th{background:var(--surface-2);font-weight:600}
+.cmp-dialog th:first-child,.cmp-dialog td:first-child{text-align:left}
+.cmp-dialog tbody th{font-weight:500;text-align:left;white-space:normal;min-width:180px}
+.cmp-unit-changes{display:grid;grid-template-columns:160px minmax(0,1fr);gap:6px 12px;margin:12px 0}
+.cmp-unit-changes dt{font-weight:600}
+.cmp-unit-changes dd{margin:0;overflow-wrap:anywhere}
+.cmp-point-details{margin-top:14px;border-top:1px solid var(--border);padding-top:12px}
+.cmp-point-details summary{font-weight:600;cursor:pointer}
+@media(max-width:700px){
+  .cmp-dialog{width:calc(100% - 12px);max-width:calc(100% - 12px);height:calc(100dvh - 12px);max-height:calc(100dvh - 12px);border-radius:8px}
+  .cmp-header,.cmp-body{padding:12px}
+  .cmp-revisions{grid-template-columns:minmax(0,1fr)}
+  .cmp-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cmp-controls label{flex:1 1 140px}
+  .cmp-controls input,.cmp-controls select{width:100%;max-width:100%}
+  .cmp-dialog button{min-height:36px}
+  .cmp-actions button{flex:1 1 140px}
+  .cmp-unit-changes{grid-template-columns:minmax(0,1fr)}
+  .cmp-unit-changes dt:not(:first-child){margin-top:8px}
+}
