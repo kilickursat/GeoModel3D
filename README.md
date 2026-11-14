@@ -31,6 +31,8 @@ GeoModel3D builds a layered ground model from borehole logs and cone penetration
 - Gives active, at-rest and passive earth pressures (Rankine) down a borehole of your own case.
 - Checks the model by leaving each borehole out and predicting it from the others, so you can see how far to trust it between boreholes.
 - Maps contact disagreement between selected saved interpretations and shows their min–max section ranges. Held-out location checks report observed range coverage and errors; ranges are not calibrated confidence intervals.
+- Separately calibrates training-only contact envelopes with split conformal prediction, recording independent training/calibration/audit groups and the finite-sample correction. Requested coverage assumes exchangeable locations and fixed interpretations; spatial geology can violate that assumption.
+- Plans contact-reaching investigations under a monetary budget using expected scenario discrimination per estimated cost. Prior weights and contact-observation resolution define this finite-case calculation; it does not model measurement noise or promise geological accuracy.
 - Reviews new boreholes against an earlier saved model: mapped forecast errors, signed model shifts, unit agreement, changed inputs and a revision-linked CSV.
 - Keeps source text, highlighted page previews and correction history with PDF-derived values. Inspect them from the input tables or a source-backed borehole in the model; changed values require a new acceptance.
 - Branches named scenarios with independent drafts and compares fixed revisions along the same section or alignment, with overlaid contacts, groundwater/stress differences and CSV output. Groundwater can follow observations, an assumed depth, or readings available as of a date.
@@ -95,7 +97,7 @@ GitHub's **Cite this repository** gives the reference from [CITATION.cff](CITATI
   author  = {Kilic, Kursat},
   title   = {GeoModel3D: 3D geological models from borehole logs and CPTs, in the browser},
   url     = {https://github.com/kilickursat/GeoModel3D},
-  version = {0.21.0},
+  version = {0.22.0},
   year    = {2026},
   license = {Apache-2.0}
 }

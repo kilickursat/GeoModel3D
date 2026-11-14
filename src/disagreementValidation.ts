@@ -29,11 +29,11 @@ export interface DisagreementValidation {
 }
 const finite=(n:unknown):n is number=>typeof n==="number"&&Number.isFinite(n);
 const epsilon=1e-6;
-const location=(p:XY)=>`${Math.round(p.x*1000)},${Math.round(p.y*1000)}`;
+export const location=(p:XY)=>`${Math.round(p.x*1000)},${Math.round(p.y*1000)}`;
 
 // A moved observation can have a co-located CPT under another ID in one interpretation. Follow the identity /
 // position links to their closure so such a CPT cannot enter a fold after the matching borehole was removed.
-function locationGroups(cases:DisagreementCase[]){
+export function locationGroups(cases:DisagreementCase[]){
   const links=new Map<string,Set<string>>();
   const connect=(a:string,b:string)=>{if(!links.has(a))links.set(a,new Set());links.get(a)!.add(b)};
   for(const c of cases)for(const [kind,logs] of [["borehole",c.project.boreholes],["cpt",c.project.cpts??[]]] as const)for(const log of logs){
@@ -56,7 +56,7 @@ function locationGroups(cases:DisagreementCase[]){
 
 // A contact is observed only where its first, unambiguous run begins at the collar or directly follows another
 // logged interval. Missing/eroded units and gap midpoints from the modelling kernel are never validation targets.
-function observedTop(hole:Borehole,project:GeoProject,unitId:string):{logged?:number;reason?:string}{
+export function observedTop(hole:Borehole,project:GeoProject,unitId:string):{logged?:number;reason?:string}{
   const order=new Map(project.units.map((u,i)=>[u.id,i]));
   if(!order.has(unitId))return {reason:"The selected unit is not declared in the reference interpretation."};
   const intervals=hole.intervals.slice().sort((a,b)=>a.from-b.from||a.to-b.to);
@@ -81,7 +81,7 @@ function observedTop(hole:Borehole,project:GeoProject,unitId:string):{logged?:nu
   return {reason:"The selected unit's top is not logged at this reference borehole."};
 }
 
-function withinTrainingHull(model:GeoModel,point:XY):boolean{
+export function withinTrainingHull(model:GeoModel,point:XY):boolean{
   const hull=convexHull([...model.boreholes,...model.cptLogs]);
   if(hull.length<3)return false;
   const origin=hull[0];

@@ -58,6 +58,28 @@ The viewer uses three.js's `WebGPURenderer` with TSL node materials, so one shad
 - **The model opens whole and solid.** **Cut**, on the section bar, removes the part in front of the section, so the section face looks at you when you cut. Turning the model does not change the half that is kept; **Flip** keeps the other one. **See-through**, in the **View** menu, makes the units translucent, to see the boreholes and CPTs inside.
 - **Terrain around the model** is clipped exactly at the model's footprint, limited to a margin of a quarter of the model's size, drawn translucent and before the model, so it never veils it.
 
+## Calibrated contact envelopes
+
+Split conformal prediction is separate from the full-data selected-interpretation range. A seeded shuffle assigns physical reference-observation groups to training, calibration and audit sets. Matching IDs and rounded 1 mm positions link borehole/CPT records across all selected cases, including moved collars. Every calibration and audit group is removed from every training case. The fitted models and fixed assumptions are unchanged when their calibration or audit observations are evaluated.
+
+At a calibration location, let `L` and `U` be the minimum and maximum predicted contact elevations across the training-only cases, and `y` the directly logged contact. The nonnegative score is `max(L − y, y − U, 0)`. For `n` calibration groups and requested coverage `c`, the expansion is the `ceil((n + 1) × c)`-th smallest score. Missing predictions contribute unbounded scores. An out-of-range rank or an unbounded selected score gives no finite interval; the calculation never clamps the rank or substitutes a zero. For example, 90% coverage needs at least nine finite scores, and nine scores use their maximum.
+
+The resulting interval `[L − q, U + q]` applies only to the same training-only predictor. Adding the calibration observations back into its fit would invalidate this calculation. Audit groups are excluded from both fitting and quantile selection. Their observed coverage is reported separately, including unavailable predictions and checks outside the training observation hulls. CSV/JSON retain split assignments, seed, removed records, scores and denominators. A single CSV metadata record carries the global partition and notes; sample rows repeat only their compact numeric context.
+
+The split-conformal coverage statement is marginal over a new exchangeable observation group, conditional on the fixed model assumptions and eligible observed-contact population. It is not coverage at every location or simultaneously across the map. Geological observations can be spatially dependent and preferentially sampled; interpretations, unit rules and terrain can already encode information from the site. Changing the split or assumptions after viewing audit results also compromises an untouched audit. The displayed target is therefore not an unconditional reliability guarantee for the site.
+
+Method: Angelopoulos and Bates, [A Gentle Introduction to Conformal Prediction and Distribution-Free Uncertainty Quantification](https://arxiv.org/abs/2107.07511).
+
+## Investigation information and cost
+
+The information mode treats the selected saved cases as a finite hypothesis set. It assumes that a successful future observation reports the contact-elevation bin `floor((elevation − origin) / resolution)` predicted by the true selected case. Prior case weights, bin resolution and elevation origin are explicit inputs. This is a noiseless, coarsened observation model: measurement error, model discrepancy and geological alternatives outside the selected cases are not estimated.
+
+For selected proposed observations `S`, candidates are ranked by `I(C; B_x | B_S) / estimated cost`, where `C` is the case identity and `B` is the predicted bin. The calculation groups cases by their joint bin signatures and evaluates the weighted conditional entropy exactly. It averages over possible outcomes; it never assumes a particular favorable observation occurred. A redundant signature adds zero information, and cumulative information cannot exceed prior case entropy. Bins are sensitive to their origin: arbitrarily close predictions on opposite bin boundaries can be counted as distinguishable. Review that assumption and vary resolution/origin before using the result.
+
+Costs combine the stated fixed charge and drilling rate with a depth estimate that reaches the contact under every selected case, plus the chosen buffer and any deeper design target. Unknown contact/ground predictions cannot create a finite depth or cost. The greedy plan respects the monetary budget, maximum location count and physical spacing, and stops when no affordable informative candidate remains. It does not claim a globally optimal programme or a calibrated reduction in geological uncertainty. Access, utilities, recovery, test type and actual drilling rates remain field-planning inputs.
+
+Information utility follows the Bayesian experimental-design principle in Lindley (1956), [On a Measure of the Information Provided by an Experiment](https://doi.org/10.1214/aoms/1177728069). The implemented finite-case observation model and greedy budget rule are stated above rather than inferred from that reference.
+
 ## Architecture
 
 The modelling kernel has no rendering dependencies. It is tested in Node, and the viewer is a thin layer on top.
@@ -73,7 +95,8 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 - `src/alignment.ts`: sections along an alignment, chainage, cross-sections square to the line, lines crossing straight sections, and the table by chainage
 - `src/corridor.ts`: bounded station sampling, design-level readouts and corridor screening flags
 - `src/corridorView.ts`, `src/corridorJob.ts`, `src/corridor.worker.ts`: corridor dashboard and cancelable offline calculation worker
-- `src/investigation.ts`: deterministic farthest-first selection of candidate investigation locations, spacing exclusions and geometric depth targets
+- `src/investigation.ts`: candidate selection, spacing/depth constraints and monetary investigation budgets
+- `src/information.ts`: exact weighted conditional entropy of finite-case contact-observation bins
 - `src/investigationView.ts`, `src/investigationJob.ts`, `src/investigation.worker.ts`: pinned investigation-plan review and export, with a cancelable offline worker
 - `src/landxml.ts`: LandXML and J-LandXML alignments (straights, arcs, clothoids, design profiles)
 - `src/cpt.ts`: cone penetration tests: GEF, BRO and DOV readers, the friction ratio, readings at a depth and averages over depth
@@ -99,6 +122,7 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 - `src/comparisonView.ts`: pinned-revision comparison controls and overlays
 - `src/disagreement.ts`: complete selected-interpretation contact envelopes on fixed map/path samples
 - `src/disagreementValidation.ts`: observed-contact validation with identity/location holdouts across every interpretation
+- `src/calibration.ts`: training/calibration/audit group splits and conformal contact-envelope correction
 - `src/disagreementView.ts`, `src/disagreementJob.ts`, `src/disagreement.worker.ts`: pinned maps, section ranges, empirical checks and cancelable offline analysis
 - `src/impact.ts`: changed-input inventories and prior-model checks against newly added borehole logs
 - `src/impactJob.ts`, `src/impact.worker.ts`, `src/modelJob.ts`: cancelable local numerical jobs, with source-page images excluded

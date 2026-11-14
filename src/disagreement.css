@@ -13,6 +13,12 @@
 .disagreement-controls label,.disagreement-heldout-label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--text-2);min-width:0}
 .disagreement-controls .disagreement-reference-label{grid-column:1/-1}
 .disagreement-controls .disagreement-alternatives-label{grid-column:1/-1}
+.disagreement-controls .disagreement-calibration-toggle{grid-column:1/-1;flex-direction:row;align-items:center;gap:8px;color:var(--text);font-size:13px;font-weight:600}
+.disagreement-calibration-toggle input{width:17px;height:17px;margin:0;flex:none}
+.disagreement-calibration-settings{display:grid;grid-column:1/-1;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;min-width:0;padding:12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface-2)}
+.disagreement-calibration-settings[hidden]{display:none}
+.disagreement-calibration-settings legend{padding:0 5px;font-size:12px;font-weight:600}
+.disagreement-calibration-settings p{grid-column:1/-1;margin:0;font-size:12px;color:var(--text-2)}
 .disagreement-controls small,.disagreement-caption,.disagreement-path,.disagreement-validation-summary{color:var(--text-2)}
 .disagreement-dialog input,.disagreement-dialog select{font:inherit;font-size:13px;color:var(--text);background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius);padding:6px 8px;max-width:100%;min-width:0}
 .disagreement-alternatives{min-height:88px}
@@ -59,10 +65,19 @@
 .disagreement-methods{border-top:1px solid var(--border);padding-top:12px;margin-top:18px}
 .disagreement-identities summary,.disagreement-methods summary{font-weight:600;cursor:pointer}
 .disagreement-planning-note{color:var(--text-2);font-size:12px}
+.disagreement-calibration{border-top:2px solid #487d71;padding-top:4px;margin-top:24px}
+.disagreement-calibration-note{padding:10px 12px;border-left:3px solid #487d71;background:var(--surface-2);font-size:12px;color:var(--text-2)}
+.disagreement-calibration-unavailable{padding:10px 12px;border-left:3px solid var(--danger);background:var(--surface-2)}
+.disagreement-calibration-details summary{font-weight:600;cursor:pointer}
+.disagreement-calibration .disagreement-envelope{fill:#d8ece3;stroke:#487d71}
+.disagreement-calibration .disagreement-reference-line{stroke:#2d6958}
+.disagreement-calibration .disagreement-section-legend span::before{border-top-color:#2d6958}
+.disagreement-calibration .disagreement-section-legend span+span::before{background:#d8ece3;border-color:#487d71}
 @media(max-width:700px){
   .disagreement-dialog{width:calc(100% - 12px);max-width:calc(100% - 12px);height:calc(100dvh - 12px);max-height:calc(100dvh - 12px);border-radius:8px}
   .disagreement-header,.disagreement-body{padding:12px}
   .disagreement-controls{grid-template-columns:minmax(0,1fr)}
+  .disagreement-calibration-settings{grid-template-columns:minmax(0,1fr)}
   .disagreement-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
   .disagreement-dialog button,.disagreement-dialog input,.disagreement-dialog select{min-height:36px}
   .disagreement-actions button{flex:1 1 150px}

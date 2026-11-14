@@ -18,6 +18,15 @@
 .planner-controls .planner-check{flex-direction:row;align-items:center;gap:8px;color:var(--text);grid-column:span 1}
 .planner-check input{flex:none;width:17px;height:17px;padding:0}
 .planner-setting-note{grid-column:1/-1;margin:0;font-size:12px}
+.planner-controls .planner-information-choice{grid-column:1/-1}
+.planner-information-settings{grid-column:1/-1;min-width:0;margin:0;padding:12px;border:1px solid var(--border);border-radius:var(--radius)}
+.planner-information-settings[hidden]{display:none}
+.planner-information-settings legend{font-size:13px;font-weight:600;padding:0 5px}
+.planner-information-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 14px;margin-bottom:12px}
+.planner-information-assumptions{margin-top:10px;font-size:12px;color:var(--text-2)}
+.planner-information-assumptions summary{cursor:pointer;font-weight:600;color:var(--text)}
+.planner-economic-stop{padding:10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface-2);font-size:12px}
+.planner-economic-summary dd{overflow-wrap:anywhere}
 .planner-actions{display:flex;flex-wrap:wrap;gap:8px;grid-column:1/-1}
 .planner-status{min-height:20px;color:var(--text-2)}
 .planner-error{padding:9px 12px;border-left:3px solid var(--danger);background:var(--surface-2);color:var(--danger)}
@@ -63,7 +72,7 @@
 @media(max-width:700px){
   .planner-dialog{width:calc(100% - 12px);max-width:calc(100% - 12px);height:calc(100dvh - 12px);max-height:calc(100dvh - 12px);border-radius:8px}
   .planner-header,.planner-body{padding:12px}
-  .planner-controls{grid-template-columns:minmax(0,1fr)}
+  .planner-controls,.planner-information-grid{grid-template-columns:minmax(0,1fr)}
   .planner-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
   .planner-readouts{grid-template-columns:repeat(2,minmax(0,1fr))}
   .planner-dialog button,.planner-dialog input:not([type=checkbox]),.planner-dialog select{min-height:36px}

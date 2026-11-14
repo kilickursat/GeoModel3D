@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.22.0 — 2026-11-14
+
+### Added
+- Split-conformal contact-envelope calibration using separate physical training, calibration and audit groups across every selected interpretation. Training-only interval maps and sections, finite-sample order statistics, explicit unavailable intervals and independent audit results are preserved in exports.
+- Investigation planning under a monetary budget with contact-reaching depth estimates, fixed/per-metre costs and exact conditional information gains for a stated finite-case, binned-observation model. Greedy selection accounts for earlier proposed observations, spacing and redundant information without changing measured data.
+
 ### Fixed
 - Release uploads discover authenticated draft releases through the release list and refresh them by ID, so a draft can receive assets and resume after an interrupted upload before publication.
 
