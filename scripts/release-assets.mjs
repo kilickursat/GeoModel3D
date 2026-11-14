@@ -36,8 +36,22 @@ function command(program,args){
 function api(path,optional=false){
   const result=spawnSync("gh",["api",path],{cwd:source,encoding:"utf8"});
   if(optional&&result.status!==0&&result.stderr?.includes("HTTP 404"))return undefined;
-  check(result.status===0,`GitHub API failed: ${result.stderr?.trim()||result.error?.message||result.status}`);
+  check(result.status===0,`GitHub API ${path} failed: ${result.stderr?.trim()||result.error?.message||result.status}`);
   return JSON.parse(result.stdout);
+}
+function findRelease(root,releaseTag){
+  const published=api(`${root}/releases/tags/${releaseTag}`,true);
+  if(published)return published;
+  // The tag endpoint only returns published releases. Authenticated listing also exposes our drafts.
+  const matches=[];
+  for(let page=1;page<=100;page++){
+    const releases=api(`${root}/releases?per_page=100&page=${page}`);
+    check(Array.isArray(releases),"GitHub returned an invalid release list.");
+    matches.push(...releases.filter(release=>release.tag_name===releaseTag));
+    check(matches.length<=1,`Multiple drafts exist for ${releaseTag}; no release was selected.`);
+    if(releases.length<100)return matches[0];
+  }
+  throw new Error("Release listing exceeded 100 pages; no release was selected.");
 }
 function publish(){
   const prepared=prepare(),repo=process.env.GH_REPO??"";
@@ -51,12 +65,13 @@ function publish(){
   }
   verifyTag();
   const ownership=`<!-- geomodel3d-release-assets:${tag}:${commit} -->`;
-  let release=api(`${root}/releases/tags/${tag}`,true),created=false;
+  let release=findRelease(root,tag),created=false;
   if(!release){
     writeFileSync(prepared.notes,`${readFileSync(prepared.notes,"utf8")}\n${ownership}\n`);
     command("gh",["release","create",tag,"--repo",repo,"--verify-tag","--target",commit,"--title",`GeoModel3D ${prepared.version}`,"--notes-file",prepared.notes,"--draft"]);
-    release=api(`${root}/releases/tags/${tag}`);created=true;
+    release=findRelease(root,tag);created=true;
   }
+  check(release&&Number.isInteger(release.id),"The release could not be found after creation.");
   // Published files are immutable here. Retrying an upload skips an identical asset, and refuses replacement.
   const assets=[["geomodel3d-offline.html",prepared.artifact],["SHA256SUMS.txt",prepared.checksum]].map(([name,path])=>({name,path,expected:`sha256:${hash(path)}`}));
   // Check every existing file before adding any missing one; a known checksum conflict must cause no uploads.
@@ -68,7 +83,7 @@ function publish(){
     const existing=release.assets.find(asset=>asset.name===name);
     if(existing){check(existing.state==="uploaded"&&existing.digest===expected,`Existing ${name} cannot be verified as identical; it was not replaced.`);continue}
     verifyTag();command("gh",["release","upload",tag,path,"--repo",repo]);
-    release=api(`${root}/releases/tags/${tag}`);
+    release=api(`${root}/releases/${release.id}`);
     const uploaded=release.assets.find(asset=>asset.name===name);
     check(uploaded?.state==="uploaded"&&uploaded.digest===expected,`Uploaded ${name} did not match its checksum.`);
   }
@@ -80,7 +95,7 @@ function publish(){
     const next=prepared.version.split(".").map(Number);
     const newer=!latest||!!current&&next.some((n,i)=>n>current[i]&&next.slice(0,i).every((v,k)=>v===current[k]));
     command("gh",["release","edit",tag,"--repo",repo,"--draft=false",newer?"--latest":"--latest=false"]);
-    release=api(`${root}/releases/tags/${tag}`);
+    release=api(`${root}/releases/${release.id}`);
   }
   console.log(JSON.stringify({tag,commit,url:release.html_url,draft:release.draft,created,existingReleaseStatePreserved:!created&&!ownedDraft,sha256:prepared.sha256}));
 }
