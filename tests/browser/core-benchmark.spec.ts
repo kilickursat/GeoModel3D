@@ -6,7 +6,7 @@ import {downloadJson,prepare} from "./helpers";
 const attack='<img src=x onerror="globalThis.benchmarkInjected=true">';
 const modelHost=(url:string)=>/https:\/\/(?:[^/]+\.)?(?:huggingface\.co|hf\.co|hf\.space|xethub\.hf\.co)\//.test(url);
 const benchmarkPath="/core-ai-benchmark.html",assetPath="/core-benchmark-v026/";
-type FixtureOptions={supported?:boolean;delayCase?:string;delayMs?:number;failCase?:string;tamperCase?:string};
+type FixtureOptions={supported?:boolean;delayCase?:string;delayMs?:number;failCase?:string;tamperCase?:string;diagnosticFailure?:boolean;progressBurst?:boolean};
 
 async function fixture(page:Page,options:FixtureOptions={}){
   await prepare(page);
@@ -15,6 +15,8 @@ async function fixture(page:Page,options:FixtureOptions={}){
       requestAdapter:async()=>({features:new Set(),limits:{maxStorageBufferBindingSize:1_073_741_824,maxBufferSize:1_073_741_824},info:{vendor:"Playwright capability fixture",architecture:"software fixture"}})
     }:undefined});
     localStorage.setItem("benchmark-project-sentinel","accepted engineering values remain unchanged");
+    const write=Storage.prototype.setItem;(globalThis as any).benchmarkRecoveryWrites=0;
+    Storage.prototype.setItem=function(key:string,value:string){if(key==="geomodel3d:qwen-benchmark:last-report")(globalThis as any).benchmarkRecoveryWrites++;return write.call(this,key,value)};
   },options.supported!==false);
   const encoded=await page.evaluate(()=>Array.from({length:40},(_,i)=>{
     const c=document.createElement("canvas");c.width=512;c.height=512;const x=c.getContext("2d")!;
@@ -51,9 +53,14 @@ self.onmessage=async({data})=>{
   if(sha256!==request.expectedSha256)throw Error('Fixture input hash mismatch');
   const reused=count++>0,max=coreBenchmarkTokenLimit(request.mode);
   if(!reused)await fetch('https://huggingface.co/__geomodel3d_benchmark_ui_fixture/model.bin');
-  self.postMessage({type:'progress',id,progress:{phase:'running',message:'Synthetic inference in progress '+request.caseId,generatedTokens:1,maxNewTokens:max}});
+  if(${!!options.diagnosticFailure})self.postMessage({type:'progress',id,progress:{phase:'loading',stage:'model-load',message:'Synthetic model transfer',file:'onnx/vision_encoder.onnx_data',loaded:1048576,total:4194304}});
+  else if(${!!options.progressBurst})for(let i=0;i<100;i++)self.postMessage({type:'progress',id,progress:{phase:'loading',stage:'model-load',message:'Fixture burst '+i,file:i%2?'onnx/vision_encoder.onnx_data':'onnx/decoder_model_merged_q4.onnx_data',loaded:i,total:100}});
+  else self.postMessage({type:'progress',id,progress:{phase:'running',stage:'generate',message:'Synthetic inference in progress '+request.caseId,generatedTokens:1,maxNewTokens:max}});
   await new Promise(r=>setTimeout(r,request.caseId===${JSON.stringify(options.delayCase??"")}?${options.delayMs??5000}:35));
-  if(request.caseId===${JSON.stringify(options.failCase??"")})throw Error('Synthetic runtime failure retained for review');
+  if(request.caseId===${JSON.stringify(options.failCase??"")}){
+   if(${!!options.diagnosticFailure}){self.postMessage({type:'error',id,message:'Load failed',diagnostic:{stage:'model-load',operation:'fetch',resource:'onnx/decoder_model_merged_q4.onnx_data',name:'TypeError',message:'Load failed '+${JSON.stringify(attack)}+' https://example.test/model?token=secret',unexpectedImage:request.image}});return}
+   throw Error('Synthetic runtime failure retained for review');
+  }
   const result={caseId:request.caseId,mode:request.mode,modelId:config.id,model:config.repo,revision:config.revision,dtypes:{...config.dtype},
    prompt:CORE_BENCHMARK_PROMPT,promptVersion:CORE_BENCHMARK_PROMPT_VERSION,enableThinking:false,generation:{doSample:false,repetitionPenalty:1.1,maxNewTokens:max},
    text:'SYNTHETIC UI TEST '+request.caseId+' '+${JSON.stringify(attack)}+' [input-sha256:'+sha256+']',generatedTokens:request.mode==='compatibility'?32:19,inputTokens:334,maxNewTokens:max,outputLimitReached:request.mode==='compatibility',
@@ -131,6 +138,7 @@ test("core benchmark quality batch binds exact image hashes, runs sequentially a
   await expect(page.locator("#benchmark-results")).toContainText(attack);await expect(page.locator("#benchmark-results img")).toHaveCount(0);expect(await page.evaluate(()=>Boolean((globalThis as any).benchmarkInjected))).toBe(false);
   const exported=await report(page);reportScope(exported);expect(exported.partial).toBe(true);expect(exported.runs).toHaveLength(1);
   const run=exported.runs[0];expect(run).toMatchObject({status:"completed",mode:"quality",maxNewTokens:128,selfReportedDeviceLabel:"Synthetic test device; not a physical phone"});
+  expect(run.appVersion).toBe(exported.appVersion);
   expect(run.selectedCaseIds).toEqual(manifest.cases.slice(0,5).map(x=>x.id));expect(run.unselectedCaseIds).toHaveLength(35);
   expect(run.cases.map((x:any)=>x.status)).toEqual(Array(5).fill("completed"));
   for(const [i,entry] of run.cases.entries()){
@@ -211,11 +219,65 @@ test("core benchmark reload recovers interrupted results without restarting infe
   await preserved(page);
 });
 
+test("core benchmark reports the failed resource separately from its last observed download",async({page})=>{
+  const {activity}=await fixture(page,{failCase:"case-01",diagnosticFailure:true});await open(page);await consent(page);await page.locator("#benchmark-run").click();
+  await expect(page.locator("#benchmark-stop")).toBeDisabled();await expect(page.locator("#benchmark-status")).toContainText("Load failed");
+  const exported=await report(page);reportScope(exported);const entry=exported.runs[0].cases[0];
+  expect(entry.status).toBe("failed");expect(entry.error).toContain("Load failed");expect(entry.error).toContain(attack);expect(entry.error).not.toContain("token=secret");
+  expect(entry.errorDiagnostic).toMatchObject({stage:"model-load",name:"TypeError",operation:"fetch",resource:"onnx/decoder_model_merged_q4.onnx_data"});
+  expect(entry.errorDiagnostic).not.toHaveProperty("unexpectedImage");
+  expect(entry.lastProgress).toMatchObject({observedAt:expect.any(String),caseElapsedMs:expect.any(Number),progress:{stage:"model-load",file:"onnx/vision_encoder.onnx_data",loaded:1048576,total:4194304}});
+  await expect(page.locator(".bench-case-diagnostic")).toContainText("failed resource: onnx/decoder_model_merged_q4.onnx_data");
+  await expect(page.locator(".bench-case-progress-note")).toContainText("observed file: onnx/vision_encoder.onnx_data");
+  await expect(page.locator("#benchmark-results img")).toHaveCount(0);expect(await page.evaluate(()=>Boolean((globalThis as any).benchmarkInjected))).toBe(false);
+  expect(activity.cases).toHaveLength(1);await preserved(page);
+});
+
+test("core benchmark throttles progress checkpoints and recovers an abrupt interruption without invented timing",async({page})=>{
+  const {activity}=await fixture(page,{progressBurst:true,delayCase:"case-01",delayMs:60_000});
+  const frozenTime=new Date("2026-11-15T12:00:00Z");await page.clock.install({time:frozenTime});await page.clock.pauseAt(frozenTime);
+  await open(page);await consent(page);await page.locator("#benchmark-run").click();await expect(page.locator("#benchmark-status")).toContainText("Fixture burst 99");
+  const before=await page.evaluate(()=>({writes:(globalThis as any).benchmarkRecoveryWrites,saved:JSON.parse(localStorage.getItem("geomodel3d:qwen-benchmark:last-report")!)}));
+  expect(before.writes).toBeLessThan(20);expect(before.saved.runs[0].cases[0].lastProgress.progress.loaded).toBe(1);
+  await page.clock.runFor(1001);
+  const after=await page.evaluate(()=>({writes:(globalThis as any).benchmarkRecoveryWrites,saved:JSON.parse(localStorage.getItem("geomodel3d:qwen-benchmark:last-report")!)}));
+  expect(after.writes-before.writes).toBe(1);expect(after.saved.runs[0].cases[0].lastProgress.progress.loaded).toBe(99);
+  const exported=await report(page);expect(exported.inProgress).toBe(true);expect(exported.runs[0].status).toBe("running");
+  const lastProgress=structuredClone(exported.runs[0].cases[0].lastProgress);
+  const stored={version:1,protocolSha256:exported.protocol.sha256,manifestSha256:exported.dataset.manifestSha256,runs:exported.runs};
+  stored.runs[0].appVersion="0.26.0";
+  stored.runs[0].cases[0].lastProgress.unexpectedImage="data:image/png;base64,unexpected";
+  stored.runs[0].cases[0].lastProgress.progress.unexpectedImage="data:image/png;base64,unexpected";
+  await page.locator("#benchmark-stop").click();
+  const unchanged={workers:activity.workers,images:activity.images.length,cases:activity.cases.length,weights:activity.weights.length};
+  // Inject the last downloaded running snapshot before bootstrap: no unload handler wrote a terminal result in this saved record.
+  await page.addInitScript(value=>localStorage.setItem("geomodel3d:qwen-benchmark:last-report",JSON.stringify(value)),stored);
+  await page.reload();await expect(page.locator("#benchmark-case option")).toHaveCount(40);await expect(page.locator("#benchmark-status")).toContainText("Recovered");
+  const recovered=await report(page);reportScope(recovered);const run=recovered.runs[0],entry=run.cases[0];
+  expect(run).toMatchObject({status:"interrupted",appVersion:"0.26.0",recoveredAt:expect.any(String)});expect(run.finishedAt).toBeUndefined();
+  expect(entry).toMatchObject({status:"interrupted",recoveredAt:expect.any(String),lastProgress});expect(entry.finishedAt).toBeUndefined();expect(entry.elapsedMs).toBeUndefined();expect(entry.result).toBeUndefined();
+  expect(entry.error).toContain("cause and stopping time were not observed");
+  await expect(page.locator(".bench-case-progress-note")).toContainText("not a completion time");
+  expect({workers:activity.workers,images:activity.images.length,cases:activity.cases.length,weights:activity.weights.length}).toEqual(unchanged);await expect(page.locator("#benchmark-consent")).not.toBeChecked();await preserved(page);
+});
+
+test("core benchmark restores legacy reports without relabelling unknown or older app versions",async({page})=>{
+  const {activity}=await fixture(page);await open(page);await consent(page);await page.locator("#benchmark-run").click();await expect(page.locator("#benchmark-stop")).toBeDisabled();
+  const exported=await report(page),originalBrowser=exported.runs[0].browserContext,originalFinishedAt=exported.runs[0].finishedAt;
+  const first=structuredClone(exported.runs[0]);delete first.appVersion;delete first.cases[0].lastProgress;delete first.cases[0].errorDiagnostic;
+  const second=structuredClone(first);second.id="run-2";second.appVersion="0.26.0";second.status="failed";second.cases[0].status="failed";second.cases[0].error="Load failed";delete second.cases[0].result;
+  const saved={version:1,protocolSha256:exported.protocol.sha256,manifestSha256:exported.dataset.manifestSha256,runs:[first,second]};
+  await page.addInitScript(value=>localStorage.setItem("geomodel3d:qwen-benchmark:last-report",JSON.stringify(value)),saved);
+  const workers=activity.workers;await page.reload();await expect(page.locator("#benchmark-case option")).toHaveCount(40);const recovered=await report(page);reportScope(recovered);
+  expect(recovered.runs[0].appVersion).toBeUndefined();expect(recovered.runs[0].cases[0].lastProgress).toBeUndefined();expect(recovered.runs[0].finishedAt).toBe(originalFinishedAt);expect(recovered.runs[0].browserContext).toEqual(originalBrowser);
+  expect(recovered.runs[1]).toMatchObject({appVersion:"0.26.0",status:"failed",cases:[{status:"failed",error:"Load failed"}]});expect(recovered.runs[1].cases[0].errorDiagnostic).toBeUndefined();expect(activity.workers).toBe(workers);await preserved(page);
+});
+
 test("core benchmark rejects a modified input before loading a model",async({page})=>{
   const {activity}=await fixture(page,{tamperCase:"case-01"});await open(page);await consent(page);await page.locator("#benchmark-run").click();
   await expect(page.locator("#benchmark-status")).toContainText(/integrity|hash|SHA-256/i);await expect(page.locator("#benchmark-stop")).toBeDisabled();
   expect(activity.workers).toBe(0);expect(activity.weights).toEqual([]);const failed=await report(page);reportScope(failed);expect(failed.runs).toHaveLength(1);
-  expect(failed.runs[0]).toMatchObject({status:"failed",cases:[{caseId:"case-01",status:"failed"}]});await preserved(page);
+  expect(failed.runs[0]).toMatchObject({status:"failed",cases:[{caseId:"case-01",status:"failed",errorDiagnostic:{stage:"image-verify",resource:"images/case-01.png"}}]});await preserved(page);
 });
 
 test("core benchmark clears only its own cache and records runtime failures",async({page})=>{

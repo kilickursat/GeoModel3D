@@ -5,6 +5,7 @@ import {CORE_BENCHMARK_MODEL,CORE_BENCHMARK_CACHE,CORE_BENCHMARK_PROMPT,CORE_BEN
 import type {CoreBenchmarkRequest,CoreBenchmarkResult,CoreBenchmarkWorkerRequest,CoreBenchmarkWorkerResponse} from "../src/coreBenchmark";
 import {CoreBenchmarkClient,coreBenchmarkSupport,clearCoreBenchmarkCache} from "../src/coreBenchmarkClient";
 import {CORE_AI_MODELS,coreAiPrompt} from "../src/coreAi";
+import {CoreBenchmarkError} from "../src/coreBenchmarkDiagnostics";
 
 const bytes=readFileSync(new URL("../docs/benchmarks/0.25.0-core-ai/images/sample-03.png",import.meta.url));
 const image="data:image/png;base64,"+Buffer.from(bytes).toString("base64"),sha256=createHash("sha256").update(bytes).digest("hex");
@@ -121,6 +122,23 @@ describe("benchmark worker lifecycle and provenance",()=>{
     const {client,workers}=setup({timeoutMs:1000});const timed=client.run(request),rejected=expect(timed).rejects.toThrow(/timed out/);await ready(workers);await rejected;expect(workers[0].terminated).toBe(true);
     const failed=client.run(request),failure=expect(failed).rejects.toThrow("GPU lost");await ready(workers,2);workers[1].reply({type:"error",id:workers[1].messages[0].id,message:"GPU lost"});await failure;expect(workers[1].terminated).toBe(true);
     client.dispose();await expect(client.run(request)).rejects.toThrow(/disposed/);
+  });
+  it("records worker bootstrap separately and preserves sanitized structured transport failures",async()=>{
+    const {client,workers}=setup(),progress=vi.fn(),first=client.run(request,progress);
+    const startup=expect(first).rejects.toMatchObject({diagnostic:{stage:"worker-start",operation:"worker",message:"Load failed [URL omitted]"}});
+    await ready(workers);expect(progress).toHaveBeenLastCalledWith(expect.objectContaining({stage:"worker-start"}));
+    workers[0].onerror?.({message:"Load failed https://signed.example.test/runtime?token=secret"} as ErrorEvent);await startup;expect(workers[0].terminated).toBe(true);
+    const second=client.run(request),failure=expect(second).rejects.toMatchObject({diagnostic:{stage:"processor-load",operation:"fetch",resource:"preprocessor_config.json",name:"TypeError",message:"Load failed"}});await ready(workers,2);
+    workers[1].reply({type:"error",id:workers[1].messages[0].id,message:"Load failed",diagnostic:{stage:"processor-load",operation:"fetch",resource:"preprocessor_config.json",name:"TypeError",message:"Load failed"}});await failure;client.dispose();
+  });
+  it("validates progress before callbacks and ignores diagnostic errors from a stale worker",async()=>{
+    const {client,workers}=setup(),progress=vi.fn(),first=client.run(request,progress),invalid=expect(first).rejects.toBeInstanceOf(CoreBenchmarkError);await ready(workers);
+    const id=workers[0].messages[0].id;workers[0].reply({type:"progress",id,progress:{phase:"loading",stage:"model-load",message:"Loading https://signed.example/file?token=secret",file:"https://signed.example/file?token=secret",loaded:4,total:8}});
+    expect(progress).toHaveBeenLastCalledWith({phase:"loading",stage:"model-load",message:"Loading [URL omitted]",loaded:4,total:8});
+    workers[0].reply({type:"progress",id,progress:{phase:"loading",message:"Bad progress",loaded:NaN}});await invalid;expect(workers[0].terminated).toBe(true);
+    const second=client.run(request),resolved=expect(second).resolves.toEqual(resultFor());await ready(workers,2);const nextId=workers[1].messages[0].id;
+    workers[0].reply({type:"error",id:nextId,message:"stale",diagnostic:{stage:"processor-load",name:"TypeError",message:"stale",operation:"fetch"}});
+    workers[1].reply({type:"result",id:nextId,result:resultFor()});await resolved;client.dispose();
   });
 });
 

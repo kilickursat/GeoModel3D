@@ -1,5 +1,7 @@
 /** Fixed Qwen device experiment. It never changes the application's model selector or reviewed logs. */
 import {CORE_AI_PROMPT_VERSION,coreAiPrompt} from "./coreAi";
+import type {CoreBenchmarkProgress,CoreBenchmarkFailure} from "./coreBenchmarkDiagnostics";
+export type {CoreBenchmarkProgress,CoreBenchmarkFailure,CoreBenchmarkStage} from "./coreBenchmarkDiagnostics";
 
 export const CORE_BENCHMARK_MODEL={id:"qwen3.5-0.8b-opt",label:"Qwen3.5 0.8B",repo:"onnx-community/Qwen3.5-0.8B-ONNX-OPT",revision:"9a4c21d8f724176b0a7edaaed36303044451886e",downloadMiB:1001,weightBytes:1049662346,
   dtype:{embed_tokens:"q4",vision_encoder:"fp32",decoder_model_merged:"q4"}} as const;
@@ -11,7 +13,6 @@ export const CORE_BENCHMARK_ONNX_VERSION="1.31.1";
 export const CORE_BENCHMARK_TIMEOUT_MS=30*60_000;
 export type CoreBenchmarkMode="quality"|"compatibility";
 export type CoreBenchmarkRequest={caseId:string;image:string;expectedSha256:string;mode:CoreBenchmarkMode};
-export type CoreBenchmarkProgress={phase:"checking"|"loading"|"running";message:string;elapsedMs?:number;inferenceElapsedMs?:number;firstTokenMs?:number|null;generatedTokens?:number;maxNewTokens?:number;loaded?:number;total?:number;file?:string};
 export type CoreBenchmarkAdapter={vendor:string;architecture:string;device:string;description:string;features:string[];softwareAdapter:boolean|null;
   limits:{maxBufferSize:number|null;maxStorageBufferBindingSize:number|null}};
 export type CoreBenchmarkMemory={gpuMemoryBytes:null;jsHeapUsedBytes:number|null;scope:string};
@@ -25,7 +26,7 @@ export type CoreBenchmarkResult={
   device:"webgpu";runtimeVersion:string;onnxRuntimeVersion:string;adapter:CoreBenchmarkAdapter;memory:CoreBenchmarkMemory;
 };
 export type CoreBenchmarkWorkerRequest={type:"run";id:number;request:CoreBenchmarkRequest};
-export type CoreBenchmarkWorkerResponse={type:"progress";id:number;progress:CoreBenchmarkProgress}|{type:"result";id:number;result:CoreBenchmarkResult}|{type:"error";id:number;message:string};
+export type CoreBenchmarkWorkerResponse={type:"progress";id:number;progress:CoreBenchmarkProgress}|{type:"result";id:number;result:CoreBenchmarkResult}|{type:"error";id:number;message:string;diagnostic?:CoreBenchmarkFailure};
 
 export function coreBenchmarkTokenLimit(mode:CoreBenchmarkMode){
   if(mode==="quality")return 128;

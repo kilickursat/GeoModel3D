@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.26.1 — 2026-11-15
+
+- Preserve bounded progress checkpoints and structured failure details in the Qwen device report: loading stage, relative file, observed byte counts and original error. Signed URLs and image bytes are excluded.
+- Separate recovery time from an unknown interruption time after a page reload. Retain original run versions and browser context without restarting inference; older reports remain recoverable.
+- Distinguish source-image, worker startup, processor/model loading, preprocessing and generation failures. The frozen model, prompt, image inputs and token limits are unchanged. These diagnostics do not establish the cause of a Safari interruption or successful iPhone inference.
+
 ## 0.26.0 — 2026-11-15
 
 ### Added

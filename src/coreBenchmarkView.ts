@@ -1,8 +1,9 @@
 // Dedicated evaluation page. It has no project/workspace imports or path into accepted geology.
 import pkg from "../package.json";
 import {CORE_BENCHMARK_MODEL,CORE_BENCHMARK_PROMPT,CORE_BENCHMARK_PROMPT_VERSION,CORE_BENCHMARK_TIMEOUT_MS,coreBenchmarkTokenLimit,checkedCoreBenchmarkResult,coreBenchmarkAdapterMetadata} from "./coreBenchmark";
-import type {CoreBenchmarkAdapter,CoreBenchmarkMode,CoreBenchmarkResult,CoreBenchmarkProgress} from "./coreBenchmark";
+import type {CoreBenchmarkAdapter,CoreBenchmarkMode,CoreBenchmarkResult,CoreBenchmarkProgress,CoreBenchmarkFailure,CoreBenchmarkStage} from "./coreBenchmark";
 import {CoreBenchmarkClient,coreBenchmarkSupport,clearCoreBenchmarkCache} from "./coreBenchmarkClient";
+import {CoreBenchmarkError,CORE_BENCHMARK_STAGE_LABELS,checkedCoreBenchmarkProgress,checkedCoreBenchmarkFailure,coreBenchmarkFailure} from "./coreBenchmarkDiagnostics";
 import humanReviewTemplate from "../docs/benchmarks/0.26.0-core-ai/human-review-template.csv?raw";
 import protocolSource from "../docs/benchmarks/0.26.0-core-ai/protocol.json?raw";
 import rubricSource from "../docs/benchmarks/0.26.0-core-ai/rubric.md?raw";
@@ -12,11 +13,13 @@ import "./coreBenchmark.css";
 interface Case {id:string;image:string;sha256:string;sourceSha256:string;width:512;height:512}
 interface Manifest {version:1;datasetId:"core-v026";cases:Case[]}
 type CaseStatus="not-started"|"running"|"completed"|"failed"|"timed-out"|"cancelled"|"interrupted";
-interface Entry {caseId:string;imageSha256:string;sourceSha256:string;status:CaseStatus;elapsedMs?:number;startedAt?:string;finishedAt?:string;error?:string;result?:CoreBenchmarkResult}
-interface Run {id:string;startedAt:string;finishedAt?:string;mode:CoreBenchmarkMode;maxNewTokens:number;status:"running"|"completed"|"failed"|"cancelled"|"interrupted";
+interface Entry {caseId:string;imageSha256:string;sourceSha256:string;status:CaseStatus;elapsedMs?:number;startedAt?:string;finishedAt?:string;recoveredAt?:string;error?:string;result?:CoreBenchmarkResult;
+  lastProgress?:{progress:CoreBenchmarkProgress;observedAt:string;caseElapsedMs:number};errorDiagnostic?:CoreBenchmarkFailure}
+interface Run {id:string;appVersion?:string;startedAt:string;finishedAt?:string;recoveredAt?:string;mode:CoreBenchmarkMode;maxNewTokens:number;status:"running"|"completed"|"failed"|"cancelled"|"interrupted";
   selfReportedDeviceLabel:string;physicalDeviceVerified:false;cohortCaseCount:40;selectedCaseIds:string[];unselectedCaseIds:string[];cases:Entry[];stopReason?:string;
   mainThreadJsHeapBeforeBytes:number|null;mainThreadJsHeapAfterBytes?:number|null;pageVisibleAtStart:boolean;preflightAdapter?:CoreBenchmarkAdapter;browserContext?:ReturnType<typeof browserContext>}
-interface Active {token:number;run:Run;abort:AbortController;client:CoreBenchmarkClient;current?:Entry;currentStarted?:number;caseTimer?:ReturnType<typeof setTimeout>}
+interface Active {token:number;run:Run;abort:AbortController;client:CoreBenchmarkClient;current?:Entry;currentStarted?:number;caseTimer?:ReturnType<typeof setTimeout>;
+  checkpointTimer?:ReturnType<typeof setTimeout>;checkpointAt?:number;checkpointStage?:string;checkpointFiles?:Set<string>}
 const protocolId="core-webgpu-pilot-2",base=new URL("./core-benchmark-v026/",location.href),runs:Run[]=[],urls=new Set<string>();
 let manifest:Manifest|undefined,manifestSha256:string|undefined,supported=false,clearing=false,active:Active|undefined,sequence=0;
 let preflightAdapter:CoreBenchmarkAdapter|undefined;
@@ -77,14 +80,19 @@ function restore(){
         const result=entry.result?checkedCoreBenchmarkResult(entry.result,{caseId:source.id,expectedSha256:source.sha256,mode:value.mode,image:""}):undefined;
         if((entry.status==="completed")!==!!result)throw new Error("Incomplete saved result.");
         const interrupted=entry.status==="running";
+        const lastProgress=entry.lastProgress?{progress:checkedCoreBenchmarkProgress(entry.lastProgress.progress),observedAt:stamp(entry.lastProgress.observedAt),caseElapsedMs:number(entry.lastProgress.caseElapsedMs)}:undefined;
+        if(lastProgress&&lastProgress.caseElapsedMs===null)throw new Error("Invalid saved progress observation.");
         return {caseId:source.id,imageSha256:source.sha256,sourceSha256:source.sourceSha256,status:interrupted?"interrupted":entry.status,
-          ...(entry.startedAt?{startedAt:stamp(entry.startedAt)}:{}),...(interrupted?{finishedAt:now(),error:"Run interrupted before this page reopened; no automatic retry."}:entry.finishedAt?{finishedAt:stamp(entry.finishedAt)}:{}),
-          ...(!interrupted&&entry.error?{error:brief(entry.error,16384)}:{}),...(entry.elapsedMs!==undefined?{elapsedMs:number(entry.elapsedMs)!}:{}),...(result?{result}:{})};
+          ...(entry.startedAt?{startedAt:stamp(entry.startedAt)}:{}),...(interrupted?{recoveredAt:now(),error:"Run interrupted before this page reopened; the cause and stopping time were not observed. No automatic retry."}:entry.finishedAt?{finishedAt:stamp(entry.finishedAt)}:{}),
+          ...(!interrupted&&entry.recoveredAt?{recoveredAt:stamp(entry.recoveredAt)}:{}),...(!interrupted&&entry.error?{error:brief(entry.error,16384)}:{}),...(!interrupted&&entry.elapsedMs!==undefined?{elapsedMs:number(entry.elapsedMs)!}:{}),
+          ...(lastProgress?{lastProgress:{...lastProgress,caseElapsedMs:lastProgress.caseElapsedMs!}}:{}),...(entry.errorDiagnostic?{errorDiagnostic:checkedCoreBenchmarkFailure(entry.errorDiagnostic)}:{}),...(result?{result}:{})};
       });
       if(value.status==="completed"&&cases.some(c=>c.status!=="completed"))throw new Error("Saved completion count is inconsistent.");
       let originalBrowser:Run["browserContext"];
       if(value.browserContext){const b=value.browserContext;originalBrowser={observedAt:stamp(b.observedAt),userAgent:brief(b.userAgent,2048),language:brief(b.language,64),hardwareConcurrency:number(b.hardwareConcurrency),deviceMemoryGiB:number(b.deviceMemoryGiB),viewport:{width:number(b.viewport.width)!,height:number(b.viewport.height)!,pixelRatio:number(b.viewport.pixelRatio)!},physicalDeviceVerified:false}}
-      return {id:`run-${index+1}`,startedAt:stamp(value.startedAt),...(value.status==="running"?{finishedAt:now()}:value.finishedAt?{finishedAt:stamp(value.finishedAt)}:{}),mode:value.mode,maxNewTokens:value.maxNewTokens,status:value.status==="running"?"interrupted":value.status,
+      if(value.appVersion!==undefined&&(typeof value.appVersion!=="string"||!/^\d+\.\d+\.\d+$/.test(value.appVersion)||value.appVersion.length>32))throw new Error("Invalid saved application version.");
+      return {id:`run-${index+1}`,...(value.appVersion!==undefined?{appVersion:value.appVersion}:{}),startedAt:stamp(value.startedAt),...(value.status==="running"?{recoveredAt:now()}:value.finishedAt?{finishedAt:stamp(value.finishedAt)}:{}),
+        ...(value.status!=="running"&&value.recoveredAt?{recoveredAt:stamp(value.recoveredAt)}:{}),mode:value.mode,maxNewTokens:value.maxNewTokens,status:value.status==="running"?"interrupted":value.status,
         selfReportedDeviceLabel:brief(value.selfReportedDeviceLabel,120),physicalDeviceVerified:false,cohortCaseCount:40,selectedCaseIds:selected,unselectedCaseIds:manifest!.cases.filter(c=>!selected.includes(c.id)).map(c=>c.id),cases,
         mainThreadJsHeapBeforeBytes:number(value.mainThreadJsHeapBeforeBytes),...(value.mainThreadJsHeapAfterBytes!==undefined?{mainThreadJsHeapAfterBytes:number(value.mainThreadJsHeapAfterBytes)}:{}),pageVisibleAtStart:value.pageVisibleAtStart===true,
         ...(value.preflightAdapter?{preflightAdapter:coreBenchmarkAdapterMetadata({info:value.preflightAdapter,features:value.preflightAdapter.features,limits:value.preflightAdapter.limits})}:{}),...(originalBrowser?{browserContext:originalBrowser}:{}),...(value.status==="running"?{stopReason:"Recovered interrupted run; no automatic retry."}:value.stopReason?{stopReason:brief(value.stopReason,16384)}:{})};
@@ -105,16 +113,20 @@ function controls(){
   $("benchmark-mode-note").textContent=modeSelect.value==="compatibility"?"Compatibility mode stops at 32 tokens. Its output is unscored and does not establish description quality.":"The full study contains 40 cases. A smaller run is a partial evaluation; human assessment is required.";
 }
 async function sha256(bytes:Uint8Array<ArrayBuffer>){if(!crypto?.subtle)throw new Error("Secure image hashing is unavailable. Use HTTPS or localhost.");return Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",bytes))).map(b=>b.toString(16).padStart(2,"0")).join("")}
-async function fetchBytes(url:URL,maxBytes:number,signal?:AbortSignal){
+async function fetchBytes(url:URL,maxBytes:number,signal?:AbortSignal,onProgress?:(value:CoreBenchmarkProgress)=>void){
   if(url.origin!==location.origin)throw new Error("Benchmark inputs must come from this site.");
-  const response=await fetch(url,{signal,credentials:"omit",redirect:"error",referrerPolicy:"no-referrer"});
-  if(!response.ok)throw new Error(`Could not load the benchmark input (HTTP ${response.status}).`);
+  const resource=url.pathname.startsWith(base.pathname)?url.pathname.slice(base.pathname.length):undefined;
+  let response:Response;
+  try{response=await fetch(url,{signal,credentials:"omit",redirect:"error",referrerPolicy:"no-referrer"})}
+  catch(error){throw new CoreBenchmarkError(coreBenchmarkFailure(error,"image-fetch",{operation:"fetch",...(resource?{resource}:{})}))}
+  if(!response.ok)throw new CoreBenchmarkError(coreBenchmarkFailure(new Error(`Could not load the benchmark input (HTTP ${response.status}).`),"image-fetch",{operation:"http",httpStatus:response.status,...(resource?{resource}:{})}));
   const size=Number(response.headers.get("Content-Length"));
   if(Number.isFinite(size)&&size>maxBytes){await response.body?.cancel();throw new Error("Benchmark input exceeds its size limit.")}
   const reader=response.body?.getReader();if(!reader)throw new Error("This browser cannot read benchmark inputs.");
   const chunks:Uint8Array[]=[];let total=0;
-  try{while(true){const next=await reader.read();if(next.done)break;total+=next.value.length;if(total>maxBytes)throw new Error("Benchmark input exceeds its size limit.");chunks.push(next.value)}}
-  catch(error){await reader.cancel().catch(()=>{});throw error}finally{reader.releaseLock()}
+  try{while(true){const next=await reader.read();if(next.done)break;total+=next.value.length;if(total>maxBytes)throw new Error("Benchmark input exceeds its size limit.");chunks.push(next.value);
+    onProgress?.({phase:"loading",stage:"image-fetch",message:"Loading the frozen image from this site…",...(resource?{file:resource}:{}),loaded:total,...(Number.isFinite(size)&&size>0?{total:size}:{})})}}
+  catch(error){await reader.cancel().catch(()=>{});throw new CoreBenchmarkError(coreBenchmarkFailure(error,"image-fetch",{operation:"read-response",...(resource?{resource}:{}),loadedBytes:total,...(Number.isFinite(size)&&size>0?{totalBytes:size}:{})}))}finally{reader.releaseLock()}
   const bytes=new Uint8Array(total);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length}return bytes;
 }
 function parseManifest(bytes:Uint8Array):Manifest{
@@ -149,23 +161,40 @@ function render(){
     const title=document.createElement("h3");title.textContent=`Run ${index+1} · ${run.mode==="quality"?"Description evaluation":"Compatibility check"}`;card.append(title);
     const summary=document.createElement("p");summary.className="bench-run-summary";
     const done=run.cases.filter(c=>c.status==="completed").length;
-    summary.textContent=`${done}/${run.cases.length} selected cases completed · ${run.status} · full study: 40 cases. ${run.mode==="compatibility"?"Unscored execution check.":"Human quality review pending."}`;card.append(summary);
+    summary.textContent=`${done}/${run.cases.length} selected cases completed · ${run.status} · full study: 40 cases${run.appVersion?` · app ${run.appVersion}`:""}. ${run.mode==="compatibility"?"Unscored execution check.":"Human quality review pending."}`;card.append(summary);
     for(const entry of run.cases){const element=document.createElement("section");element.className="bench-case";element.dataset.caseId=entry.caseId;
       const head=document.createElement("div");head.className="bench-case-head";const h=document.createElement("h4");h.textContent=entry.caseId;const badge=document.createElement("span");badge.className="bench-case-status";badge.dataset.status=entry.status;badge.textContent=entry.status.replaceAll("-"," ");head.append(h,badge);element.append(head);
       if(entry.result){const answer=document.createElement("div");answer.className="bench-answer";answer.textContent=entry.result.text;element.append(answer);
         const meta=document.createElement("p");meta.className="bench-case-meta";meta.textContent=`${entry.result.generatedTokens}/${entry.result.maxNewTokens} tokens · ${(entry.result.inferenceMs/1000).toFixed(1)} s generation${entry.result.outputLimitReached?" · output limit reached; answer may be incomplete":""}. Unreviewed model output.`;element.append(meta)}
       if(entry.error){const error=document.createElement("p");error.textContent=entry.error;element.append(error)}
+      if(entry.errorDiagnostic){const diagnostic=entry.errorDiagnostic,note=document.createElement("p");note.className="bench-case-diagnostic";
+        note.textContent=`Failure while ${CORE_BENCHMARK_STAGE_LABELS[diagnostic.stage]} (${diagnostic.name})${diagnostic.operation?` · ${diagnostic.operation}`:""}${diagnostic.resource?` · failed resource: ${diagnostic.resource}`:""}${diagnostic.httpStatus?` · HTTP ${diagnostic.httpStatus}`:""}. Export results JSON to retain these details.`;element.append(note)}
+      if(entry.lastProgress&&entry.status!=="completed"){const observation=entry.lastProgress,value=observation.progress,note=document.createElement("p");note.className="bench-case-progress-note";
+        const transfer=value.loaded!==undefined?` · ${(value.loaded/1048576).toFixed(1)}${value.total?` / ${(value.total/1048576).toFixed(1)}`:""} MiB observed`:"";
+        note.textContent=`Last observed: ${value.stage?CORE_BENCHMARK_STAGE_LABELS[value.stage]:value.message}${value.file?` · observed file: ${value.file}`:""}${transfer}${value.generatedTokens!==undefined?` · ${value.generatedTokens} tokens`:""} · ${(observation.caseElapsedMs/1000).toFixed(1)} s into this case. This checkpoint is not a completion time or a diagnosis of the interruption.`;element.append(note)}
       card.append(element)}results.append(card)}
 }
+function flushProgressCheckpoint(state:Active){
+  clearTimeout(state.checkpointTimer);state.checkpointTimer=undefined;
+  if(active!==state||state.current?.status!=="running")return;
+  state.checkpointAt=performance.now();const value=state.current.lastProgress?.progress;state.checkpointStage=value?.stage??value?.phase;checkpoint();
+}
 function progressMessage(state:Active,entry:Entry,value:CoreBenchmarkProgress){
-  if(active!==state)return;say(`${entry.caseId} · ${value.message}`);progress.hidden=false;
+  if(active!==state||state.current!==entry||entry.status!=="running")return;
+  value=checkedCoreBenchmarkProgress(value);entry.lastProgress={progress:value,observedAt:now(),caseElapsedMs:performance.now()-(state.currentStarted??performance.now())};
+  const stage=value.stage??value.phase,elapsed=performance.now()-(state.checkpointAt??-Infinity);
+  const firstFile=!!value.file&&!state.checkpointFiles?.has(value.file)&&(state.checkpointFiles?.size??0)<32;
+  if(firstFile){state.checkpointFiles??=new Set();state.checkpointFiles.add(value.file!)}
+  if(stage!==state.checkpointStage||firstFile||elapsed>=1000)flushProgressCheckpoint(state);
+  else if(state.checkpointTimer===undefined)state.checkpointTimer=setTimeout(()=>flushProgressCheckpoint(state),Math.max(0,1000-elapsed));
+  say(`${entry.caseId} · ${value.message}`);progress.hidden=false;
   if(value.phase==="loading"&&value.total&&value.loaded!==undefined){progress.max=value.total;progress.value=Math.min(value.loaded,value.total)}
   else if(value.generatedTokens!==undefined&&value.maxNewTokens){progress.max=value.maxNewTokens;progress.value=value.generatedTokens}
   else progress.removeAttribute("value");
 }
 function stop(reason:string,kind:"cancelled"|"interrupted"|"timed-out"){
   const state=active;if(!state)return;
-  active=undefined;sequence++;clearTimeout(state.caseTimer);state.abort.abort();state.client.dispose();
+  active=undefined;sequence++;clearTimeout(state.caseTimer);clearTimeout(state.checkpointTimer);state.abort.abort();state.client.dispose();
   state.run.status=kind==="timed-out"?"failed":kind;state.run.finishedAt=now();state.run.stopReason=reason;state.run.mainThreadJsHeapAfterBytes=heapBytes();
   if(state.current?.status==="running"){state.current.status=kind;state.current.finishedAt=now();state.current.elapsedMs=performance.now()-(state.currentStarted??performance.now());state.current.error=reason}
   progress.hidden=true;say(`${reason} Completed and unstarted cases are preserved. Export this page’s results before closing.`);render();controls();
@@ -177,23 +206,26 @@ async function start(){
   if(![1,5,40].includes(count)||selected.length!==count){say("Choose a valid set of frozen cases.",true);return}
   if(document.visibilityState!=="visible"){say("Keep this page visible before starting a run.",true);return}
   closeReference();
-  const run:Run={id:`run-${runs.length+1}`,startedAt:now(),mode,maxNewTokens:coreBenchmarkTokenLimit(mode),status:"running",selfReportedDeviceLabel:deviceLabel.value.trim().slice(0,120),physicalDeviceVerified:false,
+  const run:Run={id:`run-${runs.length+1}`,appVersion:pkg.version,startedAt:now(),mode,maxNewTokens:coreBenchmarkTokenLimit(mode),status:"running",selfReportedDeviceLabel:deviceLabel.value.trim().slice(0,120),physicalDeviceVerified:false,
     cohortCaseCount:40,selectedCaseIds:selected.map(c=>c.id),unselectedCaseIds:manifest.cases.filter(c=>!selected.some(s=>s.id===c.id)).map(c=>c.id),
     cases:selected.map(c=>({caseId:c.id,imageSha256:c.sha256,sourceSha256:c.sourceSha256,status:"not-started"})),mainThreadJsHeapBeforeBytes:heapBytes(),pageVisibleAtStart:true,browserContext:browserContext(),...(preflightAdapter?{preflightAdapter:structuredClone(preflightAdapter)}:{})};
   const state:Active={token:++sequence,run,abort:new AbortController(),client:new CoreBenchmarkClient()};active=state;runs.push(run);render();controls();
   try{
     for(let i=0;i<selected.length;i++){
-      if(active!==state)return;const sample=selected[i],entry=run.cases[i];state.current=entry;state.currentStarted=performance.now();entry.status="running";entry.startedAt=now();state.caseTimer=setTimeout(()=>stop("This case timed out after its thirty-minute budget; remaining cases were not started.","timed-out"),CORE_BENCHMARK_TIMEOUT_MS);render();say(`${sample.id} · Loading the frozen image from this site…`);
+      if(active!==state)return;const sample=selected[i],entry=run.cases[i];state.current=entry;state.currentStarted=performance.now();state.checkpointStage=undefined;state.checkpointFiles=new Set();entry.status="running";entry.startedAt=now();state.caseTimer=setTimeout(()=>stop("This case timed out after its thirty-minute budget; remaining cases were not started.","timed-out"),CORE_BENCHMARK_TIMEOUT_MS);render();
+      let stage:CoreBenchmarkStage="image-fetch";progressMessage(state,entry,{phase:"loading",stage,message:"Loading the frozen image from this site…",file:sample.image});
       try{
-        const bytes=await fetchBytes(new URL(sample.image,base),2_100_000,state.abort.signal);if(active!==state)return;
+        const bytes=await fetchBytes(new URL(sample.image,base),2_100_000,state.abort.signal,value=>progressMessage(state,entry,value));if(active!==state)return;
+        stage="image-verify";progressMessage(state,entry,{phase:"checking",stage,message:"Checking the frozen image hash…",file:sample.image});
         if(await sha256(bytes)!==sample.sha256)throw new Error("Image integrity check failed. No model was started for this case.");if(active!==state)return;
+        stage="worker-start";progressMessage(state,entry,{phase:"checking",stage,message:"Starting the model worker…"});
         const result=await state.client.run({caseId:sample.id,image:inputDataUrl(bytes),expectedSha256:sample.sha256,mode},value=>progressMessage(state,entry,value));if(active!==state)return;
-        entry.result=result;entry.status="completed";entry.finishedAt=now();entry.elapsedMs=performance.now()-state.currentStarted;clearTimeout(state.caseTimer);render();
-      }catch(error){if(active!==state)return;entry.error=error instanceof Error?error.message:String(error);entry.status=/timed out/i.test(entry.error)?"timed-out":"failed";entry.finishedAt=now();entry.elapsedMs=performance.now()-state.currentStarted;clearTimeout(state.caseTimer);run.status="failed";run.stopReason="Stopped at the first failed case; later selected cases were not started.";say(`${sample.id} failed. ${entry.error} Later cases remain unstarted.`,true);break}
+        entry.result=result;entry.status="completed";entry.finishedAt=now();entry.elapsedMs=performance.now()-state.currentStarted;clearTimeout(state.caseTimer);clearTimeout(state.checkpointTimer);state.checkpointTimer=undefined;render();
+      }catch(error){if(active!==state)return;entry.errorDiagnostic=coreBenchmarkFailure(error,stage,stage==="image-fetch"||stage==="image-verify"?{resource:sample.image}:{});entry.error=entry.errorDiagnostic.message;entry.status=/timed out/i.test(entry.error)?"timed-out":"failed";entry.finishedAt=now();entry.elapsedMs=performance.now()-state.currentStarted;clearTimeout(state.caseTimer);run.status="failed";run.stopReason="Stopped at the first failed case; later selected cases were not started.";say(`${sample.id} failed while ${CORE_BENCHMARK_STAGE_LABELS[entry.errorDiagnostic.stage]}. ${entry.error} Export results JSON for diagnosis. Later cases remain unstarted.`,true);break}
     }
     if(active!==state)return;if(run.status==="running"){run.status="completed";say(`${run.cases.length} selected case${run.cases.length===1?"":"s"} completed. ${mode==="compatibility"?"Compatibility output is unscored.":"Human quality review is still pending."} Export your results.`)}
     run.finishedAt=now();run.mainThreadJsHeapAfterBytes=heapBytes();
-  }finally{clearTimeout(state.caseTimer);state.client.dispose();if(active===state){active=undefined;progress.hidden=true;render();controls()}}
+  }finally{clearTimeout(state.caseTimer);clearTimeout(state.checkpointTimer);state.client.dispose();if(active===state){active=undefined;progress.hidden=true;render();controls()}}
 }
 function download(name:string,type:string,contents:string){const url=URL.createObjectURL(new Blob([contents],{type}));urls.add(url);const link=document.createElement("a");link.href=url;link.download=name;document.body.append(link);link.click();link.remove();setTimeout(()=>{URL.revokeObjectURL(url);urls.delete(url)},60_000)}
 function exportReport(){

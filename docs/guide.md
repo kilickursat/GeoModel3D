@@ -148,6 +148,8 @@ Use **Review source images** and **Download blank review sheet** to prepare imag
 
 Keep the page visible. Stopping or hiding it unloads the worker; the current and unstarted cases remain recorded. Results are saved to a dedicated local recovery record when storage permits. Reloading restores them without resuming inference. Export JSON for a durable copy before leaving, and retain failed or capped runs. **Forget saved benchmark results** removes only this history; **Clear benchmark downloads** removes only its model cache.
 
+If a run fails, export its report before trying again. New attempts retain the last observed stage, file and progress, plus a separate failure detail when the failing operation is known. A last observed file is not necessarily the file that failed. After an unexpected reload, a saved checkpoint shows how far the page had observed the run; recovery time does not establish when or why it stopped. “Load failed” alone does not prove low memory or an unsupported model. Keep the screen awake and record whether you switched apps, refreshed the page or saw Safari reload itself, along with the network connection used.
+
 For phone evidence, open the page on the physical phone in Safari and record the device/browser version in the optional label. That label stays self-reported; actual adapter/runtime information is separate. GPU memory is unknown to the page. Follow the [full protocol and review instructions](benchmarks/0.26.0-core-ai/README.md); successful execution alone is not a geological quality score.
 
 ## Reading borehole logs from PDFs
