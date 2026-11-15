@@ -126,6 +126,16 @@ Recovery uses the registered recovered length divided by the full run length. Re
 
 Only registered recovered intervals are observations; the 3-D model interpolates through unlogged gaps. The model currently assumes vertical holes and units ordered from youngest to oldest, and can extend the deepest unit below the logged depth. A photograph does not supply a surveyed 3-D trajectory or establish properties such as UCS, stiffness, permeability or shear strength. Predictions of those properties require a separately validated model and paired site data.
 
+### Inspect a core run by depth
+
+In **Core photos**, select a registered run and choose **Show depth log** below the photograph. The two tracks align the saved photo annotations and current borehole log on one increasing depth axis. The photo track identifies its draft or accepted state; later log edits can differ from accepted annotations without rewriting their source evidence.
+
+Select a comparison interval to highlight its exact region in the source photograph and its original piece form. Right-to-left rows retain their registered direction. A current-log boundary inside a piece divides the displayed comparison only; it does not create a fracture, edit the piece or change RQD. Use the interval selector for thin intervals and the depth-window controls to inspect dense runs. The complete run remains in the CSV export even when the chart shows a smaller window.
+
+Gaps remain **unrepresented depth** until the run's missing-core review confirms them. Registered rows without piece annotations are distinct from those gaps. Unit comparisons use exact project unit IDs: matching or differing labels are not geological accuracy assessments. Missing units, missing log coverage and overlapping current-log intervals remain unassessed. No rock type or engineering property is inferred from this view.
+
+Download the interval CSV to retain depths, source/run/row/piece identifiers, photograph bounds, registration/review state and current-log comparison. It contains metadata and annotations rather than image bytes. Opening the view, selecting intervals and exporting do not save or change the project. The view also works in the model's read-only **Core photos** entry and in the standalone HTML.
+
 ## Local AI for core intervals
 
 In **Core photos**, select a registered recovered row and choose **Describe this interval · local AI** for the whole row. For a closer view, choose **Describe piece · local AI** on an existing piece card. Both actions are also available when inspecting a saved run from the Site panel. A piece crop follows its registered start/end depths and the row's left-to-right or right-to-left direction; it does not change the piece boundaries or the log. The selected depths and the enclosing row's depths are shown in the AI dialog. The AI does not measure or verify depths, and the image stays in this browser.

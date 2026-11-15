@@ -5,6 +5,8 @@ import type {EvidenceSource} from "./evidence";
 import {acceptCoreRun,calculateCoreRun,coreDepthAt,corePieceBox,validateCorePhotos} from "./corePhoto";
 import type {CoreRun,CoreRow,CorePiece} from "./corePhoto";
 import {showCoreAi} from "./coreAiView";
+import {renderCoreDepthLog} from "./coreDepthLogView";
+import type {CoreDepthLogViewState,CoreDepthLogSelection,CoreDepthLogHandle} from "./coreDepthLogView";
 import "./corePhoto.css";
 
 const esc=(value:string)=>value.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]!));
@@ -52,6 +54,8 @@ export function showCorePhotos(project:GeoProject,options:CorePhotoViewOptions):
   let pending:EvidenceSource|undefined,photoNote="",notice="",error=false,mode:"view"|"draw"|"cut"="view";
   let reviewer="",replace=false;
   let closeAi:(()=>void)|undefined;
+  let depthOpen=false,depthSelection:CoreDepthLogSelection|undefined,closeDepthLog:CoreDepthLogHandle|undefined;
+  const depthStates=new Map<string,CoreDepthLogViewState>();
   const opener=document.activeElement instanceof HTMLElement?document.activeElement:null,oldOverflow=document.body.style.overflow;
   const dialog=document.createElement("dialog"),heading=`core-photo-heading-${++sequence}`;
   dialog.className="core-dialog";dialog.setAttribute("aria-labelledby",heading);
@@ -66,13 +70,14 @@ export function showCorePhotos(project:GeoProject,options:CorePhotoViewOptions):
 
   function setNotice(text:string,isError=false){notice=text;error=isError;status.textContent=text;status.classList.toggle("core-error",isError)}
   function changed(){
+    depthSelection=undefined;
     dirty=true;const current=run();if(current){current.status="draft";delete current.reviewedBy;delete current.acceptedAt;delete current.reviewEvidenceId}
     setNotice("Unsaved photo annotations. The model keeps its last accepted log until you accept this draft.");
   }
   function close():boolean{
     if(closed)return true;
     if(dirty&&!confirm("Close without saving these core-photo annotations? Choose Cancel, then Save draft to keep them."))return false;
-    closeAi?.();closed=true;if(dialog.open)dialog.close();dialog.remove();document.body.style.overflow=oldOverflow;
+    closeAi?.();closeDepthLog?.();closed=true;if(dialog.open)dialog.close();dialog.remove();document.body.style.overflow=oldOverflow;
     if(activeClose===close)activeClose=undefined;
     const focusTarget=opener?.isConnected?opener:document.querySelector<HTMLElement>('.workspace:not([hidden]) .ws-core-photos');
     focusTarget?.focus({preventScroll:true});return true;
@@ -98,7 +103,9 @@ export function showCorePhotos(project:GeoProject,options:CorePhotoViewOptions):
     }).join("");
     const selectedRow=row();let start=selectedRow?.from??0;
     const pieces=selectedRow?.pieces.map(p=>{const box=corePieceBox(selectedRow,start,p.end);start=p.end;return `<span class="core-photo-piece" style="left:${box.x0*100}%;top:${box.y0*100}%;width:${(box.x1-box.x0)*100}%;height:${(box.y1-box.y0)*100}%"></span>`}).join("")??"";
-    return `<div class="core-photo-sheet" data-mode="${mode}"><img class="core-photo" src="${page.image}" alt="Core-box photograph: ${esc(src!.name)}" draggable="false"><div class="core-photo-regions">${regions}${pieces}<span class="core-drawing" hidden></span></div></div><p class="core-photo-source">${esc(src!.name)} · saved ${page.width} × ${page.height} pixels. Original file bytes are not included.</p>`;
+    const selectedDepth=depthSelection&&selectedRow?.id===depthSelection.rowId?depthSelection:undefined;
+    const highlight=selectedDepth?`<span class="core-photo-piece core-photo-depth-selection selected" role="img" tabindex="-1" aria-label="Selected source interval ${fmt(selectedDepth.from)} to ${fmt(selectedDepth.to)} metres" style="left:${selectedDepth.box.x0*100}%;top:${selectedDepth.box.y0*100}%;width:${(selectedDepth.box.x1-selectedDepth.box.x0)*100}%;height:${(selectedDepth.box.y1-selectedDepth.box.y0)*100}%"></span>`:"";
+    return `<div class="core-photo-sheet" data-mode="${mode}"><img class="core-photo" src="${page.image}" alt="Core-box photograph: ${esc(src!.name)}" draggable="false"><div class="core-photo-regions">${regions}${pieces}${highlight}<span class="core-drawing" hidden></span></div></div><p class="core-photo-source">${esc(src!.name)} · saved ${page.width} × ${page.height} pixels. Original file bytes are not included.</p>`;
   }
   function resultHtml(current:CoreRun){
     const result=calculateCoreRun(current);
@@ -108,20 +115,31 @@ export function showCorePhotos(project:GeoProject,options:CorePhotoViewOptions):
     let start=current.from;
     return current.pieces.map((piece,i)=>{
       const from=start;start=piece.end;
-      return `<fieldset class="core-piece" data-piece="${esc(piece.id)}"><legend>Piece ${i+1} · ${fmt(from)}–${fmt(piece.end)} m · ${fmt((piece.end-from)*1000,1)} mm</legend><button type="button" class="core-ai-piece-open" aria-label="Describe piece ${i+1}, ${fmt(from)} to ${fmt(piece.end)} metres with local AI">Describe piece · local AI</button><div class="core-fields"><label>Soundness<select class="core-piece-sound"${readonly?" disabled":""}>${option("unknown","Not reviewed",piece.sound)}${option("sound","Sound",piece.sound)}${option("unsound","Unsound",piece.sound)}</select></label><label>Break after piece<select class="core-piece-break"${readonly?" disabled":""}>${option("unknown","Not reviewed",piece.breakAfter)}${option("natural","Natural fracture",piece.breakAfter)}${option("mechanical","Matched mechanical break",piece.breakAfter)}${option("continuous","No break · logging boundary",piece.breakAfter)}${option("end","Run end or gap",piece.breakAfter)}</select></label><label>Geological unit<select class="core-piece-unit"${readonly?" disabled":""}>${option("","Choose a unit",piece.unit)}${piece.unit&&!working.units.some(u=>u.id===piece.unit)?option(piece.unit,`Missing unit: ${piece.unit}`,piece.unit):""}${working.units.map(u=>option(u.id,u.name||u.id,piece.unit)).join("")}</select></label></div><label>Description<textarea class="core-piece-description" rows="2" maxlength="4096"${readonly?" readonly":""}>${esc(piece.description)}</textarea></label>${!readonly&&i<current.pieces.length-1?'<button type="button" class="core-remove-cut">Remove break after this piece</button>':""}</fieldset>`;
+      return `<fieldset class="core-piece${depthSelection?.pieceId===piece.id?" core-piece-selected":""}" data-piece="${esc(piece.id)}"><legend>Piece ${i+1} · ${fmt(from)}–${fmt(piece.end)} m · ${fmt((piece.end-from)*1000,1)} mm</legend><button type="button" class="core-ai-piece-open" aria-label="Describe piece ${i+1}, ${fmt(from)} to ${fmt(piece.end)} metres with local AI">Describe piece · local AI</button><div class="core-fields"><label>Soundness<select class="core-piece-sound"${readonly?" disabled":""}>${option("unknown","Not reviewed",piece.sound)}${option("sound","Sound",piece.sound)}${option("unsound","Unsound",piece.sound)}</select></label><label>Break after piece<select class="core-piece-break"${readonly?" disabled":""}>${option("unknown","Not reviewed",piece.breakAfter)}${option("natural","Natural fracture",piece.breakAfter)}${option("mechanical","Matched mechanical break",piece.breakAfter)}${option("continuous","No break · logging boundary",piece.breakAfter)}${option("end","Run end or gap",piece.breakAfter)}</select></label><label>Geological unit<select class="core-piece-unit"${readonly?" disabled":""}>${option("","Choose a unit",piece.unit)}${piece.unit&&!working.units.some(u=>u.id===piece.unit)?option(piece.unit,`Missing unit: ${piece.unit}`,piece.unit):""}${working.units.map(u=>option(u.id,u.name||u.id,piece.unit)).join("")}</select></label></div><label>Description<textarea class="core-piece-description" rows="2" maxlength="4096"${readonly?" readonly":""}>${esc(piece.description)}</textarea></label>${!readonly&&i<current.pieces.length-1?'<button type="button" class="core-remove-cut">Remove break after this piece</button>':""}</fieldset>`;
     }).join("");
   }
   function render(){
     const focused=document.activeElement instanceof HTMLElement&&content.contains(document.activeElement)?document.activeElement:undefined;
     const focusClass=focused?.classList[0],focusPiece=focused?.closest<HTMLElement>("[data-piece]")?.dataset.piece;
+    const depthFocus=!!focused?.closest(".core-depth-host");
+    closeDepthLog?.();closeDepthLog=undefined;
     const current=run();
     if(current&&!current.rows.some(r=>r.id===rowId))rowId=current.rows[0]?.id??"";
     const selectedRow=row();
-    content.innerHTML=`<div class="core-top"><label>Registered run<select class="core-run">${readonly?"":option("","New photograph / run",selected)}${runs().map(r=>option(r.id,`${r.boreholeId} · ${fmt(r.from)}–${fmt(r.to)} m · ${r.status}`,selected)).join("")}</select></label><p class="core-scope">Vertical boreholes. Only registered recovered intervals are observations; the 3D model interpolates through unlogged gaps. No rock classifier or strength prediction is applied.</p></div><div class="core-layout"><section class="core-image-panel" aria-label="Core photograph">${!readonly?`<div class="core-photo-tools"><button type="button" class="core-photo-view" aria-pressed="${mode==="view"}">Inspect</button><button type="button" class="core-photo-draw" aria-pressed="${mode==="draw"}"${!current?" disabled":""}>Draw row bounds</button><button type="button" class="core-photo-cut" aria-pressed="${mode==="cut"}"${!selectedRow?" disabled":""}>Place break on photo</button></div>`:""}${imageHtml()}${mode==="draw"?'<p class="core-mode-help">Drag around one continuous row of recovered core. Then enter its known start and end depths and add the row. Numeric bounds below are an alternative.</p>':mode==="cut"?'<p class="core-mode-help">Click a break within the selected row. Its depth is estimated from your registered scale; review it using the numeric depth control.</p>':""}${photoNote?`<p class="core-photo-note">${esc(photoNote)}</p>`:""}</section><section class="core-review-panel" aria-label="Core registration and review">${!current?newRunHtml():`<div class="core-run-heading"><h3>${esc(current.boreholeId)} · ${fmt(current.from)}–${fmt(current.to)} m</h3><p class="core-run-state">${current.status==="accepted"?`Accepted by ${esc(current.reviewedBy??"")} · ${esc(current.acceptedAt??"")}`:"Draft — no new observations applied to the model"}</p></div>${resultHtml(current)}<div class="core-row-list"><label>Photo row<select class="core-row">${current.rows.length?current.rows.map((r,i)=>option(r.id,`Row ${i+1}: ${fmt(r.from)}–${fmt(r.to)} m (${r.direction==="rtl"?"right to left":"left to right"})`,rowId)).join(""):'<option value="">Add a registered row</option>'}</select></label></div>${selectedRow?`<section class="core-row-review"><h3>Review row ${current.rows.indexOf(selectedRow)+1}</h3><button type="button" class="core-ai-open">Describe this interval · local AI</button><p>Depth ${fmt(selectedRow.from)}–${fmt(selectedRow.to)} m; ${selectedRow.direction==="rtl"?"right to left":"left to right"}. Image width maps linearly to depth.</p><label class="core-check"><input type="checkbox" class="core-registration"${selectedRow.registrationReviewed?" checked":""}${readonly?" disabled":""}>I checked row bounds, direction, scale and depth against the core labels. The depth span equals the actual recovered length; there is no missing core, bend or tray gap inside this straight row.</label>${!readonly?`<div class="core-cut-controls"><label>Break depth (m)<input class="core-cut-depth" type="number" step="any" min="${selectedRow.from}" max="${selectedRow.to}" value="${Number(((selectedRow.from+selectedRow.to)/2).toFixed(6))}"></label><button type="button" class="core-add-cut">Add break at depth</button></div>`:""}<div class="core-pieces">${pieceHtml(selectedRow)}</div>${!readonly?'<button type="button" class="core-delete-row">Delete selected row</button>':""}</section>`:""}${!readonly?addRowHtml(current)+editRunHtml(current):""}${reviewHtml(current)}`}</section></div>`;
+    content.innerHTML=`<div class="core-top"><label>Registered run<select class="core-run">${readonly?"":option("","New photograph / run",selected)}${runs().map(r=>option(r.id,`${r.boreholeId} · ${fmt(r.from)}–${fmt(r.to)} m · ${r.status}`,selected)).join("")}</select></label><p class="core-scope">Vertical boreholes. Only registered recovered intervals are observations; the 3D model interpolates through unlogged gaps. No rock classifier or strength prediction is applied.</p></div><div class="core-layout"><section class="core-image-panel${depthOpen&&current?" core-depth-open":""}" aria-label="Core photograph">${!readonly?`<div class="core-photo-tools"><button type="button" class="core-photo-view" aria-pressed="${mode==="view"}">Inspect</button><button type="button" class="core-photo-draw" aria-pressed="${mode==="draw"}"${!current?" disabled":""}>Draw row bounds</button><button type="button" class="core-photo-cut" aria-pressed="${mode==="cut"}"${!selectedRow?" disabled":""}>Place break on photo</button></div>`:""}${imageHtml()}${current?`<div class="core-depth-actions"><button type="button" class="core-depth-toggle" aria-expanded="${depthOpen}">${depthOpen?"Hide":"Show"} depth log</button></div><div class="core-depth-host"${depthOpen?"":" hidden"}></div>`:""}${mode==="draw"?'<p class="core-mode-help">Drag around one continuous row of recovered core. Then enter its known start and end depths and add the row. Numeric bounds below are an alternative.</p>':mode==="cut"?'<p class="core-mode-help">Click a break within the selected row. Its depth is estimated from your registered scale; review it using the numeric depth control.</p>':""}${photoNote?`<p class="core-photo-note">${esc(photoNote)}</p>`:""}</section><section class="core-review-panel" aria-label="Core registration and review">${!current?newRunHtml():`<div class="core-run-heading"><h3>${esc(current.boreholeId)} · ${fmt(current.from)}–${fmt(current.to)} m</h3><p class="core-run-state">${current.status==="accepted"?`Accepted by ${esc(current.reviewedBy??"")} · ${esc(current.acceptedAt??"")}`:"Draft — no new observations applied to the model"}</p></div>${resultHtml(current)}<div class="core-row-list"><label>Photo row<select class="core-row">${current.rows.length?current.rows.map((r,i)=>option(r.id,`Row ${i+1}: ${fmt(r.from)}–${fmt(r.to)} m (${r.direction==="rtl"?"right to left":"left to right"})`,rowId)).join(""):'<option value="">Add a registered row</option>'}</select></label></div>${selectedRow?`<section class="core-row-review"><h3>Review row ${current.rows.indexOf(selectedRow)+1}</h3><button type="button" class="core-ai-open">Describe this interval · local AI</button><p>Depth ${fmt(selectedRow.from)}–${fmt(selectedRow.to)} m; ${selectedRow.direction==="rtl"?"right to left":"left to right"}. Image width maps linearly to depth.</p><label class="core-check"><input type="checkbox" class="core-registration"${selectedRow.registrationReviewed?" checked":""}${readonly?" disabled":""}>I checked row bounds, direction, scale and depth against the core labels. The depth span equals the actual recovered length; there is no missing core, bend or tray gap inside this straight row.</label>${!readonly?`<div class="core-cut-controls"><label>Break depth (m)<input class="core-cut-depth" type="number" step="any" min="${selectedRow.from}" max="${selectedRow.to}" value="${Number(((selectedRow.from+selectedRow.to)/2).toFixed(6))}"></label><button type="button" class="core-add-cut">Add break at depth</button></div>`:""}<div class="core-pieces">${pieceHtml(selectedRow)}</div>${!readonly?'<button type="button" class="core-delete-row">Delete selected row</button>':""}</section>`:""}${!readonly?addRowHtml(current)+editRunHtml(current):""}${reviewHtml(current)}`}</section></div>`;
     $<HTMLButtonElement>(".core-save").hidden=readonly;
     $<HTMLButtonElement>(".core-save").disabled=busy||!working.corePhotos;
+    if(depthOpen&&current){
+      closeDepthLog=renderCoreDepthLog($(".core-depth-host"),{run:current,intervals:working.boreholes.find(b=>b.id===current.boreholeId)?.intervals??[],units:working.units,source:source(),
+        selectedPieceId:depthSelection?.pieceId,state:depthStates.get(current.id),
+        onStateChange:state=>depthStates.set(current.id,state),
+        onSelect:(selection,reveal)=>{rowId=selection.rowId;depthSelection=selection;mode="view";render();if(reveal){const highlight=dialog.querySelector<HTMLElement>(".core-photo-depth-selection");highlight?.scrollIntoView({block:"center"});highlight?.focus({preventScroll:true})}},
+        onClearSelection:()=>{if(depthSelection){depthSelection=undefined;render()}}
+      });
+    }
     setNotice(notice,error);
-    if(focusClass){const prefix=focusPiece?`[data-piece="${CSS.escape(focusPiece)}"] `:"";dialog.querySelector<HTMLElement>(`${prefix}.${CSS.escape(focusClass)}`)?.focus({preventScroll:true})}
+    if(depthFocus)(dialog.querySelector<HTMLElement>(".core-depth-select:not(:disabled)")??dialog.querySelector<HTMLElement>(".core-depth-window-from"))?.focus({preventScroll:true});
+    else if(focusClass){const prefix=focusPiece?`[data-piece="${CSS.escape(focusPiece)}"] `:"";dialog.querySelector<HTMLElement>(`${prefix}.${CSS.escape(focusClass)}`)?.focus({preventScroll:true})}
   }
   function newRunHtml(){
     if(readonly)return '<p>No saved core-photo run is available.</p>';
@@ -156,7 +174,8 @@ export function showCorePhotos(project:GeoProject,options:CorePhotoViewOptions):
     const target=(event.target as Element).closest<HTMLButtonElement>("button");if(!target)return;
     if(target.classList.contains("core-close")){close();return}
     if(target.classList.contains("core-save")){save();return}
-    if(target.dataset.row&&mode==="view"){rowId=target.dataset.row;render();return}
+    if(target.classList.contains("core-depth-toggle")){depthOpen=!depthOpen;if(!depthOpen)depthSelection=undefined;mode="view";render();return}
+    if(target.dataset.row&&mode==="view"){rowId=target.dataset.row;depthSelection=undefined;render();return}
     if(target.classList.contains("core-ai-open")||target.classList.contains("core-ai-piece-open")){
       const current=run(),selectedRow=row(),src=source(),image=src?.pages.find(p=>p.page===1)?.image;
       try{
@@ -218,8 +237,8 @@ export function showCorePhotos(project:GeoProject,options:CorePhotoViewOptions):
   });
   dialog.addEventListener("change",event=>{
     const target=event.target as HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement;
-    if(target.classList.contains("core-run")){selected=target.value;rowId="";mode="view";reviewer="";replace=false;render();return}
-    if(target.classList.contains("core-row")){rowId=target.value;mode="view";render();return}
+    if(target.classList.contains("core-run")){selected=target.value;depthSelection=undefined;rowId="";mode="view";reviewer="";replace=false;render();return}
+    if(target.classList.contains("core-row")){rowId=target.value;depthSelection=undefined;mode="view";render();return}
     if(readonly)return;
     if(target.classList.contains("core-upload")){
       const file=(target as HTMLInputElement).files?.[0];if(!file)return;
@@ -237,7 +256,11 @@ export function showCorePhotos(project:GeoProject,options:CorePhotoViewOptions):
       if(target.classList.contains("core-piece-sound"))piece.sound=target.value as CorePiece["sound"];
       else if(target.classList.contains("core-piece-break"))piece.breakAfter=target.value as CorePiece["breakAfter"];
       else if(target.classList.contains("core-piece-unit"))piece.unit=target.value;
-      else if(target.classList.contains("core-piece-description")){piece.description=target.value;changed();const state=dialog.querySelector<HTMLElement>(".core-run-state");if(state)state.textContent="Draft — no new observations applied to the model";return}
+      else if(target.classList.contains("core-piece-description")){
+        piece.description=target.value;changed();const state=dialog.querySelector<HTMLElement>(".core-run-state");if(state)state.textContent="Draft — no new observations applied to the model";
+        dialog.querySelector(".core-photo-depth-selection")?.remove();for(const selected of dialog.querySelectorAll(".core-piece-selected"))selected.classList.remove("core-piece-selected");
+        closeDepthLog?.refresh();return;
+      }
       else return;
       changed();render();
     }
