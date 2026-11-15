@@ -1,0 +1,133 @@
+{
+  "version": "0.28.0",
+  "recordedAt": "2026-11-15T23:25:10.518122+00:00",
+  "baseCommit": "7adaad0ab964be21cf0e335407c3c8b7e3ca5cd9",
+  "unit": {
+    "passed": 680,
+    "files": 56
+  },
+  "playwright": {
+    "passed": 80,
+    "retries": 0,
+    "workers": 2,
+    "timeoutOverrides": false
+  },
+  "targetedPlaywright": {
+    "passed": 6
+  },
+  "build": {
+    "status": "passed",
+    "typescript": true,
+    "hosted": true,
+    "benchmark": true,
+    "standalone": true,
+    "arModels": true
+  },
+  "releaseMetadataValidation": {
+    "command": "RELEASE_TAG=v0.28.0 node scripts/release-assets.mjs validate .",
+    "status": "passed",
+    "output": "{\"version\":\"0.28.0\",\"notes\":\"- Add a depth-linked core log with aligned photo annotations and current borehole intervals, explicit unrepresented/reviewed missing-core spans, and unit-label comparison without an accuracy score.\\n- Select an interval to highlight its exact source-photograph bounds and corresponding piece form, including right-to-left rows and current-log boundaries inside a piece. Navigation preserves accepted logs and photo annotations.\\n- Export full-run interval CSV with source, registration and review metadata. Depth-window controls keep dense runs inspectable; the viewer works on desktop, mobile and in the standalone HTML.\\n- Keep Qwen evaluation independent: the pinned inference configuration, frozen datasets and desktop evaluation plan remain unchanged while hardware results are pending.\"}"
+  },
+  "initialDevelopmentFailures": {
+    "passed": 4,
+    "failed": 2,
+    "explanation": "The first targeted browser run made two incorrect test assumptions: a hidden source action was expected to be absent from the DOM, and selectOption was assumed to focus the selector before a keyboard action. The assertions/focus setup were corrected. The final six targeted checks and full eighty-test suite passed without retries."
+  },
+  "frozenHistoricalInputsAndInferenceSourceUnchanged": [
+    "docs/benchmarks/0.25.0-core-ai",
+    "docs/benchmarks/0.26.0-core-ai",
+    "docs/benchmarks/0.27.0-desktop-ai",
+    "public/core-benchmark-v026",
+    "src/coreBenchmark.worker.ts",
+    "src/coreBenchmark.ts",
+    "src/coreBenchmarkClient.ts",
+    "src/coreBenchmarkView.ts",
+    "src/coreBenchmarkSummary.ts",
+    "src/coreBenchmarkTransport.ts",
+    "src/coreBenchmarkDiagnostics.ts",
+    "src/coreBenchmark.css",
+    "core-ai-benchmark.html",
+    "src/coreAi.ts",
+    "src/coreAi.worker.ts",
+    "src/coreAiClient.ts",
+    "src/coreAiCrop.ts",
+    "src/coreAiView.ts"
+  ],
+  "evaluationPlan": {
+    "id": "qwen-desktop-1",
+    "sha256": "8c5ec24878ff5efd8ac16c2f45fc10e75852614dc485bfe3b1ae4af43a9449a3",
+    "unchanged": true
+  },
+  "sourceSha256": {
+    "src/coreDepthLog.ts": "e1f78f7f97502aee63a9acace058ac72cb4234e4aa2d8e1f890aa6a1560521ec",
+    "src/coreDepthLogView.ts": "2f9214be07b7333569644a8e7cf93560e23afeb88b3ea76099af585fd50049d8",
+    "src/coreDepthLog.css": "21fe809c1752e7cd742201e177031ddd7b46915182edbb40168859c2e087d59c",
+    "src/corePhotoView.ts": "831ac7fb2cfe8d08e108aefd444c53f07a4b4e27a55b178637ff3d76ace1740e",
+    "src/corePhoto.css": "6db71fcf94c9d55eef3f7dabd526a11a3ab3b4ef2afa5ceeac6a94129db3bbef",
+    "tests/coreDepthLog.test.ts": "1ebe7918579b12e760de1e1a81cf7ff18d21392e6a8a6448fe42cd794d71f6fc",
+    "tests/browser/core-depth-log.spec.ts": "2ce7ff16d47a0b73442ea6d390c36a96ce8a3e7349941d71971a841eebdf28c1",
+    "playwright.config.ts": "ca84a3a5a468fcf932d02a5203406b568df8b3fadcd9cf684041fa9b4f265570",
+    "package.json": "290651e0d9605671a34b1064ef71262393d100df07989f5afb7838d9e358d1a7",
+    "package-lock.json": "b3691625e4aa0aace45d9db74c0da5b9b02bf2343154cc51d40c008373510770"
+  },
+  "standaloneArtifact": {
+    "filename": "geomodel3d-offline.html",
+    "bytes": 4415757,
+    "sha256": "92c0eef85d5808c8b252eaff64ebc5f5b3703297c0588a93cf4a18a375a09cf2"
+  },
+  "benchmarkWorkerArtifact": {
+    "filename": "coreBenchmark.worker-BWHLncoB.js",
+    "sha256": "33b8b7d504cb6a1b5cd53d7a42c7ce4f7507e51e26b35f754e713576882efb2a",
+    "identicalToVersion": "0.27.0"
+  },
+  "logs": {
+    "unit": {
+      "path": "0.28.0-unit.log.gz",
+      "sha256": "b6270123134854906ce10fafd94bdb708c89baa0685384d8010e86b03bc13b99",
+      "uncompressedSha256": "f227d07e6cf9a8c6fdf1941640237aee9fd0f6afeaadc82687be8210a1721116"
+    },
+    "build": {
+      "path": "0.28.0-build.log.gz",
+      "sha256": "a310c9180e0f11198285e9843f8c5513c3da155733655b8b40a1b559057e0ef9",
+      "uncompressedSha256": "3979b566573a8ecb3a9a6228e7e6aacf31ed67e372ea0581e522b8e2a9a98d75"
+    },
+    "playwright": {
+      "path": "0.28.0-playwright.log.gz",
+      "sha256": "3c1bd7d5beb8c5e2df805d9957a656f8fed154a3e382fb1f0dbc7c59ac135f5d",
+      "uncompressedSha256": "03509bb620ce08ad15a27b813fce082613cc75aa1113e1a44e607537170cb5ed"
+    },
+    "targeted-playwright": {
+      "path": "0.28.0-targeted-playwright.log.gz",
+      "sha256": "f81cbd1560b0d5fcbb071747ba919333f98d5cf3c1405f3cb33cd0359e26f359",
+      "uncompressedSha256": "6a2f81b020019c61d94883b23a62227e79fd9a9564ea4dbdf15946dee6781ed4"
+    },
+    "initial-targeted-playwright": {
+      "path": "0.28.0-initial-targeted-playwright.log.gz",
+      "sha256": "4c4214b3a19fec2ab83a34a2ac91507c12ad4864a7cbed31a491bad2e5dddcc8",
+      "uncompressedSha256": "58b536959fd914c9ae9e8e2ea335b5d3a046b2647c88b9d006cf213356a9ee91"
+    }
+  },
+  "screenshots": [
+    {
+      "path": "0.28.0-core-depth-log-desktop.png",
+      "sha256": "ad2ed852471672c7a4611e161cf9aa37952617119065a8cc1cc65a44ecf16264",
+      "scope": "Playwright depth-log workflow with synthetic photograph and annotation fixtures. Mobile uses Chromium emulation; no model inference or geological-quality evidence."
+    },
+    {
+      "path": "0.28.0-core-depth-log-mobile.png",
+      "sha256": "b995aa82ff5a26a44f8b40848302b1c3a34ac15bc5f0c9ccb28804ca6194bc09",
+      "scope": "Playwright depth-log workflow with synthetic photograph and annotation fixtures. Mobile uses Chromium emulation; no model inference or geological-quality evidence."
+    },
+    {
+      "path": "0.28.0-core-depth-log-source.png",
+      "sha256": "4424ea3ba003c16fc7d7040d1d91a5953132fbcf1575dea8fb61f736d7dab1d5",
+      "scope": "Playwright depth-log workflow with synthetic photograph and annotation fixtures. Mobile uses Chromium emulation; no model inference or geological-quality evidence."
+    },
+    {
+      "path": "0.28.0-core-depth-log-offline.png",
+      "sha256": "8ae254b9d99a2f30a8865808d7ed01d9a4712bc0e87e893ef6dd87e3e0e95b78",
+      "scope": "Playwright depth-log workflow with synthetic photograph and annotation fixtures. Mobile uses Chromium emulation; no model inference or geological-quality evidence."
+    }
+  ],
+  "evidenceScope": "Software validation of depth alignment, source selection, existing annotation/current-log comparison, CSV export and unchanged project data. Fixtures are synthetic. No new AI inference, desktop-GPU performance, expert geological grading or image-derived engineering-property claim is established."
+}

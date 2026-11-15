@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.28.0 — 2026-11-15
+
+- Add a depth-linked core log with aligned photo annotations and current borehole intervals, explicit unrepresented/reviewed missing-core spans, and unit-label comparison without an accuracy score.
+- Select an interval to highlight its exact source-photograph bounds and corresponding piece form, including right-to-left rows and current-log boundaries inside a piece. Navigation preserves accepted logs and photo annotations.
+- Export full-run interval CSV with source, registration and review metadata. Depth-window controls keep dense runs inspectable; the viewer works on desktop, mobile and in the standalone HTML.
+- Keep Qwen evaluation independent: the pinned inference configuration, frozen datasets and desktop evaluation plan remain unchanged while hardware results are pending.
+
 ## 0.27.0 — 2026-11-15
 
 - Prioritize a documented desktop/laptop hardware GPU for the next Qwen evaluation milestone: Chrome preferred, Edge validated per configuration, and iPhone/mobile AI optional. Existing mobile modelling and manual core-photo workflows continue independently.
