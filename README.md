@@ -57,6 +57,8 @@ This is a promising description result, not geological accuracy or human-geologi
 
 [Read all 16 answers, images, scores, source credits and reproduction steps](docs/benchmarks/0.25.0-core-ai/README.md). The study is exploratory: eight public patches, unverified borehole independence and unknown pretraining overlap. The app's default remains unchanged pending a larger expert-reviewed and real-device evaluation.
 
+**Continue the study on your device:** the [Qwen evaluation page](https://kilickursat.github.io/GeoModel3D/core-ai-benchmark.html) provides forty new fixed images, source-only review, explicit local model downloads and exportable device results. Interrupted runs can be recovered without automatically restarting inference. [Protocol and instructions](docs/benchmarks/0.26.0-core-ai/README.md) keep CPU diagnostics, browser execution and human quality review separate. The expanded set has no human-validated quality score yet, and physical iPhone performance remains unmeasured.
+
 ## Your data
 
 Use **Import…** or drop the files on the page:
@@ -113,7 +115,7 @@ GitHub's **Cite this repository** gives the reference from [CITATION.cff](CITATI
   author  = {Kilic, Kursat},
   title   = {GeoModel3D: 3D geological models from borehole logs and CPTs, in the browser},
   url     = {https://github.com/kilickursat/GeoModel3D},
-  version = {0.25.0},
+  version = {0.26.0},
   year    = {2026},
   license = {Apache-2.0}
 }
@@ -125,4 +127,4 @@ GeoModel3D's source code is in the [XERJ Corpus Hub](https://hub.xerj.org/corpus
 
 ## License
 
-Apache-2.0: see [LICENSE](LICENSE). The data of the sample sites keep their own terms, listed in [sites](docs/sites.md#data-sources). The real-core benchmark images and dataset manifest retain their separate [CC BY-SA 4.0 notice and attribution](docs/benchmarks/0.25.0-core-ai/NOTICE.md). PDFs are read with [PDF.js](https://mozilla.github.io/pdf.js/) (Apache-2.0); the fonts and image decoders served with it keep their own licences, which are served beside them. Scanned pages are read with [PP-OCRv6 small](https://huggingface.co/PaddlePaddle/PP-OCRv6_small_det_onnx) by PaddlePaddle (Apache-2.0) and [ONNX Runtime Web](https://onnxruntime.ai/) (MIT).
+Apache-2.0: see [LICENSE](LICENSE). The data of the sample sites keep their own terms, listed in [sites](docs/sites.md#data-sources). The real-core benchmark images and manifests retain separate CC BY-SA 4.0 notices and attribution for the [eight-image pilot](docs/benchmarks/0.25.0-core-ai/NOTICE.md) and [forty-image device study](docs/benchmarks/0.26.0-core-ai/NOTICE.md). PDFs are read with [PDF.js](https://mozilla.github.io/pdf.js/) (Apache-2.0); the fonts and image decoders served with it keep their own licences, which are served beside them. Scanned pages are read with [PP-OCRv6 small](https://huggingface.co/PaddlePaddle/PP-OCRv6_small_det_onnx) by PaddlePaddle (Apache-2.0) and [ONNX Runtime Web](https://onnxruntime.ai/) (MIT).

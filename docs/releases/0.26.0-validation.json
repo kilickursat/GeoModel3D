@@ -1,0 +1,166 @@
+{
+  "schemaVersion": 1,
+  "appVersion": "0.26.0",
+  "dateUtc": "2026-11-15",
+  "status": "software-validation-passed",
+  "unit": {
+    "command": "npm test",
+    "passed": 643,
+    "filesPassed": 52,
+    "durationSeconds": 42.45,
+    "log": "0.26.0-validation/unit.log.gz"
+  },
+  "ui": {
+    "command": "npm run test:ui",
+    "passed": 69,
+    "failed": 0,
+    "benchmarkTests": 12,
+    "reportedDuration": "7.9m",
+    "exitCode": 0,
+    "workers": 2,
+    "defaultTestTimeoutMs": 45000,
+    "existingTimeoutOverridesUnchanged": true,
+    "browserTypeScriptCheckPassed": true,
+    "log": "0.26.0-validation/ui-final.log.gz"
+  },
+  "uiEarlierAttempts": [
+    {
+      "kind": "targeted",
+      "passed": 11,
+      "failed": 1,
+      "reportedDuration": "28.2s",
+      "reason": "A test expected obsolete reviewer_name/reviewer_role CSV headers. Corrected only the assertion to reference_reviewer_id/reference_reviewer_role/reference_qualification_basis.",
+      "log": "0.26.0-validation/ui-targeted-initial.log.gz",
+      "correctionRerun": {
+        "passed": 1,
+        "failed": 0,
+        "reportedDuration": "6.9s",
+        "log": "0.26.0-validation/ui-targeted-correction.log.gz"
+      }
+    },
+    {
+      "kind": "interrupted-full-suite",
+      "passed": 17,
+      "failed": 4,
+      "interrupted": 2,
+      "notRun": 46,
+      "reportedDuration": "6.9m",
+      "exitCode": 130,
+      "reason": "Stopped during concurrent CPU diagnostics, software WebGPU inference and source/artifact writes observed to trigger Vite reloads. The four failures exhausted existing test timeouts; this attempt is not a passing run.",
+      "subsequentResult": "All 69 tests, including those four, passed unchanged after CPU diagnostics completed and source/artifact HTML writes were frozen. Software WebGPU inference continued.",
+      "log": "0.26.0-validation/ui-interrupted.log.gz"
+    },
+    {
+      "kind": "server-startup-failure",
+      "testsRun": 0,
+      "exitCode": 1,
+      "reason": "Sandbox denied the local Vite listener: listen EPERM 127.0.0.1:4173. Retried with tool network permission; no code or timeout change.",
+      "log": "0.26.0-validation/ui-server-startup-failure.log.gz",
+      "diagnosticTranscript": "0.26.0-validation/ui-server-startup-diagnostic.txt.gz"
+    }
+  ],
+  "inferenceScope": {
+    "browserBenchmarkTests": "Synthetic PNG inputs, mocked WebGPU capability and a synthetic worker response; software behavior tests only. No real model quality, speed, accuracy or physical-device qualification is inferred.",
+    "mobile": "Chromium iPhone 17 viewport emulation, not physical iPhone Safari.",
+    "actualModelEvidence": "Reported separately in docs/benchmarks/0.26.0-core-ai; not included in these test pass counts."
+  },
+  "screenshots": {
+    "state": "Actual initial page with no WebGPU adapter available; no capability or inference mocks.",
+    "pageErrors": 0,
+    "caseImageRequests": 0,
+    "modelRequests": 0,
+    "workerRequests": 0,
+    "visuallyInspected": true,
+    "images": [
+      {
+        "path": "0.26.0-device-benchmark-desktop.png",
+        "sha256": "1d857510c5d3e9c2942a2c0c1761928347b09d520f403a7b97e240821bf4f477",
+        "viewportCssPixels": 1440,
+        "scrollWidthCssPixels": 1440
+      },
+      {
+        "path": "0.26.0-device-benchmark-mobile.png",
+        "sha256": "62b014035db0c8e3c332848a95db1558034e55aaa7796ee392e32928a5c19a13",
+        "viewportCssPixels": 402,
+        "scrollWidthCssPixels": 402
+      }
+    ],
+    "captureMetadata": "0.26.0-validation/screenshots.json.gz"
+  },
+  "build": {
+    "command": "npm run build",
+    "status": "passed",
+    "exitCode": 0,
+    "log": "0.26.0-validation/build-final.log.gz",
+    "releaseAssets": {
+      "command": "RELEASE_TAG=v0.26.0 node scripts/release-assets.mjs prepare",
+      "status": "passed",
+      "confirmation": "Release agent reported successful completion; the following output hashes were independently checked."
+    },
+    "standalone": {
+      "path": "dist/geomodel3d-offline.html",
+      "bytes": 4391813,
+      "sha256": "7f62b16cf5582692434967892bfa05b2898e3ac034f8a8e34a21a7765e3efa20"
+    },
+    "benchmarkWorker": {
+      "path": "dist/assets/coreBenchmark.worker-DwxwTrxh.js",
+      "bytes": 539205,
+      "sha256": "6786bead9383db5675ca8e2ff97adff40c82988281e950a7e7dc0d9f9e20b40d",
+      "matchesActualWebgpuSnapshot": true
+    }
+  },
+  "diffCheck": "passed",
+  "archive": {
+    "directory": "0.26.0-validation",
+    "compression": "gzip level 9, mtime=0, empty original filename; reproducible from identical input bytes.",
+    "sha256Manifest": "0.26.0-validation/SHA256SUMS",
+    "decodedLogs": [
+      {
+        "path": "0.26.0-validation/unit.log.gz",
+        "decodedBytes": 373,
+        "decodedSha256": "b10db6747595876c1e5fb01695e5e47d4096fabad9c56250bd7069dff4a46ddf"
+      },
+      {
+        "path": "0.26.0-validation/ui-targeted-initial.log.gz",
+        "decodedBytes": 23608,
+        "decodedSha256": "c5f23ba8815cebb47a2adb94bb5d568012252c193079dd133d17da98985f672a"
+      },
+      {
+        "path": "0.26.0-validation/ui-targeted-correction.log.gz",
+        "decodedBytes": 957,
+        "decodedSha256": "1a77870acf3d43f7cc5de64e2b03603cc0a6d1c852aea872575c0b14274f65b2"
+      },
+      {
+        "path": "0.26.0-validation/ui-interrupted.log.gz",
+        "decodedBytes": 22922,
+        "decodedSha256": "47370db49d715082d21879c4a55fc3122c460711d3f9404a56d9cc44436ec92a"
+      },
+      {
+        "path": "0.26.0-validation/ui-server-startup-failure.log.gz",
+        "decodedBytes": 277,
+        "decodedSha256": "8c1a6ee739432d695c6f159857f629a96b01166603e4ace3ba170cd332323026"
+      },
+      {
+        "path": "0.26.0-validation/ui-final.log.gz",
+        "decodedBytes": 19276,
+        "decodedSha256": "f162def473566a95c53297a2b67422773e5f57d7c38551d290f121a52e6f7094"
+      },
+      {
+        "path": "0.26.0-validation/build-final.log.gz",
+        "decodedBytes": 34293,
+        "decodedSha256": "58cf89af052570da65e8712e72074bb022906694ff18fb83cd5e05a23da495d1"
+      },
+      {
+        "path": "0.26.0-validation/screenshots.json.gz",
+        "decodedBytes": 609,
+        "decodedSha256": "f73757b66d69036b3ba9d07e063558849982ee905ff1c9d5bc4aca0ea4594ed3"
+      },
+      {
+        "path": "0.26.0-validation/ui-server-startup-diagnostic.txt.gz",
+        "decodedBytes": 598,
+        "decodedSha256": "21a4abf91f2ca8c78d52a0e132c334051f36a556b320063cfe15e458fdd262d0"
+      }
+    ],
+    "exclusions": "Large traces, model weights, credentials and device inference outputs are not archived here."
+  }
+}

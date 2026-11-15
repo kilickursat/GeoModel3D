@@ -1,0 +1,14 @@
+{
+  "scope": "CPU technical diagnostics only; excluded from WebGPU coverage and human quality scores",
+  "rawResultsSha256": "56d1beb4f1d031a355d59b3b3dd75d1e8e3dbf9626e459cd0e60265c2dbd1e34",
+  "expectedCases": 40,
+  "completed": 40,
+  "cappedCaseIds": [
+    "case-02",
+    "case-05",
+    "case-13"
+  ],
+  "failedCaseIds": [],
+  "humanReviewStatus": "awaiting-qualified-human-review",
+  "qualityScores": null
+}

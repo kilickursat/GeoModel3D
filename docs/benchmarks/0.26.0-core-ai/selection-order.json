@@ -1,0 +1,430 @@
+{
+  "frozenAt": "2026-11-15T07:38:45.522250+00:00",
+  "seed": "geomodel3d-core-v026-20261115",
+  "algorithm": "Round-robin garbage, limestone, sandstone, shale for 10 rounds. Within each class scan ascending SHA256(UTF8(seed + NUL + archive path)), accepting first unused inferred-parent tray whose inferred hole prefix has fewer than 3 selected cases. Exclude prior-eight exact paths and their inferred parent trays.",
+  "selectedBeforeViewingOrInference": true,
+  "originalInventorySha256": "536d634f8f50912a1fa531e95720ab31d0b3f7f7b880b38c1596f72d3339b58e",
+  "samples": [
+    {
+      "id": "case-01",
+      "referenceClass": "garbage",
+      "originalArchivePath": "Lithology Dataset/test/garbage/LB04D005_21_row_4_14.jpg (2)_C2_.jpeg",
+      "selectionRankWithinClass": 1,
+      "holeLikeToken": "LB04D005",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "LB04D005_21",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-02",
+      "referenceClass": "limestone",
+      "originalArchivePath": "Lithology Dataset/test/limestone/LB04D005_13_row_1_2_30.jpg.jpeg",
+      "selectionRankWithinClass": 1,
+      "holeLikeToken": "LB04D005",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "LB04D005_13",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-03",
+      "referenceClass": "sandstone",
+      "originalArchivePath": "Lithology Dataset/test/sandstone/AS10D04_68_row_0_11.jpeg",
+      "selectionRankWithinClass": 1,
+      "holeLikeToken": "AS10D04",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "AS10D04_68",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-04",
+      "referenceClass": "shale",
+      "originalArchivePath": "Lithology Dataset/test/shale/08PD04c_80b_row_3_9.jpeg",
+      "selectionRankWithinClass": 1,
+      "holeLikeToken": "08PD04c",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "08PD04c_80b",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-05",
+      "referenceClass": "garbage",
+      "originalArchivePath": "Lithology Dataset/test/garbage/07PD01_61_row_3_5.jpg_C3_.jpeg",
+      "selectionRankWithinClass": 2,
+      "holeLikeToken": "07PD01",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "07PD01_61",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-06",
+      "referenceClass": "limestone",
+      "originalArchivePath": "Lithology Dataset/test/limestone/08PD04c_37_row_2_1_19.jpg.jpeg",
+      "selectionRankWithinClass": 2,
+      "holeLikeToken": "08PD04c",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "08PD04c_37",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-07",
+      "referenceClass": "sandstone",
+      "originalArchivePath": "Lithology Dataset/test/sandstone/IHAD3_106_row_2_6.jpeg",
+      "selectionRankWithinClass": 2,
+      "holeLikeToken": "IHAD3",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "IHAD3_106",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-08",
+      "referenceClass": "shale",
+      "originalArchivePath": "Lithology Dataset/test/shale/AS10D04_62_row_3_25.jpeg",
+      "selectionRankWithinClass": 2,
+      "holeLikeToken": "AS10D04",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "AS10D04_62",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-09",
+      "referenceClass": "garbage",
+      "originalArchivePath": "Lithology Dataset/test/garbage/IHAD2_43_row_2_0.jpg (2)_C1_.jpeg",
+      "selectionRankWithinClass": 3,
+      "holeLikeToken": "IHAD2",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "IHAD2_43",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-10",
+      "referenceClass": "limestone",
+      "originalArchivePath": "Lithology Dataset/test/limestone/PLAYFORD 1_1_row_1_26.jpeg",
+      "selectionRankWithinClass": 3,
+      "holeLikeToken": "PLAYFORD 1",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "PLAYFORD 1_1",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-11",
+      "referenceClass": "sandstone",
+      "originalArchivePath": "Lithology Dataset/test/sandstone/HODD2_42_row_3_11.jpeg",
+      "selectionRankWithinClass": 3,
+      "holeLikeToken": "HODD2",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "HODD2_42",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-12",
+      "referenceClass": "shale",
+      "originalArchivePath": "Lithology Dataset/test/shale/HODD1_45b_row_4_40.jpeg",
+      "selectionRankWithinClass": 3,
+      "holeLikeToken": "HODD1",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "HODD1_45b",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-13",
+      "referenceClass": "garbage",
+      "originalArchivePath": "Lithology Dataset/test/garbage/AS10D04_55_row_3_33.jpg_C3_.jpeg",
+      "selectionRankWithinClass": 4,
+      "holeLikeToken": "AS10D04",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "AS10D04_55",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-14",
+      "referenceClass": "limestone",
+      "originalArchivePath": "Lithology Dataset/test/limestone/WC05D001_24_row_4_2_13.jpg.jpeg",
+      "selectionRankWithinClass": 4,
+      "holeLikeToken": "WC05D001",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "WC05D001_24",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-15",
+      "referenceClass": "sandstone",
+      "originalArchivePath": "Lithology Dataset/test/sandstone/MURNAROO 1_67_row_5_2.jpeg",
+      "selectionRankWithinClass": 4,
+      "holeLikeToken": "MURNAROO 1",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "MURNAROO 1_67",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-16",
+      "referenceClass": "shale",
+      "originalArchivePath": "Lithology Dataset/test/shale/HODD1_37_row_3_30.jpeg",
+      "selectionRankWithinClass": 6,
+      "holeLikeToken": "HODD1",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "HODD1_37",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-17",
+      "referenceClass": "garbage",
+      "originalArchivePath": "Lithology Dataset/test/garbage/LB04D005_16_row_2_11.jpg_C2_.jpeg",
+      "selectionRankWithinClass": 5,
+      "holeLikeToken": "LB04D005",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "LB04D005_16",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-18",
+      "referenceClass": "limestone",
+      "originalArchivePath": "Lithology Dataset/test/limestone/WC05D001_9_row_4_1_7.jpg.jpeg",
+      "selectionRankWithinClass": 5,
+      "holeLikeToken": "WC05D001",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "WC05D001_9",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-19",
+      "referenceClass": "sandstone",
+      "originalArchivePath": "Lithology Dataset/test/sandstone/CDP008_41b_row_3_21.jpeg",
+      "selectionRankWithinClass": 5,
+      "holeLikeToken": "CDP008",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "CDP008_41b",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-20",
+      "referenceClass": "shale",
+      "originalArchivePath": "Lithology Dataset/test/shale/IHAD2_40_row_1_18.jpeg",
+      "selectionRankWithinClass": 8,
+      "holeLikeToken": "IHAD2",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "IHAD2_40",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-21",
+      "referenceClass": "garbage",
+      "originalArchivePath": "Lithology Dataset/test/garbage/OBD 7_21_row_4_13.jpg_C1_.jpeg",
+      "selectionRankWithinClass": 6,
+      "holeLikeToken": "OBD 7",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "OBD 7_21",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-22",
+      "referenceClass": "limestone",
+      "originalArchivePath": "Lithology Dataset/test/limestone/RL 1_5_row_2_33.jpeg",
+      "selectionRankWithinClass": 7,
+      "holeLikeToken": "RL 1",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "RL 1_5",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-23",
+      "referenceClass": "sandstone",
+      "originalArchivePath": "Lithology Dataset/test/sandstone/CDP008_44_row_3_11.jpeg",
+      "selectionRankWithinClass": 6,
+      "holeLikeToken": "CDP008",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "CDP008_44",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-24",
+      "referenceClass": "shale",
+      "originalArchivePath": "Lithology Dataset/test/shale/WDDD2_2b_row_3_38.jpeg",
+      "selectionRankWithinClass": 11,
+      "holeLikeToken": "WDDD2",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "WDDD2_2b",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-25",
+      "referenceClass": "garbage",
+      "originalArchivePath": "Lithology Dataset/test/garbage/IHAD2_36_row_3_0.jpg_C3_.jpeg",
+      "selectionRankWithinClass": 7,
+      "holeLikeToken": "IHAD2",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "IHAD2_36",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-26",
+      "referenceClass": "limestone",
+      "originalArchivePath": "Lithology Dataset/test/limestone/WC05D001_32_row_1_1_20.jpg.jpeg",
+      "selectionRankWithinClass": 17,
+      "holeLikeToken": "WC05D001",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "WC05D001_32",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-27",
+      "referenceClass": "sandstone",
+      "originalArchivePath": "Lithology Dataset/test/sandstone/HODD2_35_row_1_15.jpeg",
+      "selectionRankWithinClass": 7,
+      "holeLikeToken": "HODD2",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "HODD2_35",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-28",
+      "referenceClass": "shale",
+      "originalArchivePath": "Lithology Dataset/test/shale/07PD01_66_row_0_25.jpeg",
+      "selectionRankWithinClass": 15,
+      "holeLikeToken": "07PD01",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "07PD01_66",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-29",
+      "referenceClass": "garbage",
+      "originalArchivePath": "Lithology Dataset/test/garbage/08PD04c_89_row_1_0.jpg (2)_C3_.jpeg",
+      "selectionRankWithinClass": 10,
+      "holeLikeToken": "08PD04c",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "08PD04c_89",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-30",
+      "referenceClass": "limestone",
+      "originalArchivePath": "Lithology Dataset/test/limestone/COD013_2_row_1_26.jpeg",
+      "selectionRankWithinClass": 18,
+      "holeLikeToken": "COD013",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "COD013_2",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-31",
+      "referenceClass": "sandstone",
+      "originalArchivePath": "Lithology Dataset/test/sandstone/IHAD3_186_row_2_10.jpeg",
+      "selectionRankWithinClass": 8,
+      "holeLikeToken": "IHAD3",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "IHAD3_186",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-32",
+      "referenceClass": "shale",
+      "originalArchivePath": "Lithology Dataset/test/shale/WDDD2_7_row_4_18.jpeg",
+      "selectionRankWithinClass": 17,
+      "holeLikeToken": "WDDD2",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "WDDD2_7",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-33",
+      "referenceClass": "garbage",
+      "originalArchivePath": "Lithology Dataset/test/garbage/PLAYFORD 1_18_row_1_15.jpg (2)_C3_.jpeg",
+      "selectionRankWithinClass": 12,
+      "holeLikeToken": "PLAYFORD 1",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "PLAYFORD 1_18",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-34",
+      "referenceClass": "limestone",
+      "originalArchivePath": "Lithology Dataset/test/limestone/PLAYFORD 1_13_row_3_4.jpeg",
+      "selectionRankWithinClass": 19,
+      "holeLikeToken": "PLAYFORD 1",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "PLAYFORD 1_13",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-35",
+      "referenceClass": "sandstone",
+      "originalArchivePath": "Lithology Dataset/test/sandstone/SH 7_12_row_5_10.jpeg",
+      "selectionRankWithinClass": 9,
+      "holeLikeToken": "SH 7",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "SH 7_12",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-36",
+      "referenceClass": "shale",
+      "originalArchivePath": "Lithology Dataset/test/shale/07PD01_71_row_0_2.jpeg",
+      "selectionRankWithinClass": 19,
+      "holeLikeToken": "07PD01",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "07PD01_71",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-37",
+      "referenceClass": "garbage",
+      "originalArchivePath": "Lithology Dataset/test/garbage/PRICES BORE 1_8_row_2_0.jpg_C0_.jpeg",
+      "selectionRankWithinClass": 13,
+      "holeLikeToken": "PRICES BORE 1",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "PRICES BORE 1_8",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-38",
+      "referenceClass": "limestone",
+      "originalArchivePath": "Lithology Dataset/test/limestone/COD012_3_row_3_26.jpeg",
+      "selectionRankWithinClass": 37,
+      "holeLikeToken": "COD012",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "COD012_3",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-39",
+      "referenceClass": "sandstone",
+      "originalArchivePath": "Lithology Dataset/test/sandstone/SH 7_9_row_1_15.jpeg",
+      "selectionRankWithinClass": 10,
+      "holeLikeToken": "SH 7",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "SH 7_9",
+      "parentLikeTokenVerified": false
+    },
+    {
+      "id": "case-40",
+      "referenceClass": "shale",
+      "originalArchivePath": "Lithology Dataset/test/shale/HODD1_51b_row_3_4.jpeg",
+      "selectionRankWithinClass": 22,
+      "holeLikeToken": "HODD1",
+      "holeLikeTokenVerified": false,
+      "parentLikeToken": "HODD1_51b",
+      "parentLikeTokenVerified": false
+    }
+  ],
+  "prefixCounts": {
+    "LB04D005": 3,
+    "AS10D04": 3,
+    "08PD04c": 3,
+    "07PD01": 3,
+    "IHAD3": 2,
+    "IHAD2": 3,
+    "PLAYFORD 1": 3,
+    "HODD2": 2,
+    "HODD1": 3,
+    "WC05D001": 3,
+    "MURNAROO 1": 1,
+    "CDP008": 2,
+    "OBD 7": 1,
+    "RL 1": 1,
+    "WDDD2": 2,
+    "COD013": 1,
+    "SH 7": 2,
+    "PRICES BORE 1": 1,
+    "COD012": 1
+  }
+}

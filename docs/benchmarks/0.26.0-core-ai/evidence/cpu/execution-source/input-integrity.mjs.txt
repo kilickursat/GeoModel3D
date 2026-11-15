@@ -1,0 +1,24 @@
+import {readFile} from 'node:fs/promises';
+import {resolve} from 'node:path';
+import {root,repo,revision,digest} from './verify-qwen-cache.mjs';
+export const expectedManifestSha='b61549c3de8714e2f015056276efc23dfb3c6f3e1206fbd6611b68af3712c391';
+export const expectedSourceSha='301b53789551d3423730f56572762ab99cee8f59b1d1e7b3dfa30c6cf80141d2';
+export async function frozenInputs(){
+ if(process.env.ALLOW_FROZEN_V026_INFERENCE!=='1')throw Error('Await root confirmation of the frozen protocol/dataset before inference.');
+ const expectedProtocolSha=process.env.EXPECTED_PROTOCOL_SHA256;if(!/^[a-f0-9]{64}$/.test(expectedProtocolSha??''))throw Error('Provide the final frozen EXPECTED_PROTOCOL_SHA256.');
+ const folder=resolve(root,'public/core-benchmark-v026'),docs=resolve(root,'docs/benchmarks/0.26.0-core-ai');
+ const [manifestBytes,sourceBytes,inputBytes,protocolBytes,rubricBytes]=await Promise.all(['manifest.json','dataset-manifest.json','inputs.json','protocol.json','rubric.md'].map((name,i)=>readFile(resolve([folder,docs,folder,docs,docs][i],name))));
+ const hashes={publicManifestSha256:digest(manifestBytes),sourceManifestSha256:digest(sourceBytes),inputManifestSha256:digest(inputBytes),protocolSha256:digest(protocolBytes),rubricSha256:digest(rubricBytes)};
+ if(hashes.publicManifestSha256!==expectedManifestSha||hashes.sourceManifestSha256!==expectedSourceSha||hashes.protocolSha256!==expectedProtocolSha)throw Error('Frozen manifest or protocol hash mismatch.');
+ const manifest=JSON.parse(manifestBytes),source=JSON.parse(sourceBytes),inputs=JSON.parse(inputBytes),protocol=JSON.parse(protocolBytes);
+ if(manifest.version!==1||manifest.datasetId!=='core-v026'||manifest.cases.length!==40||source.samples.length!==40||inputs.inputs.length!==40||inputs.sourceManifestSha256!==hashes.sourceManifestSha256)throw Error('Dataset contract mismatch.');
+ if(protocol.protocolId!=='core-webgpu-pilot-2'||protocol.protocolDesignFrozenBeforeNewInference!==true||protocol.promptVersion!==2||protocol.model.repo!==repo||protocol.model.revision!==revision||protocol.model.enableThinking!==false||protocol.generation.doSample!==false||protocol.generation.repetitionPenalty!==1.1||protocol.generation.modes.quality.maxNewTokens!==128||protocol.execution.perCaseTimeoutMs!==1800000||JSON.stringify(protocol.execution.localValidationPlan.selectedCaseIds)!=='["case-11"]'||protocol.execution.localValidationPlan.mode!=='quality')throw Error('Frozen generation protocol mismatch.');
+ const old=JSON.parse(await readFile(resolve(root,'docs/benchmarks/0.25.0-core-ai/dataset-manifest.json'),'utf8'));const oldHashes=new Set(old.samples.map(s=>s.sha256));
+ for(let i=0;i<40;i++){
+  const c=manifest.cases[i],s=source.samples[i],p=inputs.inputs[i],id='case-'+String(i+1).padStart(2,'0');
+  if(c.id!==id||s.id!==id||p.id!==id||protocol.expectedCaseIds[i]!==id||c.image!==`images/${id}.png`||c.width!==512||c.height!==512||c.sourceSha256!==s.sha256||c.sourceSha256!==p.sourceSha256||c.sha256!==p.sha256||oldHashes.has(c.sourceSha256))throw Error('Case/source linkage mismatch: '+id);
+  const bytes=await readFile(resolve(folder,c.image));
+  if(bytes.length!==p.bytes||bytes.length>2100000||digest(bytes)!==c.sha256||!bytes.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10]))||bytes.readUInt32BE(16)!==512||bytes.readUInt32BE(20)!==512)throw Error('Prepared input mismatch: '+id);
+ }
+ return {folder,docs,manifest,source,inputs,protocol,hashes};
+}

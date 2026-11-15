@@ -108,6 +108,7 @@ Reports also identify model revisions and the fixed prompt, separate loading fro
 
 ### Modules
 
+- `src/coreBenchmark.ts`, `src/coreBenchmarkClient.ts`, `src/coreBenchmark.worker.ts`, `src/coreBenchmarkView.ts`: separate hosted Qwen device study, immutable image/model binding, bounded sequential runs, interruption/recovery and local evidence export. No project or acceptance API is imported. The [forty-case protocol](benchmarks/0.26.0-core-ai/README.md) separates compatibility, quality-mode execution and human grading; GPU memory and unverified physical-device claims remain unknown.
 The modelling kernel has no rendering dependencies. It is tested in Node, and the viewer is a thin layer on top.
 
 - `src/schema.ts`: the project schema (units, boreholes, logs, tests), with no data

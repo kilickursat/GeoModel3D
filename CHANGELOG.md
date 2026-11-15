@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.26.0 — 2026-11-15
+
+### Added
+- A separate hosted Qwen device-evaluation page with forty new frozen public image cases, explicit model downloads, single/five/full-cohort runs and distinct 128-token quality and 32-token compatibility modes. The main application's model selector/default is unchanged.
+- Input and protocol hashes, actual adapter/runtime metadata, separate loading/first-token/generation/full-case timing, failure and cap records, and explicit unknown GPU memory. Images and reports stay local; model output never changes accepted geology or engineering properties.
+- Image-only source review and a blank human review sheet. Qualified human assessment, verified borehole independence and physical iPhone measurements remain pending; no expanded-cohort accuracy score is claimed.
+- Cancellation, visibility interruption, a total case deadline including image fetch, and local report recovery without automatic inference restart. Completed, interrupted, timed-out and unstarted cases remain distinguishable in exports.
+
 ## 0.25.0 — 2026-11-15
 
 ### Added

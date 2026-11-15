@@ -27,13 +27,15 @@ function pdfjsAssets():Plugin{
 
 // Relative asset URLs: the same build works on GitHub Pages (/GeoModel3D/), any static host or sub-path.
 // Bare "three" resolves to the WebGPU build so the viewer and the three.js add-ons share one module.
-export default defineConfig({
+export default defineConfig(({mode})=>({
   base:"./",
   plugins:[pdfjsAssets()],
   resolve:{alias:[{find:/^three$/,replacement:"three/webgpu"}]},
-  build:{target:"es2022",chunkSizeWarningLimit:1500},
+  // Keep the main app a single entry for the standalone inliner. A second build
+  // adds the hosted benchmark without introducing shared chunks into index.html.
+  build:{target:"es2022",chunkSizeWarningLimit:1500,...(mode==="core-benchmark"?{emptyOutDir:false,rollupOptions:{input:"core-ai-benchmark.html"}}:{})},
   // The reading model's worker (src/docread/ocr.worker.ts) is a module: ONNX Runtime Web is one.
   worker:{format:"es"},
   // Geometry tests build full models; allow slower CI machines.
   test:{include:["tests/**/*.test.ts"],testTimeout:20000}
-});
+}));

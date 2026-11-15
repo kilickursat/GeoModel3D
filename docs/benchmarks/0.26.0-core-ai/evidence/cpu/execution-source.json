@@ -1,0 +1,26 @@
+[
+  {
+    "path": ".cache/v026/run-cpu-diagnostic.mjs",
+    "sha256": "8f51f5ecb9dae1fb20776286124c9b97c160a7f11493316fe90f313c56a22f29",
+    "archivedPath": "execution-source/run-cpu-diagnostic.mjs.txt",
+    "bytes": 3793
+  },
+  {
+    "path": ".cache/v026/input-integrity.mjs",
+    "sha256": "68e2eb6d5e8f6ccc09095d202e071425e422f10f6bfbaacccd49f1b5fc07a51b",
+    "archivedPath": "execution-source/input-integrity.mjs.txt",
+    "bytes": 3448
+  },
+  {
+    "path": ".cache/v026/verify-qwen-cache.mjs",
+    "sha256": "d76643aad30fb79184893260309340f4813706754b9c008b6cde2fc9e6a22f07",
+    "archivedPath": "execution-source/verify-qwen-cache.mjs.txt",
+    "bytes": 2242
+  },
+  {
+    "path": "scripts/core-ai-benchmark-runtime.mjs",
+    "sha256": "9105f8e32b37f156bd5427a5fa7ed4182b8f018c1d7105bd3f87ec4c9c0a3b37",
+    "archivedPath": "execution-source/core-ai-benchmark-runtime.mjs.txt",
+    "bytes": 8273
+  }
+]

@@ -1,0 +1,29 @@
+import {createServer} from 'node:http';
+import {createReadStream} from 'node:fs';
+import {stat} from 'node:fs/promises';
+import {resolve,extname} from 'node:path';
+import {root,modelDir} from './verify-qwen-cache.mjs';
+const types={'.html':'text/html; charset=utf-8','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.json':'application/json','.wasm':'application/wasm','.png':'image/png','.svg':'image/svg+xml','.ico':'image/x-icon','.woff':'font/woff','.woff2':'font/woff2'};
+export async function startStaticServer(verifiedFiles,requestLog,distPath=resolve(root,'dist')){
+ const allow=new Map(verifiedFiles.map(f=>[f.path,f]));const dist=resolve(distPath);
+ const server=createServer(async(req,res)=>{
+  let path;
+  try{
+   path=decodeURIComponent(new URL(req.url,'http://localhost').pathname);requestLog.push({path,method:req.method,at:new Date().toISOString()});
+   if(!['GET','HEAD'].includes(req.method)){res.writeHead(405);res.end();return}
+   if(path==='/transport-check.html'){res.writeHead(200,{'content-type':'text/html'});res.end('<!doctype html><title>Local weight transport check</title>');return}
+   const model=path.startsWith('/model-cache/'),relative=model?path.slice('/model-cache/'.length):path.slice(1)||'index.html';
+   const base=model?modelDir:dist,file=resolve(base,relative);
+   if(!file.startsWith(base+'/')||model&&!allow.has(relative)){res.writeHead(404);res.end();return}
+   const info=await stat(file);if(!info.isFile()){res.writeHead(404);res.end();return}
+   let start=0,end=info.size-1,status=200;
+   if(req.headers.range){const match=/^bytes=(\d+)-(\d*)$/.exec(req.headers.range);if(!match){res.writeHead(416);res.end();return}start=Number(match[1]);end=match[2]?Number(match[2]):end;if(start>end||end>=info.size){res.writeHead(416);res.end();return}status=206}
+   const headers={'content-type':types[extname(file)]??'application/octet-stream','content-length':end-start+1,'cache-control':'no-store','access-control-allow-origin':'*','accept-ranges':'bytes'};
+   if(status===206)headers['content-range']=`bytes ${start}-${end}/${info.size}`;
+   if(model)headers.etag='"'+allow.get(relative).sha256+'"';
+   res.writeHead(status,headers);if(req.method==='HEAD')res.end();else createReadStream(file,{start,end}).pipe(res);
+  }catch(error){if(!res.headersSent)res.writeHead(404);res.end()}
+ });
+ await new Promise(done=>server.listen(0,'127.0.0.1',done));
+ return {server,origin:`http://127.0.0.1:${server.address().port}`,close:()=>new Promise(done=>server.close(done))};
+}

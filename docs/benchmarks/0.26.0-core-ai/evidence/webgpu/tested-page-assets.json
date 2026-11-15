@@ -1,0 +1,20 @@
+[
+  {
+    "originalPath": "/core-ai-benchmark.html",
+    "originalSha256": "dad855b8cdcbff4e97ba62da68277ee31141cbc83d4a310fd106d21e5106662c",
+    "archive": "tested-page-assets/core-ai-benchmark.html.gz",
+    "compression": "gzip"
+  },
+  {
+    "originalPath": "/assets/core-ai-benchmark-DIN1WGtp.css",
+    "originalSha256": "9b630989e4eba39e21e0207535e4c9e0c3f4b3a4d6aee8c56d5ba20151ba3a44",
+    "archive": "tested-page-assets/core-ai-benchmark-DIN1WGtp.css.gz",
+    "compression": "gzip"
+  },
+  {
+    "originalPath": "/assets/core-ai-benchmark-CJd_lYUR.js",
+    "originalSha256": "3f16310e3a8080def3cd9e49e425ba92d62ac8052536bd11a63f66c101fe6dc6",
+    "archive": "tested-page-assets/core-ai-benchmark-CJd_lYUR.js.gz",
+    "compression": "gzip"
+  }
+]
