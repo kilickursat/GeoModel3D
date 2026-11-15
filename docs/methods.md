@@ -82,6 +82,18 @@ Information utility follows the Bayesian experimental-design principle in Lindle
 
 ## Architecture
 
+### Reviewed core photographs
+
+`src/corePhoto.ts` maps registered image rectangles to continuous recovered depth segments. Rows are straight and depth increases along their horizontal centerline in the selected direction. This linear mapping assumes a checked scale and negligible perspective distortion; a photograph alone cannot establish recovery positions or distinguish a natural break from drilling/handling damage. Unregistered spans remain absent from the accepted observations.
+
+Core recovery is `100 × registered recovered length / drilled run length`. RQD is `100 × total qualifying sound length / drilled run length`, with a qualifying length of at least 0.100 m after explicitly reviewed mechanical joins. Unknown soundness, unknown breaks, invalid joins, overlapping depths or incomplete registration/recovery review prevent a reviewed result. Unsound material interrupts joined sound lengths; sound fragments are never joined through it. A continuous logging boundary can divide lithology within intact core without introducing a fracture or reducing the joined length. The metric threshold and centerline convention follow the [USBR Engineering Geology Field Manual, volume I, chapter 5](https://www.usbr.gov/tsc/techreferences/mands/geologyfieldmanual-vol1/chap05.pdf).
+
+Acceptance creates immutable source-evidence records for the interpretation; later acceptance creates new records. The project keeps the current annotation draft separately from those snapshots. These records describe a manual photo assessment and never become laboratory/in-situ test values automatically. JSON and workspace import validate bounded annotations and references; the existing evidence image pool deduplicates photographs across revisions.
+
+The existing geological kernel still infers ordered contacts through gaps and between holes, with vertical boreholes. Missing core is not an empty 3-D volume. This workflow supplies observations and review provenance; it does not reconstruct a surveyed 3-D core, estimate fracture orientation, or infer engineering strength from RGB pixels.
+
+### Modules
+
 The modelling kernel has no rendering dependencies. It is tested in Node, and the viewer is a thin layer on top.
 
 - `src/schema.ts`: the project schema (units, boreholes, logs, tests), with no data
@@ -115,6 +127,7 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 - `src/crs.ts`: coordinate systems (registry, suggestion and conversion)
 - `src/tiles.ts`: map and elevation tiles, and terrain resampling
 - `src/evidence.ts`: source records, correction/acceptance events and import validation
+- `src/corePhoto.ts`, `src/corePhotoView.ts`, `src/corePhotoTables.ts`: depth registration, reviewed RQD, photo-to-log acceptance, the local photo workspace and interval updates that preserve unfinished table rows
 - `src/evidenceView.ts`: source-page inspector, independent of the PDF reader
 - `src/groundwater.ts`: shared observation selection and groundwater policies
 - `src/comparison.ts`: comparisons at fixed coordinates, matched by unit identity

@@ -42,6 +42,9 @@ export default defineConfig({
     {name:"calibrated-investigation",testMatch:/calibrated-investigation\.spec\.ts$/,grepInvert:/mobile calibrated workflow|standalone calibrated workflow/,use:{...devices["Desktop Chrome"],viewport:{width:1440,height:1000}}},
     {name:"calibrated-investigation-mobile",testMatch:/calibrated-investigation\.spec\.ts$/,grep:/mobile calibrated workflow/,use:{...devices["Pixel 7"]}},
     {name:"calibrated-investigation-offline",testMatch:/calibrated-investigation\.spec\.ts$/,grep:/standalone calibrated workflow/,use:{...devices["Desktop Chrome"]}},
+    {name:"core-photo",testMatch:/core-photo\.spec\.ts$/,grepInvert:/mobile core photo|standalone core photo/,use:{...devices["Desktop Chrome"],viewport:{width:1440,height:1000}}},
+    {name:"core-photo-mobile",testMatch:/core-photo\.spec\.ts$/,grep:/mobile core photo/,use:{...devices["iPhone 17"],defaultBrowserType:"chromium"}},
+    {name:"core-photo-offline",testMatch:/core-photo\.spec\.ts$/,grep:/standalone core photo/,use:{...devices["Desktop Chrome"]}},
     {name:"offline",testMatch:/offline\.spec\.ts$/,use:{...devices["Desktop Chrome"]}}
   ],
   webServer:{command:"npm run dev -- --host 127.0.0.1 --port 4173 --strictPort",url:"http://127.0.0.1:4173",reuseExistingServer:!process.env.CI,timeout:30_000}

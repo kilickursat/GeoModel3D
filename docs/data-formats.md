@@ -163,6 +163,7 @@ Readings are stored as qc in MPa, fs and u2 in kPa and Rf in percent, converted 
 
 Fields of the project file:
 - **Depths and values:** depths are in metres below the collar. Unit weights are in kN/m³. `params` holds unit design values by catalogue key.
+- **Core photographs:** optional `corePhotos: {version: 1, runs: [...]}` stores photo registrations and reviewed annotations. Each run names a borehole and an `evidence.sources` image source, with drilled `from`/`to` depths. Its rows hold normalized image rectangles, continuous recovered depth limits, direction, registration review and pieces ending at specified depths. Piece soundness, break type, unit and description remain explicit. Accepted runs reference immutable review evidence; import rejects changed annotations still labelled accepted. Drafts can precede the first log in a surveyed borehole. Photo-derived RQD remains in this collection/evidence, separate from `tests`.
 - **Groundwater:** `groundwaterDepth` is an assumed water-table depth, used where no borehole has a water level.
 - **Model base:** `base` (optional) is the elevation of a flat model base.
 - **Model extent:** `margin` (optional, metres) extends the model beyond its outermost boreholes.

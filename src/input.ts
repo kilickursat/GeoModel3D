@@ -8,6 +8,8 @@ import {WorkspaceDocument,createWorkspace,updateDraft,checkpoint,restoreRevision
 import {createWorkspaceStore} from "./storage";
 import {changeEvidenceField,acceptEvidenceField,evidenceRecord} from "./evidence";
 import {showEvidence} from "./evidenceView";
+import {showCorePhotos} from "./corePhotoView";
+import {applyCorePhotoProject} from "./corePhotoTables";
 import {showComparison} from "./comparisonView";
 import {showDataImpact} from "./impactView";
 import {showDisagreement} from "./disagreementView";
@@ -16,7 +18,7 @@ import {properties} from "./properties";
 import {buildGeologicalModel,GeoModel} from "./model";
 import {stressAt,unitWeights,UnitWeight,ASSUMED_WEIGHT,earthPressure,pressureProfile,earthPressureNotes,Drainage,ProfilePoint} from "./fields";
 import {convexHull} from "./terrain";
-import {COLUMNS,TABLE_NAMES,TableName,EditorTables,tablesFromProject,projectFromTables,emptyTables,exampleTables,fillUnits,tableCsv} from "./tables";
+import {COLUMNS,TABLE_NAMES,TableName,EditorTables,tablesFromProject,projectFromTables,projectForCorePhotos,emptyTables,exampleTables,fillUnits,tableCsv} from "./tables";
 
 type Step="start"|"project"|"history"|"scenarios"|TableName;
 const STEPS:Step[]=["start","project","boreholes","logs","water","spt","tests","units","scenarios","history"];
@@ -216,6 +218,7 @@ export function createInputWorkspace(o:InputOptions):InputWorkspace{
     const choice=(key:string,title:string,text:string)=>`<button class="ws-choice" data-start="${key}"${loading?" disabled":""}><b>${title}</b><span>${text}</span></button>`;
     return `<div class="ws-start"><h2>Enter your own data</h2>
 <p>Type in or paste your boreholes, logs, water levels, tests and units, then <b>Build model</b>. Nothing is uploaded: the data stay in this browser.</p>
+<p>For core-box photographs, open a case and choose <b>Core photos</b> under Boreholes or Logs. Register recovered intervals to depth, review the pieces, then accept the log.</p>
 <div class="ws-choices">${[
       choice("new","New case","Empty tables. One borehole is enough."),
       choice("example","Worked example","Four boreholes with water levels, SPT, tests and unit parameters, to edit."),
@@ -285,7 +288,7 @@ ${field("margin","Model extent beyond the boreholes (m)","The model reaches this
   function tableView(name:TableName){
     const {all,rows}=shownRows(name),cols=COLUMNS[name];
     const hole=PER_HOLE.includes(name)?`<label>Borehole <select class="ed-filter"><option value="">All</option>${holes().map(h=>`<option${h===filter?" selected":""}>${esc(h)}</option>`).join("")}</select></label>`:"";
-    return `<div class="ed-tools">${hole}<button class="ed-add">Add row</button>${name==="logs"?'<button class="ed-fill" title="By the unit rules of the project, or by the principal soil of the description">Fill units from descriptions</button>':""}
+    return `<div class="ed-tools">${hole}<button class="ed-add">Add row</button>${name==="boreholes"||name==="logs"?'<button class="ws-core-photos">Core photos</button>':""}${name==="logs"?'<button class="ed-fill" title="By the unit rules of the project, or by the principal soil of the description">Fill units from descriptions</button>':""}
 <span class="ed-help">${HELP[name]} Paste cells copied from a spreadsheet into any cell.</span></div>
 <div class="ed-table-wrap"><table class="ed-table"><thead><tr><th></th>${cols.map(c=>`<th${c.hint?` title="${esc(c.hint)}"`:""}>${esc(c.label)}</th>`).join("")}<th></th></tr></thead><tbody>${
       rows.map(({r,i},k)=>`<tr data-r="${i}"><td class="ed-n">${name==="units"?`<button class="ed-up" aria-label="Move up"${i===0?" disabled":""}>▲</button><button class="ed-down" aria-label="Move down"${i===t!.rows.units.length-1?" disabled":""}>▼</button>`:k+1}</td>${
@@ -469,6 +472,18 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
       render();return;
     }
     if(!t)return;
+    if(b.classList.contains("ws-core-photos")){
+      try{
+        let before=projectForCorePhotos(t,base);
+        if(!before.boreholes.length)throw new Error("Add a borehole and its collar before registering core photos.");
+        showCorePhotos(before,{onSave:project=>{
+          t=applyCorePhotoProject(t!,before,project);before=structuredClone(project);
+          message="Core photos saved. Build model applies accepted log intervals to this scenario.";
+          render();refresh(true);
+        }});
+      }catch(error){message=(error as Error).message;status.textContent=message}
+      return;
+    }
     if(workspaceDocument&&b.classList.contains("ws-scenario-create")){
       try{
         const name=body.querySelector<HTMLInputElement>(".ws-scenario-name")!.value,from=body.querySelector<HTMLSelectElement>(".ws-scenario-from")!.value;
