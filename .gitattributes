@@ -1,0 +1,5 @@
+# Preserve the exact bytes of frozen benchmark records across checkouts.
+docs/benchmarks/0.26.0-core-ai/** -text
+public/core-benchmark-v026/** -text
+# The frozen CSV uses standard CRLF record separators.
+docs/benchmarks/0.26.0-core-ai/human-review-template.csv whitespace=cr-at-eol

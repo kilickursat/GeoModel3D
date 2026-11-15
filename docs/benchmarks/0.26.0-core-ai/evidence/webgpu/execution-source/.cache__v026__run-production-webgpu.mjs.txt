@@ -1,0 +1,98 @@
+// Actual production-page/worker execution. Only model-file transport is redirected to verified local bytes.
+import {chromium} from '@playwright/test';
+import {readFile,writeFile,mkdir,cp} from 'node:fs/promises';
+import {resolve} from 'node:path';
+import {root,repo,revision,modelDir,digest,fileHash,verifyModelCache} from './verify-qwen-cache.mjs';
+import {frozenInputs} from './input-integrity.mjs';
+import {startStaticServer} from './static-server.mjs';
+const frozen=await frozenInputs(),verifiedFiles=await verifyModelCache(),allow=new Set(verifiedFiles.map(f=>f.path));
+const out='/tmp/geomodel3d-v026-engine/quality-case11-attempt-01';await mkdir(out); // no overwrite or silent retry
+const buildSnapshot=resolve(root,'.cache/v026/production-build-snapshot-01');
+await cp(resolve(root,'dist'),buildSnapshot,{recursive:true,force:false,errorOnExist:true});
+const sourcePaths=['.cache/v026/run-production-webgpu.mjs','.cache/v026/static-server.mjs','.cache/v026/input-integrity.mjs','.cache/v026/verify-qwen-cache.mjs','src/coreBenchmark.ts','src/coreBenchmarkClient.ts','src/coreBenchmark.worker.ts','src/coreBenchmarkView.ts','src/coreBenchmark.css','core-ai-benchmark.html','package.json','vite.config.ts'];
+const sources=[];for(const path of sourcePaths)sources.push({path,sha256:await fileHash(resolve(root,path))});
+const report={format:'geomodel3d-production-webgpu-evidence',version:1,startedAt:new Date().toISOString(),status:'preparing',
+ appVersion:JSON.parse(await readFile(resolve(root,'package.json'),'utf8')).version,protocolId:frozen.protocol.protocolId,protocolHashes:frozen.hashes,
+ selectedCaseIds:['case-11'],expectedCohortCases:40,plannedMode:'quality',plannedMaxNewTokens:128,perCaseTimeoutMs:1800000,
+ selectionReason:'First limestone case in frozen case ordering, selected before viewing images or outputs.',
+ qualityReviewState:'awaiting-qualified-human-review',sourceHashes:sources,verifiedModelFiles:verifiedFiles,
+ browser:'Chromium with SwiftShader software WebGPU; not physical iPhone or hardware GPU',
+ transport:'Unchanged production HTML, JS and Worker. Exact pinned Hugging Face model URLs intercepted as HTTP302 to a streaming localhost read-only mirror with verified file hashes. No mock inference or response substitution.',
+ transportLimitations:['Local mirrored weights exclude first internet download performance.','Shared host load makes softwareGPU timings diagnostic, not physical-phone speed.','One predeclared case attempt does not establish40case browser quality.','Worker message instrumentation records real requests/progress/results without altering them.'],
+ network:[],localRequests:[],blockedRequests:[],workerEvents:[],errors:[],scriptAssets:[],exportedReport:null};
+const save=()=>writeFile(resolve(out,'execution.json'),JSON.stringify(report,null,2)+'\n');
+await save();const server=await startStaticServer(verifiedFiles,report.localRequests,buildSnapshot);
+let context,heartbeat,page,lastKey;
+try{
+ const profile=resolve(root,'.cache/v026/production-qwen-browser');await mkdir(profile); // preserve prior attempts
+ context=await chromium.launchPersistentContext(profile,{executablePath:'/usr/bin/chromium',headless:true,acceptDownloads:true,
+  viewport:{width:1440,height:1100},args:['--enable-unsafe-webgpu','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+ report.browserVersion=context.browser()?.version()??'persistent context';
+ await context.route('**/*',async route=>{
+  const request=route.request(),url=new URL(request.url());
+  if(url.origin===server.origin)return route.continue();
+  const prefix=`/${repo}/resolve/${revision}/`;
+  if(url.origin==='https://huggingface.co'&&url.pathname.startsWith(prefix)&&['GET','HEAD'].includes(request.method())){
+   const relative=decodeURIComponent(url.pathname.slice(prefix.length));
+   if(allow.has(relative))return route.fulfill({status:302,headers:{location:server.origin+'/model-cache/'+relative,'access-control-allow-origin':'*'}});
+  }
+  report.blockedRequests.push({method:request.method(),url:request.url()});return route.abort();
+ });
+ context.on('request',request=>report.network.push({method:request.method(),url:request.url(),at:new Date().toISOString()}));
+ await context.exposeFunction('recordEngineMessage',event=>{
+  const p=event.message?.progress;
+  const key=p?[p.phase,p.file??'',p.generatedTokens??'',p.total?Math.floor((p.loaded??0)/p.total*10):''].join('|'):JSON.stringify(event);
+  if(key===lastKey)return;lastKey=key;
+  report.workerEvents.push({...event,at:new Date().toISOString()});
+  if(event.message?.type==='result')report.actualWorkerResult=event.message.result;
+  if(event.message?.type==='error')report.actualWorkerError=event.message.message;
+  if(p?.phase==='running')console.log(JSON.stringify({progress:p.generatedTokens??0,cap:p.maxNewTokens,elapsedMs:p.elapsedMs}));
+ });
+ await context.addInitScript(()=>{
+  const NativeWorker=window.Worker;
+  window.Worker=class extends NativeWorker{
+   constructor(...args){super(...args);const url=String(args[0]);window.recordEngineMessage({type:'worker-created',url});
+    this.addEventListener('message',event=>window.recordEngineMessage({type:'worker-message',url,message:event.data}));
+    this.addEventListener('error',event=>window.recordEngineMessage({type:'worker-error',url,message:event.message}));}
+   postMessage(message,...rest){if(message?.type==='run')window.recordEngineMessage({type:'run-request',request:{caseId:message.request.caseId,expectedSha256:message.request.expectedSha256,mode:message.request.mode}});return super.postMessage(message,...rest)}
+  };
+ });
+ page=await context.newPage();page.setDefaultTimeout(90_000);
+ page.on('pageerror',error=>report.errors.push({kind:'pageerror',message:error.message}));
+ page.on('console',message=>{if(message.type()==='error')report.errors.push({kind:'console',message:message.text()})});
+ await page.goto(server.origin+'/core-ai-benchmark.html',{waitUntil:'networkidle'});
+ await page.locator('#benchmark-case option[value="case-11"]').waitFor({state:'attached'});
+ report.preRun={workerCount:report.workerEvents.filter(e=>e.type==='worker-created').length,modelRequests:report.network.filter(r=>r.url.includes('huggingface.co')).length,status:await page.locator('#benchmark-status').innerText()};
+ if(report.preRun.workerCount||report.preRun.modelRequests)throw Error('Model work started before explicit run');
+ await page.locator('#benchmark-count').selectOption('1');await page.locator('#benchmark-case').selectOption('case-11');await page.locator('#benchmark-mode').selectOption('quality');
+ await page.locator('#benchmark-device').fill('Linux Chromium SwiftShader — software adapter, locally mirrored verified weights');
+ await page.locator('#benchmark-consent').check();await page.screenshot({path:resolve(out,'before-run.png'),fullPage:true});
+ if(!await page.locator('#benchmark-run').isEnabled())throw Error('Actual WebGPU support did not enable Run: '+await page.locator('#benchmark-support').innerText());
+ report.status='running';report.runStartedAt=new Date().toISOString();await save();
+ heartbeat=setInterval(()=>{void save();console.log(JSON.stringify({heartbeat:new Date().toISOString(),status:report.status,lastProgress:report.workerEvents.at(-1)?.message?.progress??null}))},30000);
+ await page.locator('#benchmark-run').click();
+ await page.waitForFunction(()=>document.querySelector('#benchmark-stop')?.disabled===true,null,{timeout:1850000});
+ report.finalStatusText=await page.locator('#benchmark-status').innerText();
+ await page.screenshot({path:resolve(out,'after-run.png'),fullPage:true});
+ const downloadPromise=page.waitForEvent('download');await page.locator('#benchmark-export').click();const download=await downloadPromise,path=await download.path(),bytes=await readFile(path);
+ await writeFile(resolve(out,'device-report.json'),bytes);report.exportedReportSha256=digest(bytes);report.exportedReport=JSON.parse(bytes);
+ const runs=report.exportedReport.runs;
+ if(!Array.isArray(runs)||runs.length!==1||JSON.stringify(runs[0].selectedCaseIds)!=='["case-11"]'||runs[0].mode!=='quality'||runs[0].maxNewTokens!==128)throw Error('Export does not match the predeclared single quality attempt');
+ const c=runs[0].cases.find(x=>x.caseId==='case-11'),expected=frozen.manifest.cases.find(x=>x.id==='case-11');
+ if(c.imageSha256!==expected.sha256)throw Error('Export input hash mismatch');
+ report.selectedCaseStatus=c.status;
+ if(c.status==='completed'){
+  const result=c.result;if(result.imageSha256!==expected.sha256||result.revision!==revision||result.maxNewTokens!==128||result.device!=='webgpu'||!result.text)throw Error('Actual result binding mismatch');
+  report.status='completed';report.result=result;
+ }else{report.status='completed-with-incomplete-case';report.caseError=c.error??null}
+ const workerRequests=report.workerEvents.filter(e=>e.type==='run-request');if(workerRequests.length!==1)throw Error('Unexpected repeated generation attempt');
+ if(report.blockedRequests.length)report.errors.push({kind:'transport-block',message:'Unexpected external requests were blocked; inspect log.'});
+}catch(error){report.status='failed';report.errors.push({kind:'harness',message:error.stack??String(error)});if(page&&!page.isClosed())try{await page.screenshot({path:resolve(out,'failure.png'),fullPage:true});if(await page.locator('#benchmark-stop').isEnabled())await page.locator('#benchmark-stop').click();if(await page.locator('#benchmark-export').isEnabled()){const pending=page.waitForEvent('download');await page.locator('#benchmark-export').click();const download=await pending;const bytes=await readFile(await download.path());await writeFile(resolve(out,'device-report.json'),bytes);report.exportedReport=JSON.parse(bytes);report.exportedReportSha256=digest(bytes)}}catch(exportError){report.errors.push({kind:'recovery-export',message:String(exportError)})}}
+finally{
+ clearInterval(heartbeat);
+ for(const path of [...new Set(report.localRequests.map(x=>x.path).filter(p=>p.endsWith('.js')||p.endsWith('.mjs')||p.endsWith('.wasm')||p.endsWith('.html')||p.endsWith('.css')))]){
+  if(path.startsWith('/model-cache/'))continue;const file=resolve(buildSnapshot,path.slice(1));try{report.scriptAssets.push({path,sha256:await fileHash(file)})}catch{}
+ }
+ report.completedAt=new Date().toISOString();await context?.close();await server.close();await save();
+ console.log(JSON.stringify({status:report.status,selectedCaseStatus:report.selectedCaseStatus,generatedTokens:report.result?.generatedTokens,errors:report.errors,artifact:out}));if(report.status!=='completed')process.exitCode=1;
+}

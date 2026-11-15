@@ -1,0 +1,315 @@
+{
+  "format": "geomodel3d-v026-technical-evidence",
+  "version": 1,
+  "packagedAt": "2026-11-15T08:39:46.374Z",
+  "qualityReviewState": "awaiting-qualified-human-review",
+  "releaseBuildComparison": {
+    "testedWorkerPath": "/assets/coreBenchmark.worker-DwxwTrxh.js",
+    "testedWorkerSha256": "6786bead9383db5675ca8e2ff97adff40c82988281e950a7e7dc0d9f9e20b40d",
+    "finalWorkerPath": "assets/coreBenchmark.worker-DwxwTrxh.js",
+    "finalWorkerSha256": "6786bead9383db5675ca8e2ff97adff40c82988281e950a7e7dc0d9f9e20b40d",
+    "workerByteIdentical": true,
+    "finalPageEntry": "./assets/core-ai-benchmark-YEVvrFbq.js",
+    "note": "Only the page export metadata changed after the actual-run snapshot: partial/inProgress semantics and explicit timing definitions. The original device export is retained unchanged."
+  },
+  "uiExportClarification": "The tested page predates a UI-only clarification that marks a one-case run partial and adds explicit timing definitions. Its original export is preserved unchanged; this summary derives selected1/40 and39unselected independently. Worker, prompt, protocol and image bytes are unchanged.",
+  "physicalDeviceEvidence": "not-collected",
+  "boreholeIndependence": "unverified",
+  "cpuDiagnostic": {
+    "status": "completed",
+    "startedAt": "2026-11-15T08:05:58.580Z",
+    "completedAt": "2026-11-15T08:19:54.358Z",
+    "expectedCases": 40,
+    "selectedCases": 40,
+    "statusCounts": {
+      "completed": 40
+    },
+    "cappedOutputs": 3,
+    "rawSha256": "56d1beb4f1d031a355d59b3b3dd75d1e8e3dbf9626e459cd0e60265c2dbd1e34",
+    "resultFile": "../cpu/results.json",
+    "scope": "Supplemental local CPU technical diagnostic. Not browser/WebGPU quality coverage, not physical-device performance, and not human-reviewed quality.",
+    "protocolHashes": {
+      "publicManifestSha256": "b61549c3de8714e2f015056276efc23dfb3c6f3e1206fbd6611b68af3712c391",
+      "sourceManifestSha256": "301b53789551d3423730f56572762ab99cee8f59b1d1e7b3dfa30c6cf80141d2",
+      "inputManifestSha256": "999992ee2d41ecd062133095c0f69562a263f597a722780ac029d6b446283ccd",
+      "protocolSha256": "59048ae5c9210239225c04867675594b192d61d46e3d26ca1f4f92232b483ea1",
+      "rubricSha256": "6422732b8ba1a6efe780e1e979c6b994a67737ca1501e0f126b4c3369fc77b09"
+    },
+    "sourceHashes": [
+      {
+        "path": ".cache/v026/run-cpu-diagnostic.mjs",
+        "sha256": "8f51f5ecb9dae1fb20776286124c9b97c160a7f11493316fe90f313c56a22f29"
+      },
+      {
+        "path": ".cache/v026/input-integrity.mjs",
+        "sha256": "68e2eb6d5e8f6ccc09095d202e071425e422f10f6bfbaacccd49f1b5fc07a51b"
+      },
+      {
+        "path": ".cache/v026/verify-qwen-cache.mjs",
+        "sha256": "d76643aad30fb79184893260309340f4813706754b9c008b6cde2fc9e6a22f07"
+      },
+      {
+        "path": "scripts/core-ai-benchmark-runtime.mjs",
+        "sha256": "9105f8e32b37f156bd5427a5fa7ed4182b8f018c1d7105bd3f87ec4c9c0a3b37"
+      }
+    ]
+  },
+  "browserAttempt": {
+    "status": "completed-with-incomplete-case",
+    "startedAt": "2026-11-15T08:09:04.781Z",
+    "runStartedAt": "2026-11-15T08:09:09.565Z",
+    "completedAt": "2026-11-15T08:39:16.936Z",
+    "selectedCaseIds": [
+      "case-11"
+    ],
+    "expectedCohortCases": 40,
+    "selectedCaseStatus": "timed-out",
+    "completedBrowserCases": 0,
+    "remainingUnselectedCases": 39,
+    "plannedMode": "quality",
+    "plannedMaxNewTokens": 128,
+    "browser": "Chromium with SwiftShader software WebGPU; not physical iPhone or hardware GPU",
+    "browserVersion": "156.0.8078.79",
+    "protocolHashes": {
+      "publicManifestSha256": "b61549c3de8714e2f015056276efc23dfb3c6f3e1206fbd6611b68af3712c391",
+      "sourceManifestSha256": "301b53789551d3423730f56572762ab99cee8f59b1d1e7b3dfa30c6cf80141d2",
+      "inputManifestSha256": "999992ee2d41ecd062133095c0f69562a263f597a722780ac029d6b446283ccd",
+      "protocolSha256": "59048ae5c9210239225c04867675594b192d61d46e3d26ca1f4f92232b483ea1",
+      "rubricSha256": "6422732b8ba1a6efe780e1e979c6b994a67737ca1501e0f126b4c3369fc77b09"
+    },
+    "preRun": {
+      "workerCount": 0,
+      "modelRequests": 0,
+      "status": "No model or case image has been downloaded."
+    },
+    "result": null,
+    "caseError": "This case timed out after its thirty-minute budget; remaining cases were not started.",
+    "lastRuntimeProgress": {
+      "phase": "running",
+      "message": "72 / 128 tokens · 1769s. Stop unloads this model.",
+      "generatedTokens": 72,
+      "maxNewTokens": 128,
+      "firstTokenMs": 795007.5,
+      "inferenceElapsedMs": 1768801.5,
+      "elapsedMs": 1796459.799999997
+    },
+    "sourceHashes": [
+      {
+        "path": ".cache/v026/run-production-webgpu.mjs",
+        "sha256": "fef9b44467b6530c3d115cbb5ca2b4c413b31cbdbcf3506063a6d008c7354bb7"
+      },
+      {
+        "path": ".cache/v026/static-server.mjs",
+        "sha256": "76d4ff410a84e07204b08e023ca5a62e4b2e2ac29154a484dfe13c2013ceb814"
+      },
+      {
+        "path": ".cache/v026/input-integrity.mjs",
+        "sha256": "68e2eb6d5e8f6ccc09095d202e071425e422f10f6bfbaacccd49f1b5fc07a51b"
+      },
+      {
+        "path": ".cache/v026/verify-qwen-cache.mjs",
+        "sha256": "d76643aad30fb79184893260309340f4813706754b9c008b6cde2fc9e6a22f07"
+      },
+      {
+        "path": "src/coreBenchmark.ts",
+        "sha256": "76fcc411889f568ecbd41fc92b4681e9f23e83e4dc24ca32b9c7454c701545ef"
+      },
+      {
+        "path": "src/coreBenchmarkClient.ts",
+        "sha256": "b0f58ae377bc7b4ef3cd2024faeb3c57aabc053dba363da62dd8ae1572616c21"
+      },
+      {
+        "path": "src/coreBenchmark.worker.ts",
+        "sha256": "0802a77fc2a60480466c67c9278943065a62da562e2e3812d47d812eeb3d8736"
+      },
+      {
+        "path": "src/coreBenchmarkView.ts",
+        "sha256": "c79e7aaa6b43d1b76afa34a3a8223aae1cb49157030f8bd3b5949ec1736da181"
+      },
+      {
+        "path": "src/coreBenchmark.css",
+        "sha256": "c580f9fd492ae8aac0f09df1c766ff90a98b49aad3db5a37e385d1b1d71bdb10"
+      },
+      {
+        "path": "core-ai-benchmark.html",
+        "sha256": "bcca7062847568bf668d9ce2d87617d2b49d943b116d1d587cbe977067c4aeff"
+      },
+      {
+        "path": "package.json",
+        "sha256": "ecc7e914b34010854fd2e1074bdfc0d8cec7306be0b59806e75b9036b00cf0f0"
+      },
+      {
+        "path": "vite.config.ts",
+        "sha256": "73cc16c173e83d10de68c77f4207e207c6f83c31d698452830d11be066d73492"
+      }
+    ],
+    "scriptAssets": [
+      {
+        "path": "/core-ai-benchmark.html",
+        "sha256": "dad855b8cdcbff4e97ba62da68277ee31141cbc83d4a310fd106d21e5106662c"
+      },
+      {
+        "path": "/assets/core-ai-benchmark-DIN1WGtp.css",
+        "sha256": "9b630989e4eba39e21e0207535e4c9e0c3f4b3a4d6aee8c56d5ba20151ba3a44"
+      },
+      {
+        "path": "/assets/core-ai-benchmark-CJd_lYUR.js",
+        "sha256": "3f16310e3a8080def3cd9e49e425ba92d62ac8052536bd11a63f66c101fe6dc6"
+      },
+      {
+        "path": "/assets/coreBenchmark.worker-DwxwTrxh.js",
+        "sha256": "6786bead9383db5675ca8e2ff97adff40c82988281e950a7e7dc0d9f9e20b40d"
+      },
+      {
+        "path": "/assets/ort-wasm-simd-threaded.asyncify-C87S2c-s.mjs",
+        "sha256": "59cf781530e1a16df2a291d78798e3ec1152467edaec402d6f9599d85047c302"
+      },
+      {
+        "path": "/assets/ort-wasm-simd-threaded.asyncify-AkdHdxrx.wasm",
+        "sha256": "ca319e9539cd0f1e291cf56074760121eaf39650f5dbf84b6e52c07f4b2944ec"
+      }
+    ],
+    "verifiedModelFiles": [
+      {
+        "path": "onnx/embed_tokens_q4.onnx",
+        "bytes": 857,
+        "sha256": "8773dcf4858f855bfce13def4356ca17e0bc516a477154496b6ffb6dd6d084dc",
+        "verification": "Pinned Hugging Face LFS SHA256",
+        "verified": true
+      },
+      {
+        "path": "onnx/embed_tokens_q4.onnx_data",
+        "bytes": 162897920,
+        "sha256": "9210b1d26eb14136d3522584d17da14cc5f4b82b6f5607e6d80d59424a8cbe99",
+        "verification": "Pinned Hugging Face LFS SHA256",
+        "verified": true
+      },
+      {
+        "path": "onnx/vision_encoder.onnx",
+        "bytes": 159684,
+        "sha256": "5de169e0f5f08321e5a9a9cdda99b6e8aed343a5df3670f5049ccb7afd8a8504",
+        "verification": "Pinned Hugging Face LFS SHA256",
+        "verified": true
+      },
+      {
+        "path": "onnx/vision_encoder.onnx_data",
+        "bytes": 402371584,
+        "sha256": "143c477b64fc329443be551512e12c1be0c49af46e9196d8805a516641b111a6",
+        "verification": "Pinned Hugging Face LFS SHA256",
+        "verified": true
+      },
+      {
+        "path": "onnx/decoder_model_merged_q4.onnx",
+        "bytes": 576621,
+        "sha256": "7390858c80a67275d8cb81fb70f66a24d3b86fe333057c1312de09c184a2d41b",
+        "verification": "Pinned Hugging Face LFS SHA256",
+        "verified": true
+      },
+      {
+        "path": "onnx/decoder_model_merged_q4.onnx_data",
+        "bytes": 483655680,
+        "sha256": "1a9165072dd51a9b6a917b6357a3686372b7429313022802cd4c9a730e8c9749",
+        "verification": "Pinned Hugging Face LFS SHA256",
+        "verified": true
+      },
+      {
+        "path": "config.json",
+        "bytes": 2849,
+        "sha256": "36fed6a902ccd06ef19a452bd5a0750bd88fe347d06ab75ef515615bac5b296d",
+        "verification": "Git-blob-SHA1",
+        "expected": "4ba3068385922dd464bb68f8e3a46f9f2a2ad598",
+        "verified": true
+      },
+      {
+        "path": "generation_config.json",
+        "bytes": 248,
+        "sha256": "dc0cbe66543f310896469b7b1448af792f403293a1080baaf04d586c57b23e48",
+        "verification": "Git-blob-SHA1",
+        "expected": "59ee4c198e909ccdc280d57660829658989582b2",
+        "verified": true
+      },
+      {
+        "path": "preprocessor_config.json",
+        "bytes": 336,
+        "sha256": "6a970fd06f30e6943b3e2c14d5d3b42d49b06cf99b99103d56689bef462d90f8",
+        "verification": "Git-blob-SHA1",
+        "expected": "4ae180b49f91e11d4da327d44edd9d4a909fe908",
+        "verified": true
+      },
+      {
+        "path": "tokenizer.json",
+        "bytes": 19226111,
+        "sha256": "89da80cc6689bef4d90cc1028249436975ffb0814618f1d93c65310e05801a9b",
+        "verification": "LFS-SHA256",
+        "expected": "89da80cc6689bef4d90cc1028249436975ffb0814618f1d93c65310e05801a9b",
+        "verified": true
+      },
+      {
+        "path": "tokenizer_config.json",
+        "bytes": 10069,
+        "sha256": "5dcac2c1306b11d1e18ec4c024a174bded2ca3178ce87b0aa590711696407f3d",
+        "verification": "Git-blob-SHA1",
+        "expected": "1a7a8b42ef296f48ac686bab602f518da32dd85c",
+        "verified": true
+      }
+    ],
+    "transport": "Unchanged production HTML, JS and Worker. Exact pinned Hugging Face model URLs intercepted as HTTP302 to a streaming localhost read-only mirror with verified file hashes. No mock inference or response substitution.",
+    "transportLimitations": [
+      "Local mirrored weights exclude first internet download performance.",
+      "Shared host load makes softwareGPU timings diagnostic, not physical-phone speed.",
+      "One predeclared case attempt does not establish40case browser quality.",
+      "Worker message instrumentation records real requests/progress/results without altering them."
+    ],
+    "interceptedPinnedHfRequests": 19,
+    "blockedRequests": [],
+    "localRequestCounts": {
+      "GET /core-ai-benchmark.html": 1,
+      "GET /assets/core-ai-benchmark-DIN1WGtp.css": 1,
+      "GET /assets/core-ai-benchmark-CJd_lYUR.js": 1,
+      "GET /core-benchmark-v026/manifest.json": 1,
+      "GET /core-benchmark-v026/images/case-11.png": 1,
+      "GET /assets/coreBenchmark.worker-DwxwTrxh.js": 1,
+      "GET /model-cache/preprocessor_config.json": 1,
+      "GET /model-cache/tokenizer_config.json": 2,
+      "GET /model-cache/tokenizer.json": 1,
+      "GET /model-cache/config.json": 1,
+      "GET /model-cache/onnx/embed_tokens_q4.onnx": 2,
+      "GET /model-cache/onnx/embed_tokens_q4.onnx_data": 2,
+      "GET /model-cache/onnx/decoder_model_merged_q4.onnx": 2,
+      "GET /model-cache/onnx/decoder_model_merged_q4.onnx_data": 2,
+      "GET /model-cache/generation_config.json": 2,
+      "GET /model-cache/onnx/vision_encoder.onnx": 2,
+      "GET /model-cache/onnx/vision_encoder.onnx_data": 2,
+      "GET /assets/ort-wasm-simd-threaded.asyncify-C87S2c-s.mjs": 1,
+      "GET /assets/ort-wasm-simd-threaded.asyncify-AkdHdxrx.wasm": 1
+    },
+    "workerRunRequests": 1,
+    "errors": [],
+    "rawSha256": "26fb97a00722b8f0e4fb0491c46a411b7296b7d0f839cb4d879386fdcede6cd8",
+    "rawTrace": "webgpu-execution.json.gz",
+    "deviceReport": "device-report.json",
+    "deviceReportSha256": "cf31e008cd87f88911b329ebd334cde5a7fd45da7926357eb8333e81c06911c2"
+  },
+  "attempts": [
+    {
+      "stage": "Harness build snapshot preparation",
+      "inferenceStarted": false,
+      "artifact": "setup-failure-01.json",
+      "reason": "Pre-created empty fs.cp destination was rejected before browser launch."
+    },
+    {
+      "stage": "Actual browser generation",
+      "inferenceStarted": true,
+      "artifact": "webgpu-execution.json.gz",
+      "selectedCaseIds": [
+        "case-11"
+      ]
+    }
+  ],
+  "limitations": [
+    "Forty CPU completions do not establish40browser-case coverage.",
+    "No human reviewer or geologist has graded these outputs; no quality scores are calculated.",
+    "Software WebGPU under shared host load cannot establish phone performance or memory suitability.",
+    "Physical-device operation and source independence remain missing evidence."
+  ]
+}

@@ -1,0 +1,2576 @@
+{
+  "format": "geomodel3d-core-expanded-cpu-diagnostic",
+  "version": 1,
+  "startedAt": "2026-11-15T08:05:58.580Z",
+  "status": "completed",
+  "scope": "Supplemental local CPU technical diagnostic. Not browser/WebGPU quality coverage, not physical-device performance, and not human-reviewed quality.",
+  "appVersion": "0.26.0",
+  "protocolId": "core-webgpu-pilot-2",
+  "protocolHashes": {
+    "publicManifestSha256": "b61549c3de8714e2f015056276efc23dfb3c6f3e1206fbd6611b68af3712c391",
+    "sourceManifestSha256": "301b53789551d3423730f56572762ab99cee8f59b1d1e7b3dfa30c6cf80141d2",
+    "inputManifestSha256": "999992ee2d41ecd062133095c0f69562a263f597a722780ac029d6b446283ccd",
+    "protocolSha256": "59048ae5c9210239225c04867675594b192d61d46e3d26ca1f4f92232b483ea1",
+    "rubricSha256": "6422732b8ba1a6efe780e1e979c6b994a67737ca1501e0f126b4c3369fc77b09"
+  },
+  "sourceHashes": [
+    {
+      "path": ".cache/v026/run-cpu-diagnostic.mjs",
+      "sha256": "8f51f5ecb9dae1fb20776286124c9b97c160a7f11493316fe90f313c56a22f29"
+    },
+    {
+      "path": ".cache/v026/input-integrity.mjs",
+      "sha256": "68e2eb6d5e8f6ccc09095d202e071425e422f10f6bfbaacccd49f1b5fc07a51b"
+    },
+    {
+      "path": ".cache/v026/verify-qwen-cache.mjs",
+      "sha256": "d76643aad30fb79184893260309340f4813706754b9c008b6cde2fc9e6a22f07"
+    },
+    {
+      "path": "scripts/core-ai-benchmark-runtime.mjs",
+      "sha256": "9105f8e32b37f156bd5427a5fa7ed4182b8f018c1d7105bd3f87ec4c9c0a3b37"
+    }
+  ],
+  "model": {
+    "repo": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+    "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+    "remotePathTemplate": "{model}/resolve/9a4c21d8f724176b0a7edaaed36303044451886e/"
+  },
+  "verifiedFiles": [
+    {
+      "path": "onnx/embed_tokens_q4.onnx",
+      "bytes": 857,
+      "sha256": "8773dcf4858f855bfce13def4356ca17e0bc516a477154496b6ffb6dd6d084dc",
+      "verification": "Pinned Hugging Face LFS SHA256",
+      "verified": true
+    },
+    {
+      "path": "onnx/embed_tokens_q4.onnx_data",
+      "bytes": 162897920,
+      "sha256": "9210b1d26eb14136d3522584d17da14cc5f4b82b6f5607e6d80d59424a8cbe99",
+      "verification": "Pinned Hugging Face LFS SHA256",
+      "verified": true
+    },
+    {
+      "path": "onnx/vision_encoder.onnx",
+      "bytes": 159684,
+      "sha256": "5de169e0f5f08321e5a9a9cdda99b6e8aed343a5df3670f5049ccb7afd8a8504",
+      "verification": "Pinned Hugging Face LFS SHA256",
+      "verified": true
+    },
+    {
+      "path": "onnx/vision_encoder.onnx_data",
+      "bytes": 402371584,
+      "sha256": "143c477b64fc329443be551512e12c1be0c49af46e9196d8805a516641b111a6",
+      "verification": "Pinned Hugging Face LFS SHA256",
+      "verified": true
+    },
+    {
+      "path": "onnx/decoder_model_merged_q4.onnx",
+      "bytes": 576621,
+      "sha256": "7390858c80a67275d8cb81fb70f66a24d3b86fe333057c1312de09c184a2d41b",
+      "verification": "Pinned Hugging Face LFS SHA256",
+      "verified": true
+    },
+    {
+      "path": "onnx/decoder_model_merged_q4.onnx_data",
+      "bytes": 483655680,
+      "sha256": "1a9165072dd51a9b6a917b6357a3686372b7429313022802cd4c9a730e8c9749",
+      "verification": "Pinned Hugging Face LFS SHA256",
+      "verified": true
+    },
+    {
+      "path": "config.json",
+      "bytes": 2849,
+      "sha256": "36fed6a902ccd06ef19a452bd5a0750bd88fe347d06ab75ef515615bac5b296d",
+      "verification": "Git-blob-SHA1",
+      "expected": "4ba3068385922dd464bb68f8e3a46f9f2a2ad598",
+      "verified": true
+    },
+    {
+      "path": "generation_config.json",
+      "bytes": 248,
+      "sha256": "dc0cbe66543f310896469b7b1448af792f403293a1080baaf04d586c57b23e48",
+      "verification": "Git-blob-SHA1",
+      "expected": "59ee4c198e909ccdc280d57660829658989582b2",
+      "verified": true
+    },
+    {
+      "path": "preprocessor_config.json",
+      "bytes": 336,
+      "sha256": "6a970fd06f30e6943b3e2c14d5d3b42d49b06cf99b99103d56689bef462d90f8",
+      "verification": "Git-blob-SHA1",
+      "expected": "4ae180b49f91e11d4da327d44edd9d4a909fe908",
+      "verified": true
+    },
+    {
+      "path": "tokenizer.json",
+      "bytes": 19226111,
+      "sha256": "89da80cc6689bef4d90cc1028249436975ffb0814618f1d93c65310e05801a9b",
+      "verification": "LFS-SHA256",
+      "expected": "89da80cc6689bef4d90cc1028249436975ffb0814618f1d93c65310e05801a9b",
+      "verified": true
+    },
+    {
+      "path": "tokenizer_config.json",
+      "bytes": 10069,
+      "sha256": "5dcac2c1306b11d1e18ec4c024a174bded2ca3178ce87b0aa590711696407f3d",
+      "verification": "Git-blob-SHA1",
+      "expected": "1a7a8b42ef296f48ac686bab602f518da32dd85c",
+      "verified": true
+    }
+  ],
+  "expectedCases": 40,
+  "selectedCaseIds": [
+    "case-01",
+    "case-02",
+    "case-03",
+    "case-04",
+    "case-05",
+    "case-06",
+    "case-07",
+    "case-08",
+    "case-09",
+    "case-10",
+    "case-11",
+    "case-12",
+    "case-13",
+    "case-14",
+    "case-15",
+    "case-16",
+    "case-17",
+    "case-18",
+    "case-19",
+    "case-20",
+    "case-21",
+    "case-22",
+    "case-23",
+    "case-24",
+    "case-25",
+    "case-26",
+    "case-27",
+    "case-28",
+    "case-29",
+    "case-30",
+    "case-31",
+    "case-32",
+    "case-33",
+    "case-34",
+    "case-35",
+    "case-36",
+    "case-37",
+    "case-38",
+    "case-39",
+    "case-40"
+  ],
+  "humanReviewState": "awaiting-qualified-human-review",
+  "results": [
+    {
+      "caseId": "case-01",
+      "imageSha256": "9c4054282fd511b2583702a852c6df77bff4f69ddfa0c5276be162e1bd25a401",
+      "sourceSha256": "0bd4af351c993486fce494763d91fef1afee9f2db8ba0a73372fcb28447fe9c7",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:06:02.617Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Color**: The dominant colors are a muted grayish-brown with lighter patches in the upper section.\n- **Texture**: The surface appears rough and uneven, resembling coarse sand or gravel rather than smooth stone.\n- **Visible Edges/Gaps**: There are faint horizontal lines separating different zones, suggesting an edge between two distinct materials.",
+        "loadMs": 4034.402804,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 1,
+        "preprocessingMs": 123.67118200000004,
+        "inferenceMs": 6441.772484000001,
+        "totalMs": 6565.947027000001,
+        "modelReused": false,
+        "generatedTokens": 71,
+        "tokensPerSecond": 11.02181118261301,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "9c4054282fd511b2583702a852c6df77bff4f69ddfa0c5276be162e1bd25a401",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:06:09.185Z"
+    },
+    {
+      "caseId": "case-02",
+      "imageSha256": "9ddde5be159f380665c3d57f6ad10e20dbe273b4a5360f603e670183ef0650b4",
+      "sourceSha256": "4111240058738b726ab91f75bdf0724dc42f582b16a524333d6d9208d962302f",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:06:09.188Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Color**: The dominant color is a pale beige or off-white with subtle variations in tone across the surface. There are darker greyish areas near the bottom edge where the texture appears slightly denser.\n- **Texture**: The top section displays a mottled, cloud-like appearance with irregular, wispy patterns that suggest a soft, possibly fibrous material like stone or concrete. The lower portion shows distinct, rounded shapes that appear to be cut into the surface.\n- **Visible Edges/Gaps**: At the very bottom, there is a clear gap between the rounded shapes; they do not touch each other, indicating a",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 2,
+        "preprocessingMs": 128.177717999999,
+        "inferenceMs": 11508.037371999999,
+        "totalMs": 11636.854442,
+        "modelReused": true,
+        "generatedTokens": 128,
+        "tokensPerSecond": 11.122661133464385,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "9ddde5be159f380665c3d57f6ad10e20dbe273b4a5360f603e670183ef0650b4",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": true,
+      "completedAt": "2026-11-15T08:06:20.827Z"
+    },
+    {
+      "caseId": "case-03",
+      "imageSha256": "99a2303d1f71a179061588cdb6de4f227cf692b996a56097db175e15a4bc1695",
+      "sourceSha256": "1a71a9bf01f726aabaa4058fb0190e79c3fdd14f07cd823a2ae884a16bafd821",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:06:20.830Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Color**: The dominant color is a muted grayish-brown with some lighter areas near the left edge.\n- **Texture**: There are curved lines that appear to be part of a larger object, possibly stone or concrete, creating a mottled pattern across the surface.\n- **Visible Edges/Gaps**: A distinct vertical line runs down the center-left, separating a bright area from a darker section on the right side where the curves continue.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 3,
+        "preprocessingMs": 155.4862299999986,
+        "inferenceMs": 7747.969121999999,
+        "totalMs": 7903.880635999998,
+        "modelReused": true,
+        "generatedTokens": 94,
+        "tokensPerSecond": 12.132211489213523,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "99a2303d1f71a179061588cdb6de4f227cf692b996a56097db175e15a4bc1695",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:06:28.751Z"
+    },
+    {
+      "caseId": "case-04",
+      "imageSha256": "ba11d926b0953bdaa645c2c81caee7f4d85189850290d15ee7391a658392d144",
+      "sourceSha256": "19e69e3c57223956e606149de5a95253c9917f9a7560f59b6f0dd6a3068c11b8",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:06:28.753Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- The tissue exhibits a mottled pattern with varying shades of beige and brownish tones.\n- There are irregular, somewhat amorphous structures scattered throughout the field that appear to be fragments or debris.\n- Several dark, shadowed areas suggest underlying density or mineralization within these regions.\n- The overall appearance suggests an internal structure rather than a solid object like a rock.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 4,
+        "preprocessingMs": 97.15454699999827,
+        "inferenceMs": 7124.7067449999995,
+        "totalMs": 7222.300487,
+        "modelReused": true,
+        "generatedTokens": 79,
+        "tokensPerSecond": 11.088175671993923,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "ba11d926b0953bdaa645c2c81caee7f4d85189850290d15ee7391a658392d144",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:06:35.977Z"
+    },
+    {
+      "caseId": "case-05",
+      "imageSha256": "41071393c515df137a9211ce0be4bc18a28e302815d49438489ca54c741c9503",
+      "sourceSha256": "833978af7c1b6606377eb0106e995611e101be7d4b6b5eb349c9cc73815d7a15",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:06:35.979Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Color**: The dominant color scheme consists of muted grays for the rocky surface and a pale beige/cream background. A distinct reddish-brown hue appears in the lower-left corner.\n- **Texture**: The right side displays rough, uneven textures with vertical striations that resemble stone or sedimentary rock formations. The left side shows smoother areas with some faint speckles.\n- **Visible Edges/Gaps**: There are clear discontinuities; a large gap separates the lighter upper section from the darker lower section on the left. Additionally, there appear to be irregular breaks or missing pieces along the bottom edge of the",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 5,
+        "preprocessingMs": 138.9292209999985,
+        "inferenceMs": 14097.43174,
+        "totalMs": 14236.871702999997,
+        "modelReused": true,
+        "generatedTokens": 128,
+        "tokensPerSecond": 9.079668010508133,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "41071393c515df137a9211ce0be4bc18a28e302815d49438489ca54c741c9503",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": true,
+      "completedAt": "2026-11-15T08:06:50.217Z"
+    },
+    {
+      "caseId": "case-06",
+      "imageSha256": "3aeb07923a3b47c4f5ed3fe4c66614dfe5af22963c4824be2c35d777d1e7d3c2",
+      "sourceSha256": "317269ea793119fc20a4ac0d480f0f88b85ca038c1377830fa1a39f8ee399583",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:06:50.259Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Color**: The central section displays a pale greyish-white hue with mottled variations in tone, while the surrounding areas appear darker and more uniform in color.\n- **Texture**: The middle strip exhibits a rougher surface with scattered speckles and irregularities, whereas the lower portion shows a smoother, more consistent finish.\n- **Visible Edges/Gaps**: There are distinct vertical lines separating different regions, particularly noticeable on the right side where an edge appears slightly detached from the main body.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 6,
+        "preprocessingMs": 130.28102200000285,
+        "inferenceMs": 14191.164838999997,
+        "totalMs": 14322.064362000005,
+        "modelReused": true,
+        "generatedTokens": 104,
+        "tokensPerSecond": 7.328503416026033,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "3aeb07923a3b47c4f5ed3fe4c66614dfe5af22963c4824be2c35d777d1e7d3c2",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:07:04.583Z"
+    },
+    {
+      "caseId": "case-07",
+      "imageSha256": "46826a752dd8014d80e29906bfe6cf0f1c35530b57fc8beb59ecb42242610f8f",
+      "sourceSha256": "3389ede8f1505950d390d835202155acd24406964b5ce1d730035180d1880a32",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:07:04.585Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- The central area displays a pale, off-white background with faint, mottled brownish tones scattered throughout the frame.\n- There are two distinct dark rectangular regions located in the upper portion; one appears as a solid black shape while the other shows a lighter grey square outline.\n- A large, bright white void occupies the lower half of the image, creating significant visual contrast against the surrounding elements.\n- The overall texture is somewhat indistinct due to low resolution and potential artifacts from the imaging process.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 7,
+        "preprocessingMs": 205.46088600000076,
+        "inferenceMs": 21566.072984,
+        "totalMs": 21771.859670000005,
+        "modelReused": true,
+        "generatedTokens": 105,
+        "tokensPerSecond": 4.868758446560954,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "46826a752dd8014d80e29906bfe6cf0f1c35530b57fc8beb59ecb42242610f8f",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:07:26.358Z"
+    },
+    {
+      "caseId": "case-08",
+      "imageSha256": "b6579c30ef8d5b940fa1393fea5e7bbc839574bc37e06d3ffc6cb3574003da6b",
+      "sourceSha256": "937aa4ee066df5b2bde578f72bb015a373f4dfe14d43562dd7a5ef4f1430e070",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:07:26.362Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Color**: The dominant color is a pale off-white or light gray with fainter variations in tone along the vertical lines.\n- **Texture**: There are subtle, slightly irregular textures that appear as if they were part of a larger object's surface, possibly metal or plastic.\n- **Visible Edges/Gaps**: A distinct vertical line runs through the center, creating a clear separation between the left side (where \"EXPLORE\" is partially visible) and the right side which appears dark and indistinct.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 8,
+        "preprocessingMs": 159.52962499999558,
+        "inferenceMs": 35168.2123,
+        "totalMs": 35328.17584299999,
+        "modelReused": true,
+        "generatedTokens": 107,
+        "tokensPerSecond": 3.0425203046217963,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "b6579c30ef8d5b940fa1393fea5e7bbc839574bc37e06d3ffc6cb3574003da6b",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:08:01.694Z"
+    },
+    {
+      "caseId": "case-09",
+      "imageSha256": "9fef3d9d22ee55e7fde9b7b00d0d7fbbf07e141937fc9185723149339dd2ed5f",
+      "sourceSha256": "a2bda0244e875d9e40d2fe85957747ef52a66317c5138cdefb1b7b4271fd47b8",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:08:01.707Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Color**: The dominant color is a muted earthy tone, primarily shades of gray with hints of brown and beige in the background areas.\n- **Texture**: The surface appears rough and uneven, resembling dry dirt or masonry mortar, with irregular indentations and a dusty appearance.\n- **Visible Edges/Gaps**: There are distinct vertical lines separating different sections; on the left side, there is a darker, shadowed area, while on the right side, a lighter, brighter section is partially cut off by the frame edge.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 9,
+        "preprocessingMs": 570.766232000009,
+        "inferenceMs": 14620.532565999994,
+        "totalMs": 15191.72034900001,
+        "modelReused": true,
+        "generatedTokens": 111,
+        "tokensPerSecond": 7.592062703524916,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "9fef3d9d22ee55e7fde9b7b00d0d7fbbf07e141937fc9185723149339dd2ed5f",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:08:16.901Z"
+    },
+    {
+      "caseId": "case-10",
+      "imageSha256": "2004119b07871b7c8ec52cfb92e691191eca585383a776ea58e6861f158c8b26",
+      "sourceSha256": "58aaad05ce66dae5a3a7869eeb00b68c3f816ac13ebc767441d80a7c8e4ae4cf",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:08:16.903Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Color**: The surface displays a pale pinkish-beige tone with a slightly mottled appearance. There are also dark grey markings on the left side that contrast with the lighter background.\n- **Texture**: The material appears to be rough and uneven, possibly resembling stone or concrete, with fine lines and irregularities visible across its surface.\n- **Visible Edges/Gaps**: On the right side, there is a distinct vertical edge or gap separating the main area from an adjacent section that is out of focus and partially cut off by the frame's border.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 10,
+        "preprocessingMs": 130.96896000002744,
+        "inferenceMs": 10745.03359799998,
+        "totalMs": 10876.354215,
+        "modelReused": true,
+        "generatedTokens": 116,
+        "tokensPerSecond": 10.795685182556488,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "2004119b07871b7c8ec52cfb92e691191eca585383a776ea58e6861f158c8b26",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:08:27.781Z"
+    },
+    {
+      "caseId": "case-11",
+      "imageSha256": "e3ff0a50ea8fd669658f0747dc59fdbae1c829beb6dcd47a982a50c178a53098",
+      "sourceSha256": "692d055a4dfac70d826441d4ebb7b94f6c6f1f3e4c916bd60cbd50bd14ddcdfc",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:08:27.782Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- The surface displays a mottled pattern with varying shades of gray and pale beige tones.\n- There are faint horizontal striations running across the middle section that appear slightly lighter than surrounding areas.\n- A distinct gap exists at the bottom edge where the color transitions from a light pinkish hue to the rest of the image.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 11,
+        "preprocessingMs": 123.89131799997995,
+        "inferenceMs": 7472.207385000016,
+        "totalMs": 7596.4630590000015,
+        "modelReused": true,
+        "generatedTokens": 68,
+        "tokensPerSecond": 9.100389817405992,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "e3ff0a50ea8fd669658f0747dc59fdbae1c829beb6dcd47a982a50c178a53098",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:08:35.380Z"
+    },
+    {
+      "caseId": "case-12",
+      "imageSha256": "54587569a6b18d1649ab8e1c63a2137ecd1500d049213898c74933d604ff574b",
+      "sourceSha256": "be69de20ad6699ccd530711067e8a1e205c5c9aecf75fec90b6f2cdabb81cd51",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:08:35.383Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- The image displays a mottled surface with varying shades of gray and white.\n- There are faint, irregular white spots scattered across the frame.\n- No clear edges or gaps can be identified in the visual field.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 12,
+        "preprocessingMs": 104.24541400000453,
+        "inferenceMs": 5596.4286370000045,
+        "totalMs": 5700.972910000011,
+        "modelReused": true,
+        "generatedTokens": 47,
+        "tokensPerSecond": 8.398213047740139,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "54587569a6b18d1649ab8e1c63a2137ecd1500d049213898c74933d604ff574b",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:08:41.088Z"
+    },
+    {
+      "caseId": "case-13",
+      "imageSha256": "f3f5b3e39353a1fa5b9bf99c09bac68f084eff955a65eda95fe6954dc1c619ef",
+      "sourceSha256": "7e92b7329b0230234255e7236d8a96febf66744dceec10c69b9fd3e07f5e3e95",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:08:41.089Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Colour**: The dominant coloration is a pale, off-white or cream tone with subtle variations in hue ranging from light gray to very faint beige. There are no distinct colors like red, green, or blue present.\n- **Texture**: The surface displays a mottled appearance with fine, irregular speckles that vary in size and intensity across the frame. These textures appear somewhat coarse but lack sharp definition, suggesting a natural stone finish rather than a manufactured one.\n- **Visible Edges/Gaps**: The image appears to be a continuous field of view without any clear boundaries separating different sections; there are no discernible",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 13,
+        "preprocessingMs": 115.22785100000328,
+        "inferenceMs": 11278.945638000005,
+        "totalMs": 11394.539278000011,
+        "modelReused": true,
+        "generatedTokens": 128,
+        "tokensPerSecond": 11.348578502653117,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "f3f5b3e39353a1fa5b9bf99c09bac68f084eff955a65eda95fe6954dc1c619ef",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": true,
+      "completedAt": "2026-11-15T08:08:52.486Z"
+    },
+    {
+      "caseId": "case-14",
+      "imageSha256": "5795596b4ea9a5b3d159533836530a9b3a64456b292008a5729a5f138ff48d51",
+      "sourceSha256": "96c260d6a3385f387febf009d4945373c7ce729a0da1a6a6211124432f5a420b",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:08:52.487Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- The dominant color palette consists of pale beige tones with subtle variations in shade ranging from light off-white to soft gray.\n- Texture appears as a mottled surface where the colors blend into one another without distinct lines separating them.\n- Visible edges are irregular and fragmented, particularly noticeable in the upper right corner where some areas appear slightly darker than the surrounding field.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 14,
+        "preprocessingMs": 119.60585900000297,
+        "inferenceMs": 7304.057269000012,
+        "totalMs": 7423.922790000011,
+        "modelReused": true,
+        "generatedTokens": 75,
+        "tokensPerSecond": 10.268265600588334,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "5795596b4ea9a5b3d159533836530a9b3a64456b292008a5729a5f138ff48d51",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:08:59.912Z"
+    },
+    {
+      "caseId": "case-15",
+      "imageSha256": "adc707643ab22ea07e19135786df2ef2ba1e5b2b25aa3c5a0398e1d24f1e49fc",
+      "sourceSha256": "013ab188ea05a6fdf51866e4eda9afa2ff5fa202b7fb784171ea37974d98a7c5",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:08:59.914Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Colour**: The dominant coloration is a pale off-white or cream base with subtle gray veining patterns that blend into the surface.\n- **Texture**: The material displays a mottled appearance with irregular, swirling lines and streaks of varying shades, creating a natural stone look rather than a uniform pattern.\n- **Visible Edges/Gaps**: There are no distinct borders separating different sections; instead, the image appears as a continuous field of this specific marble-like substance.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 15,
+        "preprocessingMs": 182.1936519999872,
+        "inferenceMs": 23680.94742099999,
+        "totalMs": 23863.44544099999,
+        "modelReused": true,
+        "generatedTokens": 99,
+        "tokensPerSecond": 4.180575981187642,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "adc707643ab22ea07e19135786df2ef2ba1e5b2b25aa3c5a0398e1d24f1e49fc",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:09:23.779Z"
+    },
+    {
+      "caseId": "case-16",
+      "imageSha256": "78236ca70edc96e2eb782d52c9775ba7e5c02c714db8cd3f341ebee98a3b283c",
+      "sourceSha256": "f1047e92ae11ab3bbeceeec9f4bb98a9fb836f9f3518e464027ed766e7d89b6f",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:09:23.796Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Color**: The surface displays a pale beige or off-white hue with subtle variations in tone across the frame.\n- **Texture**: It appears to be a rough, possibly concrete or stone finish with fine mottling and minor imperfections.\n- **Visible Edges/Gaps**: There are faint vertical lines suggesting seams or panel divisions, though no distinct solid edge is fully formed.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 16,
+        "preprocessingMs": 366.33713500000886,
+        "inferenceMs": 36391.15603700001,
+        "totalMs": 36757.928583,
+        "modelReused": true,
+        "generatedTokens": 80,
+        "tokensPerSecond": 2.198336318820472,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "78236ca70edc96e2eb782d52c9775ba7e5c02c714db8cd3f341ebee98a3b283c",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:10:00.564Z"
+    },
+    {
+      "caseId": "case-17",
+      "imageSha256": "89d0e0116ccb433ede9da830174d19beb749ccc4c46573fb1c7313fce05bf075",
+      "sourceSha256": "8b3afa7e0d59fe99a36eefa9cc741bb8d1f518184f32ae01627cffb80916bb5c",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:10:00.566Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Colour**: The surface displays a mottled pattern with shades ranging from off-white to pale gray, featuring subtle variations in tone that create a textured appearance rather than uniformity.  \n- **Texture**: The material exhibits a fine, fibrous or granular quality, suggesting an organic or mineral-based composition like stone or concrete, though the exact nature remains ambiguous without further context.  \n- **Visible Edges/Gaps**: There are no clear defined boundaries; instead, the image appears to be a continuous field of detail, possibly indicating a macro view of a larger object whose full form is obscured by the current framing.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 17,
+        "preprocessingMs": 578.8081139999849,
+        "inferenceMs": 41978.859423999966,
+        "totalMs": 42579.12843099999,
+        "modelReused": true,
+        "generatedTokens": 126,
+        "tokensPerSecond": 3.001510801600385,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "89d0e0116ccb433ede9da830174d19beb749ccc4c46573fb1c7313fce05bf075",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:10:43.147Z"
+    },
+    {
+      "caseId": "case-18",
+      "imageSha256": "8152ab0b9647f4d30f122c1cbf902ae153f6048988efbee40e543188a7b12e43",
+      "sourceSha256": "612dc0f8b8817eece185cfd442a97abe2a7d73b903b77b9c4d94e8c575e5009d",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:10:43.157Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- The image displays a mottled surface with varying shades of gray and white.\n- There are irregular patches of darker gray areas interspersed with lighter, whitish regions.\n- Visible gaps in the pattern suggest that the texture may be uneven or partially obscured by other elements.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 18,
+        "preprocessingMs": 233.91221599996788,
+        "inferenceMs": 24768.406212,
+        "totalMs": 25012.66422799998,
+        "modelReused": true,
+        "generatedTokens": 59,
+        "tokensPerSecond": 2.3820668756399512,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "8152ab0b9647f4d30f122c1cbf902ae153f6048988efbee40e543188a7b12e43",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:11:08.173Z"
+    },
+    {
+      "caseId": "case-19",
+      "imageSha256": "3a49fe3fc2209fcc98bfae5bd64e895f23d2195ecc2f03b110f6fbfb59156e0b",
+      "sourceSha256": "0741375f72327d62396395ff2bb18537e8cb676498f22320a85b447143ebebd1",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:11:08.180Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- The image displays a pale, mottled surface with scattered brownish-grey irregular spots.\n- There are faint grey lines running horizontally across the top portion of the frame.\n- Several distinct brownish areas appear as gaps in the otherwise uniform background.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 19,
+        "preprocessingMs": 164.78220200003125,
+        "inferenceMs": 25860.162702,
+        "totalMs": 26025.360875000013,
+        "modelReused": true,
+        "generatedTokens": 53,
+        "tokensPerSecond": 2.0494843984837354,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "3a49fe3fc2209fcc98bfae5bd64e895f23d2195ecc2f03b110f6fbfb59156e0b",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:11:34.220Z"
+    },
+    {
+      "caseId": "case-20",
+      "imageSha256": "20927579c8a6b56e2664dcdebee3ba7e62f279c8f811ca5f8acd448e57fd08c1",
+      "sourceSha256": "db07923bc561ecc2b6d8a9cb47dc5722fbb5af7760b1a028dbe33069f4d564e9",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:11:34.223Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- The surface displays a mottled pattern with varying shades of gray and white.\n- There are subtle variations in the color distribution that create a natural look.\n- Visible gaps exist between the larger areas of color, particularly on the left side where some regions appear more uniform than others.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 20,
+        "preprocessingMs": 252.6966389999725,
+        "inferenceMs": 24391.68456700002,
+        "totalMs": 24644.67028099997,
+        "modelReused": true,
+        "generatedTokens": 60,
+        "tokensPerSecond": 2.4598547031546625,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "20927579c8a6b56e2664dcdebee3ba7e62f279c8f811ca5f8acd448e57fd08c1",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:11:58.892Z"
+    },
+    {
+      "caseId": "case-21",
+      "imageSha256": "817fdc3eda3829d53d97384eab00242b654befa117d40260e9041bf52483a633",
+      "sourceSha256": "393f6be3377018123119a394996a76e9709985b1c3420ba2028335fefb97e82d",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:11:58.895Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- The image displays a uniform surface with a mottled appearance in shades of pale beige and off-white.\n- There are no distinct lines, cracks, or fractures visible; the texture appears consistent throughout the frame.\n- No specific geological features such as mineral grains or structural layers can be discerned due to the low resolution and lack of clear context.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 21,
+        "preprocessingMs": 322.23116999998456,
+        "inferenceMs": 27466.741246999998,
+        "totalMs": 27789.25297999999,
+        "modelReused": true,
+        "generatedTokens": 73,
+        "tokensPerSecond": 2.6577597736671175,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "817fdc3eda3829d53d97384eab00242b654befa117d40260e9041bf52483a633",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:12:26.691Z"
+    },
+    {
+      "caseId": "case-22",
+      "imageSha256": "873683f1c11731e0005b21f135c935834f3e82449cdade6a68e4fef13a03223c",
+      "sourceSha256": "f9b7520fbee8de988feadeb2a2b1c33596066659e4c1c8aacca0695052cbded2",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:12:26.693Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- The image displays a mottled surface with varying shades of gray and white speckles scattered across the frame.\n- There are no clear distinct edges or borders separating different regions; instead, the visual elements blend into one another.\n- No specific geological features such as fractures, mineral structures, or natural formations can be identified from these details alone.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 22,
+        "preprocessingMs": 189.07955399999628,
+        "inferenceMs": 30911.678156000038,
+        "totalMs": 31101.207552000007,
+        "modelReused": true,
+        "generatedTokens": 73,
+        "tokensPerSecond": 2.361567030802904,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "873683f1c11731e0005b21f135c935834f3e82449cdade6a68e4fef13a03223c",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:12:57.801Z"
+    },
+    {
+      "caseId": "case-23",
+      "imageSha256": "4c1fe540acc36b15205f10189727bdf279b192b0ffe1a6702387e766f904c5c3",
+      "sourceSha256": "b7f4e244b8c244eb1758dbb58ece89cafee4f3a0b66ade4d0f3f1903fdc559d2",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:12:57.813Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Colour**: The dominant hue is a pale, muted beige with subtle variations in tone across the surface.\n- **Texture**: It displays a fine, mottled grain that appears somewhat coarse but uniform throughout the frame.\n- **Visible Edges/Gaps**: There are faint, irregular lines running vertically through the center, suggesting possible structural breaks or seams within the material.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 23,
+        "preprocessingMs": 800.3603439999861,
+        "inferenceMs": 47249.60188699997,
+        "totalMs": 48050.245148000016,
+        "modelReused": true,
+        "generatedTokens": 78,
+        "tokensPerSecond": 1.6508075599566174,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "4c1fe540acc36b15205f10189727bdf279b192b0ffe1a6702387e766f904c5c3",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:13:45.918Z"
+    },
+    {
+      "caseId": "case-24",
+      "imageSha256": "7781293fd3ccfa68524aefffe440ad5f7d32b59c59935b37507344ba057164ea",
+      "sourceSha256": "e9ddad60f0e4bfd2c4f7bd3e00e2f384e8b5adf3c7193cdca81c5dc8f659513f",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:13:45.947Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- The surface displays a mottled pattern with varying shades of beige and gray tones.\n- There are numerous small, scattered specks distributed throughout the area.\n- No clear edges or gaps can be identified in the visual field.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 24,
+        "preprocessingMs": 343.57663800002774,
+        "inferenceMs": 19709.737000000023,
+        "totalMs": 20053.555345,
+        "modelReused": true,
+        "generatedTokens": 49,
+        "tokensPerSecond": 2.4860808644985952,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "7781293fd3ccfa68524aefffe440ad5f7d32b59c59935b37507344ba057164ea",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:14:06.010Z"
+    },
+    {
+      "caseId": "case-25",
+      "imageSha256": "738d31c2dffc7386da90b1e5e17a7cd47eeeaed05678faab03616aad69c70f7c",
+      "sourceSha256": "941919ad48b00f62d8dcd9914d5cfecdddde637c062468dc54733c8c51f9d312",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:14:06.012Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- The image displays a speckled surface with a mottled appearance in shades of beige, light brown, and pale gray.\n- There are no distinct lines, cracks, or fractures visible; the texture appears uniform throughout the frame.\n- No specific geological features such as mineral grains or rock layers can be identified due to the low resolution and lack of clear context.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 25,
+        "preprocessingMs": 206.29789299995173,
+        "inferenceMs": 25385.78114399995,
+        "totalMs": 25592.47070299997,
+        "modelReused": true,
+        "generatedTokens": 77,
+        "tokensPerSecond": 3.033194037371559,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "738d31c2dffc7386da90b1e5e17a7cd47eeeaed05678faab03616aad69c70f7c",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:14:31.608Z"
+    },
+    {
+      "caseId": "case-26",
+      "imageSha256": "921683ccd0af84aa33f6d6d452d7f35f91a6b4557f515243c69dc4332884c56b",
+      "sourceSha256": "7ea01e16fb7fa59d35246e23aa611358ce01c66d0eb8c44194c38d86f4ac2732",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:14:31.613Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- The image displays a mottled surface with a light beige or off-white base color.\n- There are numerous small, irregular patches of varying shades ranging from pale gray to fainter pinkish tones scattered throughout the frame.\n- The texture appears somewhat coarse and granular, resembling a stone or sedimentary material rather than a smooth surface like glass or metal.\n- No clear edges or distinct gaps can be identified in the visual field; the pattern fills the entire area shown.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 26,
+        "preprocessingMs": 361.5669840000337,
+        "inferenceMs": 29702.62628700002,
+        "totalMs": 30064.569183999964,
+        "modelReused": true,
+        "generatedTokens": 99,
+        "tokensPerSecond": 3.333038602156518,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "921683ccd0af84aa33f6d6d452d7f35f91a6b4557f515243c69dc4332884c56b",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:15:01.683Z"
+    },
+    {
+      "caseId": "case-27",
+      "imageSha256": "a10b4b6670b7232c2038314fee528f57c229a9471086532bc057b2da7f32bac6",
+      "sourceSha256": "a80f977327da210bc53098e720ace60441cc38da3f0ac3d0257eef37034fdf8c",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:15:01.686Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- The image displays a speckled surface with varying shades of grey and white.\n- There are no clear edges or gaps in the visual field; the texture appears continuous across the frame.\n- No specific geological features like rock types, mineral structures, or fractures can be identified from this view.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 27,
+        "preprocessingMs": 262.1202930000145,
+        "inferenceMs": 15144.104765000055,
+        "totalMs": 15406.698193000047,
+        "modelReused": true,
+        "generatedTokens": 62,
+        "tokensPerSecond": 4.094002317211239,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "a10b4b6670b7232c2038314fee528f57c229a9471086532bc057b2da7f32bac6",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:15:17.094Z"
+    },
+    {
+      "caseId": "case-28",
+      "imageSha256": "bb5eed9271083a0b72a842061f753a8cc341def21ec8b1b25173de6f2a4a802a",
+      "sourceSha256": "95f3355363ea1bfdee7bbfa250902661c3d7429cd888419b5376a375ee6b7b3c",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:15:17.099Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Colour**: The dominant coloration is a light gray with subtle variations in tone ranging from pale off-white to very light gray. There are fainter gray streaks scattered throughout the surface.\n- **Texture**: The material displays a mottled, grainy appearance typical of stone or concrete. It appears somewhat rough on the surface rather than smooth.\n- **Visible Edges/Gaps**: The image shows no clear defined edges; instead, there appear to be irregular gaps where the material has been cut or removed, creating a fragmented look across the frame.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 28,
+        "preprocessingMs": 220.999763000058,
+        "inferenceMs": 49211.71890700003,
+        "totalMs": 49433.03397300001,
+        "modelReused": true,
+        "generatedTokens": 115,
+        "tokensPerSecond": 2.3368417635914365,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "bb5eed9271083a0b72a842061f753a8cc341def21ec8b1b25173de6f2a4a802a",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:16:06.534Z"
+    },
+    {
+      "caseId": "case-29",
+      "imageSha256": "a52cc13d67f458308b7dbaba9af034b65d4151935f3aca234e4305f1912d2064",
+      "sourceSha256": "7d992e36108a6a6faefef855c2a9b8b54ae2340ee1c46f0da2372e20ab1adc26",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:16:06.547Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Colour**: The dominant hue is a muted greyish-brown with subtle variations in tone across the surface.\n- **Texture**: It displays a coarse, mottled appearance with numerous small, irregular speckles that resemble sand grains or mineral particles.\n- **Visible Edges/Gaps**: There are no clear defined lines separating different parts; instead, the material appears as a continuous, uniform field without distinct boundaries.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 29,
+        "preprocessingMs": 151.72279299993534,
+        "inferenceMs": 25684.57518699998,
+        "totalMs": 25836.78237199993,
+        "modelReused": true,
+        "generatedTokens": 88,
+        "tokensPerSecond": 3.4261808637793014,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "a52cc13d67f458308b7dbaba9af034b65d4151935f3aca234e4305f1912d2064",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:16:32.387Z"
+    },
+    {
+      "caseId": "case-30",
+      "imageSha256": "8497cbdf0b10ffe5f00d82636af9ada1f1a474801fbf8968a94295dd1db997b4",
+      "sourceSha256": "366f0cdf4f491e682d4aa424d2abe9355cf60c4a5e05fd0ede349a4b708440b2",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:16:32.394Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Colour**: The surface displays a mottled pattern with shades ranging from light beige to grayish-brown tones.\n- **Texture**: It appears to be a coarse-grained material with an irregular, granular appearance that suggests natural stone rather than manufactured metal.\n- **Visible Edges/Gaps**: There are no clear defined lines separating the different parts; instead, the material fills the frame completely.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 30,
+        "preprocessingMs": 142.67134600004647,
+        "inferenceMs": 19025.262224999955,
+        "totalMs": 19168.29218800005,
+        "modelReused": true,
+        "generatedTokens": 85,
+        "tokensPerSecond": 4.467743939334859,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "8497cbdf0b10ffe5f00d82636af9ada1f1a474801fbf8968a94295dd1db997b4",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:16:51.570Z"
+    },
+    {
+      "caseId": "case-31",
+      "imageSha256": "e962c8bcffc157bdb7c40176686962876055539191555e781b89937e5221ed73",
+      "sourceSha256": "19499d34cb919f700becdcc8a29159f3bb191a4aa97de13edaa29b87cad086a3",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:16:51.572Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Colour**: The dominant coloration is a pale off-white or light gray with subtle variations in tone. There are fainter areas that appear slightly darker than the surrounding regions.\n- **Texture**: The surface displays a fine, linear pattern consistent with wood grain. This texture appears somewhat irregular across different sections, suggesting natural variation rather than uniformity.\n- **Visible Edges/Gaps**: The image lacks clear boundaries; instead, there are continuous transitions between adjacent zones, creating an impression of depth without distinct separation lines.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 31,
+        "preprocessingMs": 189.85119000007398,
+        "inferenceMs": 21191.118130999967,
+        "totalMs": 21384.259457000066,
+        "modelReused": true,
+        "generatedTokens": 107,
+        "tokensPerSecond": 5.049285240096525,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "e962c8bcffc157bdb7c40176686962876055539191555e781b89937e5221ed73",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:17:12.958Z"
+    },
+    {
+      "caseId": "case-32",
+      "imageSha256": "603f66d73c7de32874a05fdc1c97999d877033f90839b58a84b03faa0e55ec6d",
+      "sourceSha256": "bc2edd8f1882fed72beaaa3b34fbd9c5d97a54f6d528c168eb53ca59080ea440",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:17:12.963Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Color**: The dominant color is a muted grayish-brown with subtle variations in tone across the surface. There are faint reddish-orange accents on the far left edge.\n- **Texture**: The material appears to have a fine, grainy texture that resembles stone or concrete, though it lacks distinct patterns like cracks or seams. It looks somewhat uniform but slightly mottled.\n- **Visible Edges/Gaps**: On the extreme left side, there is a vertical line that suggests an edge or border, although no clear gap is immediately apparent within the main body of the object shown.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 32,
+        "preprocessingMs": 130.19289200007915,
+        "inferenceMs": 20417.459630000056,
+        "totalMs": 20548.05892900005,
+        "modelReused": true,
+        "generatedTokens": 122,
+        "tokensPerSecond": 5.975278130132375,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "603f66d73c7de32874a05fdc1c97999d877033f90839b58a84b03faa0e55ec6d",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:17:33.516Z"
+    },
+    {
+      "caseId": "case-33",
+      "imageSha256": "6b585e57240b3db1f77ddaf9cbbd504e2a10c50acceb6d814862e6c0e1158413",
+      "sourceSha256": "7c2c44f003400ab6df830f75b3ab0a5479e888be854070361518d2bc1316e9ba",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:17:33.520Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Colour**: The surface displays a uniform light grey tone with subtle variations in shade across the frame.\n- **Texture**: It appears to be a matte finish with fine, mottled imperfections that resemble stone or concrete.\n- **Visible Edges/Gaps**: There are no clear defined edges; instead, the material fills most of the space with a continuous, featureless appearance.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 33,
+        "preprocessingMs": 132.61391399998683,
+        "inferenceMs": 14757.17404199997,
+        "totalMs": 14890.040116999997,
+        "modelReused": true,
+        "generatedTokens": 81,
+        "tokensPerSecond": 5.488855777499691,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "6b585e57240b3db1f77ddaf9cbbd504e2a10c50acceb6d814862e6c0e1158413",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:17:48.418Z"
+    },
+    {
+      "caseId": "case-34",
+      "imageSha256": "7e8272a283a8be41287a67ea2f9e966a06c2f782cdcd316c2ee06279d76e9c63",
+      "sourceSha256": "a910c161b379e2fb99d828b7eb1268f387998027f5e90141ad72c7ceb61f8d91",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:17:48.465Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Colour**: The dominant color is a muted grayish-blue with subtle variations in tone across the surface.\n- **Texture**: There are fine, vertical striations running through the material that resemble a mottled stone or concrete finish.\n- **Visible Edges/Gaps**: On the far left edge, there appears to be a slight irregularity or gap in the pattern compared to the rest of the surface.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 34,
+        "preprocessingMs": 136.83493200002704,
+        "inferenceMs": 16094.408866000012,
+        "totalMs": 16231.48988899996,
+        "modelReused": true,
+        "generatedTokens": 86,
+        "tokensPerSecond": 5.343470562729268,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "7e8272a283a8be41287a67ea2f9e966a06c2f782cdcd316c2ee06279d76e9c63",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:18:04.706Z"
+    },
+    {
+      "caseId": "case-35",
+      "imageSha256": "24655cbe5dbb999fbfc6fcbddfd7877c955e10e1852fe3f0ecb796be56516b78",
+      "sourceSha256": "ff3ba318859655388f0d41c938379b59c2b2cca90caed76ffa7d2c06813a0603",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:18:04.708Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Color**: The dominant color palette consists of muted grays and browns, with darker tones in the center contrasting against lighter areas on the sides.\n- **Texture**: The surface displays a rough, mottled appearance typical of stone or concrete, featuring irregular patterns that suggest wear over time.\n- **Visible Edges/Gaps**: There are distinct vertical lines separating different sections, as well as dark, shadowed gaps where the material appears to be missing or obscured from view.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 35,
+        "preprocessingMs": 162.23354199994355,
+        "inferenceMs": 17812.39008100005,
+        "totalMs": 17976.213649999932,
+        "modelReused": true,
+        "generatedTokens": 100,
+        "tokensPerSecond": 5.614069731532942,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "24655cbe5dbb999fbfc6fcbddfd7877c955e10e1852fe3f0ecb796be56516b78",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:18:22.686Z"
+    },
+    {
+      "caseId": "case-36",
+      "imageSha256": "30debcd3c150851a238293e1c9849655f1224407c103beeaddef18e410bbea29",
+      "sourceSha256": "44eb609c4c63b45b5cb3902d3c770d2d900a286698b3082d90911e8801db8d60",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:18:22.692Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Colour**: The surface displays a monochromatic palette dominated by shades of gray, with lighter areas appearing as off-white or pale gray, while darker streaks are in varying tones from dark gray to black.\n- **Texture**: The material exhibits a mottled appearance with vertical lines that appear both solid and broken, suggesting an uneven surface rather than a perfectly uniform one.\n- **Visible Edges/Gaps**: There are faint irregularities along the perimeter where the material transitions between different color zones, indicating potential edge-to-edge discontinuity or imperfections in the finish.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 36,
+        "preprocessingMs": 187.93908099993132,
+        "inferenceMs": 21800.724846999976,
+        "totalMs": 21989.085588000016,
+        "modelReused": true,
+        "generatedTokens": 118,
+        "tokensPerSecond": 5.412664066361909,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "30debcd3c150851a238293e1c9849655f1224407c103beeaddef18e410bbea29",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:18:44.689Z"
+    },
+    {
+      "caseId": "case-37",
+      "imageSha256": "644493a10f1a0abff3437f38d15a933f27f6b0b4cd6e4b924bd3b80be52f03aa",
+      "sourceSha256": "cf6b614d409116de05b785730dcb891ec239a26c7cda1b4b50060802b0ee13c0",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:18:44.692Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Color**: The dominant color is a muted grayish-brown with subtle variations in tone across the surface.\n- **Texture**: The texture appears rough and uneven, resembling a natural stone or masonry wall rather than a smooth material like metal or concrete.\n- **Visible Edges/Gaps**: There are faint vertical lines suggesting cracks or irregularities in the structure, as well as some darker areas that may represent shadows or voids within the material.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 37,
+        "preprocessingMs": 186.52813500002958,
+        "inferenceMs": 18674.543316000025,
+        "totalMs": 18861.385302000097,
+        "modelReused": true,
+        "generatedTokens": 94,
+        "tokensPerSecond": 5.033590295054895,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "644493a10f1a0abff3437f38d15a933f27f6b0b4cd6e4b924bd3b80be52f03aa",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:19:03.556Z"
+    },
+    {
+      "caseId": "case-38",
+      "imageSha256": "5933713d3790f3e7b5aea3af0bf2687e82eef16d671b6cd2a0f335dc6e65cc4c",
+      "sourceSha256": "37d98840a191cbb95442985e5eaac683c53b5c374fdb97997e85471da13fc9f2",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:19:03.560Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Colour**: The surface displays a muted grey tone with subtle variations in shade across the frame.\n- **Texture**: It exhibits a fine, vertical grain pattern that resembles wood or stone slabs.\n- **Visible Edges/Gaps**: There are no clear boundaries separating different sections; the material appears as a continuous, uniform surface.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 38,
+        "preprocessingMs": 185.1678420000244,
+        "inferenceMs": 13653.222086000023,
+        "totalMs": 13838.66157700005,
+        "modelReused": true,
+        "generatedTokens": 70,
+        "tokensPerSecond": 5.126994899744421,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "5933713d3790f3e7b5aea3af0bf2687e82eef16d671b6cd2a0f335dc6e65cc4c",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:19:17.416Z"
+    },
+    {
+      "caseId": "case-39",
+      "imageSha256": "b887574931bb45510e07fb84ce87774489f489a1041c9dd20ca83e058d1b8570",
+      "sourceSha256": "ae6577d11add1ef5a5aff859643f305950061bdc74c2f83936da96ad02a4ce9d",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:19:17.446Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Color**: The dominant color is a muted grayish-brown with a distinct reddish-orange accent along the lower-left portion.\n- **Texture**: The surface displays vertical striations that resemble wood grain but are slightly blurred due to low resolution. There appear to be faint cracks running vertically through the middle section.\n- **Visible Edges/Gaps**: A significant gap exists in the bottom-right corner where the red line ends abruptly; no further detail can be discerned beyond the edge itself.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 39,
+        "preprocessingMs": 143.6147490000585,
+        "inferenceMs": 19002.16602699994,
+        "totalMs": 19146.13644000003,
+        "modelReused": true,
+        "generatedTokens": 102,
+        "tokensPerSecond": 5.367809114764573,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "b887574931bb45510e07fb84ce87774489f489a1041c9dd20ca83e058d1b8570",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:19:36.597Z"
+    },
+    {
+      "caseId": "case-40",
+      "imageSha256": "13d4405652055f28c750b22ab22b9c81b597b6d8bb1324e6ad99dc91eef55330",
+      "sourceSha256": "ebd3aeb38465bc18db3665e82dfb77cd2f680d67e5842b065855e2e3f6fac3b7",
+      "status": "completed",
+      "startedAt": "2026-11-15T08:19:36.599Z",
+      "result": {
+        "modelId": "qwen3.5-0.8b-opt",
+        "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+        "dtypes": {
+          "embed_tokens": "q4",
+          "vision_encoder": "fp32",
+          "decoder_model_merged": "q4"
+        },
+        "weightBytes": 1049662346,
+        "license": "Apache-2.0",
+        "backend": "onnxruntime-node/cpu",
+        "transformersVersion": "4.3.2",
+        "onnxRuntimeVersion": "1.30.0",
+        "nodeVersion": "24.22.1",
+        "intraOpNumThreads": 4,
+        "text": "- **Colour**: The dominant color is a muted gray with subtle variations in tone, appearing slightly lighter in the center than at the edges.\n- **Texture**: There are fine vertical striations running down the surface, suggesting a mottled stone pattern rather than a solid block.\n- **Visible Edges/Gaps**: The image shows distinct gaps between individual stones, particularly noticeable on the left side where the lines appear more sparse compared to the right side.",
+        "loadMs": 0,
+        "sessionLoadMs": 4034.402804,
+        "sessionRunIndex": 40,
+        "preprocessingMs": 122.73840699996799,
+        "inferenceMs": 17563.763860999956,
+        "totalMs": 17686.89257300005,
+        "modelReused": true,
+        "generatedTokens": 94,
+        "tokensPerSecond": 5.35192802316851,
+        "inputTokens": 334,
+        "maxNewTokens": 128,
+        "imageWidth": 512,
+        "imageHeight": 512,
+        "imageSha256": "13d4405652055f28c750b22ab22b9c81b597b6d8bb1324e6ad99dc91eef55330",
+        "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+        "chatTemplate": {
+          "addGenerationPrompt": true,
+          "enableThinking": false
+        },
+        "generation": {
+          "doSample": false,
+          "repetitionPenalty": 1.1,
+          "maxNewTokens": 128
+        },
+        "preprocessing": "Identical prepared 512 × 512 PNG; native model processor normalization and image-token grid.",
+        "imageGrid": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "timingScope": "CPU quality-screening run; generation includes vision encoding and prompt prefill. Not browser or phone performance."
+      },
+      "outputLimitReached": false,
+      "completedAt": "2026-11-15T08:19:54.288Z"
+    }
+  ],
+  "limitations": [
+    "CPU outputs cannot populate missing WebGPU cases or satisfy browser-quality or device gates.",
+    "No human geologist has reviewed these outputs; no usefulness or accuracy scores are calculated.",
+    "Public source identifiers are not verified borehole independence.",
+    "Shared machine load makes these timings diagnostic, not a controlled device-speed benchmark."
+  ],
+  "completedAt": "2026-11-15T08:19:54.358Z"
+}

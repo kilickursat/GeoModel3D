@@ -140,6 +140,16 @@ These general-purpose VLMs have not been validated on geological core. Colour an
 
 AI is unavailable in the portable standalone HTML and in browsers without a working WebGPU adapter. Device memory and operator support can still prevent a model from loading. iPhone Chromium emulation checks layout only; it does not establish iPhone Safari inference performance.
 
+### Evaluate Qwen on your device
+
+The hosted AI dialog links to a [separate device-evaluation page](https://kilickursat.github.io/GeoModel3D/core-ai-benchmark.html). It uses forty fixed public image patches and does not read or change your project. Qwen remains outside the normal model selector while expert and device evidence are incomplete.
+
+Use **Review source images** and **Download blank review sheet** to prepare image-only observations with a qualified reviewer before reading model answers. A **Compatibility check · 32 tokens** tests execution only. **Description evaluation · 128 tokens** produces text for later human assessment; a one-case or first-five run remains partial. Model weights require about 1,001 MiB on first use, plus other files and working memory, and download only after the explicit acknowledgement and Run action.
+
+Keep the page visible. Stopping or hiding it unloads the worker; the current and unstarted cases remain recorded. Results are saved to a dedicated local recovery record when storage permits. Reloading restores them without resuming inference. Export JSON for a durable copy before leaving, and retain failed or capped runs. **Forget saved benchmark results** removes only this history; **Clear benchmark downloads** removes only its model cache.
+
+For phone evidence, open the page on the physical phone in Safari and record the device/browser version in the optional label. That label stays self-reported; actual adapter/runtime information is separate. GPU memory is unknown to the page. Follow the [full protocol and review instructions](benchmarks/0.26.0-core-ai/README.md); successful execution alone is not a geological quality score.
+
 ## Reading borehole logs from PDFs
 
 The borehole logs in a PDF report, or in an image of a log, can become the boreholes of your case. GeoModel3D reads them in the browser and shows each value beside the page it was read from, and you check them before they are used. Drop the PDF or image (PNG, JPEG or WebP) on the page, choose it with **Import…**, or use **Read logs from PDFs…** at the start of the **Input data** tab. Several documents can be read at once.

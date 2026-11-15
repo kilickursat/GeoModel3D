@@ -29,6 +29,8 @@ The optional core-image VLM runs through `onnxruntime-web` in a browser worker. 
 
 The [real-core image pilot](docs/benchmarks/0.25.0-core-ai/README.md) documents optional reproduction using the existing dependencies and separately licensed image data. Its Node CPU screening is separate from the app's browser WebGPU execution and does not measure phone performance. The image preparation verifier compares against the frozen inputs without overwriting them; a different Chromium version may produce different pixels or metadata. Use the recorded version to reproduce that baseline, or create a new benchmark directory and protocol for a new experiment.
 
+The [expanded Qwen device study](docs/benchmarks/0.26.0-core-ai/README.md) adds forty fixed public cases and a separate hosted HTML entry. `npm run build` builds the main app first, then the benchmark without clearing the output directory; this keeps shared benchmark chunks out of the single-file app. Human references, CPU diagnostics, software WebGPU and physical-device measurements must retain their distinct provenance. Missing review is unassessed, not a passing score.
+
 The modelling kernel (`src/model.ts`, `src/fields.ts`, `src/io.ts` and the other modules that do not render) has no browser dependencies and is tested in Node. The viewer (`src/main.ts`) and the Input data tab (`src/input.ts`) are thin layers on top. [Architecture](docs/methods.md#architecture) lists every module.
 
 ## Making a change

@@ -1,0 +1,91 @@
+[
+  {
+    "originalPath": ".cache/v026/run-production-webgpu.mjs",
+    "path": "execution-source/.cache__v026__run-production-webgpu.mjs.txt",
+    "sha256": "fef9b44467b6530c3d115cbb5ca2b4c413b31cbdbcf3506063a6d008c7354bb7",
+    "bytes": 10589,
+    "archived": true
+  },
+  {
+    "originalPath": ".cache/v026/static-server.mjs",
+    "path": "execution-source/.cache__v026__static-server.mjs.txt",
+    "sha256": "76d4ff410a84e07204b08e023ca5a62e4b2e2ac29154a484dfe13c2013ceb814",
+    "bytes": 2525,
+    "archived": true
+  },
+  {
+    "originalPath": ".cache/v026/input-integrity.mjs",
+    "path": "execution-source/.cache__v026__input-integrity.mjs.txt",
+    "sha256": "68e2eb6d5e8f6ccc09095d202e071425e422f10f6bfbaacccd49f1b5fc07a51b",
+    "bytes": 3448,
+    "archived": true
+  },
+  {
+    "originalPath": ".cache/v026/verify-qwen-cache.mjs",
+    "path": "execution-source/.cache__v026__verify-qwen-cache.mjs.txt",
+    "sha256": "d76643aad30fb79184893260309340f4813706754b9c008b6cde2fc9e6a22f07",
+    "bytes": 2242,
+    "archived": true
+  },
+  {
+    "originalPath": "src/coreBenchmark.ts",
+    "path": "execution-source/src__coreBenchmark.ts.txt",
+    "sha256": "76fcc411889f568ecbd41fc92b4681e9f23e83e4dc24ca32b9c7454c701545ef",
+    "bytes": 11248,
+    "archived": true
+  },
+  {
+    "originalPath": "src/coreBenchmarkClient.ts",
+    "path": "execution-source/src__coreBenchmarkClient.ts.txt",
+    "sha256": "b0f58ae377bc7b4ef3cd2024faeb3c57aabc053dba363da62dd8ae1572616c21",
+    "bytes": 6185,
+    "archived": true
+  },
+  {
+    "originalPath": "src/coreBenchmark.worker.ts",
+    "path": "execution-source/src__coreBenchmark.worker.ts.txt",
+    "sha256": "0802a77fc2a60480466c67c9278943065a62da562e2e3812d47d812eeb3d8736",
+    "bytes": 9890,
+    "archived": true
+  },
+  {
+    "originalPath": "src/coreBenchmarkView.ts",
+    "archived": false,
+    "reason": "Current source differs from the recorded execution hash; use the immutable build evidence."
+  },
+  {
+    "originalPath": "src/coreBenchmark.css",
+    "path": "execution-source/src__coreBenchmark.css.txt",
+    "sha256": "c580f9fd492ae8aac0f09df1c766ff90a98b49aad3db5a37e385d1b1d71bdb10",
+    "bytes": 5512,
+    "archived": true
+  },
+  {
+    "originalPath": "core-ai-benchmark.html",
+    "path": "execution-source/core-ai-benchmark.html.txt",
+    "sha256": "bcca7062847568bf668d9ce2d87617d2b49d943b116d1d587cbe977067c4aeff",
+    "bytes": 642,
+    "archived": true
+  },
+  {
+    "originalPath": "package.json",
+    "path": "execution-source/package.json.txt",
+    "sha256": "ecc7e914b34010854fd2e1074bdfc0d8cec7306be0b59806e75b9036b00cf0f0",
+    "bytes": 2244,
+    "archived": true
+  },
+  {
+    "originalPath": "vite.config.ts",
+    "path": "execution-source/vite.config.ts.txt",
+    "sha256": "73cc16c173e83d10de68c77f4207e207c6f83c31d698452830d11be066d73492",
+    "bytes": 2478,
+    "archived": true
+  },
+  {
+    "originalPath": ".cache/v026/package-evidence.mjs",
+    "path": "execution-source/.cache__v026__package-evidence.mjs.txt",
+    "sha256": "25d8aa2a782631ec57048a11ab3d5ceeda4b2a9838e612a2ead8df949d454251",
+    "bytes": 7925,
+    "archived": true
+  }
+]

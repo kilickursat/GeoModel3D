@@ -1,0 +1,28 @@
+import {readFile,stat} from 'node:fs/promises';
+import {createReadStream} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {resolve} from 'node:path';
+export const repo='onnx-community/Qwen3.5-0.8B-ONNX-OPT',revision='9a4c21d8f724176b0a7edaaed36303044451886e';
+export const root=resolve(import.meta.dirname,'../..'),modelDir=resolve(root,'.cache/core-ai-benchmark/models',repo,revision);
+export const digest=bytes=>createHash('sha256').update(bytes).digest('hex');
+export async function fileHash(path){const h=createHash('sha256');for await(const bytes of createReadStream(path))h.update(bytes);return h.digest('hex')}
+export async function verifyModelCache(){
+ const folder=resolve(root,'docs/benchmarks/0.25.0-core-ai/webgpu');
+ const onnx=JSON.parse(await readFile(resolve(folder,'hf-onnx-metadata.json'),'utf8'));
+ const configs=JSON.parse(await readFile(resolve(folder,'config-provenance.json'),'utf8'));
+ if(configs.repo!==repo||configs.revision!==revision)throw Error('Pinned configuration provenance mismatch');
+ const entries=[];
+ for(const name of ['embed_tokens_q4.onnx','embed_tokens_q4.onnx_data','vision_encoder.onnx','vision_encoder.onnx_data','decoder_model_merged_q4.onnx','decoder_model_merged_q4.onnx_data']){
+  const path='onnx/'+name,known=onnx.find(e=>e.path===path),local=resolve(modelDir,path),bytes=(await stat(local)).size,sha256=await fileHash(local);
+  if(!known||sha256!==known.lfs.oid||bytes!==known.size)throw Error('Weight provenance mismatch: '+path);
+  entries.push({path,bytes,sha256,verification:'Pinned Hugging Face LFS SHA256',verified:true});
+ }
+ for(const known of configs.files){
+  const local=resolve(modelDir,known.path),bytes=await readFile(local),sha256=digest(bytes);
+  const gitBlob=createHash('sha1').update(Buffer.from(`blob ${bytes.length}\0`)).update(bytes).digest('hex');
+  const actual=known.verificationAlgorithm==='Git-blob-SHA1'?gitBlob:sha256;
+  if(known.verified!==true||bytes.length!==known.size||sha256!==known.sha256||actual!==known.expected)throw Error('Configuration provenance mismatch: '+known.path);
+  entries.push({path:known.path,bytes:bytes.length,sha256,verification:known.verificationAlgorithm,expected:known.expected,verified:true});
+ }
+ return entries;
+}

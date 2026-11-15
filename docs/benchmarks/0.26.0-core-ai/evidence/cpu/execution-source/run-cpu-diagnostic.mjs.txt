@@ -1,0 +1,39 @@
+// Supplemental CPU outputs only: never substitute these for browser coverage or human review.
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {resolve} from 'node:path';
+import {env} from '@huggingface/transformers';
+import {loadBenchmarkModel,generateBenchmark,disposeBenchmarkModel} from '../../scripts/core-ai-benchmark-runtime.mjs';
+import {root,repo,revision,digest,verifyModelCache} from './verify-qwen-cache.mjs';
+import {frozenInputs} from './input-integrity.mjs';
+const frozen=await frozenInputs(),files=await verifyModelCache();
+const out=resolve(root,'.cache/v026/cpu-diagnostic-01');await mkdir(out); // refuse every overwrite, including interrupted runs
+const sources=['.cache/v026/run-cpu-diagnostic.mjs','.cache/v026/input-integrity.mjs','.cache/v026/verify-qwen-cache.mjs','scripts/core-ai-benchmark-runtime.mjs'];
+const sourceHashes=[];for(const path of sources)sourceHashes.push({path,sha256:digest(await readFile(resolve(root,path)))});
+const report={format:'geomodel3d-core-expanded-cpu-diagnostic',version:1,startedAt:new Date().toISOString(),status:'running',
+ scope:'Supplemental local CPU technical diagnostic. Not browser/WebGPU quality coverage, not physical-device performance, and not human-reviewed quality.',
+ appVersion:JSON.parse(await readFile(resolve(root,'package.json'),'utf8')).version,protocolId:frozen.protocol.protocolId,protocolHashes:frozen.hashes,sourceHashes,
+ model:{repo,revision,remotePathTemplate:`{model}/resolve/${revision}/`},verifiedFiles:files,
+ expectedCases:40,selectedCaseIds:frozen.manifest.cases.map(c=>c.id),humanReviewState:'awaiting-qualified-human-review',
+ results:frozen.manifest.cases.map(c=>({caseId:c.id,imageSha256:c.sha256,sourceSha256:c.sourceSha256,status:'not-run'})),
+ limitations:['CPU outputs cannot populate missing WebGPU cases or satisfy browser-quality or device gates.','No human geologist has reviewed these outputs; no usefulness or accuracy scores are calculated.','Public source identifiers are not verified borehole independence.','Shared machine load makes these timings diagnostic, not a controlled device-speed benchmark.']};
+const save=()=>writeFile(resolve(out,'results.json'),JSON.stringify(report,null,2)+'\n');await save();
+env.remotePathTemplate=`{model}/resolve/${revision}/`;
+let handle;
+try{
+ try{handle=await loadBenchmarkModel('qwen3.5-0.8b-opt')}
+ catch(error){report.status='load-failed';report.error=String(error);report.results[0].status='load-failed';throw error}
+ for(let i=0;i<frozen.manifest.cases.length;i++){
+  const c=frozen.manifest.cases[i],entry=report.results[i];entry.status='running';entry.startedAt=new Date().toISOString();await save();console.log(JSON.stringify({caseId:c.id,phase:'running'}));
+  try{
+   const result=await generateBenchmark(handle,resolve(frozen.folder,c.image),frozen.protocol.prompt,{maxNewTokens:128});
+   if(result.imageSha256!==c.sha256||result.revision!==revision||result.prompt!==frozen.protocol.prompt)throw Error('Result binding mismatch');
+   entry.status=result.text?'completed':'empty-output';entry.result=result;entry.outputLimitReached=result.generatedTokens>=128;
+  }catch(error){entry.status='failed';entry.error=String(error)}
+  entry.completedAt=new Date().toISOString();await save();
+ }
+ report.status=report.results.every(r=>r.status==='completed')?'completed':'completed-with-failures';
+}catch(error){report.error??=String(error);if(report.status==='running')report.status='aborted'}
+finally{await disposeBenchmarkModel();report.completedAt=new Date().toISOString();await save()}
+console.log(JSON.stringify({status:report.status,completed:report.results.filter(x=>x.status==='completed').length,capped:report.results.filter(x=>x.outputLimitReached).length,out}));
+
+if(report.status!=='completed')process.exitCode=1;

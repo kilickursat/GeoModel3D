@@ -1,0 +1,22 @@
+node:internal/fs/cp/cp:306
+    throw new ERR_FS_CP_EEXIST({
+          ^
+
+SystemError [ERR_FS_CP_EEXIST]: Target already exists: cp returned EEXIST (/workspace/GeoModel3D/.cache/v026/production-build-snapshot already exists) /workspace/GeoModel3D/.cache/v026/production-build-snapshot
+    at onDir (node:internal/fs/cp/cp:306:11)
+    at getStatsForCopy (node:internal/fs/cp/cp:199:12)
+    at async file:///workspace/GeoModel3D/.cache/v026/run-production-webgpu.mjs:11:1 {
+  code: 'ERR_FS_CP_EEXIST',
+  info: {
+    message: '/workspace/GeoModel3D/.cache/v026/production-build-snapshot already exists',
+    path: '/workspace/GeoModel3D/.cache/v026/production-build-snapshot',
+    syscall: 'cp',
+    errno: 17,
+    code: 'EEXIST'
+  },
+  errno: [Getter/Setter],
+  syscall: [Getter/Setter],
+  path: [Getter/Setter]
+}
+
+Node.js v24.22.1

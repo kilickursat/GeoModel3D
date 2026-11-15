@@ -48,6 +48,8 @@ export default defineConfig({
     {name:"core-ai",testMatch:/core-ai\.spec\.ts$/,grepInvert:/mobile core AI|standalone core AI/,use:{...devices["Desktop Chrome"],viewport:{width:1440,height:1000}}},
     {name:"core-ai-mobile",testMatch:/core-ai\.spec\.ts$/,grep:/mobile core AI/,use:{...devices["iPhone 17"],defaultBrowserType:"chromium"}},
     {name:"core-ai-offline",testMatch:/core-ai\.spec\.ts$/,grep:/standalone core AI/,use:{...devices["Desktop Chrome"]}},
+    {name:"core-benchmark",testMatch:/core-benchmark\.spec\.ts$/,grepInvert:/mobile core benchmark/,use:{...devices["Desktop Chrome"],viewport:{width:1440,height:1000}}},
+    {name:"core-benchmark-mobile",testMatch:/core-benchmark\.spec\.ts$/,grep:/mobile core benchmark/,use:{...devices["iPhone 17"],defaultBrowserType:"chromium"}},
     {name:"offline",testMatch:/offline\.spec\.ts$/,use:{...devices["Desktop Chrome"]}}
   ],
   webServer:{command:"npm run dev -- --host 127.0.0.1 --port 4173 --strictPort",url:"http://127.0.0.1:4173",reuseExistingServer:!process.env.CI,timeout:30_000}

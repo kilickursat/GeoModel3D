@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 1,
+  "protocolId": "core-webgpu-pilot-2",
+  "datasetId": "core-v026",
+  "protocolFrozenAtUtc": "2026-11-15T08:04:04.287080Z",
+  "protocolDesignFrozenBeforeNewInference": true,
+  "status": "Prepared protocol; human quality, verified borehole independence and physical-device gates remain unassessed.",
+  "scope": "Visible descriptions from local browser WebGPU. No lithology-classification, engineering-property or ground-model-accuracy validation.",
+  "expectedCaseIds": [
+    "case-01",
+    "case-02",
+    "case-03",
+    "case-04",
+    "case-05",
+    "case-06",
+    "case-07",
+    "case-08",
+    "case-09",
+    "case-10",
+    "case-11",
+    "case-12",
+    "case-13",
+    "case-14",
+    "case-15",
+    "case-16",
+    "case-17",
+    "case-18",
+    "case-19",
+    "case-20",
+    "case-21",
+    "case-22",
+    "case-23",
+    "case-24",
+    "case-25",
+    "case-26",
+    "case-27",
+    "case-28",
+    "case-29",
+    "case-30",
+    "case-31",
+    "case-32",
+    "case-33",
+    "case-34",
+    "case-35",
+    "case-36",
+    "case-37",
+    "case-38",
+    "case-39",
+    "case-40"
+  ],
+  "selection": {
+    "expectedCases": 40,
+    "publishedClasses": {
+      "garbage": 10,
+      "limestone": 10,
+      "sandstone": 10,
+      "shale": 10
+    },
+    "source": "Alzubaidi lithology dataset V1 through the credited Kaggle mirror V1; see dataset-manifest.json and NOTICE.md",
+    "caseOrder": "case-01..10 garbage; case-11..20 limestone; case-21..30 sandstone; case-31..40 shale",
+    "disjointFrom": "The eight exact source files in docs/benchmarks/0.25.0-core-ai/dataset-manifest.json",
+    "algorithmAndSeed": "Frozen in the expanded dataset manifest before viewing or inference; no output-driven case replacement.",
+    "independence": "Filename prefixes and distinct parent-photo strings are heuristics only. Official case-level mapping to boreholes/sites is required for an independence claim.",
+    "inputsMustBeFrozenBeforeRun": true,
+    "recordHashes": [
+      "source JPEG SHA256",
+      "analyzed PNG SHA256",
+      "public manifest SHA256",
+      "full source manifest SHA256",
+      "protocol SHA256",
+      "rubric SHA256"
+    ],
+    "publicManifestSha256": "b61549c3de8714e2f015056276efc23dfb3c6f3e1206fbd6611b68af3712c391",
+    "sourceManifestSha256": "301b53789551d3423730f56572762ab99cee8f59b1d1e7b3dfa30c6cf80141d2",
+    "parentPhotoExclusion": "The eight earlier cases and all 40 expanded cases use distinct inferred parent trays; the old cases and their inferred parent trays were excluded by the dataset selector. Parent-tray strings remain unverified heuristics."
+  },
+  "promptVersion": 2,
+  "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+  "model": {
+    "id": "qwen3.5-0.8b-opt",
+    "repo": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+    "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+    "architecture": "Qwen3_5ForConditionalGeneration",
+    "dtype": {
+      "embed_tokens": "q4",
+      "vision_encoder": "fp32",
+      "decoder_model_merged": "q4"
+    },
+    "weightBytes": 1049662346,
+    "enableThinking": false,
+    "runtime": {
+      "transformers": "4.3.2",
+      "onnxRuntimeWeb": "1.31.1",
+      "device": "webgpu"
+    },
+    "revisionPolicy": "Pin both from_pretrained revision and remotePathTemplate; no unversioned main tokenizer metadata request."
+  },
+  "imageProcessing": {
+    "width": 512,
+    "height": 512,
+    "format": "PNG",
+    "geometry": "Aspect-preserving crop, enlargement where necessary, neutral-gray padding; exact prepared bytes hashed. Enlargement adds no observed detail.",
+    "qwenMinPixels": 262144,
+    "qwenMaxPixels": 262144,
+    "doImageSplitting": false,
+    "sentMetadata": "No published class, source filename, borehole identity, depth, geological label or test result is sent to the model."
+  },
+  "generation": {
+    "doSample": false,
+    "repetitionPenalty": 1.1,
+    "modes": {
+      "quality": {
+        "maxNewTokens": 128,
+        "eligibleForLaterHumanQualityReview": true
+      },
+      "compatibility": {
+        "maxNewTokens": 32,
+        "eligibleForLaterHumanQualityReview": false
+      }
+    },
+    "runOrder": "Selected case IDs in ascending order, one generation per selected case. Preserve failures, caps and cancellations. Do not choose a better answer from repeated generations.",
+    "qualityCappedOutputs": "Retain and score the text as generated, mark capped/incomplete, and retain cap counts separately."
+  },
+  "execution": {
+    "perCaseTimeoutMs": 1800000,
+    "explicitUserStart": true,
+    "sequentialSingleModelSession": true,
+    "stopPolicy": "Stop or loss of page visibility terminates the worker and current fetch; preserve completed results, a cancelled/interrupted current case and unstarted selected cases. No auto-resume.",
+    "resourceScope": "The 30-minute ceiling is a protective engineering timeout, not a usable-phone latency target.",
+    "localValidationPlan": {
+      "backend": "Software WebGPU if no hardware adapter is available",
+      "selectedCaseIds": [
+        "case-11"
+      ],
+      "mode": "quality",
+      "maxNewTokens": 128,
+      "maximumAttempts": 1,
+      "cohortCoverage": "One selected attempt out of 40; completion or timeout reported honestly. All other browser cases remain not run on this device.",
+      "rationale": "First limestone case in the predeclared ordering; selected before viewing the case or its output. It cannot estimate cohort quality.",
+      "exceptions": "An infrastructure fix may require a new named run. Preserve the original attempt and reason; never overwrite or select the best output."
+    },
+    "optionalCpuDiagnostics": "May run all 40 locally on CPU, but remain a separately labelled diagnostic dataset. CPU outputs/timings cannot fill missing browser cases or satisfy any browser-quality/device gate.",
+    "realDevicePlan": "Run the full 40-case quality cohort on a physically operated target device; record self-reported device model and actual browser/adapter data separately. Emulated iPhone viewport or software WebGPU is not physical iPhone Safari.",
+    "timingDefinitions": {
+      "firstTokenMs": "Worker monotonic elapsed time from model.generate start to the first output token; excludes image fetch, hash verification, model loading and preprocessing.",
+      "workerTotalMs": "Worker monotonic time including image verification/decode, model/session loading, preprocessing and generation; excludes page image fetch and client verification.",
+      "caseElapsedMs": "Page monotonic elapsed time from starting a selected case through image fetch, hash verification, client checks, worker loading/preprocessing/generation, and receipt of its terminal result. This is the warm end-to-end p95 field. Interrupted and failed cases retain elapsed time but are not successful latency samples.",
+      "clockTimestamps": "ISO timestamps identify events; elapsed values use monotonic performance.now and are not derived from wall-clock subtraction."
+    }
+  },
+  "humanReview": {
+    "state": "awaiting-qualified-human-review",
+    "references": "A qualified human records image-only observations before seeing model text, then signs and freezes that reference file with SHA256. No assistant-written observations are credited as human review.",
+    "timing": "If technical inference already occurred, keep outputs sealed from the reference reviewer. Record that references were frozen before output disclosure, not before inference. If the reviewer has seen outputs, record contamination and use a fresh blinded reviewer for independent references.",
+    "sourceLabels": "Keep source classes and borehole filenames hidden while writing visual references where practical; record any disclosure honestly. Published geologist-derived class labels are not new human visual review.",
+    "grading": "After reference freeze, provide anonymous output IDs without model names, backend, run timings or device labels. Record the limited blinding of a single-model study. Preserve the output-to-run mapping separately until grading is frozen.",
+    "missingData": "Blank/unassessed values are missing evidence, never zero scores or passing cases. Failures and unstarted cases remain in the cohort denominator.",
+    "materials": [
+      "rubric.md",
+      "human-review-template.csv",
+      "human-review-guide.md"
+    ]
+  },
+  "researchScreeningCriteria": {
+    "status": "Predeclared research thresholds, not user-accepted performance requirements or validated accuracy standards.",
+    "humanQuality": {
+      "reviewedBrowserQualityCases": 40,
+      "minimumUsefulCases": 32,
+      "fullySupportedCases": 30,
+      "maximumCriticalFailureOutputs": 0,
+      "maximumSubstantiveVisualContradictionOutputs": 2,
+      "minimumAppropriateNonCoreOrMixedControlAnswers": 8,
+      "controlDenominator": 10,
+      "controlInterpretation": "Assess the visible content; a garbage-class patch can include a rock edge and does not require a categorical no-rock answer.",
+      "maximumCappedQualityOutputs": 4,
+      "reviewers": "At least one qualified human completes and signs image-only references and blinded grading; independently re-review critical or disputed cases. Record reviewer role and qualification basis; do not invent credential verification."
+    },
+    "sourceIndependence": {
+      "minimumAuthoritativelyMappedBoreholes": 5,
+      "required": "Case-level linkage to authoritative borehole IDs and source parent images, evidence URLs, and declaration of overlap with development/tuning data. A matching name in a registry alone is insufficient.",
+      "unknownMeans": "unassessed; do not claim the full gate passed or that cases were held out by borehole/site.",
+      "pretrainingOverlap": "unknown; public data cannot establish absence from general-model pretraining."
+    },
+    "physicalDevice": {
+      "requiredDevice": "Physical target phone/browser, such as user-operated iPhone 17 Safari; record actual versions and date.",
+      "completeQualityCases": 40,
+      "maximumExecutionErrorsOrUnplannedInterruptions": 0,
+      "minimumWarmCompletedCasesForLatency": 30,
+      "warmDefinition": "Same retained model session; modelReused=true. Cold/download/session-load time is reported separately.",
+      "warmFirstTokenP95TargetMs": 10000,
+      "warmEndToEndP95TargetMs": 30000,
+      "percentileMethod": "Nearest-rank p95: ascending values at one-based rank ceil(0.95*n). Report n, all failures and unmeasured values; do not discard slow successful cases.",
+      "memory": "Report supported JS-heap metrics only as JS heap. GPU/process peak memory is unknown unless measured with a named external method; never infer it from model weight bytes or successful completion. No numerical device-memory-budget claim can pass without a stated budget and valid measurement.",
+      "softwareAdapter": "Compatibility evidence only; excluded from physical-device latency and memory suitability claims."
+    },
+    "decision": "All required evidence must be present before calling the full gate passed. Any failed criterion is failed; missing evidence is unassessed. This protocol cannot authorize automatic geological interpretation or a default-model change."
+  },
+  "reporting": {
+    "required": [
+      "expected cohort of 40",
+      "selected case IDs and selection rule",
+      "per-case not-run/running/completed/failed/cancelled/interrupted/timed-out state",
+      "mode and token cap",
+      "input/model/protocol hashes",
+      "actual backend/adapter/runtime versions",
+      "cold and warm timing distinction",
+      "first-token timing definition and missing values",
+      "capped and empty outputs",
+      "self-reported device context separated from observed browser metadata",
+      "human-review status and reference/output disclosure order",
+      "source-independence status",
+      "all attempts and stated exceptions"
+    ],
+    "noAutomaticAccuracyScore": true,
+    "separateCoverageAndQuality": true,
+    "noPoolingCpuAndWebGpu": true,
+    "noPoolingCompatibilityAndQuality": true,
+    "noImageBytesInExport": true,
+    "noImageUpload": true
+  },
+  "limitations": [
+    "Forty selected public patches remain exploratory and may be correlated.",
+    "Published class labels describe source classes, not visual ground truth for RQD, soundness, fracture origin or engineering properties.",
+    "Already cropped patches do not test whole-row versus individual-piece improvement.",
+    "Greedy generation can differ across CPU/WebGPU/runtime implementations; parity must not be assumed.",
+    "The application model selector and default remain unchanged while expert and physical-device evidence are missing."
+  ]
+}

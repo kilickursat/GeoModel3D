@@ -1,0 +1,8 @@
+{
+  "stage": "build-snapshot preparation before browser launch",
+  "error": "Node fs.cp rejected the pre-created destination directory with ERR_FS_CP_EEXIST",
+  "inferenceStarted": false,
+  "workerCreated": false,
+  "preservedLog": "setup-failure-01.log",
+  "fix": "Let fs.cp create a new snapshot directory; preserve the original empty folder and use a new named attempt path."
+}

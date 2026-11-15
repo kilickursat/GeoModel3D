@@ -1,0 +1,122 @@
+[
+  {
+    "path": "after-run.png",
+    "bytes": 248396,
+    "sha256": "8618e9d8603c5a801d4140c0417f72427158994f11f0e740671c11c18dc26d1b"
+  },
+  {
+    "path": "before-run.png",
+    "bytes": 214308,
+    "sha256": "e981339c5f1d8bcd10df1b31a13ac50364059504dea11064343f86cf6ccd2760"
+  },
+  {
+    "path": "device-report.json",
+    "bytes": 17221,
+    "sha256": "cf31e008cd87f88911b329ebd334cde5a7fd45da7926357eb8333e81c06911c2"
+  },
+  {
+    "path": "execution-source/.cache__v026__input-integrity.mjs.txt",
+    "bytes": 3448,
+    "sha256": "68e2eb6d5e8f6ccc09095d202e071425e422f10f6bfbaacccd49f1b5fc07a51b"
+  },
+  {
+    "path": "execution-source/.cache__v026__package-evidence.mjs.txt",
+    "bytes": 7925,
+    "sha256": "25d8aa2a782631ec57048a11ab3d5ceeda4b2a9838e612a2ead8df949d454251"
+  },
+  {
+    "path": "execution-source/.cache__v026__run-production-webgpu.mjs.txt",
+    "bytes": 10589,
+    "sha256": "fef9b44467b6530c3d115cbb5ca2b4c413b31cbdbcf3506063a6d008c7354bb7"
+  },
+  {
+    "path": "execution-source/.cache__v026__static-server.mjs.txt",
+    "bytes": 2525,
+    "sha256": "76d4ff410a84e07204b08e023ca5a62e4b2e2ac29154a484dfe13c2013ceb814"
+  },
+  {
+    "path": "execution-source/.cache__v026__verify-qwen-cache.mjs.txt",
+    "bytes": 2242,
+    "sha256": "d76643aad30fb79184893260309340f4813706754b9c008b6cde2fc9e6a22f07"
+  },
+  {
+    "path": "execution-source/core-ai-benchmark.html.txt",
+    "bytes": 642,
+    "sha256": "bcca7062847568bf668d9ce2d87617d2b49d943b116d1d587cbe977067c4aeff"
+  },
+  {
+    "path": "execution-source/package.json.txt",
+    "bytes": 2244,
+    "sha256": "ecc7e914b34010854fd2e1074bdfc0d8cec7306be0b59806e75b9036b00cf0f0"
+  },
+  {
+    "path": "execution-source/src__coreBenchmark.css.txt",
+    "bytes": 5512,
+    "sha256": "c580f9fd492ae8aac0f09df1c766ff90a98b49aad3db5a37e385d1b1d71bdb10"
+  },
+  {
+    "path": "execution-source/src__coreBenchmark.ts.txt",
+    "bytes": 11248,
+    "sha256": "76fcc411889f568ecbd41fc92b4681e9f23e83e4dc24ca32b9c7454c701545ef"
+  },
+  {
+    "path": "execution-source/src__coreBenchmark.worker.ts.txt",
+    "bytes": 9890,
+    "sha256": "0802a77fc2a60480466c67c9278943065a62da562e2e3812d47d812eeb3d8736"
+  },
+  {
+    "path": "execution-source/src__coreBenchmarkClient.ts.txt",
+    "bytes": 6185,
+    "sha256": "b0f58ae377bc7b4ef3cd2024faeb3c57aabc053dba363da62dd8ae1572616c21"
+  },
+  {
+    "path": "execution-source/vite.config.ts.txt",
+    "bytes": 2478,
+    "sha256": "73cc16c173e83d10de68c77f4207e207c6f83c31d698452830d11be066d73492"
+  },
+  {
+    "path": "setup-failure-01.json",
+    "bytes": 381,
+    "sha256": "637bc8ef792ff1e6188daf84e185225e05e823e2526062a9bf4ee34ad7ecfeda"
+  },
+  {
+    "path": "setup-failure-01.log",
+    "bytes": 829,
+    "sha256": "f254d323f3a8ca561f4d1f3f0a4f6f765f54586eedce8f4c3761efeef3848edd"
+  },
+  {
+    "path": "source-archive.json",
+    "bytes": 3117,
+    "sha256": "bf41a6b145015fbd76d1c744efb80a2bb57cda146a9eca7db5679915fa268ad7"
+  },
+  {
+    "path": "summary.json",
+    "bytes": 13389,
+    "sha256": "ec8ad560d0731b3bd93a9e8a5f3f85112fd0a61178da4328d0e6a75c7207c29f"
+  },
+  {
+    "path": "tested-page-assets/core-ai-benchmark-CJd_lYUR.js.gz",
+    "bytes": 30090,
+    "sha256": "38d872cfe2ede4c8fdc8d1854348ba5fb97fab18ce916c2459e923277a13dbee"
+  },
+  {
+    "path": "tested-page-assets/core-ai-benchmark-DIN1WGtp.css.gz",
+    "bytes": 1759,
+    "sha256": "d69f0db887dcee983319a466b81d8484625ece28460207bb4a6d7e35e47eb279"
+  },
+  {
+    "path": "tested-page-assets/core-ai-benchmark.html.gz",
+    "bytes": 455,
+    "sha256": "0d5123d587e0321575a221de8b39505c3b23289e94938f8aa0cdd37989f9ab42"
+  },
+  {
+    "path": "tested-page-assets.json",
+    "bytes": 752,
+    "sha256": "72173b2a9267b25bcae42ccf5669a912ec6a081e24f7deb1cf2f50b5fbd56638"
+  },
+  {
+    "path": "webgpu-execution.json.gz",
+    "bytes": 52666,
+    "sha256": "4dd6ade8776ddc2d27793229332cc3e16acd5607148813fab800978dea46700c"
+  }
+]
