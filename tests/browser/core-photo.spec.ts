@@ -62,6 +62,7 @@ async function accept(dialog:Locator){
 
 test("core photo upload registers recovered rows and accepts only reviewed RQD with explicit log replacement",async({page},testInfo)=>{
   test.setTimeout(90_000);const {image}=await load(page),unfinished=["BH-02","7","","rock","Unfinished unrelated logging"];
+  await page.locator('[data-step="boreholes"]').click();await page.locator('.ed-table input[data-r="0"][data-c="6"]').fill("unfinished depth");await saved(page);
   await page.locator('[data-step="logs"]').click();await page.locator(".ed-add").click();
   for(const [column,value] of unfinished.entries())await page.locator('.ed-table tbody tr').last().locator(`input[data-c="${column}"]`).fill(value);
   await saved(page);const dialog=await openCore(page);
@@ -95,6 +96,7 @@ test("core photo upload registers recovered rows and accepts only reviewed RQD w
   expect(contrast).toBeGreaterThanOrEqual(4.5);
   await accept(dialog);await dialog.locator(".core-result").scrollIntoViewIfNeeded();await page.screenshot({path:testInfo.outputPath("core-photo-reviewed-desktop.png"),fullPage:true});await closeCore(page);
   const acceptedDraft:any=await downloadJson(page);expect(acceptedDraft.draft.tables.rows.logs).toContainEqual(unfinished);
+  expect(acceptedDraft.draft.tables.rows.boreholes.find((r:string[])=>r[0]==="BH-01")[6]).toBe("unfinished depth");
   const p:any=await downloadJson(page,".ws-json"),run=p.corePhotos.runs[0],logged=p.boreholes.find((b:any)=>b.id==="BH-01");
   expect(run.status).toBe("accepted");expect(run.reviewedBy).toBe("Synthetic test reviewer");expect(logged.tests??[]).toEqual([]);
   expect(logged.intervals.map((i:any)=>[i.from,i.to])).toEqual([[0,.08],[.08,.16],[.16,.5],[.5,.9],[1,2]]);
@@ -113,6 +115,7 @@ test("core photo upload registers recovered rows and accepts only reviewed RQD w
   const amended:any=await downloadJson(page,".ws-json");expect(amended.corePhotos.runs[0].status).toBe("draft");
   expect(amended.boreholes.find((b:any)=>b.id==="BH-01").intervals).toEqual(logged.intervals);expect(amended.evidence.records).toEqual(p.evidence.records);
   const amendedDraft:any=await downloadJson(page);expect(amendedDraft.draft.tables.rows.logs).toContainEqual(unfinished);
+  expect(amendedDraft.draft.tables.rows.boreholes.find((r:string[])=>r[0]==="BH-01")[6]).toBe("unfinished depth");
 });
 
 test("core photo drafts survive workspace export, reload and independent scenario edits",async({page},testInfo)=>{

@@ -75,6 +75,16 @@ describe("applying core-photo changes to raw editor tables",()=>{
     expect(applyCorePhotoProject(first,after,draft).rows).toEqual(first.rows);
   });
 
+  it.each(["incomplete","","5.000"])("preserves final-depth text %j when accepting an internal run does not extend the hole",rawDepth=>{
+    const initial=fixture();initial.boreholes[0].intervals.splice(1);delete initial.boreholes[0].depth;
+    const tables=tablesFromProject(initial);tables.rows.boreholes[0][6]=rawDepth;
+    const before=projectForCorePhotos(tables,initial),after=acceptCoreRun(before,"run",{reviewer:"Reviewer",replaceExisting:true});
+    expect(before.boreholes[0].depth).toBeUndefined();expect(after.boreholes[0].depth).toBe(5);
+    const result=applyCorePhotoProject(tables,before,after);
+    expect(result.rows.boreholes[0][6]).toBe(rawDepth);
+    expect(result.rows.logs.some(row=>row[4]==="Reviewed recovered core")).toBe(true);
+  });
+
   it("uses evidence identity as part of a row match and keeps incomplete or unassigned rows",()=>{
     const before=fixture(),after=structuredClone(before),tables=tablesFromProject(before);
     before.boreholes[0].intervals[0].evidenceId="wanted";after.boreholes[0].intervals.shift();

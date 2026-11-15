@@ -1,6 +1,7 @@
 // Apply a core-photo edit to the editor's raw draft. Importing a project filters unfinished rows; using a rebuilt
 // table here would silently discard those rows when a different, fully reviewed core run was accepted.
 import type {GeoProject,Interval} from "./schema";
+import {boreholeDepth} from "./schema";
 import type {EditorTables} from "./tables";
 
 type LoggedInterval={hole:string;interval:Interval};
@@ -49,9 +50,12 @@ export function applyCorePhotoProject(t:EditorTables,before:GeoProject,after:Geo
     result.rows.logs=logs;result.evidenceRows={...result.evidenceRows,logs:bindings};
   }
   for(const hole of after.boreholes){
-    if(hole.depth===before.boreholes.find(b=>b.id===hole.id)?.depth)continue;
+    const previous=before.boreholes.find(b=>b.id===hole.id),depth=boreholeDepth(hole);
+    // Acceptance may materialize a previously omitted, redundant final depth. Only a real extension should
+    // replace the user's final-depth text, which may still be incomplete or deliberately left blank.
+    if(depth<=(previous?boreholeDepth(previous):0))continue;
     const row=result.rows.boreholes.find(row=>row[0].trim()===hole.id);
-    if(row)row[6]=hole.depth===undefined?"":String(hole.depth);
+    if(row)row[6]=String(depth);
   }
   if(after.evidence===undefined)delete result.evidence;else result.evidence=structuredClone(after.evidence);
   if(after.corePhotos===undefined)delete result.corePhotos;else result.corePhotos=structuredClone(after.corePhotos);
