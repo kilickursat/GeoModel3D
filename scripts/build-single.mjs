@@ -7,6 +7,9 @@ const out=join(dist,"geomodel3d-offline.html");
 let html=readFileSync(join(dist,"index.html"),"utf8");
 const read=(ref)=>readFileSync(join(dist,ref.replace(/^\.?\//,"")),"utf8");
 
+// Optional model workers are not embedded in this portable file, even when it is served over HTTP.
+html=html.replace("<head>",'<head><meta name="geomodel3d-standalone" content="true">');
+
 let scripts=0,styles=0;
 html=html.replace(/<script type="module" crossorigin src="([^"]+)"><\/script>/g,(_,src)=>{
   scripts++;

@@ -113,7 +113,7 @@ These choices select or assume water levels; they do not simulate groundwater fl
 
 ## Core photographs to a ground model
 
-Open a case in **Input data**, then choose **Core photos** under **Boreholes** or **Logs**. Add the borehole collar and geological units first. The photo workflow works on the device, including in the standalone HTML; it does not use the PDF reader or download an image model.
+Open a case in **Input data**, then choose **Core photos** under **Boreholes** or **Logs**. Add the borehole collar and geological units first. Manual photo registration and review work on the device, including in the standalone HTML, without the PDF reader or an image model. The optional local AI experiment described below downloads its models only when requested.
 
 1. Choose a PNG, JPEG or WebP core-box photograph, the borehole and the full drilled run depths in metres. Keep the original photograph separately. The workspace stores a bounded PNG and the original file metadata/hash where available, not the original file bytes.
 2. Register a straight, continuous recovered row or segment: its rectangle in the photograph, start/end depths and direction. Depth increases left-to-right or right-to-left as selected. Check the known lengths against the centerline scale. Use separate segments around missing core or spacers; do not stretch the recovered core to fill the drill run. Perspective distortion, oblique pieces and loose fragments require better photography or independent measurements before registration.
@@ -125,6 +125,18 @@ Recovery uses the registered recovered length divided by the full run length. Re
 **Save draft** retains incomplete annotations. Browser storage, **Save workspace** and project JSON retain the registered photographs. Scenario copies and saved revisions retain their own annotations; workspace files share identical image bytes. In the Site panel, **Core photos** opens a read-only run, and **Source evidence** or a short click on a source-backed borehole opens highlighted piece evidence. Later log edits can differ from the accepted photo annotation; compare the current value against its saved evidence.
 
 Only registered recovered intervals are observations; the 3-D model interpolates through unlogged gaps. The model currently assumes vertical holes and units ordered from youngest to oldest, and can extend the deepest unit below the logged depth. A photograph does not supply a surveyed 3-D trajectory or establish properties such as UCS, stiffness, permeability or shear strength. Predictions of those properties require a separately validated model and paired site data.
+
+## Local AI for core intervals
+
+In **Core photos**, select a registered recovered row and open **Local AI**. The preview is the exact crop sent to the model, centered on a gray square without stretching. The padding is not part of the photograph. For fine detail, register a shorter recovered segment rather than a whole long row. Its depth range comes from your registration; the AI does not measure or verify depths. The image stays in this browser.
+
+Choose **Describe this interval** or **Suggest logging observations**, then SmolVLM 256M or 500M. **Download & run** downloads the selected model from Hugging Face and generates locally through WebGPU. **Compare both models** runs them sequentially on the same crop and task, releasing the first model before loading the second. These are substantial downloads; the displayed estimate includes all model components. Model caches can be evicted by the browser, and a cached model alone does not make the hosted page available offline.
+
+Read each result against the crop and record whether it is useful and whether it invents details. Export the benchmark report before closing: outputs and assessments are temporary and are not part of workspace JSON. The report contains model revisions, crop/depth metadata, task, generated text and timing, but no photograph. Keep the original source separately when sharing or repeating an assessment.
+
+These general-purpose VLMs have not been validated on geological core. Colour and texture descriptions can be wrong; rock type, soundness, fracture origin and engineering properties need independent review. Suggestions never populate log intervals, recovery/RQD or laboratory tests. Stop a run or unload the model to free its worker and GPU resources.
+
+AI is unavailable in the portable standalone HTML and in browsers without a working WebGPU adapter. Device memory and operator support can still prevent a model from loading. iPhone Chromium emulation checks layout only; it does not establish iPhone Safari inference performance.
 
 ## Reading borehole logs from PDFs
 

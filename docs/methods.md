@@ -92,6 +92,14 @@ Acceptance creates immutable source-evidence records for the interpretation; lat
 
 The existing geological kernel still infers ordered contacts through gaps and between holes, with vertical boreholes. Missing core is not an empty 3-D volume. This workflow supplies observations and review provenance; it does not reconstruct a surveyed 3-D core, estimate fracture orientation, or infer engineering strength from RGB pixels.
 
+### Local core-image VLM experiment
+
+A registered row is cropped and resized locally before inference. A fixed task prompt asks for visible observations and uncertainty; no accepted geological labels or engineering test values are supplied to the model. [SmolVLM 256M](https://huggingface.co/HuggingFaceTB/SmolVLM-256M-Instruct) and [500M](https://huggingface.co/HuggingFaceTB/SmolVLM-500M-Instruct) are general image-to-text models from Hugging Face, not core-specific classifiers. Results are temporary advisory text, with no route into the calculation kernel or acceptance records.
+
+The browser worker uses Transformers.js 4.3.2 and the app's ONNX Runtime Web 1.31.1. The runtime dependency and version override were selected with the maintainer for local Hugging Face inference; a dedicated worker isolates its configuration from document OCR. Model repositories are pinned to immutable revisions. Downloading starts only on an explicit run; model sessions run sequentially and cancellation terminates the worker. Runtime assets are served with the app, model files come from Hugging Face, and source pixels remain local. The standalone HTML disables AI because these worker/runtime assets are not embedded.
+
+Comparison reports identify the crop, depth registration, model revision and task, separate loading from generation time, and retain human usefulness/hallucination assessments. They are individual browser observations, not a calibrated accuracy score or a measurement of total GPU memory. Geological model selection requires expert-reviewed real photographs held out by entire borehole/site, with lighting, camera, lithology and preparation variation. Synthetic UI fixtures establish software behaviour only. Real iPhone Safari benchmarking remains a separate device check.
+
 ### Modules
 
 The modelling kernel has no rendering dependencies. It is tested in Node, and the viewer is a thin layer on top.
@@ -127,6 +135,7 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 - `src/crs.ts`: coordinate systems (registry, suggestion and conversion)
 - `src/tiles.ts`: map and elevation tiles, and terrain resampling
 - `src/evidence.ts`: source records, correction/acceptance events and import validation
+- `src/coreAi.ts`, `src/coreAiClient.ts`, `src/coreAi.worker.ts`, `src/coreAiView.ts`: local VLM experiment, cancellation, comparison and advisory report export
 - `src/corePhoto.ts`, `src/corePhotoView.ts`, `src/corePhotoTables.ts`: depth registration, reviewed RQD, photo-to-log acceptance, the local photo workspace and interval updates that preserve unfinished table rows
 - `src/evidenceView.ts`: source-page inspector, independent of the PDF reader
 - `src/groundwater.ts`: shared observation selection and groundwater policies

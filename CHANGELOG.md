@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.24.0 — 2026-11-15
+
+### Added
+- Experimental local core-image descriptions and logging observations using pinned Hugging Face SmolVLM 256M and 500M models through WebGPU. The selected registered row is cropped locally; photographs are never sent to an inference service.
+- Explicit model downloads, progress, cancellation and memory release; sequential comparison uses the same crop and task. Reviewable benchmark reports retain model revisions, output, timing and human assessments without embedding photographs.
+- Model suggestions stay separate from accepted logs, RQD and laboratory properties. General vision-language models are not validated geological classifiers. AI requires the hosted app and a supported WebGPU adapter; the standalone HTML retains manual photo logging.
+
 ## 0.23.0 — 2026-11-15
 
 ### Added
