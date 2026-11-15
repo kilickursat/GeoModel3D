@@ -1,0 +1,39 @@
+{
+  "capturedAt": "2026-11-15T07:01:45.772Z",
+  "stage": "During original single-pass inference; before reproduction-script guardrail edits.",
+  "timingLimit": "Concurrent software-WebGPU probe and build/tests share this machine. CPU timings are diagnostic records, not controlled model-speed comparisons.",
+  "files": [
+    {
+      "path": "scripts/benchmark-core-ai.mjs",
+      "sha256": "b831beb732713a32e765ed262ed144b25d4b6f95313722795d1a0f0430d1286c"
+    },
+    {
+      "path": "scripts/core-ai-benchmark-runtime.mjs",
+      "sha256": "9105f8e32b37f156bd5427a5fa7ed4182b8f018c1d7105bd3f87ec4c9c0a3b37"
+    },
+    {
+      "path": "scripts/prepare-core-benchmark.mjs",
+      "sha256": "b7cedebee9031947ac4a8d3fe50b49d2524e685419a3364b169e2ad8065ac0c0"
+    },
+    {
+      "path": "docs/benchmarks/0.25.0-core-ai/dataset-manifest.json",
+      "sha256": "7a53afd9999625eff0b92cde4c03416d7287ff5c7da3d25ca1cb4fe4f6b2fd9b"
+    },
+    {
+      "path": "docs/benchmarks/0.25.0-core-ai/inputs.json",
+      "sha256": "db52fa5cc9f50760cd7ae99127bbc8f2f9583e4e703569379c23c23baf70f81d"
+    },
+    {
+      "path": "docs/benchmarks/0.25.0-core-ai/protocol.json",
+      "sha256": "c53d3c1e4cf4d0ba5293897cfec1ab0ddebed693ac00842c139f50f415876672"
+    },
+    {
+      "path": "docs/benchmarks/0.25.0-core-ai/reference-review.json",
+      "sha256": "6fdfb71986d7887231c8bbc3946239fff7b448e377340d05ea2546da2fed1f97"
+    },
+    {
+      "path": "docs/benchmarks/0.25.0-core-ai/rubric.md",
+      "sha256": "f2d89c9b9886da094ffc6bf119500587d05bbe0efc3423e5a7f41c7960c6e4cd"
+    }
+  ]
+}

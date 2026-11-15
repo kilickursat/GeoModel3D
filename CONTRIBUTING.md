@@ -27,6 +27,8 @@ Where a local server cannot be used, build and open `dist/geomodel3d-offline.htm
 
 The optional core-image VLM runs through `onnxruntime-web` in a browser worker. The project `.npmrc` skips unused ONNX Runtime Node provider downloads during installation; it does not disable other dependency scripts. If a future npm version stops forwarding that setting, set `ONNXRUNTIME_NODE_INSTALL=skip` when running `npm ci`.
 
+The [real-core image pilot](docs/benchmarks/0.25.0-core-ai/README.md) documents optional reproduction using the existing dependencies and separately licensed image data. Its Node CPU screening is separate from the app's browser WebGPU execution and does not measure phone performance. The image preparation verifier compares against the frozen inputs without overwriting them; a different Chromium version may produce different pixels or metadata. Use the recorded version to reproduce that baseline, or create a new benchmark directory and protocol for a new experiment.
+
 The modelling kernel (`src/model.ts`, `src/fields.ts`, `src/io.ts` and the other modules that do not render) has no browser dependencies and is tested in Node. The viewer (`src/main.ts`) and the Input data tab (`src/input.ts`) are thin layers on top. [Architecture](docs/methods.md#architecture) lists every module.
 
 ## Making a change

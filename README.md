@@ -23,7 +23,7 @@ GeoModel3D builds a layered ground model from borehole logs and cone penetration
 - Builds the model from boreholes, CPTs or both: horizons between the boreholes and a closed volume for each unit. One borehole is enough to start.
 - Reads borehole logs from PDF reports and images on your device, logs drawn with a depth scale or set out as tables, scanned pages included. You check each value beside the page it was read from before it is used.
 - Registers core-box photographs to depth, assists piece and lithology logging, and calculates reviewed photo-derived RQD. Accepted intervals link back to their highlighted photographs in the model; drafts and review history travel with the workspace ([workflow](docs/guide.md#core-photographs-to-a-ground-model)). Works locally and in the standalone HTML.
-- Experiments with local Hugging Face SmolVLM 256M and 500M to describe a selected core interval and suggest observations to check. Compare both models on the same crop and export a review report. WebGPU and an explicit model download are required; suggestions never change accepted logs or measured properties ([workflow](docs/guide.md#local-ai-for-core-intervals)).
+- Experiments with local Hugging Face SmolVLM 256M and 500M to describe a registered row or individual core piece. Compare both models on the exact depth-linked crop and export a review report. WebGPU and an explicit model download are required; suggestions never change accepted logs or measured properties ([workflow](docs/guide.md#local-ai-for-core-intervals)).
 - Cuts sections at any direction and position, or along an alignment from LandXML, CSV, GeoJSON or DXF, or drawn on the model. Along a line it gives a table by chainage with the cover and the units at the crown and invert.
 - Screens an alignment in a corridor dashboard: sampled cover, groundwater head, design-level units and distance to the logs used by the model, with explicit unknowns and a CSV.
 - Proposes additional investigation locations along an alignment from sampled coverage gaps, a location-count budget and physical spacing. Export the plan without changing measured boreholes.
@@ -42,6 +42,20 @@ GeoModel3D builds a layered ground model from borehole logs and cone penetration
 - Exports a PDF report, sections as SVG or CSV, the project as JSON, and the model as GLB or USDZ for augmented reality.
 
 ![Sakae, Yokohama: 75 KuniJiban borehole logs modelled over GSI terrain, with the 2-D section below](docs/screenshot.png)
+
+## Core-image AI: an open pilot
+
+We compared two pinned local models on eight reproducibly selected real image patches from the Alzubaidi lithology dataset, including two non-core controls. Model names were hidden during assistant review against a rubric frozen before inference.
+
+| Result on these eight images | SmolVLM 500M | Qwen3.5 0.8B |
+|---|---:|---:|
+| Met the minimum usefulness rule | 0/8 | 6/8 |
+| Nonresponsive answers | 6/8 | 0/8 |
+| Reached the 128-token limit | 2/8 | 0/8 |
+
+This is a promising description result, not geological accuracy or human-geologist validation. Qwen still made substantive visual errors on two images and 14 claims the crops could not verify; even answers meeting the usefulness rule can contain unverified interpretations. It remains a **benchmark candidate**, outside the app's model selector. CPU quality runs do not measure iPhone or browser speed.
+
+[Read all 16 answers, images, scores, source credits and reproduction steps](docs/benchmarks/0.25.0-core-ai/README.md). The study is exploratory: eight public patches, unverified borehole independence and unknown pretraining overlap. The app's default remains unchanged pending a larger expert-reviewed and real-device evaluation.
 
 ## Your data
 
@@ -99,7 +113,7 @@ GitHub's **Cite this repository** gives the reference from [CITATION.cff](CITATI
   author  = {Kilic, Kursat},
   title   = {GeoModel3D: 3D geological models from borehole logs and CPTs, in the browser},
   url     = {https://github.com/kilickursat/GeoModel3D},
-  version = {0.24.0},
+  version = {0.25.0},
   year    = {2026},
   license = {Apache-2.0}
 }
@@ -111,4 +125,4 @@ GeoModel3D's source code is in the [XERJ Corpus Hub](https://hub.xerj.org/corpus
 
 ## License
 
-Apache-2.0: see [LICENSE](LICENSE). The data of the sample sites keep their own terms, listed in [sites](docs/sites.md#data-sources). PDFs are read with [PDF.js](https://mozilla.github.io/pdf.js/) (Apache-2.0); the fonts and image decoders served with it keep their own licences, which are served beside them. Scanned pages are read with [PP-OCRv6 small](https://huggingface.co/PaddlePaddle/PP-OCRv6_small_det_onnx) by PaddlePaddle (Apache-2.0) and [ONNX Runtime Web](https://onnxruntime.ai/) (MIT).
+Apache-2.0: see [LICENSE](LICENSE). The data of the sample sites keep their own terms, listed in [sites](docs/sites.md#data-sources). The real-core benchmark images and dataset manifest retain their separate [CC BY-SA 4.0 notice and attribution](docs/benchmarks/0.25.0-core-ai/NOTICE.md). PDFs are read with [PDF.js](https://mozilla.github.io/pdf.js/) (Apache-2.0); the fonts and image decoders served with it keep their own licences, which are served beside them. Scanned pages are read with [PP-OCRv6 small](https://huggingface.co/PaddlePaddle/PP-OCRv6_small_det_onnx) by PaddlePaddle (Apache-2.0) and [ONNX Runtime Web](https://onnxruntime.ai/) (MIT).

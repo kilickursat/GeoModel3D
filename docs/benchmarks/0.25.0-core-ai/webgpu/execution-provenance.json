@@ -1,0 +1,62 @@
+{
+  "sources": [
+    {
+      "path": "execution-source/qwen-webgpu-probe.mjs.txt",
+      "originalPath": ".cache/qwen-webgpu-probe.mjs",
+      "sha256": "b73538408862c1e4693a394b1df8536adf99f618d6343cfbfaadf265e8c808e0",
+      "bytes": 7159
+    },
+    {
+      "path": "execution-source/qwen-webgpu-probe-worker.mjs.txt",
+      "originalPath": ".cache/qwen-webgpu-probe-worker.mjs",
+      "sha256": "8d831a5e8dfcc2ed490c842638b8999496d026db0a0a33929128b73aa63f4162",
+      "bytes": 4314
+    },
+    {
+      "path": "execution-source/qwen-webgpu-probe-compact.mjs.txt",
+      "originalPath": ".cache/qwen-webgpu-probe-compact.mjs",
+      "sha256": "645f7d54b04be9b9f80df06f99cfd5f7fe353601dff674a5150621ace05078c2",
+      "bytes": 2719
+    }
+  ],
+  "build": {
+    "bundledWorkerSha256": "841336f6e1e773e875cf14d039ab2bbc71dc7fac0143003c28c02419e57264de",
+    "bundledWorkerBytes": 1282776,
+    "bundleArchived": false,
+    "command": "esbuild API in archived qwen-webgpu-probe.mjs; browser platform, ESM, es2022"
+  },
+  "runtimeVersions": {
+    "@huggingface/transformers": "4.3.2",
+    "onnxruntime-web": "1.31.1",
+    "esbuild": "0.28.2",
+    "@playwright/test": "1.65.1",
+    "node": "v24.22.1",
+    "chromium": "Chromium 156.0.8078.79 built on Debian GNU/Linux 13 (trixie)"
+  },
+  "browserFlags": [
+    "--enable-unsafe-webgpu",
+    "--use-angle=swiftshader",
+    "--enable-unsafe-swiftshader"
+  ],
+  "weightsArchived": false,
+  "imageUploadToCloud": false,
+  "metadataSnapshot": {
+    "path": "hf-onnx-metadata.json",
+    "sha256": "11fcde6712391aba3ad03931881383204310bdd8891487e640b52eef8dcaa107",
+    "source": "https://huggingface.co/api/models/onnx-community/Qwen3.5-0.8B-ONNX-OPT/tree/9a4c21d8f724176b0a7edaaed36303044451886e/onnx?recursive=false&expand=false"
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "artifact": "initial-main-metadata-failure.json",
+      "stage": "Tokenizer existence metadata, before model loading or generation",
+      "outcome": "Strict mirror rejected library request for main/tokenizer_config.json; no inference result."
+    },
+    {
+      "number": 2,
+      "artifact": "summary.json",
+      "change": "Pin env.remotePathTemplate to the selected immutable revision so even Transformers.js tokenizer existence probes use the same revision. Model bytes, sample and prompt unchanged.",
+      "qualityRetry": false
+    }
+  ]
+}

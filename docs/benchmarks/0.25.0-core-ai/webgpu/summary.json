@@ -1,0 +1,398 @@
+{
+  "status": "passed",
+  "startedAt": "2026-11-15T06:59:18.433Z",
+  "completedAt": "2026-11-15T07:18:15.626Z",
+  "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+  "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+  "dtype": {
+    "embed_tokens": "q4",
+    "vision_encoder": "fp32",
+    "decoder_model_merged": "q4"
+  },
+  "source": "Exact pinned Hugging Face files downloaded by the CPU benchmark, served read-only over localhost; SHA256 checked against Hugging Face LFS metadata before loading.",
+  "modelFiles": [
+    {
+      "path": "onnx/embed_tokens_q4.onnx",
+      "size": 857,
+      "sha256": "8773dcf4858f855bfce13def4356ca17e0bc516a477154496b6ffb6dd6d084dc",
+      "huggingFaceLfsSha256": "8773dcf4858f855bfce13def4356ca17e0bc516a477154496b6ffb6dd6d084dc",
+      "verified": true
+    },
+    {
+      "path": "onnx/embed_tokens_q4.onnx_data",
+      "size": 162897920,
+      "sha256": "9210b1d26eb14136d3522584d17da14cc5f4b82b6f5607e6d80d59424a8cbe99",
+      "huggingFaceLfsSha256": "9210b1d26eb14136d3522584d17da14cc5f4b82b6f5607e6d80d59424a8cbe99",
+      "verified": true
+    },
+    {
+      "path": "onnx/vision_encoder.onnx",
+      "size": 159684,
+      "sha256": "5de169e0f5f08321e5a9a9cdda99b6e8aed343a5df3670f5049ccb7afd8a8504",
+      "huggingFaceLfsSha256": "5de169e0f5f08321e5a9a9cdda99b6e8aed343a5df3670f5049ccb7afd8a8504",
+      "verified": true
+    },
+    {
+      "path": "onnx/vision_encoder.onnx_data",
+      "size": 402371584,
+      "sha256": "143c477b64fc329443be551512e12c1be0c49af46e9196d8805a516641b111a6",
+      "huggingFaceLfsSha256": "143c477b64fc329443be551512e12c1be0c49af46e9196d8805a516641b111a6",
+      "verified": true
+    },
+    {
+      "path": "onnx/decoder_model_merged_q4.onnx",
+      "size": 576621,
+      "sha256": "7390858c80a67275d8cb81fb70f66a24d3b86fe333057c1312de09c184a2d41b",
+      "huggingFaceLfsSha256": "7390858c80a67275d8cb81fb70f66a24d3b86fe333057c1312de09c184a2d41b",
+      "verified": true
+    },
+    {
+      "path": "onnx/decoder_model_merged_q4.onnx_data",
+      "size": 483655680,
+      "sha256": "1a9165072dd51a9b6a917b6357a3686372b7429313022802cd4c9a730e8c9749",
+      "huggingFaceLfsSha256": "1a9165072dd51a9b6a917b6357a3686372b7429313022802cd4c9a730e8c9749",
+      "verified": true
+    }
+  ],
+  "configFiles": [
+    {
+      "path": "config.json",
+      "size": 2849,
+      "sha256": "36fed6a902ccd06ef19a452bd5a0750bd88fe347d06ab75ef515615bac5b296d",
+      "verificationAlgorithm": "Git-blob-SHA1",
+      "expected": "4ba3068385922dd464bb68f8e3a46f9f2a2ad598",
+      "actual": "4ba3068385922dd464bb68f8e3a46f9f2a2ad598",
+      "verified": true
+    },
+    {
+      "path": "generation_config.json",
+      "size": 248,
+      "sha256": "dc0cbe66543f310896469b7b1448af792f403293a1080baaf04d586c57b23e48",
+      "verificationAlgorithm": "Git-blob-SHA1",
+      "expected": "59ee4c198e909ccdc280d57660829658989582b2",
+      "actual": "59ee4c198e909ccdc280d57660829658989582b2",
+      "verified": true
+    },
+    {
+      "path": "preprocessor_config.json",
+      "size": 336,
+      "sha256": "6a970fd06f30e6943b3e2c14d5d3b42d49b06cf99b99103d56689bef462d90f8",
+      "verificationAlgorithm": "Git-blob-SHA1",
+      "expected": "4ae180b49f91e11d4da327d44edd9d4a909fe908",
+      "actual": "4ae180b49f91e11d4da327d44edd9d4a909fe908",
+      "verified": true
+    },
+    {
+      "path": "tokenizer.json",
+      "size": 19226111,
+      "sha256": "89da80cc6689bef4d90cc1028249436975ffb0814618f1d93c65310e05801a9b",
+      "verificationAlgorithm": "LFS-SHA256",
+      "expected": "89da80cc6689bef4d90cc1028249436975ffb0814618f1d93c65310e05801a9b",
+      "actual": "89da80cc6689bef4d90cc1028249436975ffb0814618f1d93c65310e05801a9b",
+      "verified": true
+    },
+    {
+      "path": "tokenizer_config.json",
+      "size": 10069,
+      "sha256": "5dcac2c1306b11d1e18ec4c024a174bded2ca3178ce87b0aa590711696407f3d",
+      "verificationAlgorithm": "Git-blob-SHA1",
+      "expected": "1a7a8b42ef296f48ac686bab602f518da32dd85c",
+      "actual": "1a7a8b42ef296f48ac686bab602f518da32dd85c",
+      "verified": true
+    }
+  ],
+  "totalVerifiedWeightBytes": 1049662346,
+  "sample": {
+    "id": "sample-03",
+    "sha256": "fd8e3f2cd49c8752a622690df1c32bafe6ea9bc3d8a6512e9f7a276fde4910ba"
+  },
+  "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+  "promptVersion": "real-core-pilot-1",
+  "maxNewTokens": 32,
+  "protocolSha256": "c53d3c1e4cf4d0ba5293897cfec1ab0ddebed693ac00842c139f50f415876672",
+  "capability": {
+    "type": "capability",
+    "features": [
+      "depth32float-stencil8",
+      "rg11b10ufloat-renderable",
+      "bgra8unorm-storage",
+      "texture-compression-bc",
+      "chromium-experimental-sampling-resource-table",
+      "core-features-and-limits",
+      "chromium-experimental-timestamp-query-inside-passes",
+      "float32-filterable",
+      "indirect-first-instance",
+      "texture-compression-astc-sliced-3d",
+      "float32-blendable",
+      "subgroup-size-control",
+      "texture-compression-unaligned",
+      "texture-compression-astc",
+      "texture-compression-etc2",
+      "depth-clip-control",
+      "texture-compression-bc-sliced-3d",
+      "timestamp-query",
+      "clip-distances",
+      "texture-component-swizzle",
+      "subgroups"
+    ],
+    "info": {
+      "vendor": "google",
+      "architecture": "swiftshader",
+      "device": "",
+      "description": ""
+    },
+    "limits": {
+      "maxBufferSize": 1073741824,
+      "maxStorageBufferBindingSize": 1073741824
+    }
+  },
+  "stages": [
+    {
+      "phase": "file-loaded",
+      "file": "preprocessor_config.json",
+      "elapsedMs": 34.599999997764826,
+      "at": "2026-11-15T06:59:19.528Z"
+    },
+    {
+      "phase": "file-loaded",
+      "file": "preprocessor_config.json",
+      "elapsedMs": 51.399999998509884,
+      "at": "2026-11-15T06:59:19.550Z"
+    },
+    {
+      "phase": "file-loaded",
+      "file": "tokenizer_config.json",
+      "elapsedMs": 86.79999999701977,
+      "at": "2026-11-15T06:59:19.588Z"
+    },
+    {
+      "phase": "file-loaded",
+      "file": "tokenizer.json",
+      "elapsedMs": 253.89999999850988,
+      "at": "2026-11-15T06:59:19.749Z"
+    },
+    {
+      "phase": "file-loaded",
+      "file": "config.json",
+      "elapsedMs": 1201.199999999255,
+      "at": "2026-11-15T06:59:20.699Z"
+    },
+    {
+      "phase": "file-loaded",
+      "file": "onnx/embed_tokens_q4.onnx",
+      "elapsedMs": 1243.7999999970198,
+      "at": "2026-11-15T06:59:20.741Z"
+    },
+    {
+      "phase": "file-loaded",
+      "file": "onnx/decoder_model_merged_q4.onnx",
+      "elapsedMs": 1338,
+      "at": "2026-11-15T06:59:20.838Z"
+    },
+    {
+      "phase": "file-loaded",
+      "file": "onnx/vision_encoder.onnx",
+      "elapsedMs": 1346.5,
+      "at": "2026-11-15T06:59:20.855Z"
+    },
+    {
+      "phase": "file-loaded",
+      "file": "generation_config.json",
+      "elapsedMs": 1352.5,
+      "at": "2026-11-15T06:59:20.856Z"
+    },
+    {
+      "phase": "file-loaded",
+      "file": "onnx/embed_tokens_q4.onnx_data",
+      "elapsedMs": 4333.5,
+      "at": "2026-11-15T06:59:23.826Z"
+    },
+    {
+      "phase": "file-loaded",
+      "file": "onnx/vision_encoder.onnx_data",
+      "elapsedMs": 7803.89999999851,
+      "at": "2026-11-15T06:59:27.297Z"
+    },
+    {
+      "phase": "file-loaded",
+      "file": "onnx/decoder_model_merged_q4.onnx_data",
+      "elapsedMs": 9635.5,
+      "at": "2026-11-15T06:59:29.129Z"
+    }
+  ],
+  "tokenMilestones": [
+    {
+      "generatedTokens": 1,
+      "elapsedMs": 732877.8000000007,
+      "at": "2026-11-15T07:11:43.998Z"
+    },
+    {
+      "generatedTokens": 1,
+      "elapsedMs": 740001,
+      "at": "2026-11-15T07:11:51.126Z"
+    },
+    {
+      "generatedTokens": 1,
+      "elapsedMs": 750000.5,
+      "at": "2026-11-15T07:12:01.122Z"
+    },
+    {
+      "generatedTokens": 8,
+      "elapsedMs": 864522.6000000015,
+      "at": "2026-11-15T07:13:55.660Z"
+    },
+    {
+      "generatedTokens": 8,
+      "elapsedMs": 870002.1999999993,
+      "at": "2026-11-15T07:14:01.156Z"
+    },
+    {
+      "generatedTokens": 16,
+      "elapsedMs": 952571.1999999993,
+      "at": "2026-11-15T07:15:23.697Z"
+    },
+    {
+      "generatedTokens": 16,
+      "elapsedMs": 960000.3999999985,
+      "at": "2026-11-15T07:15:31.122Z"
+    },
+    {
+      "generatedTokens": 24,
+      "elapsedMs": 1038981.6999999993,
+      "at": "2026-11-15T07:16:50.112Z"
+    },
+    {
+      "generatedTokens": 24,
+      "elapsedMs": 1040000.5,
+      "at": "2026-11-15T07:16:51.124Z"
+    },
+    {
+      "generatedTokens": 24,
+      "elapsedMs": 1050000.5,
+      "at": "2026-11-15T07:17:01.121Z"
+    },
+    {
+      "generatedTokens": 32,
+      "elapsedMs": 1124231.8000000007,
+      "at": "2026-11-15T07:18:15.352Z"
+    }
+  ],
+  "firstTokenMs": 732877.8000000007,
+  "result": {
+    "type": "result",
+    "model": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+    "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+    "dtype": {
+      "embed_tokens": "q4",
+      "vision_encoder": "fp32",
+      "decoder_model_merged": "q4"
+    },
+    "device": "webgpu",
+    "transformersVersion": "4.3.2",
+    "onnxRuntimeVersion": "1.31.1",
+    "text": "- **Colour:** The dominant hue is a pale grey-blue with subtle variations in tone, appearing somewhat washed out but retaining a cool undertone. There are faint",
+    "generatedTokens": 32,
+    "inputTokens": 334,
+    "maxNewTokens": 32,
+    "loadMs": 10623.29999999702,
+    "inferenceMs": 1124233,
+    "totalMs": 1135860.1999999993,
+    "imageSha256": "fd8e3f2cd49c8752a622690df1c32bafe6ea9bc3d8a6512e9f7a276fde4910ba",
+    "imageGrid": [
+      [
+        1,
+        32,
+        32
+      ]
+    ],
+    "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+    "enableThinking": false
+  },
+  "errors": [],
+  "network": {
+    "totalRequests": 26,
+    "externalRequestCount": 0,
+    "allRequestsLocal": true,
+    "requestsByPath": [
+      {
+        "request": "GET /",
+        "count": 1
+      },
+      {
+        "request": "GET /worker.js",
+        "count": 1
+      },
+      {
+        "request": "GET /models/onnx-community/Qwen3.5-0.8B-ONNX-OPT/9a4c21d8f724176b0a7edaaed36303044451886e/preprocessor_config.json",
+        "count": 2
+      },
+      {
+        "request": "GET /models/onnx-community/Qwen3.5-0.8B-ONNX-OPT/9a4c21d8f724176b0a7edaaed36303044451886e/tokenizer_config.json",
+        "count": 2
+      },
+      {
+        "request": "GET /models/onnx-community/Qwen3.5-0.8B-ONNX-OPT/9a4c21d8f724176b0a7edaaed36303044451886e/tokenizer.json",
+        "count": 1
+      },
+      {
+        "request": "GET /models/onnx-community/Qwen3.5-0.8B-ONNX-OPT/9a4c21d8f724176b0a7edaaed36303044451886e/config.json",
+        "count": 2
+      },
+      {
+        "request": "GET /models/onnx-community/Qwen3.5-0.8B-ONNX-OPT/9a4c21d8f724176b0a7edaaed36303044451886e/onnx/embed_tokens_q4.onnx",
+        "count": 2
+      },
+      {
+        "request": "GET /models/onnx-community/Qwen3.5-0.8B-ONNX-OPT/9a4c21d8f724176b0a7edaaed36303044451886e/onnx/embed_tokens_q4.onnx_data",
+        "count": 2
+      },
+      {
+        "request": "GET /models/onnx-community/Qwen3.5-0.8B-ONNX-OPT/9a4c21d8f724176b0a7edaaed36303044451886e/onnx/decoder_model_merged_q4.onnx",
+        "count": 2
+      },
+      {
+        "request": "GET /models/onnx-community/Qwen3.5-0.8B-ONNX-OPT/9a4c21d8f724176b0a7edaaed36303044451886e/onnx/decoder_model_merged_q4.onnx_data",
+        "count": 2
+      },
+      {
+        "request": "GET /models/onnx-community/Qwen3.5-0.8B-ONNX-OPT/9a4c21d8f724176b0a7edaaed36303044451886e/onnx/vision_encoder.onnx",
+        "count": 2
+      },
+      {
+        "request": "GET /models/onnx-community/Qwen3.5-0.8B-ONNX-OPT/9a4c21d8f724176b0a7edaaed36303044451886e/onnx/vision_encoder.onnx_data",
+        "count": 2
+      },
+      {
+        "request": "GET /models/onnx-community/Qwen3.5-0.8B-ONNX-OPT/9a4c21d8f724176b0a7edaaed36303044451886e/generation_config.json",
+        "count": 2
+      },
+      {
+        "request": "GET /ort/ort-wasm-simd-threaded.asyncify.mjs",
+        "count": 1
+      },
+      {
+        "request": "GET /ort/ort-wasm-simd-threaded.asyncify.wasm",
+        "count": 1
+      },
+      {
+        "request": "GET /sample.png",
+        "count": 1
+      }
+    ],
+    "policy": "Only localhost4175 allowed; all other origins aborted. Images stayed local."
+  },
+  "timingLimitations": [
+    "Compatibility probe on Chromium software WebGPU SwiftShader, not physical hardware or iPhone.",
+    "Output cap32 differs from the128-token CPU quality pilot; this output is not included in quality scoring.",
+    "Model transfer/load times use local cached files and are not first-download performance.",
+    "Concurrent native CPU quality evaluation and browser checks competed for shared CPU resources. Timing is diagnostic only."
+  ],
+  "rawEventCount": 3707,
+  "rawTrace": "raw-result.json.gz",
+  "qualityScored": false,
+  "rawTraceSha256": "d6a950502f8c666b0588f5decedaa8293e3515044f3c5ea9564fe39eaedd17a1",
+  "executionProvenance": "execution-provenance.json",
+  "initialAttempt": "initial-main-metadata-failure.json",
+  "outputWasCapped": true,
+  "generationCompletionMeaning": "The model completed the requested 32-token compatibility probe. Its text was capped and is not part of the 128-token CPU quality scoring."
+}

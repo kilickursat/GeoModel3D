@@ -1,0 +1,47 @@
+[
+  {
+    "path": "summary.json",
+    "bytes": 13706,
+    "sha256": "c5441ad6420459d231cacc0fdca7352a28c2bce2d7177ba5566cf23c9d820e9c"
+  },
+  {
+    "path": "execution-provenance.json",
+    "bytes": 2368,
+    "sha256": "09359a25689dd4a5ddad805804e4e7bd25c3d27889545615b33f5814b5370c5d"
+  },
+  {
+    "path": "config-provenance.json",
+    "bytes": 1908,
+    "sha256": "dbeab8715c90d66496d59d3622de7100b6739d671a42e4eec3305844dfdf8726"
+  },
+  {
+    "path": "hf-onnx-metadata.json",
+    "bytes": 10264,
+    "sha256": "11fcde6712391aba3ad03931881383204310bdd8891487e640b52eef8dcaa107"
+  },
+  {
+    "path": "initial-main-metadata-failure.json",
+    "bytes": 9636,
+    "sha256": "5aed501e305a4ef9ad62a04965213d2e8092b2605d98f29d6d9549864607ad9f"
+  },
+  {
+    "path": "raw-result.json.gz",
+    "bytes": 46792,
+    "sha256": "d6a950502f8c666b0588f5decedaa8293e3515044f3c5ea9564fe39eaedd17a1"
+  },
+  {
+    "path": "execution-source/qwen-webgpu-probe-compact.mjs.txt",
+    "bytes": 2719,
+    "sha256": "645f7d54b04be9b9f80df06f99cfd5f7fe353601dff674a5150621ace05078c2"
+  },
+  {
+    "path": "execution-source/qwen-webgpu-probe-worker.mjs.txt",
+    "bytes": 4314,
+    "sha256": "8d831a5e8dfcc2ed490c842638b8999496d026db0a0a33929128b73aa63f4162"
+  },
+  {
+    "path": "execution-source/qwen-webgpu-probe.mjs.txt",
+    "bytes": 7159,
+    "sha256": "b73538408862c1e4693a394b1df8536adf99f618d6343cfbfaadf265e8c808e0"
+  }
+]

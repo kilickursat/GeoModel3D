@@ -1,0 +1,51 @@
+{
+  "repo": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+  "revision": "9a4c21d8f724176b0a7edaaed36303044451886e",
+  "files": [
+    {
+      "path": "config.json",
+      "size": 2849,
+      "sha256": "36fed6a902ccd06ef19a452bd5a0750bd88fe347d06ab75ef515615bac5b296d",
+      "verificationAlgorithm": "Git-blob-SHA1",
+      "expected": "4ba3068385922dd464bb68f8e3a46f9f2a2ad598",
+      "actual": "4ba3068385922dd464bb68f8e3a46f9f2a2ad598",
+      "verified": true
+    },
+    {
+      "path": "generation_config.json",
+      "size": 248,
+      "sha256": "dc0cbe66543f310896469b7b1448af792f403293a1080baaf04d586c57b23e48",
+      "verificationAlgorithm": "Git-blob-SHA1",
+      "expected": "59ee4c198e909ccdc280d57660829658989582b2",
+      "actual": "59ee4c198e909ccdc280d57660829658989582b2",
+      "verified": true
+    },
+    {
+      "path": "preprocessor_config.json",
+      "size": 336,
+      "sha256": "6a970fd06f30e6943b3e2c14d5d3b42d49b06cf99b99103d56689bef462d90f8",
+      "verificationAlgorithm": "Git-blob-SHA1",
+      "expected": "4ae180b49f91e11d4da327d44edd9d4a909fe908",
+      "actual": "4ae180b49f91e11d4da327d44edd9d4a909fe908",
+      "verified": true
+    },
+    {
+      "path": "tokenizer.json",
+      "size": 19226111,
+      "sha256": "89da80cc6689bef4d90cc1028249436975ffb0814618f1d93c65310e05801a9b",
+      "verificationAlgorithm": "LFS-SHA256",
+      "expected": "89da80cc6689bef4d90cc1028249436975ffb0814618f1d93c65310e05801a9b",
+      "actual": "89da80cc6689bef4d90cc1028249436975ffb0814618f1d93c65310e05801a9b",
+      "verified": true
+    },
+    {
+      "path": "tokenizer_config.json",
+      "size": 10069,
+      "sha256": "5dcac2c1306b11d1e18ec4c024a174bded2ca3178ce87b0aa590711696407f3d",
+      "verificationAlgorithm": "Git-blob-SHA1",
+      "expected": "1a7a8b42ef296f48ac686bab602f518da32dd85c",
+      "actual": "1a7a8b42ef296f48ac686bab602f518da32dd85c",
+      "verified": true
+    }
+  ]
+}

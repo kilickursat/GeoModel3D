@@ -108,7 +108,7 @@ export function showCorePhotos(project:GeoProject,options:CorePhotoViewOptions):
     let start=current.from;
     return current.pieces.map((piece,i)=>{
       const from=start;start=piece.end;
-      return `<fieldset class="core-piece" data-piece="${esc(piece.id)}"><legend>Piece ${i+1} · ${fmt(from)}–${fmt(piece.end)} m · ${fmt((piece.end-from)*1000,1)} mm</legend><div class="core-fields"><label>Soundness<select class="core-piece-sound"${readonly?" disabled":""}>${option("unknown","Not reviewed",piece.sound)}${option("sound","Sound",piece.sound)}${option("unsound","Unsound",piece.sound)}</select></label><label>Break after piece<select class="core-piece-break"${readonly?" disabled":""}>${option("unknown","Not reviewed",piece.breakAfter)}${option("natural","Natural fracture",piece.breakAfter)}${option("mechanical","Matched mechanical break",piece.breakAfter)}${option("continuous","No break · logging boundary",piece.breakAfter)}${option("end","Run end or gap",piece.breakAfter)}</select></label><label>Geological unit<select class="core-piece-unit"${readonly?" disabled":""}>${option("","Choose a unit",piece.unit)}${piece.unit&&!working.units.some(u=>u.id===piece.unit)?option(piece.unit,`Missing unit: ${piece.unit}`,piece.unit):""}${working.units.map(u=>option(u.id,u.name||u.id,piece.unit)).join("")}</select></label></div><label>Description<textarea class="core-piece-description" rows="2" maxlength="4096"${readonly?" readonly":""}>${esc(piece.description)}</textarea></label>${!readonly&&i<current.pieces.length-1?'<button type="button" class="core-remove-cut">Remove break after this piece</button>':""}</fieldset>`;
+      return `<fieldset class="core-piece" data-piece="${esc(piece.id)}"><legend>Piece ${i+1} · ${fmt(from)}–${fmt(piece.end)} m · ${fmt((piece.end-from)*1000,1)} mm</legend><button type="button" class="core-ai-piece-open" aria-label="Describe piece ${i+1}, ${fmt(from)} to ${fmt(piece.end)} metres with local AI">Describe piece · local AI</button><div class="core-fields"><label>Soundness<select class="core-piece-sound"${readonly?" disabled":""}>${option("unknown","Not reviewed",piece.sound)}${option("sound","Sound",piece.sound)}${option("unsound","Unsound",piece.sound)}</select></label><label>Break after piece<select class="core-piece-break"${readonly?" disabled":""}>${option("unknown","Not reviewed",piece.breakAfter)}${option("natural","Natural fracture",piece.breakAfter)}${option("mechanical","Matched mechanical break",piece.breakAfter)}${option("continuous","No break · logging boundary",piece.breakAfter)}${option("end","Run end or gap",piece.breakAfter)}</select></label><label>Geological unit<select class="core-piece-unit"${readonly?" disabled":""}>${option("","Choose a unit",piece.unit)}${piece.unit&&!working.units.some(u=>u.id===piece.unit)?option(piece.unit,`Missing unit: ${piece.unit}`,piece.unit):""}${working.units.map(u=>option(u.id,u.name||u.id,piece.unit)).join("")}</select></label></div><label>Description<textarea class="core-piece-description" rows="2" maxlength="4096"${readonly?" readonly":""}>${esc(piece.description)}</textarea></label>${!readonly&&i<current.pieces.length-1?'<button type="button" class="core-remove-cut">Remove break after this piece</button>':""}</fieldset>`;
     }).join("");
   }
   function render(){
@@ -157,12 +157,17 @@ export function showCorePhotos(project:GeoProject,options:CorePhotoViewOptions):
     if(target.classList.contains("core-close")){close();return}
     if(target.classList.contains("core-save")){save();return}
     if(target.dataset.row&&mode==="view"){rowId=target.dataset.row;render();return}
-    if(target.classList.contains("core-ai-open")){
+    if(target.classList.contains("core-ai-open")||target.classList.contains("core-ai-piece-open")){
       const current=run(),selectedRow=row(),src=source(),image=src?.pages.find(p=>p.page===1)?.image;
-      if(current&&selectedRow&&src&&image)closeAi=showCoreAi({image,sourceId:src.id,sourceName:src.name,sourceSha256:src.sha256,runId:current.id,boreholeId:current.boreholeId,row:selectedRow});
-      else setNotice("Register a photo row with a saved source image before describing an interval.",true);
+      try{
+        const isPiece=target.classList.contains("core-ai-piece-open"),pieceId=isPiece?target.closest<HTMLElement>("[data-piece]")?.dataset.piece:undefined;
+        if(isPiece&&!pieceId)throw new Error("Choose a piece from the selected photo row.");
+        if(current&&selectedRow&&src&&image)closeAi=showCoreAi({image,sourceId:src.id,sourceName:src.name,sourceSha256:src.sha256,runId:current.id,boreholeId:current.boreholeId,row:selectedRow,...(pieceId?{pieceId}:{})});
+        else setNotice("Register a photo row with a saved source image before describing an interval.",true);
+      }catch(e){setNotice((e as Error).message,true)}
       return;
     }
+
     if(readonly)return;
     try{
       if(target.classList.contains("core-photo-view")||target.classList.contains("core-photo-draw")||target.classList.contains("core-photo-cut")){

@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "frozenBeforeInference": true,
+  "cases": "Eight deterministic test-split patches: two each of the dataset's garbage, limestone, sandstone and shale classes. Selection seed 20261115. No post-output replacements.",
+  "promptVersion": "real-core-pilot-1",
+  "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+  "generation": {"doSample": false, "repetitionPenalty": 1.1, "maxNewTokens": 128},
+  "inputs": "Identical 512 x 512 PNGs for both models, generated with the app's aspect-preserving crop geometry and Chromium Canvas2D. No class, filename, hole token, depth, or other source metadata is passed to either model.",
+  "runOrder": "SmolVLM 500M followed by Qwen3.5 0.8B OPT; sample-01 through sample-08 per model; one generation per case. Log failures and capped outputs without retrying for a better answer.",
+  "backend": "ONNX Runtime Node CPU, four threads where available. Browser/WebGPU compatibility and native-device speed are separate checks.",
+  "evaluation": "Image-specific references and rubric frozen before inference. Identifiers masked for assistant visual review; this is not an independent human geologist evaluation. Report all eight pairs, unsupported claims and completion/cap counts.",
+  "limitations": [
+    "Published class labels were derived from geologist logs; new visual scoring is by an AI assistant, not a geologist.",
+    "The test split is not proven independent by borehole/site, and pretraining overlap is unknown.",
+    "Already cropped patches do not test the improvement from a matched whole-row image to an individual-piece crop.",
+    "No engineering-property, RQD, fracture-origin or source-depth accuracy can be scored from this dataset.",
+    "Eight cases form an exploratory pilot, not a production model validation or general accuracy estimate."
+  ]
+}

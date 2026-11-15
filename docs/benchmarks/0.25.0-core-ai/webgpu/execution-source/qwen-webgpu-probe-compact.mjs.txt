@@ -1,0 +1,27 @@
+import {readFile,writeFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+const dir='/tmp/geomodel3d-v025-qwen-webgpu';
+const report=JSON.parse(await readFile(`${dir}/result.json`,'utf8'));
+const configs=JSON.parse(await readFile(`${dir}/config-provenance.json`,'utf8'));
+const counts=new Map();for(const request of report.network){const url=new URL(request.url),key=request.method+' '+url.pathname;counts.set(key,(counts.get(key)??0)+1)}
+const generated=report.events.filter(e=>e.type==='progress'&&e.stage==='generation');
+const milestones=generated.filter((event,i)=>event.generatedTokens===1||event.generatedTokens>0&&event.generatedTokens%8===0||i===generated.length-1);
+const external=report.network.filter(request=>new URL(request.url).origin!=='http://127.0.0.1:4175');
+const compact={
+  status:report.status,startedAt:report.startedAt,completedAt:report.completedAt,
+  model:report.model,revision:report.revision,dtype:report.dtype,source:report.source,
+  modelFiles:report.modelFiles,configFiles:configs.files,totalVerifiedWeightBytes:report.modelFiles.reduce((sum,file)=>sum+file.size,0),
+  sample:report.sample,prompt:report.prompt,promptVersion:report.promptVersion,maxNewTokens:report.maxNewTokens,
+  protocolSha256:createHash('sha256').update(await readFile('docs/benchmarks/0.25.0-core-ai/protocol.json')).digest('hex'),
+  capability:report.capability,
+  stages:report.events.filter(e=>e.type==='progress'&&e.stage==='load'&&e.status==='done').map(({file,elapsedMs,at})=>({phase:'file-loaded',file,elapsedMs,at})),
+  tokenMilestones:milestones.map(({generatedTokens,elapsedMs,at})=>({generatedTokens,elapsedMs,at})),
+  firstTokenMs:generated.find(e=>e.generatedTokens>0)?.elapsedMs,result:report.result,errors:report.errors,
+  network:{totalRequests:report.network.length,externalRequestCount:external.length,allRequestsLocal:external.length===0,requestsByPath:[...counts].map(([request,count])=>({request,count})),policy:'Only localhost4175 allowed; all other origins aborted. Images stayed local.'},
+  timingLimitations:[...report.limitations,'Concurrent native CPU quality evaluation and browser checks competed for shared CPU resources. Timing is diagnostic only.'],
+  rawEventCount:report.events.length,rawTrace:'raw-result.json',qualityScored:false,
+};
+await writeFile(`${dir}/raw-result.json`,JSON.stringify(report)+'\n');
+await writeFile(`${dir}/summary.json`,JSON.stringify(compact,null,2)+'\n');
+if(report.status!=='running')await writeFile(`${dir}/result.json`,JSON.stringify(compact,null,2)+'\n');
+console.log(JSON.stringify({status:compact.status,firstTokenMs:compact.firstTokenMs,result:compact.result,artifact:`${dir}/summary.json`,externalRequests:external.length}));

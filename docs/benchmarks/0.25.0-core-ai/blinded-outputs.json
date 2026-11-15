@@ -1,0 +1,149 @@
+{
+  "scope": "Model identifiers masked for assistant visual review. Source references were frozen before inference.",
+  "cases": [
+    {
+      "caseId": "sample-01",
+      "imagePath": "/workspace/GeoModel3D/docs/benchmarks/0.25.0-core-ai/images/sample-01.png",
+      "outputs": [
+        {
+          "model": "Model A",
+          "status": "completed",
+          "text": "O.",
+          "outputLimitReached": false
+        },
+        {
+          "model": "Model B",
+          "status": "completed",
+          "text": "- The text appears as a dark, hand-drawn number \"04.\" in ink on a light-colored surface.  \n- The font style is informal and uneven, with varying stroke widths and irregular letterforms.  \n- There are faint, smudged marks and minor imperfections around the characters, suggesting manual creation rather than precise printing.  \n- No clear background context (like stone, concrete, or paper) can be definitively identified due to low resolution and limited visibility.",
+          "outputLimitReached": false
+        }
+      ]
+    },
+    {
+      "caseId": "sample-02",
+      "imagePath": "/workspace/GeoModel3D/docs/benchmarks/0.25.0-core-ai/images/sample-02.png",
+      "outputs": [
+        {
+          "model": "Model A",
+          "status": "completed",
+          "text": "- **Color**: The dominant color appears as a muted grayish-brown with some lighter areas near the top edge.\n- **Texture**: The surface looks rough and uneven, resembling metal or stone, with darker lines separating sections.\n- **Visible Edges/Gaps**: There are distinct vertical ridges or teeth along the upper portion that create a segmented appearance.",
+          "outputLimitReached": false
+        },
+        {
+          "model": "Model B",
+          "status": "completed",
+          "text": "Yes.",
+          "outputLimitReached": false
+        }
+      ]
+    },
+    {
+      "caseId": "sample-03",
+      "imagePath": "/workspace/GeoModel3D/docs/benchmarks/0.25.0-core-ai/images/sample-03.png",
+      "outputs": [
+        {
+          "model": "Model A",
+          "status": "completed",
+          "text": "Yes.",
+          "outputLimitReached": false
+        },
+        {
+          "model": "Model B",
+          "status": "completed",
+          "text": "- **Colour**: The dominant hue is a pale, muted grey with subtle variations in tone ranging from light silver-grey to slightly darker greys. There are fainter areas of off-white or very light gray that blend into the background.\n- **Texture**: The surface exhibits a rough, mottled appearance typical of stone or concrete. It displays fine lines, scratches, and uneven surface imperfections rather than smooth planes.\n- **Visible Edges/Gaps**: The image appears to be a continuous close-up of a single object; there are no distinct gaps between individual pieces or clear outlines separating different parts of the material.",
+          "outputLimitReached": false
+        }
+      ]
+    },
+    {
+      "caseId": "sample-04",
+      "imagePath": "/workspace/GeoModel3D/docs/benchmarks/0.25.0-core-ai/images/sample-04.png",
+      "outputs": [
+        {
+          "model": "Model A",
+          "status": "completed",
+          "text": "The image displays a pale, featureless surface with no discernible geological structure, mineral composition, or physical characteristics such as fractures or hardness. The texture appears uniform and lacks any distinct patterns, suggesting an abstract representation rather than a natural object like rock.",
+          "outputLimitReached": false
+        },
+        {
+          "model": "Model B",
+          "status": "completed",
+          "text": "Yes.",
+          "outputLimitReached": false
+        }
+      ]
+    },
+    {
+      "caseId": "sample-05",
+      "imagePath": "/workspace/GeoModel3D/docs/benchmarks/0.25.0-core-ai/images/sample-05.png",
+      "outputs": [
+        {
+          "model": "Model A",
+          "status": "completed",
+          "text": "- The surface displays a uniform, light greyish-grey tone with no distinct color variations.\n- The texture appears consistent across the entire frame, featuring a fine, mottled pattern without any obvious irregularities.\n- There are no discernible edges, borders, or gaps in the visual field; the image presents as a continuous, featureless area.",
+          "outputLimitReached": false
+        },
+        {
+          "model": "Model B",
+          "status": "completed",
+          "text": "**Image Description**\n\nThe image displays a close-up view of the ground surface with an uneven texture. The ground appears to be made of a light brown material, possibly mulch or grass. There are no discernible patterns or textures on the ground, making it seem like a natural, unaltered surface.\n\nThe ground's color is predominantly light brown, which could indicate that it might be made of mulch or grass. The ground seems to have some small gaps or irregularities in its texture, but they are not very prominent.\n\nThe ground is not covered by any other objects or structures. It is the main focus",
+          "outputLimitReached": true
+        }
+      ]
+    },
+    {
+      "caseId": "sample-06",
+      "imagePath": "/workspace/GeoModel3D/docs/benchmarks/0.25.0-core-ai/images/sample-06.png",
+      "outputs": [
+        {
+          "model": "Model A",
+          "status": "completed",
+          "text": "**Image Description**\n\nThe image displays a close-up view of the surface of a rock with a rough texture. The rock appears to be unevenly shaped, with visible cracks and crevices. The surface shows a mix of colors, primarily browns and blacks, which are indicative of the natural mineral composition. There are some small white specks scattered across the surface, possibly representing mineral deposits or other impurities.\n\nThe edges of the rock are somewhat blurred, suggesting that the focus remains on the main body of the rock. The edges also hint at the presence of cracks, which might indicate the nature of the rock's structure.",
+          "outputLimitReached": true
+        },
+        {
+          "model": "Model B",
+          "status": "completed",
+          "text": "- **Colour**: The dominant hue appears as a muted grayish-brown with subtle variations in tone across the surface.\n- **Texture**: The material displays a coarse, granular appearance with fine, irregular lines running diagonally through the frame.\n- **Visible Edges/Gaps**: There are faint diagonal striations suggesting a layered structure, though no distinct solid boundaries or clear gaps can be definitively identified due to the low resolution.",
+          "outputLimitReached": false
+        }
+      ]
+    },
+    {
+      "caseId": "sample-07",
+      "imagePath": "/workspace/GeoModel3D/docs/benchmarks/0.25.0-core-ai/images/sample-07.png",
+      "outputs": [
+        {
+          "model": "Model A",
+          "status": "completed",
+          "text": "- **Colour**: The surface displays a muted grey tone with subtle variations in shade, creating a soft gradient from lighter areas on the left to darker regions on the right.\n- **Texture**: The material exhibits a fine, vertical striation pattern that resembles wood grain but appears more uniform than typical stone textures.\n- **Visible Edges/Gaps**: There are no distinct borders separating different sections; instead, the entire frame shows continuous, overlapping lines indicating a seamless finish.",
+          "outputLimitReached": false
+        },
+        {
+          "model": "Model B",
+          "status": "completed",
+          "text": "Yes.",
+          "outputLimitReached": false
+        }
+      ]
+    },
+    {
+      "caseId": "sample-08",
+      "imagePath": "/workspace/GeoModel3D/docs/benchmarks/0.25.0-core-ai/images/sample-08.png",
+      "outputs": [
+        {
+          "model": "Model A",
+          "status": "completed",
+          "text": "- **Color**: The dominant color is a muted grayish-brown with darker streaks running vertically through the center. There are lighter areas on the left side that appear slightly whiter or off-white compared to the surrounding brown tones.\n- **Texture**: The surface displays a mottled pattern where the colors blend into one another in irregular ways, creating a rough, uneven appearance rather than a smooth finish.\n- **Visible Edges/Gaps**: On the far left edge, there appears to be a distinct gap or separation from the main body of the object, which contrasts sharply with the continuous lines seen further right.",
+          "outputLimitReached": false
+        },
+        {
+          "model": "Model B",
+          "status": "completed",
+          "text": "Yes.",
+          "outputLimitReached": false
+        }
+      ]
+    }
+  ]
+}
