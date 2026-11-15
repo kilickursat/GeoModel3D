@@ -44,6 +44,30 @@ async function fixture(page:Page){
   };
 }
 
+async function pieceFixture(page:Page){
+  const project=await fixture(page);
+  project.evidence.sources[0].pages[0].image=await page.evaluate(()=>{
+    const canvas=document.createElement("canvas");canvas.width=800;canvas.height=400;
+    const context=canvas.getContext("2d")!;context.fillStyle="#d8c9ae";context.fillRect(0,0,800,400);
+    // Solid, visibly different synthetic pieces make an incorrect full-row or reversed RTL crop detectable.
+    for(const [x,y,width,color] of [[100,100,150,"#c04020"],[250,100,150,"#2060c0"],[400,100,300,"#a7a394"],
+      [100,250,300,"#c09020"],[400,250,150,"#8030a0"],[550,250,150,"#208040"]] as const){
+      context.fillStyle=color;context.fillRect(x,y,width,100);
+    }
+    return canvas.toDataURL("image/png");
+  });
+  const piece=(id:string,end:number)=>({id,end,sound:"unknown",breakAfter:"unknown",unit:"rock",description:"Unchanged piece interpretation"});
+  project.boreholes[0].depth=10;project.boreholes[0].intervals[0].to=10;
+  const run=project.corePhotos.runs[0];run.to=10;
+  run.rows=[
+    {id:"row-first",box:{x0:.125,y0:.25,x1:.875,y1:.5},from:0,to:4,direction:"ltr",registrationReviewed:false,
+      pieces:[piece("piece-left-red",1),piece("piece-left-blue",2),{...piece("piece-left-rest",4),breakAfter:"end"}]},
+    {id:"row-second",box:{x0:.125,y0:.625,x1:.875,y1:.875},from:6,to:10,direction:"rtl",registrationReviewed:false,
+      pieces:[piece("piece-right-green",7),piece("piece-right-purple",8),{...piece("piece-right-rest",10),breakAfter:"end"}]}
+  ];
+  return project;
+}
+
 async function openPhotos(page:Page){
   await page.locator('[data-step="logs"]').click();await page.locator(".ws-core-photos").click();
   await expect(page.locator(".core-dialog")).toBeVisible();return page.locator(".core-dialog");
@@ -53,12 +77,12 @@ async function openAi(page:Page){
 }
 async function closeAi(page:Page){await page.locator(".core-ai-close").click();await expect(page.locator(".core-ai-dialog")).toHaveCount(0)}
 async function closePhotos(page:Page){await page.locator(".core-close").click();await expect(page.locator(".core-dialog")).toHaveCount(0)}
-async function load(page:Page,supported=true){
+async function load(page:Page,supported=true,makeFixture=fixture){
   await prepare(page);await gpuSupport(page,supported);await page.goto("/?backend=webgl#input");await openInput(page);
-  const project=await fixture(page);await importJson(page,project,"core-ai-project.json");await saved(page);return project;
+  const project=await makeFixture(page);await importJson(page,project,"core-ai-project.json");await saved(page);return project;
 }
 
-async function workerFixture(page:Page,delayMs=25){
+async function workerFixture(page:Page,delayMs=25,includeFrameHash=false){
   const activity={workers:0,models:[] as string[],methods:[] as string[]};
   // Route the Worker module, not the UI or CoreAiClient. Messages still cross a real Worker boundary, and
   // cancellation terminates that Worker. No Transformers code or real model weights run in these tests.
@@ -73,9 +97,10 @@ self.onmessage=async({data})=>{
     if(!model)throw new Error('Unknown fixture model');
     self.postMessage({type:'progress',id,progress:{phase:'loading',message:'Fetching a synthetic test weight',loaded:0,total:16}});
     await fetch('https://huggingface.co/__geomodel3d_ui_fixture/'+encodeURIComponent(model.id)+'/model.bin');
-    const bitmap=await createImageBitmap(await (await fetch(request.image)).blob());
+    const imageBlob=await (await fetch(request.image)).blob(),bitmap=await createImageBitmap(imageBlob);
+    const frameHash=${includeFrameHash}?[...new Uint8Array(await crypto.subtle.digest('SHA-256',await imageBlob.arrayBuffer()))].map(v=>v.toString(16).padStart(2,'0')).join(''):'';
     const result={modelId:model.id,model:model.repo,revision:model.revision,task:request.task,
-      text:'Synthetic '+model.id+' '+request.task+': '+${JSON.stringify(attack)},
+      text:'Synthetic '+model.id+' '+request.task+': '+${JSON.stringify(attack)}+(frameHash?' [input-sha256:'+frameHash+']':''),
       loadMs:model.id.includes('256')?8:12,inferenceMs:model.id.includes('256')?15:28,totalMs:model.id.includes('256')?23:40,
       downloadBytes:16,cacheState:'available',cached:false,generatedTokens:model.id.includes('256')?16:128,tokensPerSecond:20,
       imageWidth:bitmap.width,imageHeight:bitmap.height,maxNewTokens:128,device:'webgpu',dtype:CORE_AI_DTYPE_LABEL,
@@ -98,6 +123,15 @@ self.onmessage=async({data})=>{
   return activity;
 }
 async function ready(dialog:Locator){await expect(dialog.locator(".core-ai-crop")).toBeVisible();await expect(dialog.locator(".core-ai-run")).toBeEnabled()}
+async function previewFrame(dialog:Locator){
+  return dialog.locator(".core-ai-crop").evaluate(async(image:HTMLImageElement)=>{
+    const canvas=document.createElement("canvas");canvas.width=image.naturalWidth;canvas.height=image.naturalHeight;
+    const context=canvas.getContext("2d")!;context.drawImage(image,0,0);
+    const bytes=Uint8Array.from(atob(image.src.split(",")[1]),c=>c.charCodeAt(0));
+    return {width:canvas.width,height:canvas.height,corner:[...context.getImageData(0,0,1,1).data],center:[...context.getImageData(256,256,1,1).data],
+      sha256:[...new Uint8Array(await crypto.subtle.digest("SHA-256",bytes))].map(v=>v.toString(16).padStart(2,"0")).join("")};
+  });
+}
 async function benchmark(page:Page){return downloadJson<any>(page,".core-ai-export")}
 function expectImageFree(report:unknown){expect(JSON.stringify(report)).not.toMatch(/data:image|base64|STALE_RESULT_SHOULD_NOT_APPEAR/)}
 
@@ -115,13 +149,7 @@ test("core AI explicitly compares 256M and 500M with literal text and image-free
   const requestsBeforeStart:string[]=[];page.on("request",request=>{if(modelHost(request.url())||request.url().includes("coreAi.worker"))requestsBeforeStart.push(request.url())});
   await load(page);const before=await downloadJson(page,".ws-json"),activity=await workerFixture(page);
   await openPhotos(page);const dialog=await openAi(page);await ready(dialog);
-  const frame=await dialog.locator(".core-ai-crop").evaluate(async(image:HTMLImageElement)=>{
-    const canvas=document.createElement("canvas");canvas.width=image.naturalWidth;canvas.height=image.naturalHeight;
-    const context=canvas.getContext("2d")!;context.drawImage(image,0,0);
-    const bytes=Uint8Array.from(atob(image.src.split(",")[1]),c=>c.charCodeAt(0));
-    return {width:canvas.width,height:canvas.height,corner:[...context.getImageData(0,0,1,1).data],center:[...context.getImageData(256,256,1,1).data],
-      sha256:[...new Uint8Array(await crypto.subtle.digest("SHA-256",bytes))].map(v=>v.toString(16).padStart(2,"0")).join("")};
-  });
+  const frame=await previewFrame(dialog);
   expect(frame).toMatchObject({width:512,height:512,corner:[128,128,128,255]});expect(frame.center).not.toEqual(frame.corner);
   await dialog.locator(".core-ai-model").selectOption("smolvlm-500m");await dialog.locator(".core-ai-task").selectOption("observations");
   expect(activity).toEqual({workers:0,models:[],methods:[]});expect(requestsBeforeStart).toEqual([]);await dialog.locator(".core-ai-task").selectOption("describe");
@@ -137,17 +165,19 @@ test("core AI explicitly compares 256M and 500M with literal text and image-free
   await expect(dialog.locator('.core-ai-output img')).toHaveCount(0);expect(await page.evaluate(()=>Boolean((globalThis as any).coreAiInjected))).toBe(false);
   const first=dialog.locator(".core-ai-result").first();await first.locator(".core-ai-useful").selectOption("yes");await first.locator(".core-ai-hallucinations").selectOption("yes");
   await first.locator(".core-ai-review-notes").fill("Synthetic test output; the HTML-like text must remain literal.");
-  const report=await benchmark(page);expect(report).toMatchObject({format:"geomodel3d-core-ai-benchmark",version:1,appVersion,
-    interval:{sourceId:"source-ai",runId:"run-first",boreholeId:"BH-01",rowId:"row-first",from:0,to:.4,direction:"ltr",registrationReviewed:false}});
+  const report=await benchmark(page);expect(report).toMatchObject({format:"geomodel3d-core-ai-benchmark",version:2,appVersion,
+    interval:{sourceId:"source-ai",runId:"run-first",boreholeId:"BH-01",rowId:"row-first",from:0,to:.4,rowFrom:0,rowTo:.4,direction:"ltr",registrationReviewed:false},
+    selectedRegion:{kind:"row",rowId:"row-first",from:0,to:.4,direction:"ltr",box:{x0:.05,y0:.2,x1:.95,y1:.4}}});
+  expect(report.interval.pieceId).toBeUndefined();expect(report.selectedRegion.pieceId).toBeUndefined();
   expect(report.crop).toMatchObject({normalizedBox:{x0:.05,y0:.2,x1:.95,y1:.4},sourceWidth:800,sourceHeight:400,pixels:{x:40,y:80,width:720,height:80},analysisWidth:512,analysisHeight:512,
     preprocessing:{method:"aspect-preserving-gray-letterbox",scaledWidth:512,scaledHeight:57,padding:{left:0,top:227,right:0,bottom:228},background:"#808080"}});
   const scaled=report.crop.preprocessing;expect(scaled.scaledWidth+scaled.padding.left+scaled.padding.right).toBe(512);expect(scaled.scaledHeight+scaled.padding.top+scaled.padding.bottom).toBe(512);
   expect(Math.abs(scaled.scaledHeight-scaled.scaledWidth*report.crop.pixels.height/report.crop.pixels.width)).toBeLessThanOrEqual(.5);
-  expect(report.crop.sha256).toBe(frame.sha256);expect(report.trials).toHaveLength(1);expect(report.trials[0].promptVersion).toBe(1);expect(report.trials[0].prompt).toContain("Do not infer");
+  expect(report.crop.sha256).toBe(frame.sha256);expect(report.trials).toHaveLength(1);expect(report.trials[0].promptVersion).toBe(2);expect(report.trials[0].prompt).toContain("Do not infer");
   expect(report.trials[0]).toMatchObject({kind:"comparison",task:"describe",modelIds:["smolvlm-256m","smolvlm-500m"],status:"completed"});
   expect(report.trials[0].results.map((entry:any)=>entry.result.generatedTokens)).toEqual([16,128]);
   for(const [index,entry] of report.trials[0].results.entries()){
-    const model=index===0?"smolvlm-256m":"smolvlm-500m";expect(entry.result).toMatchObject({modelId:model,task:"describe",imageWidth:512,imageHeight:512,maxNewTokens:128,device:"webgpu",promptVersion:1});
+    const model=index===0?"smolvlm-256m":"smolvlm-500m";expect(entry.result).toMatchObject({modelId:model,task:"describe",imageWidth:512,imageHeight:512,maxNewTokens:128,device:"webgpu",promptVersion:2});
     expect(entry.result.model).toMatch(index===0?/256M/:/500M/);expect(entry.result.revision).toMatch(/^[a-f0-9]{40}$/);expect(entry.result.dtype).toContain("q4");
     expect(entry.result.runtimeVersion).toMatch(/^\d+\.\d+\.\d+/);expect(entry.result.onnxRuntimeVersion).toMatch(/^\d+\.\d+\.\d+/);
     expect(entry.result.totalMs).toBe(entry.result.loadMs+entry.result.inferenceMs);
@@ -160,6 +190,60 @@ test("core AI explicitly compares 256M and 500M with literal text and image-free
   const next=await benchmark(page);expect(next.trials.map((trial:any)=>trial.task)).toEqual(["describe","observations"]);
   expect(next.trials[0].results.map((entry:any)=>entry.result.task)).toEqual(["describe","describe"]);expect(next.trials[1].results[0].result.task).toBe("observations");expectImageFree(next);
   await closeAi(page);await closePhotos(page);expect(await downloadJson(page,".ws-json")).toEqual(before);
+});
+
+test("core AI describes distinct LTR and RTL pieces with the exact upscaled crop and depth provenance",async({page},testInfo)=>{
+  test.setTimeout(90_000);
+  const requests:string[]=[];page.on("request",request=>{if(modelHost(request.url())||request.url().includes("coreAi.worker"))requests.push(request.url())});
+  await load(page,true,pieceFixture);const before=await downloadJson(page,".ws-json"),activity=await workerFixture(page,25,true);
+  await openPhotos(page);let dialog=await openAi(page);await ready(dialog);
+  await expect(dialog.locator(".core-ai-interval")).toHaveText("BH-01 · 0–4 m");
+  await expect(dialog.locator(".core-ai-region-label")).toHaveText("Whole row · registered row 0–4 m");
+  const rowFrame=await previewFrame(dialog);expect(requests).toEqual([]);await closeAi(page);
+  const cases=[
+    {pieceId:"piece-left-red",rowId:"row-first",index:1,from:0,to:1,rowFrom:0,rowTo:4,direction:"ltr",color:[192,64,32,255],
+      box:{x0:.125,y0:.25,x1:.3125,y1:.5},pixels:{x:100,y:100,width:150,height:100}},
+    {pieceId:"piece-left-blue",rowId:"row-first",index:2,from:1,to:2,rowFrom:0,rowTo:4,direction:"ltr",color:[32,96,192,255],
+      box:{x0:.3125,y0:.25,x1:.5,y1:.5},pixels:{x:250,y:100,width:150,height:100}},
+    {pieceId:"piece-right-green",rowId:"row-second",index:1,from:6,to:7,rowFrom:6,rowTo:10,direction:"rtl",color:[32,128,64,255],
+      box:{x0:.6875,y0:.625,x1:.875,y1:.875},pixels:{x:550,y:250,width:150,height:100}}
+  ];
+  const hashes=[rowFrame.sha256];
+  for(const selected of cases){
+    await page.locator(".core-row").selectOption(selected.rowId);
+    const opener=page.locator(`[data-piece="${selected.pieceId}"] .core-ai-piece-open`),requestCount=requests.length,workerCount=activity.workers;
+    await opener.click();dialog=page.locator(".core-ai-dialog");await ready(dialog);
+    await expect(dialog.locator("h2")).toHaveText("Describe this piece");
+    await expect(dialog.locator(".core-ai-interval")).toHaveText(`BH-01 · ${selected.from}–${selected.to} m`);
+    await expect(dialog.locator(".core-ai-region-label")).toHaveText(`Piece ${selected.index} · registered row ${selected.rowFrom}–${selected.rowTo} m`);
+    await expect(dialog.locator(".core-ai-crop-info")).toContainText("Photo content: 512 × 341 pixels, from a 150 × 100 pixel crop");
+    await expect(dialog.locator(".core-ai-crop-info")).toContainText("interpolation adds no observed detail");
+    await expect(dialog.locator(".core-ai-result")).toHaveCount(0);
+    const frame=await previewFrame(dialog);
+    expect(frame).toMatchObject({width:512,height:512,corner:[128,128,128,255],center:selected.color});
+    expect(hashes).not.toContain(frame.sha256);hashes.push(frame.sha256);
+    expect(requests).toHaveLength(requestCount);expect(activity.workers).toBe(workerCount);
+    const modelId=await dialog.locator(".core-ai-model").inputValue();await dialog.locator(".core-ai-run").click();
+    await expect(dialog.locator(".core-ai-result")).toHaveCount(1);await expect(dialog.locator(".core-ai-export")).toBeEnabled();
+    await expect(dialog.locator(".core-ai-result-interval")).toContainText(`BH-01 · ${selected.from}–${selected.to} m`);
+    await expect(dialog.locator(".core-ai-output")).toContainText(`[input-sha256:${frame.sha256}]`);
+    const report=await benchmark(page);expect(report).toMatchObject({format:"geomodel3d-core-ai-benchmark",version:2,appVersion,
+      interval:{sourceId:"source-ai",sourceName:"Synthetic core photo.png",runId:"run-first",boreholeId:"BH-01",rowId:selected.rowId,pieceId:selected.pieceId,
+        from:selected.from,to:selected.to,rowFrom:selected.rowFrom,rowTo:selected.rowTo,direction:selected.direction,registrationReviewed:false},
+      selectedRegion:{kind:"piece",rowId:selected.rowId,pieceId:selected.pieceId,from:selected.from,to:selected.to,direction:selected.direction,box:selected.box},
+      crop:{normalizedBox:selected.box,sourceWidth:800,sourceHeight:400,pixels:selected.pixels,analysisWidth:512,analysisHeight:512,sha256:frame.sha256,
+        preprocessing:{method:"aspect-preserving-gray-letterbox",scaledWidth:512,scaledHeight:341,scale:512/150,upscaled:true,
+          padding:{left:0,top:85,right:0,bottom:86},background:"#808080"}}});
+    expect(report.trials).toHaveLength(1);expect(report.trials[0]).toMatchObject({kind:"single",task:"describe",modelIds:[modelId],status:"completed"});
+    expect(report.trials[0].results).toHaveLength(1);expect(report.trials[0].results[0].result).toMatchObject({modelId,imageWidth:512,imageHeight:512});
+    expect(report.trials[0].results[0].result.text).toContain(`[input-sha256:${frame.sha256}]`);expectImageFree(report);
+    if(selected.pieceId==="piece-right-green"){
+      await dialog.locator(".core-ai-interval").scrollIntoViewIfNeeded();await page.screenshot({path:testInfo.outputPath("core-ai-rtl-piece-desktop.png"),fullPage:true});
+    }
+    await closeAi(page);await expect(opener).toBeFocused();
+  }
+  expect(activity.models).toHaveLength(cases.length);expect(activity.methods).toEqual(cases.map(()=>"GET"));
+  await closePhotos(page);expect(await downloadJson(page,".ws-json")).toEqual(before);
 });
 
 test("core AI cancellation, stale worker messages and closing preserve the selected interval",async({page})=>{
@@ -182,7 +266,7 @@ test("core AI cancellation, stale worker messages and closing preserve the selec
 });
 
 test("mobile core AI comparison fits iPhone Chromium emulation and keeps review controls usable",async({page},testInfo)=>{
-  await load(page);await workerFixture(page);await openPhotos(page);const dialog=await openAi(page);await ready(dialog);
+  await load(page,true,pieceFixture);const activity=await workerFixture(page);await openPhotos(page);const dialog=await openAi(page);await ready(dialog);
   await dialog.locator(".core-ai-compare").click();await expect(dialog.locator(".core-ai-result")).toHaveCount(2);await expect(dialog.locator(".core-ai-export")).toBeEnabled();
   expect(await dialog.evaluate(el=>el.scrollWidth<=el.clientWidth+1)).toBe(true);expect(await dialog.locator(".core-ai-content").evaluate(el=>el.scrollWidth<=el.clientWidth+1)).toBe(true);
   const card=dialog.locator(".core-ai-result").last();await card.locator(".core-ai-useful").selectOption("no");await card.locator(".core-ai-hallucinations").selectOption("yes");
@@ -190,7 +274,16 @@ test("mobile core AI comparison fits iPhone Chromium emulation and keeps review 
   await page.screenshot({path:testInfo.outputPath("core-ai-comparison-iphone.png"),fullPage:true});
   for(let i=0;i<24;i++){await page.keyboard.press("Tab");expect(await dialog.evaluate(el=>el.contains(document.activeElement))).toBe(true)}
   const report=await benchmark(page);expect(report.trials[0].results[1].review).toEqual({useful:"no",hallucinations:"yes",notes:"Reviewed on a narrow screen."});expectImageFree(report);
-  await closeAi(page);await expect(page.locator(".core-ai-open")).toBeFocused();await closePhotos(page);
+  await closeAi(page);await expect(page.locator(".core-ai-open")).toBeFocused();
+  const opener=page.locator('[data-piece="piece-left-red"] .core-ai-piece-open'),workers=activity.workers,modelRequests=activity.models.length;
+  await opener.click();const pieceDialog=page.locator(".core-ai-dialog");await ready(pieceDialog);
+  await expect(pieceDialog.locator(".core-ai-interval")).toHaveText("BH-01 · 0–1 m");
+  expect(await previewFrame(pieceDialog)).toMatchObject({width:512,height:512,center:[192,64,32,255],corner:[128,128,128,255]});
+  expect(await pieceDialog.evaluate(el=>el.scrollWidth<=el.clientWidth+1)).toBe(true);
+  expect(await pieceDialog.locator(".core-ai-content").evaluate(el=>el.scrollWidth<=el.clientWidth+1)).toBe(true);
+  expect(activity.workers).toBe(workers);expect(activity.models).toHaveLength(modelRequests);
+  await pieceDialog.locator(".core-ai-interval").scrollIntoViewIfNeeded();await page.screenshot({path:testInfo.outputPath("core-ai-piece-iphone.png"),fullPage:true});
+  await closeAi(page);await expect(opener).toBeFocused();await closePhotos(page);
 });
 
 test("standalone core AI explains its limit while manual core review remains available offline",async({page,context},testInfo)=>{
@@ -202,6 +295,11 @@ test("standalone core AI explains its limit while manual core review remains ava
   await openPhotos(page);const dialog=await openAi(page);await expect(dialog.locator(".core-ai-crop")).toBeVisible();
   await expect(dialog.locator(".core-ai-support")).toContainText(/unavailable in the standalone HTML/i);await expect(dialog.locator(".core-ai-run")).toBeDisabled();await expect(dialog.locator(".core-ai-compare")).toBeDisabled();
   expect(modelRequests).toEqual([]);expect(errors).toEqual([]);await page.screenshot({path:testInfo.outputPath("core-ai-standalone-limit.png"),fullPage:true});
+  await closeAi(page);await page.locator('[data-piece="piece-first"] .core-ai-piece-open').click();
+  const pieceDialog=page.locator(".core-ai-dialog");await expect(pieceDialog.locator("h2")).toHaveText("Describe this piece");
+  await expect(pieceDialog.locator(".core-ai-crop")).toBeVisible();await expect(pieceDialog.locator(".core-ai-interval")).toHaveText("BH-01 · 0–0.4 m");
+  await expect(pieceDialog.locator(".core-ai-support")).toContainText(/unavailable in the standalone HTML/i);
+  await expect(pieceDialog.locator(".core-ai-run")).toBeDisabled();await expect(pieceDialog.locator(".core-ai-compare")).toBeDisabled();
   await closeAi(page);await page.locator(".core-registration").check();await expect(page.locator(".core-registration")).toBeChecked();await page.locator(".core-save").click();await closePhotos(page);
   const exported:any=await downloadJson(page);expect(exported.draft.tables.corePhotos.runs[0].rows[0].registrationReviewed).toBe(true);expect(modelRequests).toEqual([]);
 });

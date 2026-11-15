@@ -1,0 +1,41 @@
+import {AutoProcessor,Qwen3_5ForConditionalGeneration,RawImage,Tensor,TextStreamer,env} from '@huggingface/transformers';
+const repo='onnx-community/Qwen3.5-0.8B-ONNX-OPT',revision='9a4c21d8f724176b0a7edaaed36303044451886e';
+const dtype={embed_tokens:'q4',vision_encoder:'fp32',decoder_model_merged:'q4'};
+env.allowLocalModels=false;env.allowRemoteModels=true;env.useBrowserCache=false;env.useCustomCache=false;env.useFSCache=false;env.useWasmCache=false;
+// Transformers4.3.2 tokenizer-existence probing omits revision; pin even that metadata request.
+env.remoteHost=location.origin+'/models/';env.remotePathTemplate=`{model}/${revision}/`;
+env.backends.onnx.wasm.numThreads=1;env.backends.onnx.wasm.proxy=false;
+env.backends.onnx.wasm.wasmPaths={wasm:location.origin+'/ort/ort-wasm-simd-threaded.asyncify.wasm',mjs:location.origin+'/ort/ort-wasm-simd-threaded.asyncify.mjs'};
+function post(type,value){self.postMessage({type,...value})}
+self.onmessage=async(event)=>{
+  const {prompt,maxNewTokens}=event.data;let model,inputs,outputs,timer;
+  const started=performance.now();
+  try{
+    const adapter=await navigator.gpu?.requestAdapter();if(!adapter)throw new Error('No worker WebGPU adapter');
+    env.backends.onnx.webgpu.adapter=adapter;
+    post('capability',{features:[...adapter.features],info:{vendor:adapter.info.vendor,architecture:adapter.info.architecture,device:adapter.info.device,description:adapter.info.description},limits:{maxBufferSize:adapter.limits.maxBufferSize,maxStorageBufferBindingSize:adapter.limits.maxStorageBufferBindingSize}});
+    const progress_callback=p=>post('progress',{stage:'load',status:p.status,file:p.file,loaded:p.loaded,total:p.total,elapsedMs:performance.now()-started});
+    const processor=await AutoProcessor.from_pretrained(repo,{revision,progress_callback});
+    processor.image_processor.min_pixels=512*512;processor.image_processor.max_pixels=512*512;
+    model=await Qwen3_5ForConditionalGeneration.from_pretrained(repo,{revision,dtype,device:'webgpu',progress_callback});
+    const loadMs=performance.now()-started;
+    const bytes=await(await fetch('/sample.png')).arrayBuffer();
+    const imageSha256=[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(b=>b.toString(16).padStart(2,'0')).join('');
+    const image=await RawImage.fromBlob(new Blob([bytes],{type:'image/png'}));
+    if(image.width!==512||image.height!==512)throw new Error('Expected prepared512square image');
+    const text=processor.apply_chat_template([{role:'user',content:[{type:'image'},{type:'text',text:prompt}]}],{add_generation_prompt:true,enable_thinking:false});
+    if(!text.endsWith('<think>\n\n</think>\n\n'))throw new Error('Qwen non-thinking template invariant failed');
+    inputs=await processor(text,[image]);
+    const inputTokens=inputs.input_ids.dims.at(-1),inferenceStart=performance.now();let generated=0;
+    const running=()=>post('progress',{stage:'generation',generatedTokens:generated,maxNewTokens,elapsedMs:performance.now()-inferenceStart});
+    timer=setInterval(running,10000);
+    const streamer=new TextStreamer(processor.tokenizer,{skip_prompt:true,callback_function:()=>{},token_callback_function:tokens=>{generated+=tokens.length;running()}});
+    outputs=await model.generate({...inputs,do_sample:false,repetition_penalty:1.1,max_new_tokens:maxNewTokens,return_dict_in_generate:false,streamer});
+    clearInterval(timer);timer=undefined;
+    if(!(outputs instanceof Tensor))throw new Error('Unexpected generation output');
+    const inferenceMs=performance.now()-inferenceStart,tokens=outputs.tolist()[0].slice(inputTokens).map(Number);
+    post('result',{model:repo,revision,dtype,device:'webgpu',transformersVersion:env.version,onnxRuntimeVersion:env.backends.onnx.versions.web,
+      text:processor.tokenizer.decode(tokens,{skip_special_tokens:true}).trim(),generatedTokens:tokens.length,inputTokens,maxNewTokens,loadMs,inferenceMs,totalMs:performance.now()-started,imageSha256,imageGrid:inputs.image_grid_thw.tolist().map(row=>row.map(Number)),prompt,enableThinking:false});
+  }catch(error){post('failure',{message:error.stack??String(error),elapsedMs:performance.now()-started})}
+  finally{clearInterval(timer);outputs?.dispose?.();if(inputs)for(const value of Object.values(inputs))value?.dispose?.();await model?.dispose()}
+};

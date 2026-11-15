@@ -1,7 +1,8 @@
 import {afterEach,describe,expect,it,vi} from "vitest";
-import {CORE_AI_CACHE,CORE_AI_MODELS,CORE_AI_MAX_NEW_TOKENS,coreAiPrompt,validateCoreAiRequest} from "../src/coreAi";
+import {CORE_AI_CACHE,CORE_AI_MODELS,CORE_AI_MAX_NEW_TOKENS,CORE_AI_PROMPT_VERSION,coreAiPrompt,validateCoreAiRequest} from "../src/coreAi";
 import type {CoreAiRequest,CoreAiResult,CoreAiWorkerResponse} from "../src/coreAi";
 import {CoreAiClient,clearCoreAiCache,coreAiSupport} from "../src/coreAiClient";
+import pilotProtocol from "../docs/benchmarks/0.25.0-core-ai/protocol.json";
 
 const image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=";
 const request:CoreAiRequest={modelId:"smolvlm-256m",task:"describe",image};
@@ -30,6 +31,22 @@ describe("bounded local AI input",()=>{
     for(const model of CORE_AI_MODELS){expect(model.repo).toMatch(/^HuggingFaceTB\/SmolVLM-/);expect(model.revision).toMatch(/^[a-f0-9]{40}$/)}
     for(const task of ["describe","observations"] as const){expect(coreAiPrompt(task)).toContain("Do not infer");expect(coreAiPrompt(task)).toContain("RQD")}
     expect(validateCoreAiRequest(request)).toEqual({width:1,height:1});
+  });
+  it("uses the description prompt frozen before the real-image pilot",()=>{
+    expect(pilotProtocol.frozenBeforeInference).toBe(true);
+    expect(CORE_AI_PROMPT_VERSION).toBe(2);
+    expect(coreAiPrompt("describe")).toBe(pilotProtocol.prompt);
+  });
+  it("permits non-rock negative controls without presupposing the crop contains drill core",()=>{
+    for(const task of ["describe","observations"] as const){
+      const prompt=coreAiPrompt(task);
+      expect(prompt).toContain("this image crop");
+      expect(prompt).toContain("If it does not clearly show rock or is unclear, say so.");
+      expect(prompt).not.toMatch(/\b(?:drill core|core sample|rock sample)\b/i);
+      const prohibited=prompt.split("Do not infer ")[1];
+      expect(prohibited).toBeDefined();
+      for(const inference of ["rock type","minerals","strength","soundness","fracture cause","RQD","numerical properties"])expect(prohibited).toContain(inference);
+    }
   });
   it("rejects remote images, unsupported requests, oversized payloads and misleading PNG headers",()=>{
     for(const patch of [{modelId:"other"},{task:"estimate-strength"},{image:"https://example.test/photo.png"},{image:"data:image/svg+xml;base64,PHN2Zz4="},{image:"data:image/png;base64,"+"A".repeat(2_800_000)},{image:"data:image/png;base64,AAAA"}])

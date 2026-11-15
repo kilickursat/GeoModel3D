@@ -1,0 +1,1921 @@
+{
+  "schemaVersion": 1,
+  "protocolVersion": "core-ai-visible-description-pilot-1",
+  "reviewStatus": "Frozen before identity mapping was opened.",
+  "reviewer": {
+    "role": "assistant visual review; not a geologist",
+    "modelIdentityBlind": true,
+    "sourceClassBlind": false,
+    "inputs": "Only blinded-outputs.json, frozen rubric/reference-review.json, and all eight analyzed PNG images were read. No results.json, model mapping, runtime or runner was opened."
+  },
+  "inputHashes": {
+    "blindedOutputsSha256": "1b1de1ba2dd5d741cd8359ea6ec46703bbd931b873ce8ff3763fb32c7e6c06a2",
+    "rubricSha256": "f2d89c9b9886da094ffc6bf119500587d05bbe0efc3423e5a7f41c7960c6e4cd",
+    "referenceReviewSha256": "6fdfb71986d7887231c8bbc3946239fff7b448e377340d05ea2546da2fed1f97"
+  },
+  "methodNotes": [
+    "The frozen rubric gives 1 point for an omitted category; consequently a nonresponsive answer scores 4/8 but is explicitly not useful. These points are not accuracy or correctness percentages.",
+    "The frozen useful-and-grounded rule requires a specific supported visual detail, no substantive visual contradiction and no critical failure. It does not prohibit every noncritical unverified interpretation; those remain separately recorded. Do not read a true value as all claims being reliable.",
+    "Material resemblance is distinguished from asserted lithology/mineral identity. Negative statements that properties cannot be seen are not flagged as property predictions.",
+    "Critical flags are evaluated contextually, not by keyword. The mineral-composition/deposit speculation in sample-06 Model A is flagged; a natural-versus-mechanical fracture-origin flag is not added because no such cause is asserted.",
+    "Token-cap status is retained as supplied in the anonymous packet. No timing, token-count or model-identity inference was used.",
+    "Anonymous labels are independently randomized per case. Do not aggregate Model A or Model B across images as a stable model.",
+    "Published labels were not used to reward inferred lithology or to treat sample-02 as entirely free of rock."
+  ],
+  "postHocObservations": [
+    {
+      "id": "posthoc-sample-02-light-top-edge",
+      "caseId": "sample-02",
+      "observation": "The analyzed PNG has a very thin pale top border and slightly lighter ridge surfaces. This supports a limited top-edge brightness remark, not a statement that the upper image is generally bright.",
+      "reason": "Not present in the frozen image-specific reference; recorded separately without changing it."
+    }
+  ],
+  "cases": [
+    {
+      "caseId": "sample-01",
+      "outputs": [
+        {
+          "caseId": "sample-01",
+          "anonymousLabel": "Model A",
+          "status": "completed",
+          "text": "O.",
+          "outputLimitReached": false,
+          "nonresponsive": true,
+          "totalScore": 4,
+          "maxScore": 8,
+          "categoryScores": {
+            "colour": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "No evaluable colour observation or substantive claim is supplied. The frozen rubric assigns 1 for omission.",
+              "observationIds": [
+                "sample-01-C1"
+              ]
+            },
+            "texture": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "No evaluable texture observation or substantive claim is supplied. The frozen rubric assigns 1 for omission.",
+              "observationIds": [
+                "sample-01-T1",
+                "sample-01-T2"
+              ]
+            },
+            "boundary": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "No evaluable boundary observation or substantive claim is supplied. The frozen rubric assigns 1 for omission.",
+              "observationIds": [
+                "sample-01-B1"
+              ]
+            },
+            "uncertainty": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "No evaluable uncertainty observation or substantive claim is supplied. The frozen rubric assigns 1 for omission.",
+              "observationIds": [
+                "sample-01-T1",
+                "sample-01-B1"
+              ]
+            }
+          },
+          "usefulAndGrounded": false,
+          "hasSubstantiveVisualContradiction": false,
+          "criticalFailures": [],
+          "claims": [],
+          "notes": [
+            "Ambiguous isolated glyph; it does not establish a specific supported observation about the crop."
+          ],
+          "usefulnessReason": "No specific supported image observation."
+        },
+        {
+          "caseId": "sample-01",
+          "anonymousLabel": "Model B",
+          "status": "completed",
+          "text": "- The text appears as a dark, hand-drawn number \"04.\" in ink on a light-colored surface.  \n- The font style is informal and uneven, with varying stroke widths and irregular letterforms.  \n- There are faint, smudged marks and minor imperfections around the characters, suggesting manual creation rather than precise printing.  \n- No clear background context (like stone, concrete, or paper) can be definitively identified due to low resolution and limited visibility.",
+          "outputLimitReached": false,
+          "nonresponsive": false,
+          "totalScore": 7,
+          "maxScore": 8,
+          "categoryScores": {
+            "colour": {
+              "score": 2,
+              "maxScore": 2,
+              "reason": "Correctly distinguishes dark writing from the pale background.",
+              "observationIds": [
+                "sample-01-C1"
+              ]
+            },
+            "texture": {
+              "score": 2,
+              "maxScore": 2,
+              "reason": "Identifies handwritten-looking uneven strokes and surrounding faint marks.",
+              "observationIds": [
+                "sample-01-T1",
+                "sample-01-T2"
+              ]
+            },
+            "boundary": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "Does not discuss the visible upper/lower border or cropped leftmost character.",
+              "observationIds": [
+                "sample-01-B1",
+                "sample-01-T2"
+              ]
+            },
+            "uncertainty": {
+              "score": 2,
+              "maxScore": 2,
+              "reason": "Explicitly acknowledges that substrate identity and background context cannot be established. Ink and complete transcription remain unverified.",
+              "observationIds": [
+                "sample-01-T1",
+                "sample-01-T2"
+              ]
+            }
+          },
+          "usefulAndGrounded": true,
+          "hasSubstantiveVisualContradiction": false,
+          "criticalFailures": [],
+          "claims": [
+            {
+              "id": "sample-01-B-claim-01",
+              "quote": "a dark, hand-drawn number",
+              "classification": "supported-visually",
+              "reason": "Dark handwritten-looking characters are clear.",
+              "observationIds": [
+                "sample-01-C1",
+                "sample-01-T2"
+              ]
+            },
+            {
+              "id": "sample-01-B-claim-02",
+              "quote": "\"04.\"",
+              "classification": "not-verifiable-from-crop",
+              "reason": "This is a plausible reading, but the leftmost glyph is cropped and distinguishing O from 0 or a complete identifier is not reliable.",
+              "observationIds": [
+                "sample-01-T2"
+              ]
+            },
+            {
+              "id": "sample-01-B-claim-03",
+              "quote": "in ink",
+              "classification": "not-verifiable-from-crop",
+              "reason": "The image shows dark marking; its physical medium is not established.",
+              "observationIds": [
+                "sample-01-T2"
+              ]
+            },
+            {
+              "id": "sample-01-B-claim-04",
+              "quote": "on a light-colored surface",
+              "classification": "supported-visually",
+              "reason": "The panel background is pale.",
+              "observationIds": [
+                "sample-01-C1"
+              ]
+            },
+            {
+              "id": "sample-01-B-claim-05",
+              "quote": "informal and uneven, with varying stroke widths and irregular letterforms",
+              "classification": "supported-visually",
+              "reason": "The visible strokes vary in width and shape.",
+              "observationIds": [
+                "sample-01-T2"
+              ]
+            },
+            {
+              "id": "sample-01-B-claim-06",
+              "quote": "faint, smudged marks and minor imperfections around the characters",
+              "classification": "supported-visually",
+              "reason": "Faint scuffs and mottling surround the dark characters.",
+              "observationIds": [
+                "sample-01-T1"
+              ]
+            },
+            {
+              "id": "sample-01-B-claim-07",
+              "quote": "suggesting manual creation rather than precise printing",
+              "classification": "not-verifiable-from-crop",
+              "reason": "Handwritten appearance is supported, but the actual production method cannot be confirmed.",
+              "observationIds": [
+                "sample-01-T2"
+              ]
+            },
+            {
+              "id": "sample-01-B-claim-08",
+              "quote": "No clear background context (like stone, concrete, or paper) can be definitively identified",
+              "classification": "appropriate-abstention",
+              "reason": "Specific substrate material cannot be reliably identified.",
+              "observationIds": [
+                "sample-01-T1"
+              ]
+            },
+            {
+              "id": "sample-01-B-claim-09",
+              "quote": "due to low resolution and limited visibility",
+              "classification": "supported-visually",
+              "reason": "The tightly cropped, low-detail view lacks wider context.",
+              "observationIds": [
+                "sample-01-T1",
+                "sample-01-T2"
+              ]
+            }
+          ],
+          "notes": [
+            "Four bullet points exceed the prompt's maximum of three. The unsupported marking-medium and exact-transcription claims are not critical geological claims."
+          ],
+          "usefulnessReason": "At least one specific supported visual observation, no substantive visual contradiction, and no critical failure; separately listed noncritical unverified claims are not excused."
+        }
+      ],
+      "pairedComparison": {
+        "higherScoringAnonymousLabel": "Model B",
+        "scoreDifferenceAMinusB": -3,
+        "interpretation": "Case-specific labels only; no model identity or cross-case A/B aggregation is inferred."
+      },
+      "analyzedImage": {
+        "sha256": "949f36faf19cfec4e29bff81fe48e863728d2c687ee441594278793f64c2a9e6",
+        "path": "docs/benchmarks/0.25.0-core-ai/images/sample-01.png"
+      }
+    },
+    {
+      "caseId": "sample-02",
+      "outputs": [
+        {
+          "caseId": "sample-02",
+          "anonymousLabel": "Model A",
+          "status": "completed",
+          "text": "- **Color**: The dominant color appears as a muted grayish-brown with some lighter areas near the top edge.\n- **Texture**: The surface looks rough and uneven, resembling metal or stone, with darker lines separating sections.\n- **Visible Edges/Gaps**: There are distinct vertical ridges or teeth along the upper portion that create a segmented appearance.",
+          "outputLimitReached": false,
+          "nonresponsive": false,
+          "totalScore": 6,
+          "maxScore": 8,
+          "categoryScores": {
+            "colour": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "Gray-brown describes part of the image, but omits the extensive almost-black upper region; the lighter top-edge remark is incomplete rather than a substantive contradiction.",
+              "observationIds": [
+                "sample-02-C1"
+              ]
+            },
+            "texture": {
+              "score": 2,
+              "maxScore": 2,
+              "reason": "Uneven lower texture and repeated upper ridges are supported; resemblance to metal/stone is an uncertain analogy.",
+              "observationIds": [
+                "sample-02-T1",
+                "sample-02-T2"
+              ]
+            },
+            "boundary": {
+              "score": 2,
+              "maxScore": 2,
+              "reason": "Correctly identifies the repeated near-vertical upper ridges or slots without calling them geological fractures.",
+              "observationIds": [
+                "sample-02-T1",
+                "sample-02-B1"
+              ]
+            },
+            "uncertainty": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "Uses appearance language but does not explicitly explain the mixed tray-like/rock-like regions or the poor lighting.",
+              "observationIds": [
+                "sample-02-T1",
+                "sample-02-T2",
+                "sample-02-C1"
+              ]
+            }
+          },
+          "usefulAndGrounded": true,
+          "hasSubstantiveVisualContradiction": false,
+          "criticalFailures": [],
+          "claims": [
+            {
+              "id": "sample-02-A-claim-01",
+              "quote": "a muted grayish-brown",
+              "classification": "supported-visually",
+              "reason": "Muted gray-brown is visible in the background and lower object, although it is incomplete as a description of the dominant dark regions.",
+              "observationIds": [
+                "sample-02-C1"
+              ]
+            },
+            {
+              "id": "sample-02-A-claim-02",
+              "quote": "some lighter areas near the top edge",
+              "classification": "supported-visually",
+              "reason": "The analyzed image has a very thin light top border and lighter ridge surfaces. This small feature was not in the frozen reference.",
+              "postHocObservationIds": [
+                "posthoc-sample-02-light-top-edge"
+              ],
+              "observationIds": []
+            },
+            {
+              "id": "sample-02-A-claim-03",
+              "quote": "The surface looks rough and uneven",
+              "classification": "supported-visually",
+              "reason": "The partial lower object has an uneven mottled appearance; this should not be generalized to every region.",
+              "observationIds": [
+                "sample-02-T2"
+              ]
+            },
+            {
+              "id": "sample-02-A-claim-04",
+              "quote": "resembling metal or stone",
+              "classification": "not-verifiable-from-crop",
+              "reason": "The comparison is hedged, but material identity cannot be resolved from this mixed, poorly lit crop.",
+              "observationIds": [
+                "sample-02-T1",
+                "sample-02-T2"
+              ]
+            },
+            {
+              "id": "sample-02-A-claim-05",
+              "quote": "darker lines separating sections",
+              "classification": "supported-visually",
+              "reason": "Dark slots separate the repeated upper features.",
+              "observationIds": [
+                "sample-02-T1"
+              ]
+            },
+            {
+              "id": "sample-02-A-claim-06",
+              "quote": "distinct vertical ridges or teeth along the upper portion",
+              "classification": "supported-visually",
+              "reason": "The repeated elongated upper features with rounded lower ends are clearly visible.",
+              "observationIds": [
+                "sample-02-T1"
+              ]
+            },
+            {
+              "id": "sample-02-A-claim-07",
+              "quote": "create a segmented appearance",
+              "classification": "supported-visually",
+              "reason": "The repeated upper features create a divided visual pattern.",
+              "observationIds": [
+                "sample-02-T1"
+              ]
+            }
+          ],
+          "notes": [
+            "The published non-core class was not treated as evidence that all rock is absent. No claim about natural fractures or rock type is made."
+          ],
+          "usefulnessReason": "At least one specific supported visual observation, no substantive visual contradiction, and no critical failure; separately listed noncritical unverified claims are not excused."
+        },
+        {
+          "caseId": "sample-02",
+          "anonymousLabel": "Model B",
+          "status": "completed",
+          "text": "Yes.",
+          "outputLimitReached": false,
+          "nonresponsive": true,
+          "totalScore": 4,
+          "maxScore": 8,
+          "categoryScores": {
+            "colour": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "No evaluable colour observation or substantive claim is supplied. The frozen rubric assigns 1 for omission.",
+              "observationIds": [
+                "sample-02-C1"
+              ]
+            },
+            "texture": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "No evaluable texture observation or substantive claim is supplied. The frozen rubric assigns 1 for omission.",
+              "observationIds": [
+                "sample-02-T1",
+                "sample-02-T2"
+              ]
+            },
+            "boundary": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "No evaluable boundary observation or substantive claim is supplied. The frozen rubric assigns 1 for omission.",
+              "observationIds": [
+                "sample-02-B1"
+              ]
+            },
+            "uncertainty": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "No evaluable uncertainty observation or substantive claim is supplied. The frozen rubric assigns 1 for omission.",
+              "observationIds": [
+                "sample-02-T1",
+                "sample-02-B1"
+              ]
+            }
+          },
+          "usefulAndGrounded": false,
+          "hasSubstantiveVisualContradiction": false,
+          "criticalFailures": [],
+          "claims": [],
+          "notes": [
+            "Unqualified 'Yes' does not answer this descriptive task or provide an evaluable image claim."
+          ],
+          "usefulnessReason": "No specific supported image observation."
+        }
+      ],
+      "pairedComparison": {
+        "higherScoringAnonymousLabel": "Model A",
+        "scoreDifferenceAMinusB": 2,
+        "interpretation": "Case-specific labels only; no model identity or cross-case A/B aggregation is inferred."
+      },
+      "analyzedImage": {
+        "sha256": "dbc58d98a440d77e7db3169fcd7531e6e58a789e680b93917fd642c9fcf3dd26",
+        "path": "docs/benchmarks/0.25.0-core-ai/images/sample-02.png"
+      }
+    },
+    {
+      "caseId": "sample-03",
+      "outputs": [
+        {
+          "caseId": "sample-03",
+          "anonymousLabel": "Model A",
+          "status": "completed",
+          "text": "Yes.",
+          "outputLimitReached": false,
+          "nonresponsive": true,
+          "totalScore": 4,
+          "maxScore": 8,
+          "categoryScores": {
+            "colour": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "No evaluable colour observation or substantive claim is supplied. The frozen rubric assigns 1 for omission.",
+              "observationIds": [
+                "sample-03-C1"
+              ]
+            },
+            "texture": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "No evaluable texture observation or substantive claim is supplied. The frozen rubric assigns 1 for omission.",
+              "observationIds": [
+                "sample-03-T1",
+                "sample-03-T2"
+              ]
+            },
+            "boundary": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "No evaluable boundary observation or substantive claim is supplied. The frozen rubric assigns 1 for omission.",
+              "observationIds": [
+                "sample-03-B1"
+              ]
+            },
+            "uncertainty": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "No evaluable uncertainty observation or substantive claim is supplied. The frozen rubric assigns 1 for omission.",
+              "observationIds": [
+                "sample-03-T1",
+                "sample-03-B1"
+              ]
+            }
+          },
+          "usefulAndGrounded": false,
+          "hasSubstantiveVisualContradiction": false,
+          "criticalFailures": [],
+          "claims": [],
+          "notes": [
+            "Unqualified 'Yes' does not answer this descriptive task or provide an evaluable image claim."
+          ],
+          "usefulnessReason": "No specific supported image observation."
+        },
+        {
+          "caseId": "sample-03",
+          "anonymousLabel": "Model B",
+          "status": "completed",
+          "text": "- **Colour**: The dominant hue is a pale, muted grey with subtle variations in tone ranging from light silver-grey to slightly darker greys. There are fainter areas of off-white or very light gray that blend into the background.\n- **Texture**: The surface exhibits a rough, mottled appearance typical of stone or concrete. It displays fine lines, scratches, and uneven surface imperfections rather than smooth planes.\n- **Visible Edges/Gaps**: The image appears to be a continuous close-up of a single object; there are no distinct gaps between individual pieces or clear outlines separating different parts of the material.",
+          "outputLimitReached": false,
+          "nonresponsive": false,
+          "totalScore": 5,
+          "maxScore": 8,
+          "categoryScores": {
+            "colour": {
+              "score": 2,
+              "maxScore": 2,
+              "reason": "Pale/muted gray and lighter tonal variations match the surface.",
+              "observationIds": [
+                "sample-03-C1"
+              ]
+            },
+            "texture": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "Mottling and fine lines are supported, but classifying the lines as scratches and calling their origin typical of stone/concrete exceeds the reference.",
+              "observationIds": [
+                "sample-03-T1",
+                "sample-03-T2"
+              ]
+            },
+            "boundary": {
+              "score": 2,
+              "maxScore": 2,
+              "reason": "Correctly describes the continuous close-up without clear gaps between pieces.",
+              "observationIds": [
+                "sample-03-B1"
+              ]
+            },
+            "uncertainty": {
+              "score": 0,
+              "maxScore": 2,
+              "reason": "Calls ambiguous lines scratches without qualifying that their origin is unresolved.",
+              "observationIds": [
+                "sample-03-T1",
+                "sample-03-T2",
+                "sample-03-B1"
+              ]
+            }
+          },
+          "usefulAndGrounded": true,
+          "hasSubstantiveVisualContradiction": false,
+          "criticalFailures": [],
+          "claims": [
+            {
+              "id": "sample-03-B-claim-01",
+              "quote": "a pale, muted grey",
+              "classification": "supported-visually",
+              "reason": "The main surface has muted gray tones.",
+              "observationIds": [
+                "sample-03-C1"
+              ]
+            },
+            {
+              "id": "sample-03-B-claim-02",
+              "quote": "variations in tone ranging from light silver-grey to slightly darker greys",
+              "classification": "supported-visually",
+              "reason": "Lighter and darker streaks are visible.",
+              "observationIds": [
+                "sample-03-C1",
+                "sample-03-T1"
+              ]
+            },
+            {
+              "id": "sample-03-B-claim-03",
+              "quote": "off-white or very light gray",
+              "classification": "supported-visually",
+              "reason": "Pale streaks and mottles occur in the crop.",
+              "observationIds": [
+                "sample-03-C1",
+                "sample-03-T1"
+              ]
+            },
+            {
+              "id": "sample-03-B-claim-04",
+              "quote": "a rough, mottled appearance",
+              "classification": "supported-visually",
+              "reason": "The surface appears mottled and uneven in tone; this is not a physical roughness measurement.",
+              "observationIds": [
+                "sample-03-T1"
+              ]
+            },
+            {
+              "id": "sample-03-B-claim-05",
+              "quote": "typical of stone or concrete",
+              "classification": "not-verifiable-from-crop",
+              "reason": "This is a material analogy rather than a verified material identification.",
+              "observationIds": [
+                "sample-03-T1"
+              ]
+            },
+            {
+              "id": "sample-03-B-claim-06",
+              "quote": "fine lines",
+              "classification": "supported-visually",
+              "reason": "Many fine lines are visible.",
+              "observationIds": [
+                "sample-03-T1",
+                "sample-03-T2"
+              ]
+            },
+            {
+              "id": "sample-03-B-claim-07",
+              "quote": "scratches",
+              "classification": "not-verifiable-from-crop",
+              "reason": "The reference cannot distinguish scratch origin from other causes of the visible streaks.",
+              "observationIds": [
+                "sample-03-T1",
+                "sample-03-T2"
+              ]
+            },
+            {
+              "id": "sample-03-B-claim-08",
+              "quote": "uneven surface imperfections rather than smooth planes",
+              "classification": "not-verifiable-from-crop",
+              "reason": "Tone and line variation are visible, but actual surface relief cannot be determined confidently.",
+              "observationIds": [
+                "sample-03-T1",
+                "sample-03-T2"
+              ]
+            },
+            {
+              "id": "sample-03-B-claim-09",
+              "quote": "a continuous close-up of a single object",
+              "classification": "supported-visually",
+              "reason": "The crop shows a continuous surface without separable large pieces.",
+              "observationIds": [
+                "sample-03-B1"
+              ]
+            },
+            {
+              "id": "sample-03-B-claim-10",
+              "quote": "no distinct gaps between individual pieces or clear outlines separating different parts",
+              "classification": "supported-visually",
+              "reason": "No clearly open separating gap is visible.",
+              "observationIds": [
+                "sample-03-B1"
+              ]
+            }
+          ],
+          "notes": [
+            "Meets the frozen minimum usefulness rule because it supplies specific supported details and no substantive visual contradiction or critical claim. It is not fully grounded: the scratch/material interpretations are unverified."
+          ],
+          "usefulnessReason": "At least one specific supported visual observation, no substantive visual contradiction, and no critical failure; separately listed noncritical unverified claims are not excused."
+        }
+      ],
+      "pairedComparison": {
+        "higherScoringAnonymousLabel": "Model B",
+        "scoreDifferenceAMinusB": -1,
+        "interpretation": "Case-specific labels only; no model identity or cross-case A/B aggregation is inferred."
+      },
+      "analyzedImage": {
+        "sha256": "fd8e3f2cd49c8752a622690df1c32bafe6ea9bc3d8a6512e9f7a276fde4910ba",
+        "path": "docs/benchmarks/0.25.0-core-ai/images/sample-03.png"
+      }
+    },
+    {
+      "caseId": "sample-04",
+      "outputs": [
+        {
+          "caseId": "sample-04",
+          "anonymousLabel": "Model A",
+          "status": "completed",
+          "text": "The image displays a pale, featureless surface with no discernible geological structure, mineral composition, or physical characteristics such as fractures or hardness. The texture appears uniform and lacks any distinct patterns, suggesting an abstract representation rather than a natural object like rock.",
+          "outputLimitReached": false,
+          "nonresponsive": false,
+          "totalScore": 2,
+          "maxScore": 8,
+          "categoryScores": {
+            "colour": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "Pale is broadly correct but omits the visible gray/cream and tan/dark variation.",
+              "observationIds": [
+                "sample-04-C1"
+              ]
+            },
+            "texture": {
+              "score": 0,
+              "maxScore": 2,
+              "reason": "Calling the surface featureless, uniform and without distinct patterns contradicts the visible mottling, dark marks and tan upper-right patch.",
+              "observationIds": [
+                "sample-04-T1",
+                "sample-04-T2"
+              ]
+            },
+            "boundary": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "No clear fracture is established, but the distinct edge of the upper-right patch is omitted.",
+              "observationIds": [
+                "sample-04-B1"
+              ]
+            },
+            "uncertainty": {
+              "score": 0,
+              "maxScore": 2,
+              "reason": "Suggests an abstract representation instead of acknowledging an unresolved natural-looking surface with visible features.",
+              "observationIds": [
+                "sample-04-T1",
+                "sample-04-T2"
+              ]
+            }
+          },
+          "usefulAndGrounded": false,
+          "hasSubstantiveVisualContradiction": true,
+          "criticalFailures": [],
+          "claims": [
+            {
+              "id": "sample-04-A-claim-01",
+              "quote": "a pale",
+              "classification": "supported-visually",
+              "reason": "The main surface is light gray/cream.",
+              "observationIds": [
+                "sample-04-C1"
+              ]
+            },
+            {
+              "id": "sample-04-A-claim-02",
+              "quote": "featureless surface",
+              "classification": "contradicted-visually",
+              "reason": "The image has clear speckling, dark marks and a tan patch.",
+              "observationIds": [
+                "sample-04-T1",
+                "sample-04-T2"
+              ]
+            },
+            {
+              "id": "sample-04-A-claim-03",
+              "quote": "no discernible geological structure",
+              "classification": "appropriate-abstention",
+              "reason": "No diagnostic geological structure is established by this tight surface crop.",
+              "observationIds": [
+                "sample-04-T1",
+                "sample-04-T2"
+              ]
+            },
+            {
+              "id": "sample-04-A-claim-04",
+              "quote": "no discernible ... mineral composition",
+              "classification": "appropriate-abstention",
+              "reason": "Mineral composition cannot be identified from this view.",
+              "observationIds": [
+                "sample-04-T1",
+                "sample-04-T2"
+              ]
+            },
+            {
+              "id": "sample-04-A-claim-05",
+              "quote": "physical characteristics such as fractures or hardness",
+              "classification": "appropriate-abstention",
+              "reason": "No clear open fracture is demonstrated and hardness is not visually determinable. This is not a hardness prediction.",
+              "observationIds": [
+                "sample-04-B1"
+              ]
+            },
+            {
+              "id": "sample-04-A-claim-06",
+              "quote": "The texture appears uniform and lacks any distinct patterns",
+              "classification": "contradicted-visually",
+              "reason": "The mottling and localized tan feature are distinct visible patterns.",
+              "observationIds": [
+                "sample-04-T1",
+                "sample-04-T2"
+              ]
+            },
+            {
+              "id": "sample-04-A-claim-07",
+              "quote": "an abstract representation rather than a natural object like rock",
+              "classification": "not-verifiable-from-crop",
+              "reason": "The crop does not establish an abstract or artificially generated origin; the inference is unjustified.",
+              "observationIds": [
+                "sample-04-T1",
+                "sample-04-T2"
+              ]
+            }
+          ],
+          "notes": [
+            "Negated mineral composition and hardness statements are abstentions, not critical property predictions."
+          ],
+          "usefulnessReason": "Has a substantive contradiction with the image, despite some correct content."
+        },
+        {
+          "caseId": "sample-04",
+          "anonymousLabel": "Model B",
+          "status": "completed",
+          "text": "Yes.",
+          "outputLimitReached": false,
+          "nonresponsive": true,
+          "totalScore": 4,
+          "maxScore": 8,
+          "categoryScores": {
+            "colour": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "No evaluable colour observation or substantive claim is supplied. The frozen rubric assigns 1 for omission.",
+              "observationIds": [
+                "sample-04-C1"
+              ]
+            },
+            "texture": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "No evaluable texture observation or substantive claim is supplied. The frozen rubric assigns 1 for omission.",
+              "observationIds": [
+                "sample-04-T1",
+                "sample-04-T2"
+              ]
+            },
+            "boundary": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "No evaluable boundary observation or substantive claim is supplied. The frozen rubric assigns 1 for omission.",
+              "observationIds": [
+                "sample-04-B1"
+              ]
+            },
+            "uncertainty": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "No evaluable uncertainty observation or substantive claim is supplied. The frozen rubric assigns 1 for omission.",
+              "observationIds": [
+                "sample-04-T1",
+                "sample-04-B1"
+              ]
+            }
+          },
+          "usefulAndGrounded": false,
+          "hasSubstantiveVisualContradiction": false,
+          "criticalFailures": [],
+          "claims": [],
+          "notes": [
+            "Unqualified 'Yes' does not answer this descriptive task or provide an evaluable image claim."
+          ],
+          "usefulnessReason": "No specific supported image observation."
+        }
+      ],
+      "pairedComparison": {
+        "higherScoringAnonymousLabel": "Model B",
+        "scoreDifferenceAMinusB": -2,
+        "interpretation": "Case-specific labels only; no model identity or cross-case A/B aggregation is inferred."
+      },
+      "analyzedImage": {
+        "sha256": "b4f67963f7f5d27b48a81bfd6b8c293475c13cd637a25f2e2c45eeeaa61ae636",
+        "path": "docs/benchmarks/0.25.0-core-ai/images/sample-04.png"
+      }
+    },
+    {
+      "caseId": "sample-05",
+      "outputs": [
+        {
+          "caseId": "sample-05",
+          "anonymousLabel": "Model A",
+          "status": "completed",
+          "text": "- The surface displays a uniform, light greyish-grey tone with no distinct color variations.\n- The texture appears consistent across the entire frame, featuring a fine, mottled pattern without any obvious irregularities.\n- There are no discernible edges, borders, or gaps in the visual field; the image presents as a continuous, featureless area.",
+          "outputLimitReached": false,
+          "nonresponsive": false,
+          "totalScore": 3,
+          "maxScore": 8,
+          "categoryScores": {
+            "colour": {
+              "score": 0,
+              "maxScore": 2,
+              "reason": "Light grayish-gray with no color variations contradicts the warm brown/tan surface and pale flecks.",
+              "observationIds": [
+                "sample-05-C1",
+                "sample-05-T2"
+              ]
+            },
+            "texture": {
+              "score": 0,
+              "maxScore": 2,
+              "reason": "Fine mottling is correctly identified, but the final 'featureless' description contradicts that visible pattern and the bright flecks. The frozen rubric gives 0 for a substantive texture contradiction.",
+              "observationIds": [
+                "sample-05-T1",
+                "sample-05-T2"
+              ]
+            },
+            "boundary": {
+              "score": 2,
+              "maxScore": 2,
+              "reason": "Correctly notes no clear internal boundary or open separating gap.",
+              "observationIds": [
+                "sample-05-B1"
+              ]
+            },
+            "uncertainty": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "Avoids geological inference but gives no acknowledgement of the tight crop or unresolved material identity.",
+              "observationIds": [
+                "sample-05-T1",
+                "sample-05-B1"
+              ]
+            }
+          },
+          "usefulAndGrounded": false,
+          "hasSubstantiveVisualContradiction": true,
+          "criticalFailures": [],
+          "claims": [
+            {
+              "id": "sample-05-A-claim-01",
+              "quote": "a uniform, light greyish-grey tone",
+              "classification": "contradicted-visually",
+              "reason": "The main color is warm tan/brown rather than light gray.",
+              "observationIds": [
+                "sample-05-C1"
+              ]
+            },
+            {
+              "id": "sample-05-A-claim-02",
+              "quote": "no distinct color variations",
+              "classification": "contradicted-visually",
+              "reason": "Small bright flecks and darker shading are visible.",
+              "observationIds": [
+                "sample-05-C1",
+                "sample-05-T2"
+              ]
+            },
+            {
+              "id": "sample-05-A-claim-03",
+              "quote": "texture appears consistent across the entire frame",
+              "classification": "supported-visually",
+              "reason": "There is a broadly continuous fine texture across the image.",
+              "observationIds": [
+                "sample-05-T1"
+              ]
+            },
+            {
+              "id": "sample-05-A-claim-04",
+              "quote": "a fine, mottled pattern",
+              "classification": "supported-visually",
+              "reason": "Fine mottling is clearly visible.",
+              "observationIds": [
+                "sample-05-T1"
+              ]
+            },
+            {
+              "id": "sample-05-A-claim-05",
+              "quote": "without any obvious irregularities",
+              "classification": "supported-visually",
+              "reason": "No large discontinuity is visible; small specks remain present and this is interpreted as a broad texture statement.",
+              "observationIds": [
+                "sample-05-T1",
+                "sample-05-B1"
+              ]
+            },
+            {
+              "id": "sample-05-A-claim-06",
+              "quote": "no discernible edges, borders, or gaps",
+              "classification": "supported-visually",
+              "reason": "No specimen outline or broad open internal gap is clear.",
+              "observationIds": [
+                "sample-05-B1"
+              ]
+            },
+            {
+              "id": "sample-05-A-claim-07",
+              "quote": "a continuous, featureless area",
+              "classification": "contradicted-visually",
+              "reason": "Continuous is supported, but featureless ignores the fine mottling and bright specks.",
+              "observationIds": [
+                "sample-05-T1",
+                "sample-05-T2",
+                "sample-05-B1"
+              ]
+            }
+          ],
+          "notes": [
+            "Specific texture support does not cancel the substantive color error."
+          ],
+          "usefulnessReason": "Has a substantive contradiction with the image, despite some correct content."
+        },
+        {
+          "caseId": "sample-05",
+          "anonymousLabel": "Model B",
+          "status": "completed",
+          "text": "**Image Description**\n\nThe image displays a close-up view of the ground surface with an uneven texture. The ground appears to be made of a light brown material, possibly mulch or grass. There are no discernible patterns or textures on the ground, making it seem like a natural, unaltered surface.\n\nThe ground's color is predominantly light brown, which could indicate that it might be made of mulch or grass. The ground seems to have some small gaps or irregularities in its texture, but they are not very prominent.\n\nThe ground is not covered by any other objects or structures. It is the main focus",
+          "outputLimitReached": true,
+          "nonresponsive": false,
+          "totalScore": 2,
+          "maxScore": 8,
+          "categoryScores": {
+            "colour": {
+              "score": 2,
+              "maxScore": 2,
+              "reason": "Light brown broadly matches the actual warm brown/tan color.",
+              "observationIds": [
+                "sample-05-C1"
+              ]
+            },
+            "texture": {
+              "score": 0,
+              "maxScore": 2,
+              "reason": "Denies discernible texture despite visible fine mottling and speckling.",
+              "observationIds": [
+                "sample-05-T1",
+                "sample-05-T2"
+              ]
+            },
+            "boundary": {
+              "score": 0,
+              "maxScore": 2,
+              "reason": "Introduces small gaps without a visible basis.",
+              "observationIds": [
+                "sample-05-B1"
+              ]
+            },
+            "uncertainty": {
+              "score": 0,
+              "maxScore": 2,
+              "reason": "Infers a ground surface, possible mulch/grass and a natural unaltered state from a tightly cropped ambiguous surface.",
+              "observationIds": [
+                "sample-05-T1",
+                "sample-05-B1"
+              ]
+            }
+          },
+          "usefulAndGrounded": false,
+          "hasSubstantiveVisualContradiction": true,
+          "criticalFailures": [],
+          "claims": [
+            {
+              "id": "sample-05-B-claim-01",
+              "quote": "a close-up view",
+              "classification": "supported-visually",
+              "reason": "The image is a tight surface crop.",
+              "observationIds": [
+                "sample-05-T1",
+                "sample-05-B1"
+              ]
+            },
+            {
+              "id": "sample-05-B-claim-02",
+              "quote": "the ground surface",
+              "classification": "not-verifiable-from-crop",
+              "reason": "The crop provides no wider scene establishing ground or its orientation.",
+              "observationIds": [
+                "sample-05-B1"
+              ]
+            },
+            {
+              "id": "sample-05-B-claim-03",
+              "quote": "an uneven texture",
+              "classification": "supported-visually",
+              "reason": "Fine uneven tonal texture is present.",
+              "observationIds": [
+                "sample-05-T1"
+              ]
+            },
+            {
+              "id": "sample-05-B-claim-04",
+              "quote": "a light brown material",
+              "classification": "supported-visually",
+              "reason": "The image is warm tan/brown.",
+              "observationIds": [
+                "sample-05-C1"
+              ]
+            },
+            {
+              "id": "sample-05-B-claim-05",
+              "quote": "possibly mulch or grass",
+              "classification": "not-verifiable-from-crop",
+              "reason": "No visible blades, fibers or diagnostic mulch features establish these materials.",
+              "observationIds": [
+                "sample-05-T1",
+                "sample-05-T2"
+              ]
+            },
+            {
+              "id": "sample-05-B-claim-06",
+              "quote": "There are no discernible patterns or textures",
+              "classification": "contradicted-visually",
+              "reason": "A fine mottled pattern and pale flecks are discernible.",
+              "observationIds": [
+                "sample-05-T1",
+                "sample-05-T2"
+              ]
+            },
+            {
+              "id": "sample-05-B-claim-07",
+              "quote": "a natural, unaltered surface",
+              "classification": "not-verifiable-from-crop",
+              "reason": "Natural origin and alteration history cannot be determined from the crop.",
+              "observationIds": [
+                "sample-05-T1"
+              ]
+            },
+            {
+              "id": "sample-05-B-claim-08",
+              "quote": "The ground's color is predominantly light brown",
+              "classification": "supported-visually",
+              "reason": "The color clause matches; calling it ground remains unverified.",
+              "observationIds": [
+                "sample-05-C1"
+              ]
+            },
+            {
+              "id": "sample-05-B-claim-09",
+              "quote": "which could indicate that it might be made of mulch or grass",
+              "classification": "not-verifiable-from-crop",
+              "reason": "Brown color does not establish those materials.",
+              "observationIds": [
+                "sample-05-C1",
+                "sample-05-T1"
+              ]
+            },
+            {
+              "id": "sample-05-B-claim-10",
+              "quote": "some small gaps or irregularities in its texture",
+              "classification": "not-verifiable-from-crop",
+              "reason": "Fine texture variation exists, but actual small gaps are not resolved.",
+              "observationIds": [
+                "sample-05-T1",
+                "sample-05-B1"
+              ]
+            },
+            {
+              "id": "sample-05-B-claim-11",
+              "quote": "they are not very prominent",
+              "classification": "not-verifiable-from-crop",
+              "reason": "This qualification does not establish the existence of the asserted gaps.",
+              "observationIds": [
+                "sample-05-B1"
+              ]
+            },
+            {
+              "id": "sample-05-B-claim-12",
+              "quote": "not covered by any other objects or structures",
+              "classification": "supported-visually",
+              "reason": "No distinct overlying object is identifiable inside this crop; this does not establish the surrounding scene.",
+              "observationIds": [
+                "sample-05-B1"
+              ]
+            }
+          ],
+          "notes": [
+            "Token cap reached and final sentence is incomplete. The ground/mulch/grass claims are unsupported non-geotechnical interpretations, not mineral or strength predictions; no critical geological flag is assigned."
+          ],
+          "usefulnessReason": "Has a substantive contradiction with the image, despite some correct content."
+        }
+      ],
+      "pairedComparison": {
+        "higherScoringAnonymousLabel": "Model A",
+        "scoreDifferenceAMinusB": 1,
+        "interpretation": "Case-specific labels only; no model identity or cross-case A/B aggregation is inferred."
+      },
+      "analyzedImage": {
+        "sha256": "b74cdfaecfb8efc5686abce5fe77296010854a9909f60f019b1b0b1ea8ab8440",
+        "path": "docs/benchmarks/0.25.0-core-ai/images/sample-05.png"
+      }
+    },
+    {
+      "caseId": "sample-06",
+      "outputs": [
+        {
+          "caseId": "sample-06",
+          "anonymousLabel": "Model A",
+          "status": "completed",
+          "text": "**Image Description**\n\nThe image displays a close-up view of the surface of a rock with a rough texture. The rock appears to be unevenly shaped, with visible cracks and crevices. The surface shows a mix of colors, primarily browns and blacks, which are indicative of the natural mineral composition. There are some small white specks scattered across the surface, possibly representing mineral deposits or other impurities.\n\nThe edges of the rock are somewhat blurred, suggesting that the focus remains on the main body of the rock. The edges also hint at the presence of cracks, which might indicate the nature of the rock's structure.",
+          "outputLimitReached": true,
+          "nonresponsive": false,
+          "totalScore": 2,
+          "maxScore": 8,
+          "categoryScores": {
+            "colour": {
+              "score": 2,
+              "maxScore": 2,
+              "reason": "Brown and black are supported broad colors.",
+              "observationIds": [
+                "sample-06-C1"
+              ]
+            },
+            "texture": {
+              "score": 0,
+              "maxScore": 2,
+              "reason": "A confident rough, unevenly shaped rock description and distinct white-speck detail exceed what this dark crop resolves.",
+              "observationIds": [
+                "sample-06-T2"
+              ]
+            },
+            "boundary": {
+              "score": 0,
+              "maxScore": 2,
+              "reason": "Claims cracks, crevices and blurred rock edges where only ambiguous diagonal lines and a cropped surface are established.",
+              "observationIds": [
+                "sample-06-T1",
+                "sample-06-B1"
+              ]
+            },
+            "uncertainty": {
+              "score": 0,
+              "maxScore": 2,
+              "reason": "Infers mineral composition/deposits and structure from unresolved low-contrast features.",
+              "observationIds": [
+                "sample-06-C1",
+                "sample-06-T1",
+                "sample-06-T2",
+                "sample-06-B1"
+              ]
+            }
+          },
+          "usefulAndGrounded": false,
+          "hasSubstantiveVisualContradiction": false,
+          "criticalFailures": [
+            {
+              "code": "unsupported-mineral-interpretation",
+              "quotes": [
+                "indicative of the natural mineral composition",
+                "possibly representing mineral deposits or other impurities"
+              ],
+              "reason": "Infers mineral composition/deposits from color and unresolved specks despite the fixed task prohibiting mineral inference. No specific mineral name is needed for the unsupported mineral-versus-impurity interpretation to exceed the task.",
+              "observationIds": [
+                "sample-06-C1",
+                "sample-06-T2"
+              ]
+            }
+          ],
+          "claims": [
+            {
+              "id": "sample-06-A-claim-01",
+              "quote": "a close-up view of the surface",
+              "classification": "supported-visually",
+              "reason": "This is a tight surface crop.",
+              "observationIds": [
+                "sample-06-T1",
+                "sample-06-T2"
+              ]
+            },
+            {
+              "id": "sample-06-A-claim-02",
+              "quote": "of a rock",
+              "classification": "not-verifiable-from-crop",
+              "reason": "The appearance is compatible with rock, but this dark crop does not establish material identity by itself.",
+              "observationIds": [
+                "sample-06-T2"
+              ]
+            },
+            {
+              "id": "sample-06-A-claim-03",
+              "quote": "with a rough texture",
+              "classification": "not-verifiable-from-crop",
+              "reason": "Low contrast does not reliably establish physical surface roughness.",
+              "observationIds": [
+                "sample-06-T2"
+              ]
+            },
+            {
+              "id": "sample-06-A-claim-04",
+              "quote": "unevenly shaped",
+              "classification": "not-verifiable-from-crop",
+              "reason": "The complete object boundary is not present.",
+              "observationIds": [
+                "sample-06-B1"
+              ]
+            },
+            {
+              "id": "sample-06-A-claim-05",
+              "quote": "visible cracks and crevices",
+              "classification": "not-verifiable-from-crop",
+              "reason": "The diagonal dark lines do not reliably establish open gaps or cracks.",
+              "observationIds": [
+                "sample-06-T1",
+                "sample-06-B1"
+              ]
+            },
+            {
+              "id": "sample-06-A-claim-06",
+              "quote": "primarily browns and blacks",
+              "classification": "supported-visually",
+              "reason": "Dark brown and charcoal/black tones are visible.",
+              "observationIds": [
+                "sample-06-C1"
+              ]
+            },
+            {
+              "id": "sample-06-A-claim-07",
+              "quote": "indicative of the natural mineral composition",
+              "classification": "not-verifiable-from-crop",
+              "reason": "Color alone cannot establish mineral composition or its cause.",
+              "observationIds": [
+                "sample-06-C1"
+              ]
+            },
+            {
+              "id": "sample-06-A-claim-08",
+              "quote": "small white specks scattered across the surface",
+              "classification": "not-verifiable-from-crop",
+              "reason": "Faint speckling is present, but distinct scattered white specks are not reliably resolved in this dark crop.",
+              "observationIds": [
+                "sample-06-T2"
+              ]
+            },
+            {
+              "id": "sample-06-A-claim-09",
+              "quote": "possibly representing mineral deposits or other impurities",
+              "classification": "not-verifiable-from-crop",
+              "reason": "Neither mineral deposits nor impurities can be established; hedging does not supply evidence.",
+              "observationIds": [
+                "sample-06-T2"
+              ]
+            },
+            {
+              "id": "sample-06-A-claim-10",
+              "quote": "The edges of the rock are somewhat blurred",
+              "classification": "not-verifiable-from-crop",
+              "reason": "No full rock outline is shown; source blur cannot identify object edges.",
+              "observationIds": [
+                "sample-06-B1"
+              ]
+            },
+            {
+              "id": "sample-06-A-claim-11",
+              "quote": "the focus remains on the main body of the rock",
+              "classification": "not-verifiable-from-crop",
+              "reason": "Camera intent/focus and a complete body are not established.",
+              "observationIds": [
+                "sample-06-B1"
+              ]
+            },
+            {
+              "id": "sample-06-A-claim-12",
+              "quote": "The edges also hint at the presence of cracks",
+              "classification": "not-verifiable-from-crop",
+              "reason": "No reliably identified edges or cracks support this inference.",
+              "observationIds": [
+                "sample-06-B1"
+              ]
+            },
+            {
+              "id": "sample-06-A-claim-13",
+              "quote": "which might indicate the nature of the rock's structure",
+              "classification": "not-verifiable-from-crop",
+              "reason": "Internal or geological structure is not established from the ambiguous dark lines.",
+              "observationIds": [
+                "sample-06-T1",
+                "sample-06-B1"
+              ]
+            }
+          ],
+          "notes": [
+            "Token cap reached even though the displayed final sentence ends with punctuation. Crack claims are unsupported geometry, but no explicit natural-versus-mechanical fracture origin is asserted; do not add an origin flag."
+          ],
+          "usefulnessReason": "Has a critical unsupported mineral inference."
+        },
+        {
+          "caseId": "sample-06",
+          "anonymousLabel": "Model B",
+          "status": "completed",
+          "text": "- **Colour**: The dominant hue appears as a muted grayish-brown with subtle variations in tone across the surface.\n- **Texture**: The material displays a coarse, granular appearance with fine, irregular lines running diagonally through the frame.\n- **Visible Edges/Gaps**: There are faint diagonal striations suggesting a layered structure, though no distinct solid boundaries or clear gaps can be definitively identified due to the low resolution.",
+          "outputLimitReached": false,
+          "nonresponsive": false,
+          "totalScore": 5,
+          "maxScore": 8,
+          "categoryScores": {
+            "colour": {
+              "score": 2,
+              "maxScore": 2,
+              "reason": "Muted grayish-brown and tonal variation match the visible colors.",
+              "observationIds": [
+                "sample-06-C1"
+              ]
+            },
+            "texture": {
+              "score": 0,
+              "maxScore": 2,
+              "reason": "Diagonal fine lines are supported, but coarse granular detail is not resolved; the texture score reflects unjustified detail rather than a proven physical grain size.",
+              "observationIds": [
+                "sample-06-T1",
+                "sample-06-T2"
+              ]
+            },
+            "boundary": {
+              "score": 2,
+              "maxScore": 2,
+              "reason": "Correctly identifies diagonal striations and avoids claiming definite open gaps.",
+              "observationIds": [
+                "sample-06-T1",
+                "sample-06-B1"
+              ]
+            },
+            "uncertainty": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "Acknowledges low resolution and uncertain boundaries, but the layered-structure suggestion goes beyond the visible lines.",
+              "observationIds": [
+                "sample-06-T1",
+                "sample-06-T2",
+                "sample-06-B1"
+              ]
+            }
+          },
+          "usefulAndGrounded": true,
+          "hasSubstantiveVisualContradiction": false,
+          "criticalFailures": [],
+          "claims": [
+            {
+              "id": "sample-06-B-claim-01",
+              "quote": "a muted grayish-brown",
+              "classification": "supported-visually",
+              "reason": "The surface has muted brown/gray tones.",
+              "observationIds": [
+                "sample-06-C1"
+              ]
+            },
+            {
+              "id": "sample-06-B-claim-02",
+              "quote": "subtle variations in tone",
+              "classification": "supported-visually",
+              "reason": "Low-contrast bands and mottling vary in shade.",
+              "observationIds": [
+                "sample-06-C1",
+                "sample-06-T2"
+              ]
+            },
+            {
+              "id": "sample-06-B-claim-03",
+              "quote": "a coarse, granular appearance",
+              "classification": "not-verifiable-from-crop",
+              "reason": "The crop supports faint fine speckling, but does not resolve coarse grains.",
+              "observationIds": [
+                "sample-06-T2"
+              ]
+            },
+            {
+              "id": "sample-06-B-claim-04",
+              "quote": "fine, irregular lines running diagonally",
+              "classification": "supported-visually",
+              "reason": "Diagonal near-parallel lines are visible.",
+              "observationIds": [
+                "sample-06-T1"
+              ]
+            },
+            {
+              "id": "sample-06-B-claim-05",
+              "quote": "faint diagonal striations",
+              "classification": "supported-visually",
+              "reason": "Low-contrast diagonal streaks are visible.",
+              "observationIds": [
+                "sample-06-T1"
+              ]
+            },
+            {
+              "id": "sample-06-B-claim-06",
+              "quote": "suggesting a layered structure",
+              "classification": "not-verifiable-from-crop",
+              "reason": "A layered geological or material structure is not established by the stripe pattern.",
+              "observationIds": [
+                "sample-06-T1"
+              ]
+            },
+            {
+              "id": "sample-06-B-claim-07",
+              "quote": "no distinct solid boundaries or clear gaps can be definitively identified",
+              "classification": "appropriate-abstention",
+              "reason": "The dark lines do not reliably establish open separating gaps.",
+              "observationIds": [
+                "sample-06-B1"
+              ]
+            },
+            {
+              "id": "sample-06-B-claim-08",
+              "quote": "due to the low resolution",
+              "classification": "supported-visually",
+              "reason": "The low-detail crop limits interpretation; low illumination is also material.",
+              "observationIds": [
+                "sample-06-T2"
+              ]
+            }
+          ],
+          "notes": [
+            "Meets the frozen minimum usefulness rule through supported line/color observations and no substantive visual contradiction or critical claim. Coarse grains and layered structure remain unverified; useful does not mean every statement is grounded."
+          ],
+          "usefulnessReason": "At least one specific supported visual observation, no substantive visual contradiction, and no critical failure; separately listed noncritical unverified claims are not excused."
+        }
+      ],
+      "pairedComparison": {
+        "higherScoringAnonymousLabel": "Model B",
+        "scoreDifferenceAMinusB": -3,
+        "interpretation": "Case-specific labels only; no model identity or cross-case A/B aggregation is inferred."
+      },
+      "analyzedImage": {
+        "sha256": "a467ee0ae51878052e51cd39d6ec88f276acfc1a1d8136d9770dbcee264c4c6a",
+        "path": "docs/benchmarks/0.25.0-core-ai/images/sample-06.png"
+      }
+    },
+    {
+      "caseId": "sample-07",
+      "outputs": [
+        {
+          "caseId": "sample-07",
+          "anonymousLabel": "Model A",
+          "status": "completed",
+          "text": "- **Colour**: The surface displays a muted grey tone with subtle variations in shade, creating a soft gradient from lighter areas on the left to darker regions on the right.\n- **Texture**: The material exhibits a fine, vertical striation pattern that resembles wood grain but appears more uniform than typical stone textures.\n- **Visible Edges/Gaps**: There are no distinct borders separating different sections; instead, the entire frame shows continuous, overlapping lines indicating a seamless finish.",
+          "outputLimitReached": false,
+          "nonresponsive": false,
+          "totalScore": 5,
+          "maxScore": 8,
+          "categoryScores": {
+            "colour": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "Muted gray is correct, but a simple left-to-right gradient is not established among the alternating vertical tonal zones.",
+              "observationIds": [
+                "sample-07-C1",
+                "sample-07-T2"
+              ]
+            },
+            "texture": {
+              "score": 2,
+              "maxScore": 2,
+              "reason": "Fine vertical striations are directly supported. Wood-grain wording is a resemblance, not an asserted wood identity.",
+              "observationIds": [
+                "sample-07-T1"
+              ]
+            },
+            "boundary": {
+              "score": 2,
+              "maxScore": 2,
+              "reason": "Correctly describes the lack of clear separating boundaries and continuous lines.",
+              "observationIds": [
+                "sample-07-B1",
+                "sample-07-T1"
+              ]
+            },
+            "uncertainty": {
+              "score": 0,
+              "maxScore": 2,
+              "reason": "Infers a seamless finish and a comparison with typical stone textures without acknowledging unresolved stripe origin.",
+              "observationIds": [
+                "sample-07-T1",
+                "sample-07-T2",
+                "sample-07-B1"
+              ]
+            }
+          },
+          "usefulAndGrounded": true,
+          "hasSubstantiveVisualContradiction": false,
+          "criticalFailures": [],
+          "claims": [
+            {
+              "id": "sample-07-A-claim-01",
+              "quote": "a muted grey tone",
+              "classification": "supported-visually",
+              "reason": "The image is muted gray/blue-gray.",
+              "observationIds": [
+                "sample-07-C1"
+              ]
+            },
+            {
+              "id": "sample-07-A-claim-02",
+              "quote": "subtle variations in shade",
+              "classification": "supported-visually",
+              "reason": "Narrow and broader light/dark zones are visible.",
+              "observationIds": [
+                "sample-07-C1",
+                "sample-07-T2"
+              ]
+            },
+            {
+              "id": "sample-07-A-claim-03",
+              "quote": "a soft gradient from lighter areas on the left to darker regions on the right",
+              "classification": "not-verifiable-from-crop",
+              "reason": "There are alternating zones, not a clearly established consistent left-to-right gradient.",
+              "observationIds": [
+                "sample-07-T2"
+              ]
+            },
+            {
+              "id": "sample-07-A-claim-04",
+              "quote": "a fine, vertical striation pattern",
+              "classification": "supported-visually",
+              "reason": "Dense near-vertical parallel streaks fill the crop.",
+              "observationIds": [
+                "sample-07-T1"
+              ]
+            },
+            {
+              "id": "sample-07-A-claim-05",
+              "quote": "resembles wood grain",
+              "classification": "supported-visually",
+              "reason": "This is a visual analogy for parallel streaks, not a verified material claim.",
+              "observationIds": [
+                "sample-07-T1"
+              ]
+            },
+            {
+              "id": "sample-07-A-claim-06",
+              "quote": "more uniform than typical stone textures",
+              "classification": "not-verifiable-from-crop",
+              "reason": "The crop does not establish a representative comparison with stone textures generally.",
+              "observationIds": [
+                "sample-07-T1"
+              ]
+            },
+            {
+              "id": "sample-07-A-claim-07",
+              "quote": "no distinct borders separating different sections",
+              "classification": "supported-visually",
+              "reason": "No clear gap separating pieces is visible.",
+              "observationIds": [
+                "sample-07-B1"
+              ]
+            },
+            {
+              "id": "sample-07-A-claim-08",
+              "quote": "continuous, overlapping lines",
+              "classification": "not-verifiable-from-crop",
+              "reason": "Continuous parallel streaks are visible, but their physical overlap is not established.",
+              "observationIds": [
+                "sample-07-T1"
+              ]
+            },
+            {
+              "id": "sample-07-A-claim-09",
+              "quote": "indicating a seamless finish",
+              "classification": "not-verifiable-from-crop",
+              "reason": "An applied finish or seamless manufactured surface is not established.",
+              "observationIds": [
+                "sample-07-T1",
+                "sample-07-B1"
+              ]
+            }
+          ],
+          "notes": [
+            "Meets the frozen minimum usefulness rule, with several unsupported noncritical interpretations still listed. No wood species, lithology or fracture origin is asserted."
+          ],
+          "usefulnessReason": "At least one specific supported visual observation, no substantive visual contradiction, and no critical failure; separately listed noncritical unverified claims are not excused."
+        },
+        {
+          "caseId": "sample-07",
+          "anonymousLabel": "Model B",
+          "status": "completed",
+          "text": "Yes.",
+          "outputLimitReached": false,
+          "nonresponsive": true,
+          "totalScore": 4,
+          "maxScore": 8,
+          "categoryScores": {
+            "colour": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "No evaluable colour observation or substantive claim is supplied. The frozen rubric assigns 1 for omission.",
+              "observationIds": [
+                "sample-07-C1"
+              ]
+            },
+            "texture": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "No evaluable texture observation or substantive claim is supplied. The frozen rubric assigns 1 for omission.",
+              "observationIds": [
+                "sample-07-T1",
+                "sample-07-T2"
+              ]
+            },
+            "boundary": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "No evaluable boundary observation or substantive claim is supplied. The frozen rubric assigns 1 for omission.",
+              "observationIds": [
+                "sample-07-B1"
+              ]
+            },
+            "uncertainty": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "No evaluable uncertainty observation or substantive claim is supplied. The frozen rubric assigns 1 for omission.",
+              "observationIds": [
+                "sample-07-T1",
+                "sample-07-B1"
+              ]
+            }
+          },
+          "usefulAndGrounded": false,
+          "hasSubstantiveVisualContradiction": false,
+          "criticalFailures": [],
+          "claims": [],
+          "notes": [
+            "Unqualified 'Yes' does not answer this descriptive task or provide an evaluable image claim."
+          ],
+          "usefulnessReason": "No specific supported image observation."
+        }
+      ],
+      "pairedComparison": {
+        "higherScoringAnonymousLabel": "Model A",
+        "scoreDifferenceAMinusB": 1,
+        "interpretation": "Case-specific labels only; no model identity or cross-case A/B aggregation is inferred."
+      },
+      "analyzedImage": {
+        "sha256": "7e481b01869c9d86d7f3cc80b8150797baec23c9cecf46ef7ecb961396b52d30",
+        "path": "docs/benchmarks/0.25.0-core-ai/images/sample-07.png"
+      }
+    },
+    {
+      "caseId": "sample-08",
+      "outputs": [
+        {
+          "caseId": "sample-08",
+          "anonymousLabel": "Model A",
+          "status": "completed",
+          "text": "- **Color**: The dominant color is a muted grayish-brown with darker streaks running vertically through the center. There are lighter areas on the left side that appear slightly whiter or off-white compared to the surrounding brown tones.\n- **Texture**: The surface displays a mottled pattern where the colors blend into one another in irregular ways, creating a rough, uneven appearance rather than a smooth finish.\n- **Visible Edges/Gaps**: On the far left edge, there appears to be a distinct gap or separation from the main body of the object, which contrasts sharply with the continuous lines seen further right.",
+          "outputLimitReached": false,
+          "nonresponsive": false,
+          "totalScore": 7,
+          "maxScore": 8,
+          "categoryScores": {
+            "colour": {
+              "score": 2,
+              "maxScore": 2,
+              "reason": "Correctly identifies muted gray-brown, dark bands and lighter left-side tones.",
+              "observationIds": [
+                "sample-08-C1"
+              ]
+            },
+            "texture": {
+              "score": 2,
+              "maxScore": 2,
+              "reason": "Mottled color variation and an uneven-looking appearance match the surface; no physical roughness value is claimed.",
+              "observationIds": [
+                "sample-08-T1"
+              ]
+            },
+            "boundary": {
+              "score": 2,
+              "maxScore": 2,
+              "reason": "Correctly describes the prominent gap-like separation near the left side without assigning a fracture cause.",
+              "observationIds": [
+                "sample-08-B1",
+                "sample-08-B2"
+              ]
+            },
+            "uncertainty": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "Uses appearance language but does not explicitly distinguish a true gap from an edge shadow or other boundary.",
+              "observationIds": [
+                "sample-08-B1",
+                "sample-08-B2"
+              ]
+            }
+          },
+          "usefulAndGrounded": true,
+          "hasSubstantiveVisualContradiction": false,
+          "criticalFailures": [],
+          "claims": [
+            {
+              "id": "sample-08-A-claim-01",
+              "quote": "a muted grayish-brown",
+              "classification": "supported-visually",
+              "reason": "The broad right area is brown-gray.",
+              "observationIds": [
+                "sample-08-C1"
+              ]
+            },
+            {
+              "id": "sample-08-A-claim-02",
+              "quote": "darker streaks running vertically through the center",
+              "classification": "supported-visually",
+              "reason": "A near-vertical dark band is clearly visible left of center; the spatial wording is imprecise but does not negate the identified feature.",
+              "observationIds": [
+                "sample-08-B1"
+              ]
+            },
+            {
+              "id": "sample-08-A-claim-03",
+              "quote": "lighter areas on the left side",
+              "classification": "supported-visually",
+              "reason": "The far left is lighter gray-beige.",
+              "observationIds": [
+                "sample-08-C1"
+              ]
+            },
+            {
+              "id": "sample-08-A-claim-04",
+              "quote": "slightly whiter or off-white compared to the surrounding brown tones",
+              "classification": "supported-visually",
+              "reason": "The left strip is relatively pale against the darker brown area.",
+              "observationIds": [
+                "sample-08-C1"
+              ]
+            },
+            {
+              "id": "sample-08-A-claim-05",
+              "quote": "a mottled pattern",
+              "classification": "supported-visually",
+              "reason": "Subtle mottling is visible on the broad right surface.",
+              "observationIds": [
+                "sample-08-T1"
+              ]
+            },
+            {
+              "id": "sample-08-A-claim-06",
+              "quote": "colors blend into one another in irregular ways",
+              "classification": "supported-visually",
+              "reason": "Tonal variation is irregular rather than a uniform fill.",
+              "observationIds": [
+                "sample-08-T1"
+              ]
+            },
+            {
+              "id": "sample-08-A-claim-07",
+              "quote": "a rough, uneven appearance rather than a smooth finish",
+              "classification": "supported-visually",
+              "reason": "Uneven-looking tonal texture is supported as appearance, without establishing measured relief or a finish process.",
+              "observationIds": [
+                "sample-08-T1"
+              ]
+            },
+            {
+              "id": "sample-08-A-claim-08",
+              "quote": "there appears to be a distinct gap or separation",
+              "classification": "supported-visually",
+              "reason": "The dark band appears gap-like while its physical origin remains unresolved.",
+              "observationIds": [
+                "sample-08-B1",
+                "sample-08-B2"
+              ]
+            },
+            {
+              "id": "sample-08-A-claim-09",
+              "quote": "On the far left edge",
+              "classification": "supported-visually",
+              "reason": "The feature lies toward the left, mainly in the left third rather than at the exact image boundary; this is a minor spatial approximation.",
+              "observationIds": [
+                "sample-08-B1"
+              ]
+            },
+            {
+              "id": "sample-08-A-claim-10",
+              "quote": "contrasts sharply with the continuous lines seen further right",
+              "classification": "supported-visually",
+              "reason": "The high-contrast band differs from the subtler right-side marks.",
+              "observationIds": [
+                "sample-08-T1",
+                "sample-08-B2"
+              ]
+            }
+          ],
+          "notes": [
+            "No fracture cause, aperture, engineering property or rock identity is inferred. Minor left/center wording is recorded without treating it as a substantive contradiction."
+          ],
+          "usefulnessReason": "At least one specific supported visual observation, no substantive visual contradiction, and no critical failure; separately listed noncritical unverified claims are not excused."
+        },
+        {
+          "caseId": "sample-08",
+          "anonymousLabel": "Model B",
+          "status": "completed",
+          "text": "Yes.",
+          "outputLimitReached": false,
+          "nonresponsive": true,
+          "totalScore": 4,
+          "maxScore": 8,
+          "categoryScores": {
+            "colour": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "No evaluable colour observation or substantive claim is supplied. The frozen rubric assigns 1 for omission.",
+              "observationIds": [
+                "sample-08-C1"
+              ]
+            },
+            "texture": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "No evaluable texture observation or substantive claim is supplied. The frozen rubric assigns 1 for omission.",
+              "observationIds": [
+                "sample-08-T1",
+                "sample-08-T2"
+              ]
+            },
+            "boundary": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "No evaluable boundary observation or substantive claim is supplied. The frozen rubric assigns 1 for omission.",
+              "observationIds": [
+                "sample-08-B1"
+              ]
+            },
+            "uncertainty": {
+              "score": 1,
+              "maxScore": 2,
+              "reason": "No evaluable uncertainty observation or substantive claim is supplied. The frozen rubric assigns 1 for omission.",
+              "observationIds": [
+                "sample-08-T1",
+                "sample-08-B1"
+              ]
+            }
+          },
+          "usefulAndGrounded": false,
+          "hasSubstantiveVisualContradiction": false,
+          "criticalFailures": [],
+          "claims": [],
+          "notes": [
+            "Unqualified 'Yes' does not answer this descriptive task or provide an evaluable image claim."
+          ],
+          "usefulnessReason": "No specific supported image observation."
+        }
+      ],
+      "pairedComparison": {
+        "higherScoringAnonymousLabel": "Model A",
+        "scoreDifferenceAMinusB": 3,
+        "interpretation": "Case-specific labels only; no model identity or cross-case A/B aggregation is inferred."
+      },
+      "analyzedImage": {
+        "sha256": "bf7f5c30dce8527afbe6a1e1aeec367b62546071081698a353a9fb2a4f943e83",
+        "path": "docs/benchmarks/0.25.0-core-ai/images/sample-08.png"
+      }
+    }
+  ],
+  "aggregateAcrossAllOutputsForAuditOnly": {
+    "outputs": 16,
+    "completed": 16,
+    "nonresponsive": 6,
+    "usefulAndGrounded": 6,
+    "outputsWithCriticalFailures": 1,
+    "outputLimitReached": 2,
+    "note": "Audit counts across both anonymous outputs; these are not model-level performance measures."
+  },
+  "limitations": [
+    "Assistant-authored scores have not been independently validated by a geologist.",
+    "Eight public tight patches do not establish site/borehole generalization or freedom from training contamination.",
+    "This paired text review cannot validate engineering properties, a 3D model, full-row versus closer-crop gains, browser compatibility or mobile memory/latency.",
+    "No default-model or advancement decision is made while identities are masked."
+  ],
+  "scoringRecordPreparedAtUtc": "2026-11-15T07:09:21Z",
+  "frozenAtUtc": "2026-11-15T07:13:21Z"
+}

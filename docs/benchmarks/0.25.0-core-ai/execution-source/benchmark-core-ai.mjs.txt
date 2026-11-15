@@ -1,0 +1,59 @@
+// Reproducible local CPU quality pilot. This does not measure browser or phone performance.
+import {readFile,writeFile,mkdir} from "node:fs/promises";
+import {resolve} from "node:path";
+import {createHash} from "node:crypto";
+import {BENCHMARK_MODELS,loadBenchmarkModel,generateBenchmark,disposeBenchmarkModel} from "./core-ai-benchmark-runtime.mjs";
+
+const root=resolve(import.meta.dirname,".."),folder=resolve(root,"docs/benchmarks/0.25.0-core-ai");
+const arg=name=>{const index=process.argv.indexOf(name);return index<0?undefined:process.argv[index+1]};
+const out=resolve(root,arg("--out")??".cache/v025-core-benchmark/run");
+const requested=arg("--models")?.split(",")??BENCHMARK_MODELS.map(m=>m.id);
+if(requested.some(id=>!BENCHMARK_MODELS.some(m=>m.id===id)))throw new Error("Unknown model identifier.");
+const digest=bytes=>createHash("sha256").update(bytes).digest("hex");
+const inputs=JSON.parse(await readFile(resolve(folder,"inputs.json"),"utf8"));
+const protocol=JSON.parse(await readFile(resolve(folder,"protocol.json"),"utf8"));
+const references=await readFile(resolve(folder,"reference-review.json"));
+const rubric=await readFile(resolve(folder,"rubric.md"));
+if(inputs.inputs.length!==8)throw new Error("The frozen pilot must contain eight cases.");
+if(protocol.generation.doSample!==false||protocol.generation.repetitionPenalty!==1.1||protocol.generation.maxNewTokens!==128)throw new Error("Generation settings differ from the frozen runtime protocol.");
+for(const sample of inputs.inputs){
+  const path=resolve(folder,sample.path);if(!path.startsWith(folder+"/images/"))throw new Error("Invalid input path.");
+  if(digest(await readFile(path))!==sample.sha256)throw new Error(`Input integrity mismatch: ${sample.id}`);
+}
+const report={format:"geomodel3d-core-image-pilot",version:1,startedAt:new Date().toISOString(),status:"running",
+  appVersion:JSON.parse(await readFile(resolve(root,"package.json"),"utf8")).version,
+  scope:"Local CPU quality screening with published real-core patches; assistant visual evaluation is separate from geologist-derived source labels. No geotechnical or native-device validation claim.",
+  protocol,protocolSha256:digest(await readFile(resolve(folder,"protocol.json"))),referenceSha256:digest(references),rubricSha256:digest(rubric),
+  runtimeSourceSha256:digest(await readFile(resolve(root,"scripts/core-ai-benchmark-runtime.mjs"))),
+  inputs:inputs.inputs.map(({id,sha256})=>({id,sha256})),models:BENCHMARK_MODELS.filter(m=>requested.includes(m.id)),results:[]};
+await mkdir(out,{recursive:true});
+const save=()=>writeFile(resolve(out,"results.json"),JSON.stringify(report,null,2)+"\n");
+await save();
+try{
+  for(const model of report.models){
+    let handle;
+    try{handle=await loadBenchmarkModel(model,{onProgress:event=>{if(event.status==="ready")console.log(JSON.stringify({model:model.id,phase:"ready"}))}})}
+    catch(error){for(const sample of inputs.inputs)report.results.push({caseId:sample.id,modelId:model.id,status:"load-error",error:String(error)});await save();continue}
+    for(const sample of inputs.inputs){
+      const started=Date.now();console.log(JSON.stringify({model:model.id,caseId:sample.id,phase:"running"}));
+      try{
+        const result=await generateBenchmark(handle,resolve(folder,sample.path),protocol.prompt,{maxNewTokens:protocol.generation.maxNewTokens});
+        report.results.push({caseId:sample.id,modelId:model.id,status:result.text?"completed":"empty-output",wallMs:Date.now()-started,result,
+          outputLimitReached:result.generatedTokens>=result.maxNewTokens});
+      }catch(error){report.results.push({caseId:sample.id,modelId:model.id,status:"generation-error",wallMs:Date.now()-started,error:String(error)})}
+      await save();
+    }
+    await disposeBenchmarkModel();
+  }
+  report.status=report.results.every(r=>r.status==="completed")?"completed":"completed-with-failures";
+  report.completedAt=new Date().toISOString();await save();
+  // Opaque labels conceal identities during the separate visual review; this is not an independent expert panel.
+  const mapping=Object.fromEntries(inputs.inputs.map(input=>{
+    const assignments=[...report.models].sort((a,b)=>digest(`20261115\0${input.id}\0${a.id}`).localeCompare(digest(`20261115\0${input.id}\0${b.id}`)));
+    return [input.id,Object.fromEntries(assignments.map((m,i)=>[m.id,`Model ${String.fromCharCode(65+i)}`]))];
+  }));
+  await writeFile(resolve(out,"blinded-outputs.json"),JSON.stringify({scope:"Model identifiers masked for assistant visual review. Source references were frozen before inference.",
+    cases:inputs.inputs.map(input=>({caseId:input.id,imagePath:resolve(folder,input.path),outputs:report.results.filter(r=>r.caseId===input.id).map(r=>({model:mapping[input.id][r.modelId],status:r.status,text:r.result?.text??"",outputLimitReached:r.outputLimitReached??false})).sort((a,b)=>a.model.localeCompare(b.model))}))},null,2)+"\n");
+  await writeFile(resolve(out,"model-mapping.json"),JSON.stringify(mapping,null,2)+"\n");
+  console.log(JSON.stringify({status:report.status,runs:report.results.length,out}));
+}finally{await disposeBenchmarkModel()}

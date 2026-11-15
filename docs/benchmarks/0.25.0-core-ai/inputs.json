@@ -1,0 +1,274 @@
+{
+  "version": 1,
+  "sourceManifest": "dataset-manifest.json",
+  "inputLicense": "CC BY-SA 4.0; see NOTICE.md",
+  "preparation": "Local Chromium Canvas2D using the app's coreAiCropPlan and drawImage defaults. Whole published patches fill a 512-square frame without stretching. Upscaling adds no observed detail; metadata is not embedded.",
+  "browserVersion": "156.0.8078.79",
+  "cropHelperSha256": "5178f31f16f30d3cb2afbb01728183998d13f89e0d7875bce9055831e97fd5e1",
+  "inputs": [
+    {
+      "id": "sample-01",
+      "path": "images/sample-01.png",
+      "sha256": "949f36faf19cfec4e29bff81fe48e863728d2c687ee441594278793f64c2a9e6",
+      "bytes": 377455,
+      "sourceSha256": "e95a2ee0154bb7e157da4b49866dca9ff53b070428ddbc2caafd337b2028da29",
+      "plan": {
+        "sourceWidth": 300,
+        "sourceHeight": 300,
+        "pixels": {
+          "x": 0,
+          "y": 0,
+          "width": 300,
+          "height": 300
+        },
+        "width": 512,
+        "height": 512,
+        "preprocessing": {
+          "method": "aspect-preserving-gray-letterbox",
+          "scaledWidth": 512,
+          "scaledHeight": 512,
+          "scale": 1.7066666666666668,
+          "upscaled": true,
+          "padding": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          "background": "#808080"
+        }
+      }
+    },
+    {
+      "id": "sample-02",
+      "path": "images/sample-02.png",
+      "sha256": "dbc58d98a440d77e7db3169fcd7531e6e58a789e680b93917fd642c9fcf3dd26",
+      "bytes": 278041,
+      "sourceSha256": "0efd5ee107d017cee7115cbd915ca436bd26ea59fc37cb5693d21bcbbc9e02af",
+      "plan": {
+        "sourceWidth": 300,
+        "sourceHeight": 300,
+        "pixels": {
+          "x": 0,
+          "y": 0,
+          "width": 300,
+          "height": 300
+        },
+        "width": 512,
+        "height": 512,
+        "preprocessing": {
+          "method": "aspect-preserving-gray-letterbox",
+          "scaledWidth": 512,
+          "scaledHeight": 512,
+          "scale": 1.7066666666666668,
+          "upscaled": true,
+          "padding": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          "background": "#808080"
+        }
+      }
+    },
+    {
+      "id": "sample-03",
+      "path": "images/sample-03.png",
+      "sha256": "fd8e3f2cd49c8752a622690df1c32bafe6ea9bc3d8a6512e9f7a276fde4910ba",
+      "bytes": 380577,
+      "sourceSha256": "192b3fbca36f6769544db53027454293b85b0dad724c204c62d3bc0b0e652908",
+      "plan": {
+        "sourceWidth": 300,
+        "sourceHeight": 300,
+        "pixels": {
+          "x": 0,
+          "y": 0,
+          "width": 300,
+          "height": 300
+        },
+        "width": 512,
+        "height": 512,
+        "preprocessing": {
+          "method": "aspect-preserving-gray-letterbox",
+          "scaledWidth": 512,
+          "scaledHeight": 512,
+          "scale": 1.7066666666666668,
+          "upscaled": true,
+          "padding": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          "background": "#808080"
+        }
+      }
+    },
+    {
+      "id": "sample-04",
+      "path": "images/sample-04.png",
+      "sha256": "b4f67963f7f5d27b48a81bfd6b8c293475c13cd637a25f2e2c45eeeaa61ae636",
+      "bytes": 298569,
+      "sourceSha256": "75c298c6a67cb8eed8d74a421f90c91a502b1d9037391d8ba4d0b329f6e9507f",
+      "plan": {
+        "sourceWidth": 280,
+        "sourceHeight": 280,
+        "pixels": {
+          "x": 0,
+          "y": 0,
+          "width": 280,
+          "height": 280
+        },
+        "width": 512,
+        "height": 512,
+        "preprocessing": {
+          "method": "aspect-preserving-gray-letterbox",
+          "scaledWidth": 512,
+          "scaledHeight": 512,
+          "scale": 1.8285714285714285,
+          "upscaled": true,
+          "padding": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          "background": "#808080"
+        }
+      }
+    },
+    {
+      "id": "sample-05",
+      "path": "images/sample-05.png",
+      "sha256": "b74cdfaecfb8efc5686abce5fe77296010854a9909f60f019b1b0b1ea8ab8440",
+      "bytes": 330358,
+      "sourceSha256": "6998746136b8a0dbd32b4de96bba6850a29b1727a4047fa58d74bd58f3489ad7",
+      "plan": {
+        "sourceWidth": 300,
+        "sourceHeight": 300,
+        "pixels": {
+          "x": 0,
+          "y": 0,
+          "width": 300,
+          "height": 300
+        },
+        "width": 512,
+        "height": 512,
+        "preprocessing": {
+          "method": "aspect-preserving-gray-letterbox",
+          "scaledWidth": 512,
+          "scaledHeight": 512,
+          "scale": 1.7066666666666668,
+          "upscaled": true,
+          "padding": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          "background": "#808080"
+        }
+      }
+    },
+    {
+      "id": "sample-06",
+      "path": "images/sample-06.png",
+      "sha256": "a467ee0ae51878052e51cd39d6ec88f276acfc1a1d8136d9770dbcee264c4c6a",
+      "bytes": 279292,
+      "sourceSha256": "62dacde15c78665b60a60db5bc1ad5b89a002eeee064051a1cbf939c426248e8",
+      "plan": {
+        "sourceWidth": 300,
+        "sourceHeight": 300,
+        "pixels": {
+          "x": 0,
+          "y": 0,
+          "width": 300,
+          "height": 300
+        },
+        "width": 512,
+        "height": 512,
+        "preprocessing": {
+          "method": "aspect-preserving-gray-letterbox",
+          "scaledWidth": 512,
+          "scaledHeight": 512,
+          "scale": 1.7066666666666668,
+          "upscaled": true,
+          "padding": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          "background": "#808080"
+        }
+      }
+    },
+    {
+      "id": "sample-07",
+      "path": "images/sample-07.png",
+      "sha256": "7e481b01869c9d86d7f3cc80b8150797baec23c9cecf46ef7ecb961396b52d30",
+      "bytes": 261627,
+      "sourceSha256": "e8d474270d72def2b00ed1826a289803bfc7ef661ce415daf8ac5bac2eae1ec4",
+      "plan": {
+        "sourceWidth": 300,
+        "sourceHeight": 300,
+        "pixels": {
+          "x": 0,
+          "y": 0,
+          "width": 300,
+          "height": 300
+        },
+        "width": 512,
+        "height": 512,
+        "preprocessing": {
+          "method": "aspect-preserving-gray-letterbox",
+          "scaledWidth": 512,
+          "scaledHeight": 512,
+          "scale": 1.7066666666666668,
+          "upscaled": true,
+          "padding": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          "background": "#808080"
+        }
+      }
+    },
+    {
+      "id": "sample-08",
+      "path": "images/sample-08.png",
+      "sha256": "bf7f5c30dce8527afbe6a1e1aeec367b62546071081698a353a9fb2a4f943e83",
+      "bytes": 290552,
+      "sourceSha256": "733e7071fd4e1f2182c0fa2a3ae937034d6143476c6a4d3ce177997f01f27228",
+      "plan": {
+        "sourceWidth": 300,
+        "sourceHeight": 300,
+        "pixels": {
+          "x": 0,
+          "y": 0,
+          "width": 300,
+          "height": 300
+        },
+        "width": 512,
+        "height": 512,
+        "preprocessing": {
+          "method": "aspect-preserving-gray-letterbox",
+          "scaledWidth": 512,
+          "scaledHeight": 512,
+          "scale": 1.7066666666666668,
+          "upscaled": true,
+          "padding": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          "background": "#808080"
+        }
+      }
+    }
+  ]
+}

@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 0.25.0 — 2026-11-15
+
+### Added
+- Individual-piece local AI inspection with exact depth registration, right-to-left support, and an immutable preview of the selected source pixels. Version-2 trial reports retain the piece and enclosing-row context, input hash, scale and padding.
+- A reproducible eight-image real-core pilot comparing pinned SmolVLM 500M and Qwen3.5 0.8B configurations, with source attribution, frozen inputs and rubric, complete outputs and model-masked assistant review. This is an exploratory description study, not geological or mobile-device validation; Qwen remains a benchmark candidate outside the application model selector.
+
+### Changed
+- Small selected crops fill the 512-pixel model frame without stretching; the preview explicitly identifies enlargement and its inability to add observed detail.
+- Neutral version-2 prompts allow unclear and non-rock inputs instead of asserting that every crop depicts drill core. AI output remains separate from accepted logs, RQD and engineering properties.
+
 ## 0.24.0 — 2026-11-15
 
 ### Added

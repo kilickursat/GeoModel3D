@@ -10,7 +10,7 @@ export const CORE_AI_DTYPE = {embed_tokens:"fp32",vision_encoder:"fp32",decoder_
 export const CORE_AI_DTYPE_LABEL = "embed_tokens=fp32;vision_encoder=fp32;decoder_model_merged=q4";
 export const CORE_AI_RUNTIME_VERSION = "4.3.2";
 export const CORE_AI_ONNX_VERSION = "1.31.1";
-export const CORE_AI_PROMPT_VERSION = 1;
+export const CORE_AI_PROMPT_VERSION = 2;
 export type CoreAiTask = "describe" | "observations";
 export type CoreAiRequest = {modelId:string;task:CoreAiTask;image:string};
 export type CoreAiProgress = {phase:"checking"|"loading"|"running";message:string;loaded?:number;total?:number;elapsedMs?:number;file?:string};
@@ -37,9 +37,9 @@ export function coreAiModel(id:string){
 }
 
 export function coreAiPrompt(task:CoreAiTask):string {
-  const limit="Describe only what is visible. Do not infer rock type, mineral composition, strength, soundness, RQD, fracture cause, or any numerical engineering property. If something is unclear, say so. Keep the answer brief.";
-  if(task==="describe")return `Describe this photograph of drill core in plain language, focusing on visible colours, textures and arrangement. ${limit}`;
-  if(task==="observations")return `List up to four visible observations in this photograph of drill core for a human reviewer to check, such as colour changes, visible gaps or surface markings. ${limit}`;
+  const limit="If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.";
+  if(task==="describe")return `Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. ${limit}`;
+  if(task==="observations")return `List up to four visible observations in this image crop for a human reviewer to check, such as colour changes, visible edges or gaps, or surface markings. ${limit}`;
   throw new Error("Unknown local AI task.");
 }
 

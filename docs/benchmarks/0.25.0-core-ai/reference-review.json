@@ -1,0 +1,513 @@
+{
+  "schemaVersion": 1,
+  "protocolVersion": "core-ai-visible-description-pilot-1",
+  "preparedAtUtc": "2026-11-15T06:53:05Z",
+  "referenceStatus": "Frozen before model outputs were supplied to the reference author.",
+  "author": {
+    "role": "assistant visual review; not a geologist",
+    "method": "Viewed all eight original JPEGs individually after viewing a contact sheet. Published folder labels were visible. No model output was viewed.",
+    "classBlind": false,
+    "modelOutputBlind": true
+  },
+  "scope": "Visible features only. Published classes are context from the source dataset, not a fresh geologist review and not visual ground truth for engineering properties.",
+  "source": {
+    "original": "https://data.mendeley.com/datasets/b6rj29mrss/1",
+    "doi": "10.17632/b6rj29mrss.1",
+    "originalLicense": "CC BY 4.0",
+    "mirror": "https://www.kaggle.com/datasets/breejeshdhar/automated-lithology-classification",
+    "mirrorVersion": 1,
+    "mirrorLicense": "CC BY-SA 4.0",
+    "download": "https://www.kaggle.com/api/v1/datasets/download/breejeshdhar/automated-lithology-classification?datasetVersionNumber=1",
+    "archiveBytes": 1201499645,
+    "mirrorBundleId": "3709250/6428854",
+    "citation": "Alzubaidi, Fatimah (2021), Lithology dataset, Mendeley Data, V1, doi:10.17632/b6rj29mrss.1.",
+    "paper": "https://doi.org/10.1016/j.petrol.2020.107933",
+    "mirrorOriginalByteIdentity": "Not verified between Kaggle and Mendeley archives; hashes below identify the exact selected mirrored JPEGs."
+  },
+  "sampling": {
+    "seed": "20261115",
+    "algorithm": "Ascending SHA256(UTF8(seed + NUL + archive path)); first 2 paths per test class",
+    "testClassCounts": {
+      "garbage": 3000,
+      "limestone": 3000,
+      "sandstone": 3000,
+      "shale": 3000
+    },
+    "selectionBeforeViewing": true
+  },
+  "fixedTask": {
+    "promptVersion": 2,
+    "prompt": "Describe only visible features of this image crop. Give up to three short bullet points about colour, texture and visible edges or gaps. If it does not clearly show rock or is unclear, say so. Do not infer rock type, minerals, strength, soundness, fracture cause, RQD, or numerical properties.",
+    "generation": {
+      "do_sample": false,
+      "max_new_tokens": 128,
+      "repetition_penalty": 1.1
+    }
+  },
+  "universalUnsupportedInferences": [
+    "Rock or mineral identity from image appearance alone.",
+    "Strength, soundness, rock quality, RQD, recovery, density, porosity, permeability, stiffness or other engineering properties.",
+    "Natural versus mechanical origin of a line, edge or apparent gap.",
+    "Measured grain size, fracture aperture, physical dimensions or depth without an independently verified scale and registration."
+  ],
+  "scoring": {
+    "rubric": "rubric.md",
+    "categories": [
+      "colour",
+      "texture",
+      "boundary",
+      "uncertainty"
+    ],
+    "pointsPerApplicableCategory": 2,
+    "applicabilityNote": "All four categories apply to each image, including cautious recognition that a reliable gap is not discernible. Omission is not a substantive contradiction and receives the rubric's generic/omitted score.",
+    "unknownObservationHandling": "Log any additional directly visible feature as post-hoc; do not silently change this frozen reference.",
+    "blindPacket": "Remove model identity and timings. Keep published labels separate from the visual scoring observations; the reference author was not blind to source labels."
+  },
+  "independence": {
+    "site": "unknown",
+    "borehole": "unverified",
+    "parentPhotograph": "unverified",
+    "note": "Filename prefixes resemble borehole IDs but are not verified identities. The test folder is not established to be site- or borehole-held-out; model pretraining exposure is unknown."
+  },
+  "samples": [
+    {
+      "id": "sample-01",
+      "sourceImage": {
+        "path": "images/sample-01.jpeg",
+        "originalArchivePath": "Lithology Dataset/test/garbage/IHAD1_1_row_2_10.jpg_C2_.jpeg",
+        "sha256": "e95a2ee0154bb7e157da4b49866dca9ff53b070428ddbc2caafd337b2028da29",
+        "width": 300,
+        "height": 300
+      },
+      "publishedReference": {
+        "class": "garbage",
+        "provenance": "Class directory in the mirrored Alzubaidi dataset. The associated paper describes lithology labels derived from geologist logs and a garbage class for non-core regions. This is not a new human review of this selected patch.",
+        "lithologyLabelUsedForVisibleScoring": false
+      },
+      "visualReference": {
+        "recognisability": "clearly non-rock marked panel or label",
+        "observations": [
+          {
+            "id": "sample-01-C1",
+            "category": "colour",
+            "text": "The broad background is pale tan, beige and pinkish gray, with a large dark brown to black marking."
+          },
+          {
+            "id": "sample-01-T1",
+            "category": "texture",
+            "text": "The flat-looking background is mildly mottled and has scattered faint scuffs or spots."
+          },
+          {
+            "id": "sample-01-T2",
+            "category": "texture",
+            "text": "Thick handwritten-looking dark characters cross the lower half, with a dark separate dot toward the right. The leftmost character is cut off by the image edge."
+          },
+          {
+            "id": "sample-01-B1",
+            "category": "boundary",
+            "text": "Thin dark near-horizontal border strips occur at the top and bottom. These are panel or photographic boundaries, not demonstrated geological gaps."
+          }
+        ],
+        "uncertainties": [
+          "The marked panel or label is clear, but its specific material and the complete text are not needed or reliably established.",
+          "No rock specimen, natural fracture or rock texture is established by this crop."
+        ],
+        "additionalCriticalUnsupportedClaims": [
+          "Confidently describing the panel as a rock specimen or interpreting the writing as natural veins or fractures."
+        ],
+        "applicable": {
+          "colour": true,
+          "texture": true,
+          "boundary": true,
+          "uncertainty": true
+        }
+      }
+    },
+    {
+      "id": "sample-02",
+      "sourceImage": {
+        "path": "images/sample-02.jpeg",
+        "originalArchivePath": "Lithology Dataset/test/garbage/COD013_0_row_1_1.jpg_C2_.jpeg",
+        "sha256": "0efd5ee107d017cee7115cbd915ca436bd26ea59fc37cb5693d21bcbbc9e02af",
+        "width": 300,
+        "height": 300
+      },
+      "publishedReference": {
+        "class": "garbage",
+        "provenance": "Class directory in the mirrored Alzubaidi dataset. The associated paper describes lithology labels derived from geologist logs and a garbage class for non-core regions. This is not a new human review of this selected patch.",
+        "lithologyLabelUsedForVisibleScoring": false
+      },
+      "visualReference": {
+        "recognisability": "mixed manufactured tray-like pattern and partial rock-like material",
+        "observations": [
+          {
+            "id": "sample-02-C1",
+            "category": "colour",
+            "text": "Much of the upper image is very dark gray to black. A muted gray-brown background and mottled tan/brown lower object are visible."
+          },
+          {
+            "id": "sample-02-T1",
+            "category": "texture",
+            "text": "Repeated elongated near-vertical dark stripes or slots have rounded lower ends in the upper half."
+          },
+          {
+            "id": "sample-02-T2",
+            "category": "texture",
+            "text": "The partial rounded object at the bottom has a mottled, uneven-looking brown/tan surface and a pale thin line across part of its left side."
+          },
+          {
+            "id": "sample-02-B1",
+            "category": "boundary",
+            "text": "There is a curved dark boundary around the top of the lower rounded object, against the gray-brown background; another partial mottled object is cut off at the right edge."
+          }
+        ],
+        "uncertainties": [
+          "Poor illumination limits texture and material identification.",
+          "The crop contains both tray-like features and partial rock-like material; the dataset's garbage class does not mean rock is absent.",
+          "The repeated upper features look manufactured; their depth, physical material and exact function are not established."
+        ],
+        "additionalCriticalUnsupportedClaims": [
+          "Interpreting the repeated upper slots as natural rock fractures or geological bedding.",
+          "Treating the whole image as a clear rock specimen while ignoring the prominent tray-like region."
+        ],
+        "applicable": {
+          "colour": true,
+          "texture": true,
+          "boundary": true,
+          "uncertainty": true
+        }
+      }
+    },
+    {
+      "id": "sample-03",
+      "sourceImage": {
+        "path": "images/sample-03.jpeg",
+        "originalArchivePath": "Lithology Dataset/test/limestone/LB04D005_58_row_2_2_23.jpg.jpeg",
+        "sha256": "192b3fbca36f6769544db53027454293b85b0dad724c204c62d3bc0b0e652908",
+        "width": 300,
+        "height": 300
+      },
+      "publishedReference": {
+        "class": "limestone",
+        "provenance": "Class directory in the mirrored Alzubaidi dataset. The associated paper describes lithology labels derived from geologist logs and a garbage class for non-core regions. This is not a new human review of this selected patch.",
+        "lithologyLabelUsedForVisibleScoring": false
+      },
+      "visualReference": {
+        "recognisability": "tightly cropped mottled surface; rock-like appearance without diagnostic identity",
+        "observations": [
+          {
+            "id": "sample-03-C1",
+            "category": "colour",
+            "text": "The surface is predominantly muted gray with greenish or blue-gray casts, pale streaks and a small brownish mark toward the lower right."
+          },
+          {
+            "id": "sample-03-T1",
+            "category": "texture",
+            "text": "Numerous thin pale and darker near-horizontal, gently sloping streaks cross a finely mottled surface."
+          },
+          {
+            "id": "sample-03-T2",
+            "category": "texture",
+            "text": "A few thinner pale lines cross the dominant streaks, including a slanted line in the lower central-left area."
+          },
+          {
+            "id": "sample-03-B1",
+            "category": "boundary",
+            "text": "No clearly open gap separating large pieces is visible. The visible lines alone do not establish separation."
+          }
+        ],
+        "uncertainties": [
+          "Linear streaks could have several surface or image causes; bedding, scratches, veins and fractures cannot be distinguished confidently.",
+          "The crop does not show the full specimen or an independently interpretable physical scale."
+        ],
+        "additionalCriticalUnsupportedClaims": [
+          "Calling the thin lines natural fractures, mineral veins or proven bedding.",
+          "Inferring lithology or mineral identity from the muted color and streaks."
+        ],
+        "applicable": {
+          "colour": true,
+          "texture": true,
+          "boundary": true,
+          "uncertainty": true
+        }
+      }
+    },
+    {
+      "id": "sample-04",
+      "sourceImage": {
+        "path": "images/sample-04.jpeg",
+        "originalArchivePath": "Lithology Dataset/test/limestone/08PD04c_30_row_4_1_8.jpg.jpeg",
+        "sha256": "75c298c6a67cb8eed8d74a421f90c91a502b1d9037391d8ba4d0b329f6e9507f",
+        "width": 280,
+        "height": 280
+      },
+      "publishedReference": {
+        "class": "limestone",
+        "provenance": "Class directory in the mirrored Alzubaidi dataset. The associated paper describes lithology labels derived from geologist logs and a garbage class for non-core regions. This is not a new human review of this selected patch.",
+        "lithologyLabelUsedForVisibleScoring": false
+      },
+      "visualReference": {
+        "recognisability": "tightly cropped pale speckled surface; rock-like appearance without diagnostic identity",
+        "observations": [
+          {
+            "id": "sample-04-C1",
+            "category": "colour",
+            "text": "The main surface is light gray to cream, with scattered darker gray/brown specks and a small tan patch toward the upper right."
+          },
+          {
+            "id": "sample-04-T1",
+            "category": "texture",
+            "text": "The surface is finely mottled or speckled, with several irregular small dark marks."
+          },
+          {
+            "id": "sample-04-T2",
+            "category": "texture",
+            "text": "A tan elongated oval or angular patch near the upper right has a darker outline or shadow along its lower-right side."
+          },
+          {
+            "id": "sample-04-B1",
+            "category": "boundary",
+            "text": "The upper-right patch has a locally distinct edge. No broad open gap or fully separated piece is clearly visible."
+          }
+        ],
+        "uncertainties": [
+          "The small upper-right patch could be a protrusion, inclusion or surface feature; its material and origin are not established.",
+          "Lighting and low resolution limit distinctions between grain texture, shallow relief and marks."
+        ],
+        "additionalCriticalUnsupportedClaims": [
+          "Identifying the tan patch as a particular mineral, fossil or clast type as an established observation.",
+          "Inferring rock strength, soundness or lithology from the pale surface."
+        ],
+        "applicable": {
+          "colour": true,
+          "texture": true,
+          "boundary": true,
+          "uncertainty": true
+        }
+      }
+    },
+    {
+      "id": "sample-05",
+      "sourceImage": {
+        "path": "images/sample-05.jpeg",
+        "originalArchivePath": "Lithology Dataset/test/sandstone/MURNAROO 1_62_row_5_2.jpeg",
+        "sha256": "6998746136b8a0dbd32b4de96bba6850a29b1727a4047fa58d74bd58f3489ad7",
+        "width": 300,
+        "height": 300
+      },
+      "publishedReference": {
+        "class": "sandstone",
+        "provenance": "Class directory in the mirrored Alzubaidi dataset. The associated paper describes lithology labels derived from geologist logs and a garbage class for non-core regions. This is not a new human review of this selected patch.",
+        "lithologyLabelUsedForVisibleScoring": false
+      },
+      "visualReference": {
+        "recognisability": "uniform tightly cropped fine-speckled surface; material identity uncertain",
+        "observations": [
+          {
+            "id": "sample-05-C1",
+            "category": "colour",
+            "text": "The image is predominantly warm tan to muted brown, with scattered small pale or whitish flecks."
+          },
+          {
+            "id": "sample-05-T1",
+            "category": "texture",
+            "text": "The surface has dense fine mottling or a fine granular-looking pattern, with subtle uneven darker shading."
+          },
+          {
+            "id": "sample-05-T2",
+            "category": "texture",
+            "text": "Small bright points are especially noticeable toward the left side; individual mineral identity is not resolved."
+          },
+          {
+            "id": "sample-05-B1",
+            "category": "boundary",
+            "text": "No clear specimen outline, distinct separated pieces or broad open gap is visible inside the crop."
+          }
+        ],
+        "uncertainties": [
+          "A granular appearance does not establish grain sizes, mineralogy or lithology at this resolution.",
+          "The tightly cropped surface lacks a clear complete specimen boundary or scale."
+        ],
+        "additionalCriticalUnsupportedClaims": [
+          "Inferring sandstone, quartz or other lithology/minerals from fine speckling.",
+          "Reporting porosity, cementation, physical grain size or strength as measured properties."
+        ],
+        "applicable": {
+          "colour": true,
+          "texture": true,
+          "boundary": true,
+          "uncertainty": true
+        }
+      }
+    },
+    {
+      "id": "sample-06",
+      "sourceImage": {
+        "path": "images/sample-06.jpeg",
+        "originalArchivePath": "Lithology Dataset/test/sandstone/07PD01_28_row_3_6.jpeg",
+        "sha256": "62dacde15c78665b60a60db5bc1ad5b89a002eeee064051a1cbf939c426248e8",
+        "width": 300,
+        "height": 300
+      },
+      "publishedReference": {
+        "class": "sandstone",
+        "provenance": "Class directory in the mirrored Alzubaidi dataset. The associated paper describes lithology labels derived from geologist logs and a garbage class for non-core regions. This is not a new human review of this selected patch.",
+        "lithologyLabelUsedForVisibleScoring": false
+      },
+      "visualReference": {
+        "recognisability": "dark tightly cropped streaked surface; limited material visibility",
+        "observations": [
+          {
+            "id": "sample-06-C1",
+            "category": "colour",
+            "text": "The image is dark brown to charcoal gray, with low-contrast lighter brown and darker bands."
+          },
+          {
+            "id": "sample-06-T1",
+            "category": "texture",
+            "text": "Several near-parallel slanting dark and light streaks run roughly from lower left toward upper right."
+          },
+          {
+            "id": "sample-06-T2",
+            "category": "texture",
+            "text": "Between streaks the surface is faintly mottled or finely speckled, but detail is difficult to resolve."
+          },
+          {
+            "id": "sample-06-B1",
+            "category": "boundary",
+            "text": "Dark diagonal linear regions are visible, including near the upper left; the image does not reliably establish an open separating gap."
+          }
+        ],
+        "uncertainties": [
+          "Low illumination and contrast obscure small features and the depth of dark lines.",
+          "The diagonal streaks do not establish bedding, cleavage, cracks or their causes."
+        ],
+        "additionalCriticalUnsupportedClaims": [
+          "Confidently resolving dark lines as natural or mechanical fractures.",
+          "Claiming precise grains, minerals, rock type or engineering quality from this poorly lit patch."
+        ],
+        "applicable": {
+          "colour": true,
+          "texture": true,
+          "boundary": true,
+          "uncertainty": true
+        }
+      }
+    },
+    {
+      "id": "sample-07",
+      "sourceImage": {
+        "path": "images/sample-07.jpeg",
+        "originalArchivePath": "Lithology Dataset/test/shale/HODD1_54_row_0_16.jpeg",
+        "sha256": "e8d474270d72def2b00ed1826a289803bfc7ef661ce415daf8ac5bac2eae1ec4",
+        "width": 300,
+        "height": 300
+      },
+      "publishedReference": {
+        "class": "shale",
+        "provenance": "Class directory in the mirrored Alzubaidi dataset. The associated paper describes lithology labels derived from geologist logs and a garbage class for non-core regions. This is not a new human review of this selected patch.",
+        "lithologyLabelUsedForVisibleScoring": false
+      },
+      "visualReference": {
+        "recognisability": "tightly cropped gray striped surface; material and stripe cause uncertain",
+        "observations": [
+          {
+            "id": "sample-07-C1",
+            "category": "colour",
+            "text": "The surface is medium to dark gray with a muted blue-gray cast and alternating pale and dark stripes."
+          },
+          {
+            "id": "sample-07-T1",
+            "category": "texture",
+            "text": "Dense thin, almost vertical parallel lines or streaks extend across nearly the whole image."
+          },
+          {
+            "id": "sample-07-T2",
+            "category": "texture",
+            "text": "Broader subtle light and dark zones lie behind the thin streaks; fine surface detail is otherwise subdued."
+          },
+          {
+            "id": "sample-07-B1",
+            "category": "boundary",
+            "text": "The many lines do not visibly separate individual pieces; no reliable broad open gap is evident."
+          }
+        ],
+        "uncertainties": [
+          "The stripes could have a surface, acquisition or geological origin; the photograph does not decide their cause.",
+          "Line counts or widths are not a fracture count or physical measurement."
+        ],
+        "additionalCriticalUnsupportedClaims": [
+          "Treating the repeated lines as established natural fractures, cleavage, bedding or mineral veins.",
+          "Inferring shale or soundness from this striped appearance."
+        ],
+        "applicable": {
+          "colour": true,
+          "texture": true,
+          "boundary": true,
+          "uncertainty": true
+        }
+      }
+    },
+    {
+      "id": "sample-08",
+      "sourceImage": {
+        "path": "images/sample-08.jpeg",
+        "originalArchivePath": "Lithology Dataset/test/shale/07PD01_38_row_4_2_22.jpg.jpeg",
+        "sha256": "733e7071fd4e1f2182c0fa2a3ae937034d6143476c6a4d3ce177997f01f27228",
+        "width": 300,
+        "height": 300
+      },
+      "publishedReference": {
+        "class": "shale",
+        "provenance": "Class directory in the mirrored Alzubaidi dataset. The associated paper describes lithology labels derived from geologist logs and a garbage class for non-core regions. This is not a new human review of this selected patch.",
+        "lithologyLabelUsedForVisibleScoring": false
+      },
+      "visualReference": {
+        "recognisability": "dark surface with a distinct narrow separating band; exact material and geometry uncertain",
+        "observations": [
+          {
+            "id": "sample-08-C1",
+            "category": "colour",
+            "text": "A broad muted dark brown-gray region occupies the right; the far left is lighter gray-beige and an intervening band is nearly black."
+          },
+          {
+            "id": "sample-08-T1",
+            "category": "texture",
+            "text": "The broad right region is subtly mottled with faint thin marks; it has much less contrast than the dark band."
+          },
+          {
+            "id": "sample-08-B1",
+            "category": "boundary",
+            "text": "An irregular near-vertical dark band runs down the left third, curving or slanting toward the right near the bottom."
+          },
+          {
+            "id": "sample-08-B2",
+            "category": "boundary",
+            "text": "The band has distinct edges and includes a few narrower lighter strips. It appears gap-like but its depth and physical origin are not resolved."
+          }
+        ],
+        "uncertainties": [
+          "The dark band may represent a gap, an edge shadow or another surface boundary; exact geometry and cause are not established.",
+          "The crop is too tight and dark to identify complete pieces or a drilling-run fracture inventory."
+        ],
+        "additionalCriticalUnsupportedClaims": [
+          "Asserting that the dark band is a natural or drilling-induced fracture.",
+          "Using its apparent width to estimate aperture, RQD, rock strength or quality."
+        ],
+        "applicable": {
+          "colour": true,
+          "texture": true,
+          "boundary": true,
+          "uncertainty": true
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "Eight selected public image patches provide an exploratory comparison, not statistical validation or a default-model promotion.",
+    "The source patches are already about 2 by 2 cm; this set cannot establish whether selecting a closer piece crop improves over a whole-row crop.",
+    "No newly recruited geologist has reviewed these images or outputs.",
+    "No fracture cause, RQD, strength, soundness or other engineering-property truth is present.",
+    "All category scores are assistant judgements, not expert agreement or lithology accuracy."
+  ]
+}

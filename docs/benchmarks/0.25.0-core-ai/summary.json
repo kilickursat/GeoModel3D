@@ -1,0 +1,129 @@
+{
+  "version": 1,
+  "unblindedAt": "2026-11-15T07:14:09.358Z",
+  "reviewSha256": "b5a5cf84d75dc828fd22c7b31cfc15661c12dff88dce2cc064fe1d5175e4e5f5",
+  "reviewer": "AI assistant; not a geologist or independent expert panel",
+  "models": [
+    {
+      "modelId": "smolvlm-500m",
+      "cases": 8,
+      "useful": 0,
+      "criticalFailureOutputs": 1,
+      "nonresponsive": 6,
+      "capped": 2,
+      "visualContradictionOutputs": 1,
+      "scores": [
+        4,
+        4,
+        4,
+        4,
+        2,
+        2,
+        4,
+        4
+      ],
+      "claimClassifications": {
+        "supported-visually": 7,
+        "not-verifiable-from-crop": 17,
+        "contradicted-visually": 1
+      }
+    },
+    {
+      "modelId": "qwen3.5-0.8b-opt",
+      "cases": 8,
+      "useful": 6,
+      "criticalFailureOutputs": 0,
+      "nonresponsive": 0,
+      "capped": 0,
+      "visualContradictionOutputs": 2,
+      "scores": [
+        7,
+        6,
+        5,
+        2,
+        3,
+        5,
+        5,
+        7
+      ],
+      "claimClassifications": {
+        "supported-visually": 43,
+        "not-verifiable-from-crop": 14,
+        "appropriate-abstention": 5,
+        "contradicted-visually": 5
+      }
+    }
+  ],
+  "pairs": [
+    {
+      "caseId": "sample-01",
+      "smolvlmScore": 4,
+      "qwenScore": 7,
+      "difference": 3,
+      "smolvlmUseful": false,
+      "qwenUseful": true
+    },
+    {
+      "caseId": "sample-02",
+      "smolvlmScore": 4,
+      "qwenScore": 6,
+      "difference": 2,
+      "smolvlmUseful": false,
+      "qwenUseful": true
+    },
+    {
+      "caseId": "sample-03",
+      "smolvlmScore": 4,
+      "qwenScore": 5,
+      "difference": 1,
+      "smolvlmUseful": false,
+      "qwenUseful": true
+    },
+    {
+      "caseId": "sample-04",
+      "smolvlmScore": 4,
+      "qwenScore": 2,
+      "difference": -2,
+      "smolvlmUseful": false,
+      "qwenUseful": false
+    },
+    {
+      "caseId": "sample-05",
+      "smolvlmScore": 2,
+      "qwenScore": 3,
+      "difference": 1,
+      "smolvlmUseful": false,
+      "qwenUseful": false
+    },
+    {
+      "caseId": "sample-06",
+      "smolvlmScore": 2,
+      "qwenScore": 5,
+      "difference": 3,
+      "smolvlmUseful": false,
+      "qwenUseful": true
+    },
+    {
+      "caseId": "sample-07",
+      "smolvlmScore": 4,
+      "qwenScore": 5,
+      "difference": 1,
+      "smolvlmUseful": false,
+      "qwenUseful": true
+    },
+    {
+      "caseId": "sample-08",
+      "smolvlmScore": 4,
+      "qwenScore": 7,
+      "difference": 3,
+      "smolvlmUseful": false,
+      "qwenUseful": true
+    }
+  ],
+  "qwenPaired": {
+    "wins": 7,
+    "ties": 0,
+    "losses": 1
+  },
+  "advancementGate": "Not established: independent borehole identity and native-device suitability remain unverified. Minimum usefulness can coexist with noncritical unverified claims; not all claims are supported. No default-model promotion."
+}
