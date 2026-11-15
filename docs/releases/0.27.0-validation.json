@@ -1,0 +1,98 @@
+{
+  "version": "0.27.0",
+  "recordedAt": "2026-11-15T12:32:54.056421+00:00",
+  "baseCommit": "efb01207b299f2ebd294e08c4579f983a26111cd",
+  "unit": {
+    "passed": 668,
+    "files": 55
+  },
+  "playwright": {
+    "passed": 74,
+    "retries": 0,
+    "workers": 2,
+    "timeoutOverrides": false
+  },
+  "targetedPlaywright": {
+    "passed": 17
+  },
+  "build": {
+    "status": "passed",
+    "typescript": true,
+    "hosted": true,
+    "benchmark": true,
+    "standalone": true,
+    "arModels": true
+  },
+  "releaseMetadataValidation": "RELEASE_TAG=v0.27.0 node scripts/release-assets.mjs validate . passed",
+  "initialDevelopmentFailure": "The initial unit run had 667 passes and one failure in the new provenance test, which read .id instead of the existing frozen .protocolId field. Only the assertion was corrected. The final full suite passed 668 tests.",
+  "frozenHistoricalInputsAndInferenceSourceUnchanged": [
+    "docs/benchmarks/0.26.0-core-ai",
+    "public/core-benchmark-v026",
+    "src/coreBenchmark.worker.ts",
+    "src/coreBenchmark.ts",
+    "src/coreBenchmarkClient.ts"
+  ],
+  "evaluationPlan": {
+    "id": "qwen-desktop-1",
+    "sha256": "8c5ec24878ff5efd8ac16c2f45fc10e75852614dc485bfe3b1ae4af43a9449a3"
+  },
+  "sourceSha256": {
+    "src/coreBenchmarkSummary.ts": "a16413ebf331831d91e8e752fb82e8a67ce49d070ed41993b6324232d141d5b5",
+    "src/coreBenchmarkView.ts": "2a30c0fb4826cf0113428cdedf2a8b4abf3d545218e0ee15ef2782b2e6db877c",
+    "src/coreBenchmark.css": "8d7377bc3a5f99d58d528ce015e4f5131566ed272923bb5aced8bbca46055ee1",
+    "tests/coreBenchmarkSummary.test.ts": "e17c3bd61d91f0bde1f3eca882ae85f5e9d96e9d37ba998fb1fdc2ff7c3bb0ff",
+    "tests/browser/core-benchmark.spec.ts": "8cda572c56831bfca50e3da97ac9d687b69a4189bfd606955e48ffb1c80a7648",
+    "package.json": "4db7793fe3a7b0f8d5f356612e68b6c474574aa3ac4e613a4aa7e838a7aff764",
+    "package-lock.json": "2aeab1310129984e7f11d4fef107f76b4ef3b68983451bf348d480966b472e3b"
+  },
+  "standaloneArtifact": {
+    "filename": "geomodel3d-offline.html",
+    "bytes": 4391813,
+    "sha256": "29c2e0d4610dc908ff2f84107730cea885924314910d4746a4ef28be80b14c44"
+  },
+  "benchmarkWorkerArtifact": {
+    "filename": "coreBenchmark.worker-BWHLncoB.js",
+    "sha256": "33b8b7d504cb6a1b5cd53d7a42c7ce4f7507e51e26b35f754e713576882efb2a",
+    "identicalToVersion": "0.26.1"
+  },
+  "logs": {
+    "unit": {
+      "path": "0.27.0-unit.log.gz",
+      "sha256": "d51c657910f38ade68bb4adba5c430f7b59edcdf54b8d8d753c6e01810068819",
+      "uncompressedSha256": "8f972f2c48e6f0dda8ab084ddfc233fb8d2b630767fdb8d20e9b2b99213cf27a"
+    },
+    "build": {
+      "path": "0.27.0-build.log.gz",
+      "sha256": "2fed88c37aefdba7f4e80b39114d80f701ffea47eb3ea13e3ff0cb4b2d237228",
+      "uncompressedSha256": "b38703a3ace29b8bf20e4c9d053c7897ea28ba6719e0572fa6e96730c8d6c740"
+    },
+    "playwright": {
+      "path": "0.27.0-playwright.log.gz",
+      "sha256": "8951482beaba2b4e3808a1871cfcfa46286e59000d6a795b9ca66968042e5dbd",
+      "uncompressedSha256": "90de8a98e89af28c18d4fa809812c68cfdce68928cf53904270887887c27db1d"
+    },
+    "targeted-playwright": {
+      "path": "0.27.0-targeted-playwright.log.gz",
+      "sha256": "55ea4698ea9505504b8bef2b778723b80de3a34111f780fcc726fc2f1c7841b6",
+      "uncompressedSha256": "46bac59e253928c867389fc3a9be672d10b36add443d648abc8d92519b62dd25"
+    },
+    "initial-unit": {
+      "path": "0.27.0-initial-unit.log.gz",
+      "sha256": "fcb7de5e42952a2eebea8c251cae830c90fae8d0fd2e3629db0ff161c2154e9b",
+      "uncompressedSha256": "f2bd2fc2e114e9427d865f313dfb389c7ad43f73f234f109b3986e48517d1e2b"
+    }
+  },
+  "screenshots": [
+    {
+      "path": "0.27.0-benchmark-desktop.png",
+      "sha256": "6f81406cd269d0da8ca2ff940b06a760df7875597dce9dd3ed1564f365d461a4",
+      "scope": "Playwright layout check with frozen public image inputs and synthetic output, timing and software-adapter fixtures; not model performance."
+    },
+    {
+      "path": "0.27.0-benchmark-mobile.png",
+      "sha256": "be558206372e4e6fc02c0a7642f26e3a86990505f7b97622d723aceabdb3f027",
+      "scope": "Playwright layout check with frozen public image inputs and synthetic output, timing and software-adapter fixtures; not model performance."
+    }
+  ],
+  "evidenceScope": "Software validation only. No new Qwen inference or hardware-GPU timings were produced. This environment has no usable hardware adapter. Desktop performance, qualified human grading, source independence and GPU/process memory suitability remain unassessed."
+}

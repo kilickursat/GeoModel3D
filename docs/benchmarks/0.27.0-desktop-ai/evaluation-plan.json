@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "id": "qwen-desktop-1",
+  "frozenAtUtc": "2026-11-15T12:22:04Z",
+  "status": "Prepared desktop evaluation; hardware performance and qualified human grading are pending.",
+  "scope": "Desktop-first evaluation of visible core-image descriptions. iPhone and other mobile AI are optional exploratory targets, not requirements for this desktop milestone.",
+  "baseProtocol": {
+    "id": "core-webgpu-pilot-2",
+    "sha256": "59048ae5c9210239225c04867675594b192d61d46e3d26ca1f4f92232b483ea1",
+    "path": "../0.26.0-core-ai/protocol.json",
+    "rubricSha256": "6422732b8ba1a6efe780e1e979c6b994a67737ca1501e0f126b4c3369fc77b09",
+    "publicManifestSha256": "b61549c3de8714e2f015056276efc23dfb3c6f3e1206fbd6611b68af3712c391",
+    "sourceManifestSha256": "301b53789551d3423730f56572762ab99cee8f59b1d1e7b3dfa30c6cf80141d2",
+    "unchanged": "Model revision/dtypes, runtime versions, prompt, exact forty images, input hashing, generation modes, visual rubric and preservation of all attempts remain as frozen in the base protocol.",
+    "deviceRequirementOverride": "For this new plan only, replace the base protocol's required target phone with a documented desktop or laptop hardware GPU using Chrome or Edge. Historical runs retain their original protocol and are not retrospectively assigned this plan."
+  },
+  "primaryTarget": {
+    "formFactor": "desktop-or-laptop",
+    "preferredBrowser": "Chrome",
+    "otherCandidateBrowser": "Edge",
+    "backend": "hardware-webgpu",
+    "softwareAdapter": "Excluded from desktop hardware performance claims.",
+    "unknownAdapter": "Unassessed until hardware is documented; an unknown identity is not a hardware pass.",
+    "operatorRecord": "Record machine, OS, GPU and browser versions, date and power/load conditions. Keep these self-reported details separate from observed browser/worker adapter information.",
+    "verification": "A desktop target selection, user agent or hardware-looking adapter string does not verify a physical desktop. Do not infer physical-device verification automatically.",
+    "supportClaim": "Validate each named configuration. A result on one Chrome/GPU combination does not establish support across all desktops or Edge."
+  },
+  "execution": {
+    "initialCheck": "Run case-01 once in compatibility mode (32 tokens). Retain its outcome. Resolve execution failures before attempting the full quality cohort.",
+    "qualityRun": "In a separate named run, select all forty cases in quality mode (128 tokens), sequentially in the fixed order. Preserve all caps, failures, cancellations and unstarted cases. Do not select a preferred retry.",
+    "cohortCaseCount": 40,
+    "perCaseTimeoutMs": 1800000,
+    "warmDefinition": "Successful cases in the same retained worker model session with modelReused=true. Reused downloaded files alone do not make a model session warm.",
+    "coldDefinition": "Successful cases with modelReused=false. Report model loading and any download separately from generation.",
+    "minimumWarmSamplesForP95": 30,
+    "percentileMethod": "Nearest-rank p95 at one-based rank ceil(0.95*n). Count valid samples for each metric separately, include all slow successful cases, and retain failures outside latency samples.",
+    "firstTokenMetric": "firstTokenMs: from model.generate to its first token, excluding loading/preprocessing.",
+    "endToEndMetric": "case elapsedMs: image fetch/verification, client/worker work, model loading, preprocessing, generation and receipt. Never substitute worker totalMs for a missing case elapsedMs.",
+    "noPooling": "Do not pool across runs, machines, protocols, quality/compatibility modes, CPU/WebGPU, or hardware/software adapters.",
+    "localEnvironment": "If no hardware adapter is exposed, record that limitation and do not substitute software rendering for the desktop hardware study."
+  },
+  "researchScreeningCriteria": {
+    "status": "Proposed research screening thresholds retained from the earlier study, not accepted service-level guarantees or validated accuracy standards.",
+    "completeQualityCases": 40,
+    "maximumExecutionErrorsOrUnplannedInterruptions": 0,
+    "warmFirstTokenP95TargetMs": 10000,
+    "warmEndToEndP95TargetMs": 30000,
+    "qualifiedHumanReview": {
+      "reviewedCases": 40,
+      "minimumUsefulCases": 32,
+      "minimumFullySupportedCases": 30,
+      "maximumCriticalFailureOutputs": 0,
+      "maximumSubstantiveVisualContradictionOutputs": 2,
+      "minimumAppropriateControlAnswers": 8,
+      "controlDenominator": 10,
+      "maximumCappedQualityOutputs": 4,
+      "procedure": "A qualified human freezes image-only references before seeing output, then grades masked outputs using the unchanged visual rubric. Record role/qualification basis and disclosure order. Assistant review and source lithology classes are not human visual ground truth."
+    },
+    "sourceIndependence": {
+      "minimumAuthoritativelyMappedBoreholes": 5,
+      "currentStatus": "unverified",
+      "requirement": "Keep the original authoritative case-level source/borehole mapping requirement. Filename groupings cannot establish independent held-out holes; unknown pretraining overlap remains a limitation."
+    },
+    "memory": "Record available JS heap only as JS heap. GPU/process peak memory and a numerical memory budget remain unassessed unless measured with a named external method and declared budget. Weight bytes, per-buffer limits and successful execution do not measure total memory.",
+    "decision": "Human quality, hardware provenance, source independence and memory suitability remain explicit external evidence. The page summarizes technical measurements only and never awards overall approval or geological accuracy. Missing evidence cannot pass."
+  },
+  "mobile": {
+    "requiredForDesktopMilestone": false,
+    "status": "Optional exploratory AI testing; current mobile modelling and manual core-photo workflows continue independently."
+  },
+  "history": "Only newly started runs receive this plan's ID/hash and chosen target. Saved legacy runs remain unassigned; do not relabel them or pool their measurements into desktop evidence.",
+  "applicationModelSelection": "Qwen stays an evaluation candidate until the required evidence supports a separately reviewed promotion."
+}
