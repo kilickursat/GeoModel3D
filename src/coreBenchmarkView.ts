@@ -8,6 +8,9 @@ import humanReviewTemplate from "../docs/benchmarks/0.26.0-core-ai/human-review-
 import protocolSource from "../docs/benchmarks/0.26.0-core-ai/protocol.json?raw";
 import rubricSource from "../docs/benchmarks/0.26.0-core-ai/rubric.md?raw";
 import sourceManifest from "../docs/benchmarks/0.26.0-core-ai/dataset-manifest.json?raw";
+import evaluationPlanSource from "../docs/benchmarks/0.27.0-desktop-ai/evaluation-plan.json?raw";
+import {checkedCoreBenchmarkEvaluation,summarizeCoreBenchmarkRun} from "./coreBenchmarkSummary";
+import type {CoreBenchmarkEvaluation} from "./coreBenchmarkSummary";
 import "./coreBenchmark.css";
 
 interface Case {id:string;image:string;sha256:string;sourceSha256:string;width:512;height:512}
@@ -15,7 +18,7 @@ interface Manifest {version:1;datasetId:"core-v026";cases:Case[]}
 type CaseStatus="not-started"|"running"|"completed"|"failed"|"timed-out"|"cancelled"|"interrupted";
 interface Entry {caseId:string;imageSha256:string;sourceSha256:string;status:CaseStatus;elapsedMs?:number;startedAt?:string;finishedAt?:string;recoveredAt?:string;error?:string;result?:CoreBenchmarkResult;
   lastProgress?:{progress:CoreBenchmarkProgress;observedAt:string;caseElapsedMs:number};errorDiagnostic?:CoreBenchmarkFailure}
-interface Run {id:string;appVersion?:string;startedAt:string;finishedAt?:string;recoveredAt?:string;mode:CoreBenchmarkMode;maxNewTokens:number;status:"running"|"completed"|"failed"|"cancelled"|"interrupted";
+interface Run {id:string;appVersion?:string;evaluation?:CoreBenchmarkEvaluation;startedAt:string;finishedAt?:string;recoveredAt?:string;mode:CoreBenchmarkMode;maxNewTokens:number;status:"running"|"completed"|"failed"|"cancelled"|"interrupted";
   selfReportedDeviceLabel:string;physicalDeviceVerified:false;cohortCaseCount:40;selectedCaseIds:string[];unselectedCaseIds:string[];cases:Entry[];stopReason?:string;
   mainThreadJsHeapBeforeBytes:number|null;mainThreadJsHeapAfterBytes?:number|null;pageVisibleAtStart:boolean;preflightAdapter?:CoreBenchmarkAdapter;browserContext?:ReturnType<typeof browserContext>}
 interface Active {token:number;run:Run;abort:AbortController;client:CoreBenchmarkClient;current?:Entry;currentStarted?:number;caseTimer?:ReturnType<typeof setTimeout>;
@@ -24,15 +27,18 @@ const protocolId="core-webgpu-pilot-2",base=new URL("./core-benchmark-v026/",loc
 let manifest:Manifest|undefined,manifestSha256:string|undefined,supported=false,clearing=false,active:Active|undefined,sequence=0;
 let preflightAdapter:CoreBenchmarkAdapter|undefined;
 let protocolSha256:string|undefined,rubricSha256:string|undefined,sourceManifestSha256:string|undefined;
+const evaluationPlan=JSON.parse(evaluationPlanSource) as {id:string;baseProtocol:{sha256:string;rubricSha256:string;sourceManifestSha256:string;publicManifestSha256:string}};
+let evaluationPlanSha256:string|undefined;
 const recoveryKey="geomodel3d:qwen-benchmark:last-report";
 let recoveryNote="";
 let referenceAbort:AbortController|undefined,referenceUrl:string|undefined,referenceSequence=0;
 const createdAt=new Date().toISOString();
 const app=document.querySelector<HTMLElement>("#benchmark-app")!;
 app.innerHTML=`<main class="bench-shell"><nav class="bench-nav" aria-label="Benchmark navigation"><a class="bench-brand" href="./">GeoModel3D <span class="bench-version"></span></a><a href="./">Back to the ground model</a></nav>
-<header class="bench-hero"><p class="bench-eyebrow">Experimental evaluation</p><h1>Test Qwen on your device</h1><p class="bench-lead">Run the same published core-image cases locally, then export what happened.</p><p>The model describes visible features. Human review is still pending, and no result changes your ground model, logs or engineering properties.</p></header>
+<header class="bench-hero"><p class="bench-eyebrow">Experimental evaluation</p><h1>Test Qwen on your device</h1><p class="bench-lead">Evaluate Qwen locally on desktop Chrome, then export the evidence.</p><p>The model describes visible features. Human review is still pending, and no result changes your ground model, logs or engineering properties.</p></header>
 <div class="bench-grid"><section class="bench-card" aria-labelledby="benchmark-run-heading"><h2 id="benchmark-run-heading">Run a device check</h2><p class="bench-support" id="benchmark-support" role="status">Checking this browser’s WebGPU support…</p>
-<div class="bench-fields"><label>Purpose<select id="benchmark-mode"><option value="quality">Description evaluation · 128 tokens</option><option value="compatibility">Compatibility check · 32 tokens</option></select></label><label>Cases<select id="benchmark-count"><option value="1">One case</option><option value="5">First five cases</option><option value="40">All forty cases</option></select></label><label class="wide" id="benchmark-case-label">Selected case<select id="benchmark-case" disabled><option>Loading case IDs…</option></select></label><label class="wide">Device label (optional)<input id="benchmark-device" maxlength="120" placeholder="For example, iPhone 17 · Safari" autocomplete="off"><span class="bench-hint">Your label is recorded as self-reported, separately from browser information.</span></label></div>
+<p class="bench-hint" id="benchmark-target-note">Desktop/laptop Chrome with a hardware GPU is the primary target; Edge is another candidate. iPhone and other mobile AI checks are optional. Start with a one-case compatibility check, then run all forty quality cases if execution succeeds.</p>
+<div class="bench-fields"><label class="wide">Evaluation target<select id="benchmark-target"><option value="desktop">Desktop/laptop Chrome or Edge (primary)</option><option value="exploratory">Other devices (exploratory)</option></select><span class="bench-hint">This records your chosen target; it does not verify the physical device.</span></label><label>Purpose<select id="benchmark-mode"><option value="quality">Description evaluation · 128 tokens</option><option value="compatibility">Compatibility check · 32 tokens</option></select></label><label>Cases<select id="benchmark-count"><option value="1">One case</option><option value="5">First five cases</option><option value="40">All forty cases</option></select></label><label class="wide" id="benchmark-case-label">Selected case<select id="benchmark-case" disabled><option>Loading case IDs…</option></select></label><label class="wide">Machine / OS / GPU / browser (optional)<input id="benchmark-device" maxlength="120" placeholder="For example, laptop · Windows · RTX 4060 · Chrome 142" autocomplete="off"><span class="bench-hint">Your label is recorded as self-reported, separately from browser information.</span></label></div>
 <p class="bench-hint" id="benchmark-mode-note">The full study contains 40 cases. A smaller run is a partial evaluation; human assessment is required.</p>
 <label class="bench-consent"><input id="benchmark-consent" type="checkbox"><span>I understand that starting may download about <strong>1.0 GiB</strong> of model weights, plus runtime and selected image files. Processing stays on this device.</span></label>
 <div class="bench-actions"><button id="benchmark-run" class="primary" type="button" disabled>Download model &amp; run</button><button id="benchmark-stop" type="button" disabled>Stop &amp; unload</button></div>
@@ -42,12 +48,13 @@ app.innerHTML=`<main class="bench-shell"><nav class="bench-nav" aria-label="Benc
 <div class="bench-actions"><button id="benchmark-review-images" type="button" disabled>Review source images</button><button id="benchmark-review-csv" type="button" disabled>Download blank review sheet</button><button id="benchmark-export" type="button" disabled>Export results JSON</button><button id="benchmark-clear-cache" type="button">Clear benchmark downloads</button></div><p id="benchmark-recovery-status" role="status"></p><button id="benchmark-forget-report" type="button" disabled>Forget saved benchmark results</button><p id="benchmark-dataset-status">Loading the frozen case manifest…</p><p>These public patches do not establish borehole independence or engineering-property accuracy. GPU memory cannot be measured by this page; any available JavaScript heap value is reported separately.</p></aside></div>
 <section id="benchmark-reference-panel" class="bench-card bench-reference" aria-labelledby="benchmark-reference-heading" hidden><div class="bench-reference-heading"><h2 id="benchmark-reference-heading">Image-only reference review</h2><button id="benchmark-reference-close" type="button">Close source review</button></div><p id="benchmark-reference-note">Describe the visible colour, texture, markings, edges and uncertainty in the blank review sheet. Save and freeze that reference before viewing model answers. No model runs from this panel.</p><div class="bench-reference-controls"><label>Source case<select id="benchmark-reference-case" aria-label="Source case"></select></label><button id="benchmark-reference-next" type="button">Next source image</button></div><div id="benchmark-reference-preview" aria-live="polite"></div></section>
 <section class="bench-results" aria-labelledby="benchmark-results-heading"><h2 id="benchmark-results-heading">Run history</h2><div id="benchmark-results"><p class="bench-empty">No runs yet. Starting another run keeps earlier results in this page.</p></div></section>
-<footer class="bench-footer"><div class="bench-links"><a href="https://github.com/kilickursat/GeoModel3D/tree/main/docs/benchmarks/0.26.0-core-ai" target="_blank" rel="noreferrer">Study protocol and source credits</a><a href="https://github.com/kilickursat/GeoModel3D/blob/main/docs/benchmarks/0.26.0-core-ai/NOTICE.md" target="_blank" rel="noreferrer">Image licence</a></div><p>Qwen3.5 0.8B · pinned Hugging Face model · local WebGPU. Model weights are separate from this page. Cached files may be evicted by your browser.</p></footer></main>`;
+<footer class="bench-footer"><div class="bench-links"><a href="https://github.com/kilickursat/GeoModel3D/tree/main/docs/benchmarks/0.27.0-desktop-ai" target="_blank" rel="noreferrer">Desktop evaluation plan and instructions</a><a href="https://github.com/kilickursat/GeoModel3D/tree/main/docs/benchmarks/0.26.0-core-ai" target="_blank" rel="noreferrer">Study protocol and source credits</a><a href="https://github.com/kilickursat/GeoModel3D/blob/main/docs/benchmarks/0.26.0-core-ai/NOTICE.md" target="_blank" rel="noreferrer">Image licence</a></div><p>Qwen3.5 0.8B · pinned Hugging Face model · local WebGPU. Model weights are separate from this page. Cached files may be evicted by your browser.</p></footer></main>`;
 const $=<T extends HTMLElement>(id:string)=>document.getElementById(id) as T;
 $("benchmark-app").querySelector(".bench-version")!.textContent=`${pkg.version}`;
 const runButton=$<HTMLButtonElement>("benchmark-run"),stopButton=$<HTMLButtonElement>("benchmark-stop"),exportButton=$<HTMLButtonElement>("benchmark-export");
 const csvButton=$<HTMLButtonElement>("benchmark-review-csv"),clearButton=$<HTMLButtonElement>("benchmark-clear-cache"),consent=$<HTMLInputElement>("benchmark-consent");
 const referenceButton=$<HTMLButtonElement>("benchmark-review-images"),referenceSelect=$<HTMLSelectElement>("benchmark-reference-case"),referenceNext=$<HTMLButtonElement>("benchmark-reference-next");
+const targetSelect=$<HTMLSelectElement>("benchmark-target");
 const modeSelect=$<HTMLSelectElement>("benchmark-mode"),countSelect=$<HTMLSelectElement>("benchmark-count"),caseSelect=$<HTMLSelectElement>("benchmark-case"),deviceLabel=$<HTMLInputElement>("benchmark-device");
 const status=$("benchmark-status"),progress=$<HTMLProgressElement>("benchmark-progress"),results=$("benchmark-results");
 function now(){return new Date().toISOString()}
@@ -91,7 +98,9 @@ function restore(){
       let originalBrowser:Run["browserContext"];
       if(value.browserContext){const b=value.browserContext;originalBrowser={observedAt:stamp(b.observedAt),userAgent:brief(b.userAgent,2048),language:brief(b.language,64),hardwareConcurrency:number(b.hardwareConcurrency),deviceMemoryGiB:number(b.deviceMemoryGiB),viewport:{width:number(b.viewport.width)!,height:number(b.viewport.height)!,pixelRatio:number(b.viewport.pixelRatio)!},physicalDeviceVerified:false}}
       if(value.appVersion!==undefined&&(typeof value.appVersion!=="string"||!/^\d+\.\d+\.\d+$/.test(value.appVersion)||value.appVersion.length>32))throw new Error("Invalid saved application version.");
-      return {id:`run-${index+1}`,...(value.appVersion!==undefined?{appVersion:value.appVersion}:{}),startedAt:stamp(value.startedAt),...(value.status==="running"?{recoveredAt:now()}:value.finishedAt?{finishedAt:stamp(value.finishedAt)}:{}),
+      const evaluation=checkedCoreBenchmarkEvaluation(value.evaluation);
+      if(value.evaluation!==undefined&&!evaluation)throw new Error("Invalid saved evaluation identity.");
+      return {id:`run-${index+1}`,...(evaluation?{evaluation}:{}),...(value.appVersion!==undefined?{appVersion:value.appVersion}:{}),startedAt:stamp(value.startedAt),...(value.status==="running"?{recoveredAt:now()}:value.finishedAt?{finishedAt:stamp(value.finishedAt)}:{}),
         ...(value.status!=="running"&&value.recoveredAt?{recoveredAt:stamp(value.recoveredAt)}:{}),mode:value.mode,maxNewTokens:value.maxNewTokens,status:value.status==="running"?"interrupted":value.status,
         selfReportedDeviceLabel:brief(value.selfReportedDeviceLabel,120),physicalDeviceVerified:false,cohortCaseCount:40,selectedCaseIds:selected,unselectedCaseIds:manifest!.cases.filter(c=>!selected.includes(c.id)).map(c=>c.id),cases,
         mainThreadJsHeapBeforeBytes:number(value.mainThreadJsHeapBeforeBytes),...(value.mainThreadJsHeapAfterBytes!==undefined?{mainThreadJsHeapAfterBytes:number(value.mainThreadJsHeapAfterBytes)}:{}),pageVisibleAtStart:value.pageVisibleAtStart===true,
@@ -102,12 +111,12 @@ function restore(){
 }
 function say(message:string,error=false){status.textContent=message;status.dataset.error=String(error)}
 function controls(){
-  runButton.disabled=!!active||clearing||!supported||!manifest||!protocolSha256||!consent.checked;
+  runButton.disabled=!!active||clearing||!supported||!manifest||!protocolSha256||!evaluationPlanSha256||!consent.checked;
   $("benchmark-forget-report").toggleAttribute("disabled",!!active||!runs.length);
   stopButton.disabled=!active;clearButton.disabled=!!active||clearing;exportButton.disabled=!runs.length;csvButton.disabled=!manifest;
   referenceButton.disabled=referenceSelect.disabled=referenceNext.disabled=!!active||!manifest;
   if(manifest&&referenceSelect.value===manifest.cases.at(-1)?.id)referenceNext.disabled=true;
-  for(const el of [modeSelect,countSelect,caseSelect,deviceLabel,consent])el.disabled=!!active||clearing;
+  for(const el of [targetSelect,modeSelect,countSelect,caseSelect,deviceLabel,consent])el.disabled=!!active||clearing;
   if(!manifest)caseSelect.disabled=true;
   $("benchmark-case-label").hidden=countSelect.value!=="1";
   $("benchmark-mode-note").textContent=modeSelect.value==="compatibility"?"Compatibility mode stops at 32 tokens. Its output is unscored and does not establish description quality.":"The full study contains 40 cases. A smaller run is a partial evaluation; human assessment is required.";
@@ -154,6 +163,30 @@ async function showReference(){
     const caption=document.createElement("p");caption.textContent=`${sample.id} · verified 512 × 512 input. The patch is enlarged from the source; enlargement adds no observed detail.`;preview.replaceChildren(image,caption);
   }catch(error){if(referenceSequence===token)preview.textContent=error instanceof Error?error.message:String(error)}
 }
+function technicalSummary(run:Run){
+  const value=summarizeCoreBenchmarkRun(run,{id:evaluationPlan.id,sha256:evaluationPlanSha256!});
+  const panel=document.createElement("section");panel.className="bench-technical-summary";
+  const heading=document.createElement("h4");heading.textContent="Technical summary";panel.append(heading);
+  const note=(text:string)=>{const p=document.createElement("p");p.textContent=text;panel.append(p)};
+  note(run.evaluation?`Evaluation: ${run.evaluation.planId} · ${run.evaluation.target} target. Plan hash is retained in the JSON export.`:"Legacy run: no evaluation plan assigned. Its original device context is retained.");
+  note(value.classificationReason);
+  const c=value.counts;
+  note(`${c.attempted} attempted · ${c.failed} failed · ${c.timedOut} timed out · ${c.interrupted} interrupted · ${c.cancelled} cancelled · ${c.notStarted} not started · ${c.unselected} unselected · ${c.capped} capped outputs.`);
+  const grid=document.createElement("div");grid.className="bench-timing-grid";
+  const seconds=(ms:number|null)=>ms===null?"—":`${(ms/1000).toFixed(3)} s`;
+  for(const kind of ["cold","warm"] as const){
+    const group=value.timings[kind],section=document.createElement("div"),title=document.createElement("h5");
+    title.textContent=`${kind==="cold"?"Cold model session":"Warm model session"} · ${group.count} completed`;section.append(title);
+    for(const [key,label] of [["firstToken","First token"],["endToEnd","End to end"],["load","Model loading"]] as const){
+      const metric=group[key],p=document.createElement("p");p.textContent=`${label}: ${metric.count} measured · median ${seconds(metric.medianMs)} · p95 ${seconds(metric.p95Ms)}`;section.append(p);
+    }
+    grid.append(section);
+  }
+  panel.append(grid);
+  note(value.timings.withheldReason??"Timings describe this run only. Each p95 needs at least 30 valid samples; — means unavailable. Warm means the model session was reused. First-token timing excludes loading and preprocessing.");
+  note("Technical measurements do not establish description quality. Human grading, source independence, physical-device verification and total GPU/process memory remain unassessed.");
+  return panel;
+}
 function render(){
   checkpoint();
   if(!runs.length){results.textContent="No runs yet.";return}results.replaceChildren();
@@ -162,6 +195,7 @@ function render(){
     const summary=document.createElement("p");summary.className="bench-run-summary";
     const done=run.cases.filter(c=>c.status==="completed").length;
     summary.textContent=`${done}/${run.cases.length} selected cases completed · ${run.status} · full study: 40 cases${run.appVersion?` · app ${run.appVersion}`:""}. ${run.mode==="compatibility"?"Unscored execution check.":"Human quality review pending."}`;card.append(summary);
+    card.append(technicalSummary(run));
     for(const entry of run.cases){const element=document.createElement("section");element.className="bench-case";element.dataset.caseId=entry.caseId;
       const head=document.createElement("div");head.className="bench-case-head";const h=document.createElement("h4");h.textContent=entry.caseId;const badge=document.createElement("span");badge.className="bench-case-status";badge.dataset.status=entry.status;badge.textContent=entry.status.replaceAll("-"," ");head.append(h,badge);element.append(head);
       if(entry.result){const answer=document.createElement("div");answer.className="bench-answer";answer.textContent=entry.result.text;element.append(answer);
@@ -200,13 +234,14 @@ function stop(reason:string,kind:"cancelled"|"interrupted"|"timed-out"){
   progress.hidden=true;say(`${reason} Completed and unstarted cases are preserved. Export this page’s results before closing.`);render();controls();
 }
 async function start(){
-  if(active||clearing||!manifest||!protocolSha256||!supported||!consent.checked)return;
+  if(active||clearing||!manifest||!protocolSha256||!evaluationPlanSha256||!supported||!consent.checked)return;
+  if(targetSelect.value!=="desktop"&&targetSelect.value!=="exploratory")return;
   const mode=modeSelect.value as CoreBenchmarkMode,count=Number(countSelect.value);
   const selected=count===1?manifest.cases.filter(c=>c.id===caseSelect.value):manifest.cases.slice(0,count);
   if(![1,5,40].includes(count)||selected.length!==count){say("Choose a valid set of frozen cases.",true);return}
   if(document.visibilityState!=="visible"){say("Keep this page visible before starting a run.",true);return}
   closeReference();
-  const run:Run={id:`run-${runs.length+1}`,appVersion:pkg.version,startedAt:now(),mode,maxNewTokens:coreBenchmarkTokenLimit(mode),status:"running",selfReportedDeviceLabel:deviceLabel.value.trim().slice(0,120),physicalDeviceVerified:false,
+  const run:Run={id:`run-${runs.length+1}`,appVersion:pkg.version,evaluation:{planId:evaluationPlan.id,planSha256:evaluationPlanSha256,target:targetSelect.value},startedAt:now(),mode,maxNewTokens:coreBenchmarkTokenLimit(mode),status:"running",selfReportedDeviceLabel:deviceLabel.value.trim().slice(0,120),physicalDeviceVerified:false,
     cohortCaseCount:40,selectedCaseIds:selected.map(c=>c.id),unselectedCaseIds:manifest.cases.filter(c=>!selected.some(s=>s.id===c.id)).map(c=>c.id),
     cases:selected.map(c=>({caseId:c.id,imageSha256:c.sha256,sourceSha256:c.sourceSha256,status:"not-started"})),mainThreadJsHeapBeforeBytes:heapBytes(),pageVisibleAtStart:true,browserContext:browserContext(),...(preflightAdapter?{preflightAdapter:structuredClone(preflightAdapter)}:{})};
   const state:Active={token:++sequence,run,abort:new AbortController(),client:new CoreBenchmarkClient()};active=state;runs.push(run);render();controls();
@@ -233,9 +268,10 @@ function exportReport(){
   const report={format:"geomodel3d-core-device-benchmark",version:1,appVersion:pkg.version,createdAt,exportedAt:now(),inProgress:!!active,partial:runs.some(run=>run.selectedCaseIds.length!==40||run.cases.some(c=>c.status!=="completed")),
     protocol:{id:protocolId,sha256:protocolSha256,rubricSha256,sourceManifestSha256,timingDefinitions:JSON.parse(protocolSource).execution.timingDefinitions,promptVersion:CORE_BENCHMARK_PROMPT_VERSION,prompt:CORE_BENCHMARK_PROMPT,model:CORE_BENCHMARK_MODEL,qualityTokenLimit:128,compatibilityTokenLimit:32,doSample:false,repetitionPenalty:1.1,humanReviewStatus:"pending",qualityScores:null},
     dataset:{id:manifest.datasetId,manifestSha256,cohortCaseCount:40,boreholeIndependence:"unverified",cases:manifest.cases.map(c=>({caseId:c.id,imageSha256:c.sha256,sourceSha256:c.sourceSha256,width:c.width,height:c.height}))},
+    activeEvaluationPlan:{id:evaluationPlan.id,sha256:evaluationPlanSha256,plan:JSON.parse(evaluationPlanSource),appliesTo:"Only runs explicitly carrying this plan ID and hash."},
     browser:browserContext(),
     memory:{gpuMemoryBytes:null,note:"Main-thread and worker JavaScript heap observations, when available, exclude GPU allocations. They do not measure total model or device memory."},
-    methodology:"Each selected case runs once in recorded order with the pinned model, frozen input hash and fixed prompt. Stop, failure or page hiding preserves completed/current/unstarted records. Runs are not retried automatically. Compatibility output is excluded from quality evaluation. Human references and scores must be supplied independently; no quality or engineering accuracy is inferred from execution.",runs:structuredClone(runs)};
+    methodology:"Each selected case runs once in recorded order with the pinned model, frozen input hash and fixed prompt. Stop, failure or page hiding preserves completed/current/unstarted records. Runs are not retried automatically. Compatibility output is excluded from quality evaluation. Human references and scores must be supplied independently; no quality or engineering accuracy is inferred from execution.",runs:runs.map(run=>({...structuredClone(run),technicalSummary:summarizeCoreBenchmarkRun(run,{id:evaluationPlan.id,sha256:evaluationPlanSha256!})}))};
   download(`geomodel3d-qwen-device-${new Date().toISOString().replaceAll(":","-")}.json`,"application/json",JSON.stringify(report,null,2)+"\n");
 }
 function reviewCsv(){
@@ -262,11 +298,14 @@ window.addEventListener("beforeunload",event=>{if(active){stop("Page closed or r
 void coreBenchmarkSupport().then(value=>{
   supported=value.supported;preflightAdapter=(value as typeof value&{adapter?:CoreBenchmarkAdapter}).adapter;
   const support=$("benchmark-support");support.dataset.state=!supported?"unavailable":preflightAdapter?.softwareAdapter?"software":"available";
-  support.textContent=!supported?(value.reason??"WebGPU is unavailable. You can still prepare a human reference sheet."):preflightAdapter?.softwareAdapter?"A software WebGPU adapter is active. Runs may take a long time and do not measure hardware GPU or phone speed.":"WebGPU is available. No model downloads until you start. Adapter identity may be hidden by the browser.";
+  support.textContent=!supported?(value.reason??"WebGPU is unavailable. You can still prepare a human reference sheet."):preflightAdapter?.softwareAdapter?"A software WebGPU adapter is active. Runs may take a long time and do not measure desktop hardware GPU speed.":"WebGPU is available. No model downloads until you start. Adapter identity may be hidden by the browser.";
   controls();
 }).catch(error=>{supported=false;$("benchmark-support").textContent=error instanceof Error?error.message:String(error);$("benchmark-support").dataset.state="unavailable";controls()});
 void fetchBytes(new URL("manifest.json",base),128_000).then(async bytes=>{
-  const parsed=parseManifest(bytes),encoder=new TextEncoder();const [hash,ph,rh,sh]=await Promise.all([sha256(bytes),sha256(encoder.encode(protocolSource)),sha256(encoder.encode(rubricSource)),sha256(encoder.encode(sourceManifest))]);manifest=parsed;manifestSha256=hash;protocolSha256=ph;rubricSha256=rh;sourceManifestSha256=sh;caseSelect.replaceChildren(...parsed.cases.map(c=>new Option(c.id,c.id)));
+  const parsed=parseManifest(bytes),encoder=new TextEncoder();const [hash,ph,rh,sh,eh]=await Promise.all([sha256(bytes),sha256(encoder.encode(protocolSource)),sha256(encoder.encode(rubricSource)),sha256(encoder.encode(sourceManifest)),sha256(encoder.encode(evaluationPlanSource))]);
+  const expected=evaluationPlan.baseProtocol;
+  if(hash!==expected.publicManifestSha256||ph!==expected.sha256||rh!==expected.rubricSha256||sh!==expected.sourceManifestSha256)throw new Error("Benchmark files do not match the frozen desktop evaluation plan. Reload the page before starting a new run.");
+  evaluationPlanSha256=eh;manifest=parsed;manifestSha256=hash;protocolSha256=ph;rubricSha256=rh;sourceManifestSha256=sh;caseSelect.replaceChildren(...parsed.cases.map(c=>new Option(c.id,c.id)));
   referenceSelect.replaceChildren(...parsed.cases.map(c=>new Option(c.id,c.id)));
   $("benchmark-dataset-status").textContent="40 frozen public images are available. Case images load only when you review a source or start a run.";restore();render();controls();
 }).catch(error=>{$("benchmark-dataset-status").textContent=`Case manifest unavailable: ${error instanceof Error?error.message:String(error)}`;say("The frozen image set could not be verified. No model or case image was downloaded.",true);controls()});

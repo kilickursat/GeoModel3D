@@ -57,7 +57,9 @@ This is a promising description result, not geological accuracy or human-geologi
 
 [Read all 16 answers, images, scores, source credits and reproduction steps](docs/benchmarks/0.25.0-core-ai/README.md). The study is exploratory: eight public patches, unverified borehole independence and unknown pretraining overlap. The app's default remains unchanged pending a larger expert-reviewed and real-device evaluation.
 
-**Continue the study on your device:** the [Qwen evaluation page](https://kilickursat.github.io/GeoModel3D/core-ai-benchmark.html) provides forty new fixed images, source-only review, explicit local model downloads and exportable device results. Interrupted runs can be recovered without automatically restarting inference. [Protocol and instructions](docs/benchmarks/0.26.0-core-ai/README.md) keep CPU diagnostics, browser execution and human quality review separate. The expanded set has no human-validated quality score yet, and physical iPhone performance remains unmeasured.
+**Next milestone: desktop hardware-GPU evaluation.** The [Qwen evaluation page](https://kilickursat.github.io/GeoModel3D/core-ai-benchmark.html) uses forty fixed images, source-only review, explicit local model downloads and exportable results. Chrome on a documented desktop/laptop GPU is the preferred target; Edge is another candidate to validate per configuration. **iPhone and other mobile AI testing are optional**, while existing mobile modelling and manual core-photo workflows continue independently.
+
+The [desktop plan and instructions](docs/benchmarks/0.27.0-desktop-ai/README.md) reference the unchanged inference protocol and visual rubric. New runs record their evaluation target and plan identity; technical summaries keep individual runs, modes and cold/warm timings separate. Earlier CPU/software-GPU results remain historical evidence. The expanded set still has no qualified-human quality score or desktop hardware-GPU performance result; the current managed test environment exposes no usable hardware adapter. A technical summary is not overall approval or geological accuracy.
 
 ## Your data
 
@@ -115,7 +117,7 @@ GitHub's **Cite this repository** gives the reference from [CITATION.cff](CITATI
   author  = {Kilic, Kursat},
   title   = {GeoModel3D: 3D geological models from borehole logs and CPTs, in the browser},
   url     = {https://github.com/kilickursat/GeoModel3D},
-  version = {0.26.1},
+  version = {0.27.0},
   year    = {2026},
   license = {Apache-2.0}
 }

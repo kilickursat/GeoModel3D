@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.27.0 — 2026-11-15
+
+- Prioritize a documented desktop/laptop hardware GPU for the next Qwen evaluation milestone: Chrome preferred, Edge validated per configuration, and iPhone/mobile AI optional. Existing mobile modelling and manual core-photo workflows continue independently.
+- Record a new desktop evaluation plan and chosen target only on newly started runs. The forty images, pinned model/runtime, prompt, generation settings and visual rubric are unchanged; historical evidence and legacy runs are not relabelled.
+- Add per-run technical outcome and timing summaries with separate cold/warm sessions and at least thirty valid warm samples for nearest-rank p95. Missing measurements, software/unknown adapters, human grading, memory suitability and source independence cannot produce an overall approval or accuracy claim.
+- Publish desktop execution/review instructions and a capability probe showing no usable hardware WebGPU adapter in the current managed test environment. No new hardware inference or human-validated quality result is claimed.
+
 ## 0.26.1 — 2026-11-15
 
 - Preserve bounded progress checkpoints and structured failure details in the Qwen device report: loading stage, relative file, observed byte counts and original error. Signed URLs and image bytes are excluded.
