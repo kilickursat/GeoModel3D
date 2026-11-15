@@ -24,6 +24,8 @@ import {reportHtml} from "./report";
 import {createInputWorkspace,InputModelContext} from "./input";
 import {parseWorkspace} from "./workspace";
 import {showEvidence} from "./evidenceView";
+import {showCorePhotos} from "./corePhotoView";
+import {calculateCoreRun} from "./corePhoto";
 import {showCorridor} from "./corridorView";
 import {agreement,askAgreement,withdrawAgreement} from "./agreement";
 import {loadReader} from "./reader";
@@ -850,6 +852,7 @@ ui.innerHTML=`<div class="topbar"></div><h1 class="title">GeoModel3D <span>${pkg
     <div class="check-results"></div></details>
   <details class="coords"><summary>Coordinates</summary><label class="crs"><input class="crs-input" list="crs-options" placeholder="EPSG code, name or country" spellcheck="false" autocomplete="off" aria-label="Coordinate system"></label><datalist id="crs-options"></datalist></details>
   <details class="site-evidence" hidden><summary>Source evidence</summary><p>Original readings and subsequent edits, with the saved source pages.</p><div></div></details>
+  <details class="site-core-photos" hidden><summary>Core photos</summary><p>Reviewed photo annotations and RQD are separate from laboratory tests. Edited logs may differ from these saved annotations.</p><div></div></details>
   <details class="notes" hidden><summary></summary><ul></ul></details>
   <p class="panel-hint"></p>
 </div>`;
@@ -1135,8 +1138,16 @@ function renderSourceEvidence(){
   }
   box.hidden=!links.length;
   box.querySelector("div")!.innerHTML=links.map(l=>`<button data-evidence="${esc(l.id)}">${esc(l.label)}</button>`).join("");
+  const photos=ui.querySelector<HTMLDetailsElement>(".site-core-photos")!,runs=project.corePhotos?.runs??[];
+  photos.hidden=!runs.length;
+  photos.querySelector("div")!.innerHTML=runs.map(run=>{
+    const result=calculateCoreRun(run),quality=run.status==="accepted"&&result.rqdPercent!==undefined?` · reviewed RQD ${fmt(result.rqdPercent,1)}%`:" · draft";
+    return `<button data-core-run="${esc(run.id)}">${esc(run.boreholeId)} · ${fmt(run.from,2)}–${fmt(run.to,2)} m${quality}</button>`;
+  }).join("");
 }
 ui.addEventListener("click",e=>{
+  const core=(e.target as Element).closest<HTMLButtonElement>("[data-core-run]");
+  if(core){showCorePhotos(project,{initialRunId:core.dataset.coreRun,readOnly:true,onSave:()=>{}});return}
   const b=(e.target as Element).closest<HTMLButtonElement>("[data-evidence]");
   if(b)openProjectEvidence(b.dataset.evidence!,`Source evidence · ${b.textContent}`);
 });
@@ -1213,6 +1224,8 @@ function applyRules(){
   // The CPT layers follow the rules applied, unless the project has rules of their own for them.
   const cpts=target==="cptRules"||!project.cptRules?project.cpts?.map(c=>c.layers&&c.layersSource==="automatic"?{...c,layers:layerUnits(c.layers,c.z,rules)}:c):project.cpts;
   const used=new Set([...boreholes.flatMap(b=>b.intervals.map(i=>i.unit)),...(cpts??[]).flatMap(c=>(c.layers??[]).map(l=>l.unit))].filter(Boolean));
+  // Accepted photograph annotations retain their original unit definitions when model rules are changed.
+  for(const run of project.corePhotos?.runs??[])for(const row of run.rows)for(const piece of row.pieces)if(piece.unit)used.add(piece.unit);
   const kept=project.units.filter(u=>used.has(u.id)),added=[...used].filter(id=>!kept.some(u=>u.id===id));
   if(added.length)notes.push(`New units added at the bottom of the column: ${added.join(", ")}`);
   const unmatched=unmatchedLayers(cpts);

@@ -1,10 +1,11 @@
 // The data editor's tables: a project as rows of text a person can type or paste, and back. A project is rebuilt from
 // the tables through the CSV importer, so data typed in are checked exactly as imported files are.
 import {GeoProject,UnitRule,Borehole,boreholeDepth} from "./schema";
-import {ImportResult,importFiles,toCsv} from "./io";
+import {ImportResult,importFiles,importCorePhotoTables,toCsv} from "./io";
 import {Crs,projectCrs,findCrs,searchCrs,customCrs} from "./crs";
 import {applyUnitRules,lithologyRules} from "./rules";
 import type {EvidenceCollection} from "./evidence";
+import {CoreCollection,validateCorePhotos} from "./corePhoto";
 import {parseGroundwater} from "./groundwater";
 
 export type TableName="boreholes"|"logs"|"water"|"spt"|"tests"|"units";
@@ -39,6 +40,7 @@ export interface ProjectFields { name:string; description:string; source:string;
 export interface EditorTables {
   project:ProjectFields; rows:Record<TableName,string[][]>;
   evidence?:EvidenceCollection;
+  corePhotos?:CoreCollection;
   // Entries move with their rows when the editor inserts, removes or reorders rows. null is an unsourced row.
   evidenceRows?:Partial<Record<TableName,(string|null)[]>>;
   groundwaterDraft?:{mode:"observed"|"assumed-depth"|"as-of";depth:string;date:string;includeUndated:boolean};
@@ -74,6 +76,7 @@ export function tablesFromProject(p:GeoProject):EditorTables{
     ...(p.groundwater?{groundwaterDraft:{mode:p.groundwater.mode,depth:p.groundwater.mode==="assumed-depth"?String(p.groundwater.depth):"",
       date:p.groundwater.mode==="as-of"?p.groundwater.date:"",includeUndated:p.groundwater.mode==="as-of"&&!!p.groundwater.includeUndated}}:{}),
     ...(p.evidence?{evidence:structuredClone(p.evidence)}:{}),
+    ...(p.corePhotos?{corePhotos:structuredClone(p.corePhotos)}:{}),
     ...(Object.values(evidenceRows).some(ids=>ids.some(id=>id!==null))?{evidenceRows}:{})};
 }
 export function emptyTables():EditorTables{
@@ -129,7 +132,15 @@ export const tableCsv=(t:EditorTables,name:TableName)=>csvOf(name,t.rows[name]).
 // A project from the tables. What the tables do not show (terrain, unit rules, other unit parameters, lines and CPTs) is
 // kept from the project being edited; terrain, lines and CPTs only while its coordinate system stays the same.
 export function projectFromTables(t:EditorTables,base?:GeoProject):ImportResult{
+  return projectFromEditorTables(t,base,false);
+}
+// Core registration needs valid collar coordinates, but may precede the first accepted geological interval.
+export function projectForCorePhotos(t:EditorTables,base?:GeoProject):GeoProject{
+  return projectFromEditorTables(t,base,true).project;
+}
+function projectFromEditorTables(t:EditorTables,base:GeoProject|undefined,forCorePhotos:boolean):ImportResult{
   const crs=crsFromText(t.project.crs);
+  const corePhotos=t.corePhotos??base?.corePhotos;
   const evidence=t.evidence??base?.evidence,recordIds=new Set(evidence?.records.map(r=>r.id));
   for(const [name,ids] of Object.entries(t.evidenceRows??{}) as Array<[TableName,(string|null)[]]>){
     if(!Array.isArray(ids)||ids.length!==t.rows[name]?.length)throw new Error(`Evidence links for ${name} do not match the editor rows.`);
@@ -146,7 +157,7 @@ export function projectFromTables(t:EditorTables,base?:GeoProject):ImportResult{
   })};
   const files=(Object.keys(COLUMNS) as TableName[]).filter(n=>n==="boreholes"||n==="logs"||rows[n].some(filled))
     .map(n=>csvOf(n,rows[n],t.evidenceRows?.[n]));
-  const result=importFiles(files,undefined,crs);
+  const result=forCorePhotos||corePhotos?.runs.length?importCorePhotoTables(files,crs,forCorePhotos?undefined:new Set(corePhotos!.runs.map(r=>r.boreholeId))):importFiles(files,undefined,crs);
   if(evidence)result.project.evidence=structuredClone(evidence);
   result.warnings.push(...notes);
   const p=result.project,f=t.project,num=(s:string)=>s.trim()===""?undefined:Number(s.replace(",","."));
@@ -189,6 +200,7 @@ export function projectFromTables(t:EditorTables,base?:GeoProject):ImportResult{
     p.groundwater=parseGroundwater(g.mode==="assumed-depth"?{mode:g.mode,depth:g.depth.trim()?Number(g.depth.trim().replace(",",".")):NaN}:
       g.mode==="as-of"?{mode:g.mode,date:g.date.trim(),includeUndated:g.includeUndated}:{mode:g.mode});
   }
+  if(corePhotos)p.corePhotos=validateCorePhotos(corePhotos,{evidence:p.evidence??{version:1,sources:[],records:[]},...(forCorePhotos?{}:{boreholes:p.boreholes,units:p.units})});
   return result;
 }
 

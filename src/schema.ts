@@ -2,6 +2,7 @@
 // data, so the modelling kernel (and a worker running it) can use it without the bundled datasets in src/geology.ts.
 import {TerrainGrid} from "./terrain";
 import type {EvidenceCollection} from "./evidence";
+import type {CoreCollection} from "./corePhoto";
 
 // Geological units are listed in stratigraphic order, youngest (top) to oldest (bottom). An erosive unit's base
 // is an unconformity that cuts down into older units. Unit weights are in kN/m³; `params` holds other design values
@@ -59,6 +60,8 @@ export interface GeoProject {
   units:UnitDef[]; rules?:UnitRule[]; boreholes:Borehole[]; terrain?:TerrainGrid; alignments?:Alignment[]; cpts?:Cpt[];
   cptLayers?:boolean; cptRules?:UnitRule[];
   evidence?:EvidenceCollection;
+  // Registered core photographs and reviewed photo-derived observations. These are separate from measured tests.
+  corePhotos?:CoreCollection;
 }
 
 export function boreholeDepth(b:Borehole){return Math.max(b.depth??0,...b.intervals.map(i=>i.to))}

@@ -7,6 +7,7 @@ import {importFiles,toProjectJson} from "./io";
 import {alignmentProblem} from "./alignment";
 import {parseGroundwater} from "./groundwater";
 import {EvidenceCollection,validateEvidence,EVIDENCE_MAX_IMAGE_BYTES,EVIDENCE_MAX_PAGE_IMAGE_BYTES} from "./evidence";
+import {validateCorePhotos} from "./corePhoto";
 
 export interface WorkspaceRevision {
   id:string; parentId?:string; createdAt:string; reason:string; engineVersion:string; project:GeoProject; scenarioId?:string;
@@ -243,6 +244,9 @@ function parseTables(value:unknown,image:ImageResolver,path="draft.tables"):Edit
   }
   const parsed=clone(t) as unknown as EditorTables;
   if(t.evidence!==undefined)parsed.evidence=evidenceCollection(t.evidence,`${path}.evidence`,image);
+  // A draft may contain unfinished collar/unit edits. Resolve its source images now; check geological references
+  // when building, without dropping annotations or making an unfinished workspace impossible to reopen.
+  if(t.corePhotos!==undefined)try{parsed.corePhotos=validateCorePhotos(t.corePhotos,{evidence:parsed.evidence??{version:1,sources:[],records:[]}})}catch(error){invalid(`${path}.corePhotos`,(error as Error).message)}
   const ids=new Set(parsed.evidence?.records.map(r=>r.id)??[]);
   if(t.evidenceRows!==undefined){
     const bindings=record(t.evidenceRows,`${path}.evidenceRows`);
@@ -300,7 +304,6 @@ function parseProject(value:unknown,path:string,image:ImageResolver):GeoProject{
     for(const k of ["x","y","z"])number(b[k],`${at}.${k}`);
     optionalNumbers(b,["depth","lon","lat"],at);evidenceReference(b.evidenceId,evidenceIds,at);
     intervals(b.intervals,`${at}.intervals`,false,evidenceIds);
-    if(!(b.intervals as unknown[]).length)invalid(`${at}.intervals`,"must contain a log");
     for(const [key,required,optional] of [["spt",["depth","blows","penetration"],[]],["water",["depth"],[]],["tests",["depth","value"],["to"]]] as const){
       if(b[key]===undefined)continue;
       for(const [j,r] of records(b[key],`${at}.${key}`).entries()){
@@ -350,6 +353,8 @@ function parseProject(value:unknown,path:string,image:ImageResolver):GeoProject{
     g.z=z.map((v,i)=>number(v,`${at}.z[${i}]`,true));optionalStrings(g,["source"],at);
   }
   const project=p as unknown as GeoProject;
+  if(p.corePhotos!==undefined)try{project.corePhotos=validateCorePhotos(p.corePhotos,{evidence:project.evidence??{version:1,sources:[],records:[]},boreholes:project.boreholes,units:project.units})}catch(error){invalid(`${path}.corePhotos`,(error as Error).message)}
+  for(const [i,b] of project.boreholes.entries())if(!b.intervals.length&&!project.corePhotos?.runs.some(r=>r.boreholeId===b.id))invalid(`${path}.boreholes[${i}].intervals`,"must contain a log or have a saved core-photo registration");
   // Let the established parser check project compatibility. Its normalisations (e.g. reapplying interpretation
   // rules or dropping a redundant final depth) must not rewrite the original saved checkpoint.
   const parsed=importFiles([{name:"checkpoint.geomodel3d.json",text:toProjectJson(project)}]).project;

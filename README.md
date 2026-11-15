@@ -22,6 +22,7 @@ GeoModel3D builds a layered ground model from borehole logs and cone penetration
 
 - Builds the model from boreholes, CPTs or both: horizons between the boreholes and a closed volume for each unit. One borehole is enough to start.
 - Reads borehole logs from PDF reports and images on your device, logs drawn with a depth scale or set out as tables, scanned pages included. You check each value beside the page it was read from before it is used.
+- Registers core-box photographs to depth, assists piece and lithology logging, and calculates reviewed photo-derived RQD. Accepted intervals link back to their highlighted photographs in the model; drafts and review history travel with the workspace ([workflow](docs/guide.md#core-photographs-to-a-ground-model)). Works locally and in the standalone HTML.
 - Cuts sections at any direction and position, or along an alignment from LandXML, CSV, GeoJSON or DXF, or drawn on the model. Along a line it gives a table by chainage with the cover and the units at the crown and invert.
 - Screens an alignment in a corridor dashboard: sampled cover, groundwater head, design-level units and distance to the logs used by the model, with explicit unknowns and a CSV.
 - Proposes additional investigation locations along an alignment from sampled coverage gaps, a location-count budget and physical spacing. Export the plan without changing measured boreholes.
@@ -97,7 +98,7 @@ GitHub's **Cite this repository** gives the reference from [CITATION.cff](CITATI
   author  = {Kilic, Kursat},
   title   = {GeoModel3D: 3D geological models from borehole logs and CPTs, in the browser},
   url     = {https://github.com/kilickursat/GeoModel3D},
-  version = {0.22.0},
+  version = {0.23.0},
   year    = {2026},
   license = {Apache-2.0}
 }

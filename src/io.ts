@@ -13,7 +13,8 @@ import {isBroXml,readBroXml} from "./broXml";
 import {isDovXml,readDovXml,interpretationKinds,kindNames,formationOf,stratigraphicName,DovInterpretation} from "./dovXml";
 import {applyUnitRules,japaneseLithologyRules,lithologyRules} from "./rules";
 import {propertyFromHeader,propertyKey,propertyDef,implausibleTests} from "./properties";
-import {validateEvidence} from "./evidence";
+import {EvidenceCollection,validateEvidence} from "./evidence";
+import {validateCorePhotos} from "./corePhoto";
 
 export interface TextFile { name:string; text:string }
 // `alignments` names the lines read, when alignment files were among those imported; `cpts` the CPTs added.
@@ -470,6 +471,7 @@ function checkProperties(units:UnitDef[],warnings:string[]){
 function readProjectJson(doc:any,file:string):ImportResult{
   const t:Tables={collars:new Map(),intervals:new Map(),units:[],warnings:[]};
   const evidence=doc.evidence===undefined?undefined:validateEvidence(doc.evidence);
+  const corePhotos=doc.corePhotos===undefined?undefined:validateCorePhotos(doc.corePhotos,{evidence:evidence??{version:1,sources:[],records:[]}});
   const records=new Set(evidence?.records.map(r=>r.id));
   const evidenceRef=(value:unknown):{evidenceId?:string}=>{
     if(value===undefined)return {};
@@ -494,8 +496,9 @@ function readProjectJson(doc:any,file:string):ImportResult{
   const rules:UnitRule[]|undefined=Array.isArray(doc.rules)?doc.rules.filter((r:any)=>r&&typeof r.match==="string"&&typeof r.unit==="string"):undefined;
   const crs=doc.crsProj4?{name:doc.crs||doc.crsCode||"Custom",code:doc.crsCode,proj4:String(doc.crsProj4)}:doc.crsCode?findCrs(String(doc.crsCode)):undefined;
   if(doc.crsCode&&!crs)t.warnings.push(`${file}: coordinate system ${doc.crsCode} is not known here; the model is shown without a map`);
-  const result=assemble(t,doc.name||file,doc.crs,!t.units.length,crs??undefined,rules);
+  const result=assemble(t,doc.name||file,doc.crs,!t.units.length,crs??undefined,rules,{evidence,keepCollars:new Set(corePhotos?.runs.map(r=>r.boreholeId))});
   if(evidence)result.project.evidence=evidence;
+  if(corePhotos)result.project.corePhotos=validateCorePhotos(corePhotos,{evidence:evidence??{version:1,sources:[],records:[]},boreholes:result.project.boreholes,units:result.project.units});
   if(doc.description)result.project.description=String(doc.description);
   if(doc.source)result.project.source=String(doc.source);
   if(Number.isFinite(doc.base))result.project.base=Number(doc.base);
@@ -547,7 +550,7 @@ function readProjectJson(doc:any,file:string):ImportResult{
 export function toProjectJson(p:GeoProject){
   const doc={format:"geomodel3d-project",version:1,name:p.name,description:p.description,source:p.source,crs:p.crs,crsCode:p.crsCode,crsProj4:p.crsProj4,
     base:p.base,groundwaterDepth:p.groundwaterDepth,groundwater:p.groundwater,margin:p.margin,units:p.units,rules:p.rules,boreholes:p.boreholes,alignments:p.alignments,
-    cpts:p.cpts,cptLayers:p.cptLayers,cptRules:p.cptRules,terrain:p.terrain,evidence:p.evidence};
+    cpts:p.cpts,cptLayers:p.cptLayers,cptRules:p.cptRules,terrain:p.terrain,evidence:p.evidence,corePhotos:p.corePhotos};
   // Long lists of numbers (the terrain grid, CPT readings) take one line each, and so does each layer of a CPT.
   return JSON.stringify(doc,null,1).replace(/"(z|depth|qc|fs|u2|rf|qt)": \[[^\]{}"]*\]/g,m=>m.replace(/\s+/g,""))
     .replace(/\{\s*"from": [^{}\]]*?"name": "[^"]*"\s*\}/g,m=>m.replace(/\n\s*/g,""))+"\n";
@@ -586,10 +589,12 @@ function georeference(t:Tables,declared?:Crs):Crs|undefined{
   return crs;
 }
 
-function assemble(t:Tables,name:string,crsName:string|undefined,inferUnits:boolean,declared?:Crs,ruleSet?:UnitRule[]):ImportResult{
+function assemble(t:Tables,name:string,crsName:string|undefined,inferUnits:boolean,declared?:Crs,ruleSet?:UnitRule[],options:{keepCollars?:ReadonlySet<string>;evidence?:EvidenceCollection}={}):ImportResult{
   const warnings=t.warnings,boreholes:Borehole[]=[],rules=ruleSet??t.rules;
   const crs=georeference(t,declared);
-  for(const [id,raw] of t.intervals){
+  const logs=new Map(t.intervals);
+  for(const id of options.keepCollars??[])if(t.collars.has(id)&&!logs.has(id))logs.set(id,[]);
+  for(const [id,raw] of logs){
     const collar=t.collars.get(id);
     if(!collar||![collar.x,collar.y,collar.z].every(Number.isFinite)){warnings.push(`${id}: no collar position and elevation; not placed`);continue}
     const intervals:Interval[]=[];
@@ -602,7 +607,10 @@ function assemble(t:Tables,name:string,crsName:string|undefined,inferUnits:boole
       intervals.push(i);
     }
     intervals.sort((p,q)=>p.from-q.from);
-    if(!intervals.length){warnings.push(`${id}: no usable intervals; not placed`);continue}
+    if(!intervals.length){
+      if(!options.keepCollars?.has(id)){warnings.push(`${id}: no usable intervals; not placed`);continue}
+      warnings.push(`${id}: collar retained for core-photo registration; no accepted log intervals, so it supplies no geological observations`);
+    }
     const b:Borehole={id,x:collar.x,y:collar.y,z:collar.z,intervals,...(collar.evidenceId?{evidenceId:collar.evidenceId}:{})};
     if(collar.depth!==undefined&&Number.isFinite(collar.depth)&&collar.depth>boreholeDepth(b))b.depth=collar.depth;
     if(Number.isFinite(collar.lon)&&Number.isFinite(collar.lat)){b.lon=collar.lon;b.lat=collar.lat}
@@ -616,13 +624,19 @@ function assemble(t:Tables,name:string,crsName:string|undefined,inferUnits:boole
   for(const id of t.measured?.keys()??[])if(!t.intervals.has(id))warnings.push(`${id}: tests or water levels for a borehole without a log; ignored`);
   warnings.push(...implausibleTests(boreholes));
   if(rules?.length){
-    const mapped=applyUnitRules(boreholes,rules);
-    boreholes.splice(0,boreholes.length,...mapped.boreholes);
+    // Accepted photo intervals already carry an explicit reviewed assignment. Automatic import rules must not
+    // reinterpret their free-text descriptions; the user can still change units explicitly in the editor.
+    const fixed=new Set(options.evidence?.records.filter(r=>r.method==="manual"&&r.fields.coreRunId&&r.fields.runReview&&r.fields.unit).map(r=>r.id));
+    const selected=boreholes.map(b=>({...b,intervals:b.intervals.filter(i=>!i.evidenceId||!fixed.has(i.evidenceId))}));
+    const mapped=applyUnitRules(selected,rules);
+    boreholes.splice(0,boreholes.length,...boreholes.map((b,index)=>{
+      let cursor=0;return {...b,intervals:b.intervals.map(i=>i.evidenceId&&fixed.has(i.evidenceId)?i:mapped.boreholes[index].intervals[cursor++])};
+    }));
     if(mapped.unmatched.size)warnings.push(`Descriptions that no rule assigns to a unit are modelled as units of their own: ${[...mapped.unmatched].map(([n,c])=>`${n} (${c})`).join(", ")}`);
   }
   // A location tested by a CPT has no log.
   const tested=new Set([...t.cpts??[]].map(([id,e])=>e.loca??id));
-  for(const id of t.collars.keys())if(!t.intervals.has(id)&&!tested.has(id))warnings.push(`${id}: collar without intervals; ignored`);
+  for(const id of t.collars.keys())if(!logs.has(id)&&!tested.has(id))warnings.push(`${id}: collar without intervals; ignored`);
   const logged=new Set(boreholes.flatMap(b=>b.intervals.map(i=>i.unit)));
   let units:UnitDef[];
   if(inferUnits||!t.units.length){
@@ -648,6 +662,14 @@ function assemble(t:Tables,name:string,crsName:string|undefined,inferUnits:boole
   if(rules?.length)project.rules=rules;
   const cpts=t.cpts?.size?placeCpts(project,cptReads(t),warnings):undefined;
   return {project,warnings,...(cpts?{cpts}:{})};
+}
+
+// The core editor can start with surveyed collars before any log is accepted. It uses the ordinary CSV parsing,
+// unit conversions and georeferencing, but retains the requested empty collars without manufacturing intervals.
+export function importCorePhotoTables(files:TextFile[],declared?:Crs,keepCollars?:ReadonlySet<string>):ImportResult{
+  const t:Tables={collars:new Map(),intervals:new Map(),units:[],warnings:[]};
+  for(const file of files)readCsvTable(file,t);
+  return assemble(t,"Core-photo project",undefined,false,declared,undefined,{keepCollars:keepCollars??new Set(t.collars.keys())});
 }
 
 // ---------- CPTs ----------

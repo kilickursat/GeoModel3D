@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.23.0 — 2026-11-15
+
+### Added
+- Local core-box photo registration with depth-linked recovered rows, reversible row direction, piece cuts, reviewed lithology, soundness and natural/mechanical break annotations. Incomplete drafts persist with the workspace.
+- Photo-derived core recovery and reviewed RQD using sound lengths of at least 100 mm over the full drilled run, with mechanical breaks rejoined and missing intervals retained. Results remain separate from laboratory and in-situ test measurements.
+- Explicit acceptance writes source-linked log intervals into the current scenario, with highlighted photograph evidence and review records. Existing logs require explicit replacement; earlier source records and saved revisions remain available.
+- Desktop, mobile and standalone photo workflows without an image-analysis service or new runtime dependency. This release provides assisted manual interpretation; it does not classify rock automatically or predict strength from RGB photographs.
+
 ## 0.22.0 — 2026-11-14
 
 ### Added
