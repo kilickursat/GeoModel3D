@@ -1,0 +1,111 @@
+{
+  "appVersion": "0.24.0",
+  "date": "2026-11-15",
+  "scope": "Actual local inference through the production UI, using a synthetic core drawing. This checks engine compatibility, not geological accuracy or hardware-GPU/iPhone performance.",
+  "browser": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+  "adapter": {
+    "vendor": "google",
+    "architecture": "swiftshader",
+    "device": "",
+    "description": ""
+  },
+  "dtype": "embed_tokens=fp32;vision_encoder=fp32;decoder_model_merged=q4",
+  "input": {
+    "normalizedBox": {
+      "x0": 0,
+      "y0": 0,
+      "x1": 1,
+      "y1": 1
+    },
+    "sourceWidth": 256,
+    "sourceHeight": 96,
+    "pixels": {
+      "x": 0,
+      "y": 0,
+      "width": 256,
+      "height": 96
+    },
+    "analysisWidth": 512,
+    "analysisHeight": 512,
+    "sha256": "ae99e48460e1b9824af95af9dfac474b4430c1750f84294ce65274cfc84dfb2e",
+    "preprocessing": {
+      "method": "aspect-preserving-gray-letterbox",
+      "scaledWidth": 256,
+      "scaledHeight": 96,
+      "padding": {
+        "left": 128,
+        "top": 208,
+        "right": 128,
+        "bottom": 208
+      },
+      "background": "#808080"
+    },
+    "preparationMs": 388.6000000014901
+  },
+  "task": "describe",
+  "results": [
+    {
+      "modelId": "smolvlm-256m",
+      "model": "HuggingFaceTB/SmolVLM-256M-Instruct",
+      "revision": "d039ab0d4b9311b617e8ffec1d06c8464364aeb3",
+      "task": "describe",
+      "text": "This is a drill core.",
+      "loadMs": 14842.800000000745,
+      "inferenceMs": 525457.200000003,
+      "totalMs": 541566.1999999993,
+      "downloadBytes": 0,
+      "cacheState": "available",
+      "cached": true,
+      "generatedTokens": 7,
+      "tokensPerSecond": 0.013321732007858984,
+      "imageWidth": 512,
+      "imageHeight": 512,
+      "maxNewTokens": 128,
+      "device": "webgpu",
+      "dtype": "embed_tokens=fp32;vision_encoder=fp32;decoder_model_merged=q4",
+      "modelReused": false,
+      "runtimeVersion": "4.3.2",
+      "onnxRuntimeVersion": "1.31.1",
+      "preprocessingMs": 1266,
+      "preprocessing": "Aspect-preserving resize and neutral-gray padding to one 512 \u00d7 512 encoder tile; no image splitting.",
+      "promptVersion": 1
+    },
+    {
+      "modelId": "smolvlm-500m",
+      "model": "HuggingFaceTB/SmolVLM-500M-Instruct",
+      "revision": "753c1752602b5e739af7a7fa6947a635051897a3",
+      "task": "describe",
+      "text": "This image displays a single, solid-looking drill core with distinct patterns. The core appears to be made from a material that has been drilled through, revealing its inner structure. The pattern consists of five rectangular shapes arranged horizontally across the image. Each rectangle features a different texture and color.\n\n1. **Rectangular Shapes and Textures**:\n    - **First Rectangle (Top Left)**: This rectangle has a light greyish hue. It seems to have a smooth surface with no discernible texture.\n    - **Second Rectangle (Middle Left)**: This rectangle also has a light greyish hue but shows a slightly darker texture.",
+      "loadMs": 29479.70000000298,
+      "inferenceMs": 1154760.1999999993,
+      "totalMs": 1184624,
+      "downloadBytes": 811545504,
+      "cacheState": "available",
+      "cached": false,
+      "generatedTokens": 128,
+      "tokensPerSecond": 0.1108455244647331,
+      "imageWidth": 512,
+      "imageHeight": 512,
+      "maxNewTokens": 128,
+      "device": "webgpu",
+      "dtype": "embed_tokens=fp32;vision_encoder=fp32;decoder_model_merged=q4",
+      "modelReused": false,
+      "runtimeVersion": "4.3.2",
+      "onnxRuntimeVersion": "1.31.1",
+      "preprocessingMs": 383.5,
+      "preprocessing": "Aspect-preserving resize and neutral-gray padding to one 512 \u00d7 512 encoder tile; no image splitting.",
+      "promptVersion": 1
+    }
+  ],
+  "notes": [
+    "256M reused cached weights; 500M downloaded weights. Load times are not directly comparable.",
+    "The first 500M attempt received HTTP 502 from Hugging Face; a repeat succeeded without changing the runtime or model configuration.",
+    "Inference time includes image encoding and prompt prefill. Tokens per second uses that full interval, not steady-state decoding time.",
+    "The synthetic scene is not a photograph and no usefulness/accuracy score is assigned.",
+    "The actual trials preserved geological logs, measured tests and photo annotations; no result was applied to the model.",
+    "500M reached the 128-token limit and included an unsupported claim about an inner structure; the final UI marks capped responses as potentially incomplete.",
+    "Both model runs used the same production worker asset. A later UI-only change added the output-limit note; all five affected browser cases passed again."
+  ],
+  "standaloneSha256": "ce12a56b48af7f7660085db10f3b817be033bfd14eed1ba1e5d442a1254c9115",
+  "workerAsset": "coreAi.worker-Y1iy_R65.js"
+}
