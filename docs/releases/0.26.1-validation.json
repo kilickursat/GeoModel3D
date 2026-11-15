@@ -1,0 +1,118 @@
+{
+  "appVersion": "0.26.1",
+  "status": "passed",
+  "unit": {
+    "passed": 657,
+    "files": 54,
+    "durationSeconds": 26.52,
+    "log": "0.26.1-validation/unit-final.log.gz",
+    "initialAttempt": "648 passed; nine release-script tests could not spawn Node due to sandbox EPERM. Unchanged full suite passed with subprocess permission. Initial log retained."
+  },
+  "browser": {
+    "passed": 72,
+    "duration": "5.2m",
+    "retries": 0,
+    "ordinaryTimeouts": true,
+    "log": "0.26.1-validation/ui-full.log.gz",
+    "targetedBenchmarkPassed": 15,
+    "inference": "Synthetic worker/capability fixtures; no model-quality or physical-device result."
+  },
+  "build": {
+    "status": "passed",
+    "log": "0.26.1-validation/build.log.gz",
+    "standaloneBytes": 4391813,
+    "standaloneSha256": "b78d96f4879a9f357c029898e38e417dd815ca4a0bd75c8c694ea72202baefa0",
+    "workerSha256": "33b8b7d504cb6a1b5cd53d7a42c7ce4f7507e51e26b35f754e713576882efb2a",
+    "releaseMetadata": "RELEASE_TAG=v0.26.1 node scripts/release-assets.mjs prepare passed"
+  },
+  "productionProbe": {
+    "status": "passed",
+    "attempts": 1,
+    "scope": "Actual production worker with SwiftShader WebGPU; required preprocessor_config.json request intentionally aborted. Zero weight downloads and zero inference. This is not a Safari compatibility result.",
+    "checks": [
+      "exact image hash",
+      "processor-load stage and fetch operation",
+      "pinned relative failed filename",
+      "original TypeError retained",
+      "unknown byte/status fields absent",
+      "export/recovery metadata preserved",
+      "no automatic retry"
+    ],
+    "execution": "0.26.1-validation/production-probe.json.gz",
+    "executionSha256": "d2586d67fb096a29f808a8c4260934caa586d670c245b277318f1da4b020df20"
+  },
+  "screenshots": {
+    "scope": "Synthetic failure fixture with mocked capability/inference; desktop and iPhone-sized Chromium, not physical Safari. Visually inspected, no overflow or page errors.",
+    "desktop": "0.26.1-diagnostic-desktop.png",
+    "mobile": "0.26.1-diagnostic-mobile.png",
+    "metadata": "0.26.1-validation/screenshots.json.gz",
+    "captureHarnessSetup": "Initial harness attempts corrected missing bundled-browser path and hidden select-option wait; application source unchanged."
+  },
+  "limitations": [
+    "The cause of the reported Safari failure remains unknown.",
+    "No successful physical-phone inference or new quality score was established.",
+    "User-supplied report is not included in this public evidence."
+  ],
+  "artifacts": [
+    {
+      "path": "build.log.gz",
+      "bytes": 3322,
+      "sha256": "177fd600061e79c37c11900f1438a078cf4a2fa61b4667724d074145b2d6ce04",
+      "decodedSha256": "a308d2c120918a3a1ddbff93a2a870a8122fc3ed8553a35f2ca1f6f1abdce252"
+    },
+    {
+      "path": "production-probe-recovered-report.json.gz",
+      "bytes": 6602,
+      "sha256": "8a52dd25afe7d3631516cc76fde0ad6064f57e3c36daba9263f5e1f6bd132938",
+      "decodedSha256": "2eb263b99d61411ce7a28f6addd30b677ca4ee61e0e9a4143af656a0d63cd4b1"
+    },
+    {
+      "path": "production-probe-report.json.gz",
+      "bytes": 6593,
+      "sha256": "9b37bf3577ee22a0528ee468fcc1d8e1ca5e456b5bb44ce7e7119164c8390112",
+      "decodedSha256": "9198cdb31007d3707ed6ca4cabe990a6e26b8d42e54b540dadc3d7e8d66adfb2"
+    },
+    {
+      "path": "production-probe-source.mjs.gz",
+      "bytes": 4225,
+      "sha256": "af680785ebf1bc9d9ff57ee709bc252899ae3a6f7f8872242c24cbf11c6b3b56",
+      "decodedSha256": "b00f13cf2fde5fac55efc8a2446a2787f6736b85f517a09cc61ec424a9f29ab5"
+    },
+    {
+      "path": "production-probe.json.gz",
+      "bytes": 7933,
+      "sha256": "693c4910b4e53a4b0a4d5db6b684d378ac853e4e88a102fe6647cf6440966a8e",
+      "decodedSha256": "d2586d67fb096a29f808a8c4260934caa586d670c245b277318f1da4b020df20"
+    },
+    {
+      "path": "screenshots.json.gz",
+      "bytes": 236,
+      "sha256": "80e70a2276b12e5977bacef5f3bbc38979fc1b847bf718609782e191676cd887",
+      "decodedSha256": "edba147a5dff06bad9cf449a29f7a13783e1f2517ab3ee92f82af6c0191a9208"
+    },
+    {
+      "path": "ui-full.log.gz",
+      "bytes": 3962,
+      "sha256": "d1f45fcc5b07e6bfe80c0365f5fff7d8b85b47175820c56ea589261b55a66aa8",
+      "decodedSha256": "24ae869a4b97d65aede2779ad5c16059526455b2e7398b6e670d2d6f304704cf"
+    },
+    {
+      "path": "ui-targeted.log.gz",
+      "bytes": 1095,
+      "sha256": "6a30e15ed1a139d87ee9918ca8c273563bd52d489e4e01cac4671309876c4825",
+      "decodedSha256": "7831e10246ae4424c77b68155081c8bb6244e97cd42175906faaf1f6521fdbc4"
+    },
+    {
+      "path": "unit-final.log.gz",
+      "bytes": 282,
+      "sha256": "7823740ea26c193874d7a59c7a92b99867fc0cc05a57f3fa19c0431f82bbd84a",
+      "decodedSha256": "5c8569675563fec1afe3dd8578ad754dd9b22b1caa903940aacbc05f19d24a68"
+    },
+    {
+      "path": "unit-initial-sandbox.log.gz",
+      "bytes": 1247,
+      "sha256": "ab09dc7840c01230d8108fcb8ec1089c2e1d4b31cd2d4279d3fea1989093d93e",
+      "decodedSha256": "1f747dd1431148e7f0e7391e8f101176838e43c916a28c47f3f1836eff0cf1fd"
+    }
+  ]
+}
