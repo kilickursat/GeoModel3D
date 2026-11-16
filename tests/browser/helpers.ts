@@ -29,12 +29,29 @@ export async function saved(page:Page){
   await expect(page.locator(".ws-save-status")).toHaveText("Saved in this browser");
 }
 
+// Workspace files (format 4) store repeated project content once and refer to it as workspace-part:<id>. Tests read
+// complete projects, as src/workspace.ts expandWorkspaceParts gives them; the result is still a valid workspace file.
+function expandParts(value:any){
+  if(value?.format!=="geomodel3d-workspace"||!value.projectParts)return value;
+  const pool=value.projectParts,resolve=(v:unknown)=>typeof v==="string"&&v.startsWith("workspace-part:")?structuredClone(pool[v.slice(15)]):v;
+  const project=(p:any)=>{
+    if(!p||typeof p!=="object")return;
+    for(const key of ["boreholes","cpts","alignments"])if(Array.isArray(p[key]))p[key]=p[key].map(resolve);
+    for(const key of ["terrain","evidence","corePhotos"])if(p[key]!==undefined)p[key]=resolve(p[key]);
+  };
+  for(const r of value.revisions??[])project(r.project);
+  project(value.draft?.base);
+  for(const s of value.scenarios??[])project(s.draft?.base);
+  delete value.projectParts;
+  return value;
+}
+
 export async function downloadJson<T=WorkspaceDocument>(page:Page,selector=".ws-workspace"):Promise<T>{
   const pending=page.waitForEvent("download");
   await page.locator(selector).click();
   const download=await pending,path=await download.path();
   expect(path).not.toBeNull();
-  return JSON.parse(await readFile(path!,"utf8")) as T;
+  return expandParts(JSON.parse(await readFile(path!,"utf8"))) as T;
 }
 
 export async function importJson(page:Page,document:unknown,name="review.workspace.geomodel3d.json"){

@@ -1,6 +1,6 @@
 import {describe,it,expect,vi} from "vitest";
 import {createIndexedDbBackend,createWorkspaceStore,LEGACY_WORKSPACE_KEY,migrateLegacyWorkspace,WorkspaceBackend} from "../src/storage";
-import {createWorkspace,toWorkspaceJson} from "../src/workspace";
+import {createWorkspace,toWorkspaceJson,expandWorkspaceParts} from "../src/workspace";
 import {emptyTables,tablesFromProject} from "../src/tables";
 import {GeoProject} from "../src/schema";
 
@@ -101,7 +101,7 @@ describe("browser workspace persistence",()=>{
     expect(JSON.parse(saved.value()!).draft.tables.project.name).toBe("first");
     gates.shift()!();await last;
     expect((await store.load())!.draft.tables.project.name).toBe("last");
-    expect(writes.map(json=>JSON.parse(json).draft.tables.project.name)).toEqual(["first","fail","last"]);
+    expect(writes.map(json=>expandWorkspaceParts(JSON.parse(json)).draft.tables.project.name)).toEqual(["first","fail","last"]);
   });
 
   it("returns null for an empty store and exposes read and legacy-access failures",async()=>{

@@ -2,7 +2,7 @@ import {describe,it,expect} from "vitest";
 import type {GeoProject} from "../src/schema";
 import type {EvidenceCollection} from "../src/evidence";
 import {emptyTables,tablesFromProject} from "../src/tables";
-import {checkpoint,createScenario,createWorkspace,parseWorkspace,renameScenario,restoreRevision,switchScenario,toWorkspaceJson,updateDraft} from "../src/workspace";
+import {checkpoint,createScenario,createWorkspace,parseWorkspace,renameScenario,restoreRevision,switchScenario,toWorkspaceJson,updateDraft,expandWorkspaceParts} from "../src/workspace";
 
 const png="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aBLkAAAAASUVORK5CYII=";
 const site=():GeoProject=>({name:"Scenario site",groundwaterDepth:2,units:[{id:"clay",name:"Clay",color:"#998877",params:{custom:42}}],
@@ -11,12 +11,12 @@ const site=():GeoProject=>({name:"Scenario site",groundwaterDepth:2,units:[{id:"
   alignments:[{name:"Tunnel",points:[{x:0,y:0},{x:10,y:0}]}],
   cpts:[{id:"CPT-1",x:0,y:0,z:10,depth:[1,2],qc:[1,NaN],layers:[{from:0,to:2,unit:"clay"}],layersSource:"reviewed"}]});
 const built=()=>{const p=site();return checkpoint(createWorkspace(tablesFromProject(p),p),p,"Baseline build")};
-const wire=(document:ReturnType<typeof createWorkspace>)=>JSON.parse(toWorkspaceJson(document));
+const wire=(document:ReturnType<typeof createWorkspace>)=>expandWorkspaceParts(JSON.parse(toWorkspaceJson(document)));
 
 describe("named workspace scenarios",()=>{
   it("starts with a stable Baseline and a detached editable draft",()=>{
     const tables=emptyTables(),p=site(),document=createWorkspace(tables,p);
-    expect(document.version).toBe(3);
+    expect(document.version).toBe(4);
     expect(document.scenarios).toEqual([{id:document.id+":baseline",name:"Baseline",createdAt:document.savedAt}]);
     expect(document.activeScenarioId).toBe(document.scenarios[0].id);
     expect(document.activeRevisionId).toBeUndefined();
@@ -128,11 +128,11 @@ describe("named workspace scenarios",()=>{
     const tables=emptyTables();tables.evidence=evidence;
     let document=createScenario(createWorkspace(tables),"Without preview");
     document=updateDraft(document,emptyTables());
-    const json=toWorkspaceJson(document),encoded=JSON.parse(json);
+    const json=toWorkspaceJson(document),encoded=expandWorkspaceParts(JSON.parse(json));
     expect(json.split(png)).toHaveLength(2);
     expect(Object.values(encoded.evidenceImages)).toEqual([png]);
     expect(encoded.scenarios[0].draft.tables.evidence.sources[0].pages[0].image).toMatch(/^workspace-image:/);
-    const restored=parseWorkspace(encoded);
+    const restored=parseWorkspace(JSON.parse(json));
     expect(restored).toEqual(document);
     expect(restored.scenarios[0].draft!.tables.evidence!.sources[0].pages[0].image).toBe(png);
     const changed=renameScenario(document,document.activeScenarioId,"Renamed active");
@@ -148,7 +148,7 @@ describe("scenario workspace migration and validation",()=>{
     if(version===1)delete old.evidenceImages;
     for(const r of old.revisions)delete r.scenarioId;
     const migrated=parseWorkspace(old);
-    expect(migrated.version).toBe(3);
+    expect(migrated.version).toBe(4);
     expect(migrated.id).toBe(document.id);
     expect(migrated.draft).toEqual(document.draft);
     expect(migrated.activeRevisionId).toBe(document.activeRevisionId);

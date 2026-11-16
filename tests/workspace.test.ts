@@ -4,7 +4,7 @@ import {sampleProjects} from "../src/geology";
 import {buildGeologicalModel} from "../src/model";
 import {emptyTables,tablesFromProject} from "../src/tables";
 import {importFiles,toProjectJson} from "../src/io";
-import {checkpoint,createWorkspace,parseWorkspace,restoreRevision,toWorkspaceJson,updateDraft} from "../src/workspace";
+import {checkpoint,createWorkspace,parseWorkspace,restoreRevision,toWorkspaceJson,updateDraft,expandWorkspaceParts} from "../src/workspace";
 
 function site():GeoProject{
   return {
@@ -127,7 +127,7 @@ describe("workspace drafts and checkpoints",()=>{
 });
 
 describe("workspace validation",()=>{
-  const document=()=>JSON.parse(toWorkspaceJson(checkpoint(createWorkspace(tablesFromProject(site()),site()),site(),"Build")));
+  const document=()=>expandWorkspaceParts(JSON.parse(toWorkspaceJson(checkpoint(createWorkspace(tablesFromProject(site()),site()),site(),"Build"))));
   it.each([
     ["format",(d:any)=>{d.format="geomodel3d-project"}],
     ["version",(d:any)=>{d.version=99}],
