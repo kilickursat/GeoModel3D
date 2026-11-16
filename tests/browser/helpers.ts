@@ -49,6 +49,9 @@ function expandParts(value:any){
 export async function downloadJson<T=WorkspaceDocument>(page:Page,selector=".ws-workspace"):Promise<T>{
   const pending=page.waitForEvent("download");
   await page.locator(selector).click();
+  // A file with page images or core photographs asks first (src/exportImages.ts); these tests keep the images.
+  const ask=page.locator("dialog.export-images");
+  if(await ask.count())await ask.locator('button[value="include"]').click();
   const download=await pending,path=await download.path();
   expect(path).not.toBeNull();
   return expandParts(JSON.parse(await readFile(path!,"utf8"))) as T;
