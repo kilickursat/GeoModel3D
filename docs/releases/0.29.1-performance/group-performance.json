@@ -1,0 +1,98 @@
+{
+  "baseCommit": "37dfeb6927466a442cb221f6693e4dd5647cbf9a",
+  "nodeVersion": "v24.22.1",
+  "platform": "linux",
+  "architecture": "x64",
+  "recordedAt": "2026-11-16T02:41:16.142Z",
+  "runOrder": [
+    "before",
+    "after"
+  ],
+  "workloads": [
+    100,
+    200,
+    400,
+    800
+  ],
+  "groupRadius": 100,
+  "interpretations": 2,
+  "geometry": "40 columns at 1m spacing; floor(index/40) row, grid in x/y, identical copies of valid logged contacts",
+  "methodology": "One fresh Node process per implementation, ascending workload sizes within each process, no repeated timing trials. Same esbuild harness; before substitutes the two grouping sources from the base commit. Wall-clock timings on a shared host are diagnostic, not a controlled performance benchmark.",
+  "sourceHashes": {
+    "before": {
+      "src/disagreementValidation.ts": "935b0a94093694755afdd490c10819342f8d1e3ef94d1f347664b92e74b3d7ac",
+      "src/calibration.ts": "3ce5c059ed373e4ebfd89ad7665e1f4b7e955bee14e7e3f1cac3b6224338f41e"
+    },
+    "after": {
+      "src/disagreementValidation.ts": "806958a77550d8ebde46618a4b9ae910813593c86f0098a14385ecdab139e580",
+      "src/calibration.ts": "98039b3b85931108d2ac3dbe1a8ddf9322a759a78e24c0b9ba5094d8f49c033c"
+    }
+  },
+  "harnessSha256": "7f8c1cb56ad41e4d7ca450a5794b54dda0e97bb7744741ff5893e0989510d40a",
+  "before": [
+    {
+      "n": 100,
+      "elapsedMs": 55,
+      "groups": 1,
+      "training": 0
+    },
+    {
+      "n": 200,
+      "elapsedMs": 271,
+      "groups": 1,
+      "training": 0
+    },
+    {
+      "n": 400,
+      "elapsedMs": 2415,
+      "groups": 1,
+      "training": 0
+    },
+    {
+      "n": 800,
+      "elapsedMs": 20605,
+      "groups": 1,
+      "training": 0
+    }
+  ],
+  "after": [
+    {
+      "n": 100,
+      "elapsedMs": 15,
+      "groups": 1,
+      "training": 0
+    },
+    {
+      "n": 200,
+      "elapsedMs": 4,
+      "groups": 1,
+      "training": 0
+    },
+    {
+      "n": 400,
+      "elapsedMs": 7,
+      "groups": 1,
+      "training": 0
+    },
+    {
+      "n": 800,
+      "elapsedMs": 13,
+      "groups": 1,
+      "training": 0
+    }
+  ],
+  "completedAt": "2026-11-16T02:42:24.588446+00:00",
+  "checks": {
+    "identicalGroupAndTrainingCounts": true,
+    "timingTrialsPerSize": 1,
+    "inferenceRun": false
+  },
+  "artifacts": {
+    "geomodel3d-v0291-group-benchmark.ts": "7f8c1cb56ad41e4d7ca450a5794b54dda0e97bb7744741ff5893e0989510d40a",
+    "geomodel3d-v0291-group-build.mjs": "1b5ab2b3f51ac9f048c5fb1729fa2510ac7696a1c00fe8d908d31de41755e28f",
+    "geomodel3d-v0291-group-before.mjs": "ed478c31a8db55e3901fe1eca864876889d722aa8542bf345e00c87b94a201d4",
+    "geomodel3d-v0291-group-after.mjs": "43fa898de4b924357fbb610ea60661c05b9e4342bed8dfce3c3044e5510bc81b",
+    "geomodel3d-v0291-group-before.jsonl": "ff8e1e000682b8175e19740f57e3d437979ce747700d7fc1afdcf240f92a0a63",
+    "geomodel3d-v0291-group-after.jsonl": "e11a216823e68a3ec3a48d40bccde464b5a1668a0818d0f1f64f38843e8a1917"
+  }
+}

@@ -1,0 +1,135 @@
+{
+  "baseCommit": "37dfeb6927466a442cb221f6693e4dd5647cbf9a",
+  "recordedAt": "2026-11-16T02:41:54.470Z",
+  "node": "v24.22.1",
+  "platform": "linux",
+  "arch": "x64",
+  "notes": "Actual unchanged workspace source bundled with esbuild, plus re-export of its existing tablesFromProject import. Independent Node processes, explicit GC. Timings are local software measurements, not a device benchmark.",
+  "fixtureSha256": "60700d17e385946fe570e11d22a5b2f8c75b797b5adecce368d53cbeea3cd611",
+  "variants": {
+    "before": {
+      "sourceSha256": "d24c89d67f3671afecccbbb87151deb2cfe8f14931867f3c37a8735eef0c6e5e",
+      "runs": [
+        {
+          "node": "v24.22.1",
+          "workload": {
+            "replacementWorkspaces": 24,
+            "revisionsPerWorkspace": 2,
+            "terrainCellsPerWorkspace": 40000,
+            "retainedWorkspaces": 1
+          },
+          "measurement": "Node process.memoryUsage().heapUsed after explicit GC; excludes native and GPU allocations",
+          "heapBeforeBytes": 13569032,
+          "heapAfterBytes": 32516560,
+          "retainedHeapDeltaBytes": 18947528,
+          "liveWorkspaceUnchanged": true,
+          "warmSerialization": {
+            "samples": 10,
+            "medianMs": 13.290569000000232,
+            "maxMs": 13.826008000000002
+          }
+        },
+        {
+          "node": "v24.22.1",
+          "workload": {
+            "replacementWorkspaces": 24,
+            "revisionsPerWorkspace": 2,
+            "terrainCellsPerWorkspace": 40000,
+            "retainedWorkspaces": 1
+          },
+          "measurement": "Node process.memoryUsage().heapUsed after explicit GC; excludes native and GPU allocations",
+          "heapBeforeBytes": 13569032,
+          "heapAfterBytes": 32516592,
+          "retainedHeapDeltaBytes": 18947560,
+          "liveWorkspaceUnchanged": true,
+          "warmSerialization": {
+            "samples": 10,
+            "medianMs": 13.195629499999995,
+            "maxMs": 14.38499899999988
+          }
+        },
+        {
+          "node": "v24.22.1",
+          "workload": {
+            "replacementWorkspaces": 24,
+            "revisionsPerWorkspace": 2,
+            "terrainCellsPerWorkspace": 40000,
+            "retainedWorkspaces": 1
+          },
+          "measurement": "Node process.memoryUsage().heapUsed after explicit GC; excludes native and GPU allocations",
+          "heapBeforeBytes": 13569072,
+          "heapAfterBytes": 32516600,
+          "retainedHeapDeltaBytes": 18947528,
+          "liveWorkspaceUnchanged": true,
+          "warmSerialization": {
+            "samples": 10,
+            "medianMs": 13.134975999999824,
+            "maxMs": 13.86209000000008
+          }
+        }
+      ]
+    },
+    "after": {
+      "sourceSha256": "a07ff5b1ae0ff26c354625cfa2c0e1ba494fb14a1394408324c03137fdebe280",
+      "runs": [
+        {
+          "node": "v24.22.1",
+          "workload": {
+            "replacementWorkspaces": 24,
+            "revisionsPerWorkspace": 2,
+            "terrainCellsPerWorkspace": 40000,
+            "retainedWorkspaces": 1
+          },
+          "measurement": "Node process.memoryUsage().heapUsed after explicit GC; excludes native and GPU allocations",
+          "heapBeforeBytes": 11213224,
+          "heapAfterBytes": 11303808,
+          "retainedHeapDeltaBytes": 90584,
+          "liveWorkspaceUnchanged": true,
+          "warmSerialization": {
+            "samples": 10,
+            "medianMs": 12.872733499999867,
+            "maxMs": 14.104925999999978
+          }
+        },
+        {
+          "node": "v24.22.1",
+          "workload": {
+            "replacementWorkspaces": 24,
+            "revisionsPerWorkspace": 2,
+            "terrainCellsPerWorkspace": 40000,
+            "retainedWorkspaces": 1
+          },
+          "measurement": "Node process.memoryUsage().heapUsed after explicit GC; excludes native and GPU allocations",
+          "heapBeforeBytes": 11213256,
+          "heapAfterBytes": 11303840,
+          "retainedHeapDeltaBytes": 90584,
+          "liveWorkspaceUnchanged": true,
+          "warmSerialization": {
+            "samples": 10,
+            "medianMs": 12.999811000000136,
+            "maxMs": 13.675995000000057
+          }
+        },
+        {
+          "node": "v24.22.1",
+          "workload": {
+            "replacementWorkspaces": 24,
+            "revisionsPerWorkspace": 2,
+            "terrainCellsPerWorkspace": 40000,
+            "retainedWorkspaces": 1
+          },
+          "measurement": "Node process.memoryUsage().heapUsed after explicit GC; excludes native and GPU allocations",
+          "heapBeforeBytes": 11213328,
+          "heapAfterBytes": 11303912,
+          "retainedHeapDeltaBytes": 90584,
+          "liveWorkspaceUnchanged": true,
+          "warmSerialization": {
+            "samples": 10,
+            "medianMs": 13.42409500000008,
+            "maxMs": 13.862810000000081
+          }
+        }
+      ]
+    }
+  }
+}

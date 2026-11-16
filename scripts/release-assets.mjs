@@ -33,11 +33,21 @@ function command(program,args){
   check(result.status===0,`${program} failed: ${result.stderr?.trim()||result.stdout?.trim()||result.status}`);
   return result.stdout.trim();
 }
-function api(path,optional=false){
-  const result=spawnSync("gh",["api",path],{cwd:source,encoding:"utf8"});
+function api(path,optional=false,flags=[]){
+  const result=spawnSync("gh",["api",path,...flags],{cwd:source,encoding:"utf8"});
   if(optional&&result.status!==0&&result.stderr?.includes("HTTP 404"))return undefined;
   check(result.status===0,`GitHub API ${path} failed: ${result.stderr?.trim()||result.error?.message||result.status}`);
   return JSON.parse(result.stdout);
+}
+function apiJson(path,method,value){
+  // A file preserves multiline notes and literal shell syntax; no request body is interpolated into a command.
+  const input=join(source,".cache/release-request.json");writeFileSync(input,JSON.stringify(value));
+  return api(path,false,["--method",method,"--input",input,"--header","Content-Type: application/json"]);
+}
+function checkedRelease(release,expectedId){
+  check(release&&Number.isSafeInteger(release.id)&&release.id>0&&release.tag_name===tag&&typeof release.draft==="boolean"&&Array.isArray(release.assets)
+    &&(expectedId===undefined||release.id===expectedId),"GitHub returned an invalid release identity or asset list.");
+  return release;
 }
 function findRelease(root,releaseTag){
   const published=api(`${root}/releases/tags/${releaseTag}`,true);
@@ -68,10 +78,14 @@ function publish(){
   let release=findRelease(root,tag),created=false;
   if(!release){
     writeFileSync(prepared.notes,`${readFileSync(prepared.notes,"utf8")}\n${ownership}\n`);
-    command("gh",["release","create",tag,"--repo",repo,"--verify-tag","--target",commit,"--title",`GeoModel3D ${prepared.version}`,"--notes-file",prepared.notes,"--draft"]);
-    release=findRelease(root,tag);created=true;
+    verifyTag();
+    // Creation returns the authoritative release ID. A new draft may not yet appear in release listings.
+    release=checkedRelease(apiJson(`${root}/releases`,"POST",{tag_name:tag,target_commitish:commit,name:`GeoModel3D ${prepared.version}`,
+      body:readFileSync(prepared.notes,"utf8"),draft:true,prerelease:false}));
+    check(release.draft&&release.body?.includes(ownership),"GitHub did not return the requested owned draft.");
+    created=true;
   }
-  check(release&&Number.isInteger(release.id),"The release could not be found after creation.");
+  checkedRelease(release);
   // Published files are immutable here. Retrying an upload skips an identical asset, and refuses replacement.
   const assets=[["geomodel3d-offline.html",prepared.artifact],["SHA256SUMS.txt",prepared.checksum]].map(([name,path])=>({name,path,expected:`sha256:${hash(path)}`}));
   // Check every existing file before adding any missing one; a known checksum conflict must cause no uploads.
@@ -82,8 +96,12 @@ function publish(){
   for(const {name,path,expected} of assets){
     const existing=release.assets.find(asset=>asset.name===name);
     if(existing){check(existing.state==="uploaded"&&existing.digest===expected,`Existing ${name} cannot be verified as identical; it was not replaced.`);continue}
-    verifyTag();command("gh",["release","upload",tag,path,"--repo",repo]);
-    release=api(`${root}/releases/${release.id}`);
+    verifyTag();
+    // Keep using the ID for mutations; gh release upload/edit would rediscover the draft by its tag.
+    const uploadedResult=api(`https://uploads.github.com/${root}/releases/${release.id}/assets?name=${encodeURIComponent(name)}`,false,
+      ["--method","POST","--input",path,"--header","Content-Type: application/octet-stream"]);
+    check(uploadedResult?.name===name&&uploadedResult.state==="uploaded"&&uploadedResult.digest===expected,`Uploaded ${name} did not match its checksum.`);
+    release=checkedRelease(api(`${root}/releases/${release.id}`),release.id);
     const uploaded=release.assets.find(asset=>asset.name===name);
     check(uploaded?.state==="uploaded"&&uploaded.digest===expected,`Uploaded ${name} did not match its checksum.`);
   }
@@ -94,8 +112,12 @@ function publish(){
     const current=latest&&stable.test(latest.tag_name)?latest.tag_name.slice(1).split(".").map(Number):undefined;
     const next=prepared.version.split(".").map(Number);
     const newer=!latest||!!current&&next.some((n,i)=>n>current[i]&&next.slice(0,i).every((v,k)=>v===current[k]));
-    command("gh",["release","edit",tag,"--repo",repo,"--draft=false",newer?"--latest":"--latest=false"]);
-    release=api(`${root}/releases/${release.id}`);
+    release=checkedRelease(apiJson(`${root}/releases/${release.id}`,"PATCH",{draft:false,make_latest:String(newer)}),release.id);
+    check(!release.draft,"GitHub did not publish the verified release.");
+    for(const {name,expected} of assets){
+      const uploaded=release.assets.find(asset=>asset.name===name);
+      check(uploaded?.state==="uploaded"&&uploaded.digest===expected,`Published ${name} did not match its checksum.`);
+    }
   }
   console.log(JSON.stringify({tag,commit,url:release.html_url,draft:release.draft,created,existingReleaseStatePreserved:!created&&!ownedDraft,sha256:prepared.sha256}));
 }

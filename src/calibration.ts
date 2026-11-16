@@ -85,11 +85,12 @@ export function calibrateDisagreement(cases:DisagreementCase[],options:Calibrati
   }
   const radius=groupRadius(options.groupRadius),reference=cases[0].project,groupFor=locationGroups(cases,radius),excludedReferences:CalibrationPartition["excludedReferences"]=[],representatives=new Map<string,{hole:Borehole;logged:number;group:CalibrationGroup}>();
   const ordered=reference.boreholes.slice().sort((a,b)=>a.id.localeCompare(b.id)||a.x-b.x||a.y-b.y);
+  const represented=new Set<ReturnType<typeof groupFor>>();
   for(const hole of ordered){
     const observation=observedTop(hole,reference,options.unitId);
     if(![hole.x,hole.y,hole.z].every(finite)||observation.logged===undefined){excludedReferences.push({id:hole.id,reason:observation.reason??"The collar coordinates or elevation are not finite."});continue}
-    const linked=groupFor(hole),positions=sorted(linked.keys),id=`location:${positions[0]}`;
-    if(representatives.has(id))continue;
+    const linked=groupFor(hole);if(represented.has(linked))continue;represented.add(linked);
+    const positions=sorted(linked.keys),id=`location:${positions[0]}`;
     representatives.set(id,{hole,logged:observation.logged,group:{id,role:"training",referenceId:hole.id,x:hole.x,y:hole.y,
       memberReferenceIds:ordered.filter(other=>linked.boreholeIds.has(other.id)||linked.keys.has(location(other))).map(other=>other.id),
       positions,boreholeIds:sorted(linked.boreholeIds),cptIds:sorted(linked.cptIds)}});

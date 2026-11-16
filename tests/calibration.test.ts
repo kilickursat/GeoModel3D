@@ -176,4 +176,27 @@ describe("calibration groups of nearby logs",()=>{
     expect(result.partition.groups.some(g=>g.referenceId==="BH-twin")).toBe(true);
     expect(()=>calibrateDisagreement(cases(twin()),{...settings,groupRadius:-2})).toThrow(/grouping distance/);
   });
+
+  it("handles a dense 800-log group once while keeping every member and the stable reference",()=>{
+    const p=project(1),hole=p.boreholes[0];
+    p.boreholes=Array.from({length:800},(_,i)=>({...structuredClone(hole),id:`BH-${String(i).padStart(3,"0")}`,x:i%40,y:Math.floor(i/40)}));
+    const result=calibrateDisagreement(cases(p),{...settings,groupRadius:100});
+    expect(result.partition).toMatchObject({trainingCount:0,calibrationCount:0,auditCount:1,excludedReferenceCount:0});
+    expect(result.partition.groups).toHaveLength(1);const group=result.partition.groups[0];
+    expect(group).toMatchObject({id:"location:0,0",referenceId:"BH-000",role:"audit",x:0,y:0});
+    expect(group.memberReferenceIds).toEqual(p.boreholes.map(hole=>hole.id));
+    expect(group.boreholeIds).toEqual(group.memberReferenceIds);expect(group.positions).toHaveLength(800);
+    for(const removal of result.partition.removals){expect(removal.boreholeIds).toEqual(group.memberReferenceIds);expect(removal.remainingBoreholes).toBe(0)}
+    expect(result.unavailableReason).toMatch(/no observed reference groups in the training partition/i);
+  });
+
+  it("retains the calibrated partition and numerical results when grouped input order changes",()=>{
+    const input=cases(twin()),before=calibrateDisagreement(input,settings);
+    for(const c of input)c.project.boreholes.reverse();
+    const after=calibrateDisagreement(input,settings);
+    // Removal arrays follow input order; group roles, representatives, scores and audit results do not.
+    expect(after.partition.groups).toEqual(before.partition.groups);expect(after.rows).toEqual(before.rows);
+    expect(after.quantile).toBe(before.quantile);expect(after.audit).toEqual(before.audit);
+    expect(after.intervals).toEqual(before.intervals);
+  });
 });

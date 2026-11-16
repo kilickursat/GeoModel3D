@@ -1,5 +1,5 @@
 import {describe,it,expect} from "vitest";
-import {validateDisagreement,validationCsv} from "../src/disagreementValidation";
+import {locationGroups,validateDisagreement,validationCsv} from "../src/disagreementValidation";
 import type {DisagreementCase} from "../src/disagreement";
 import type {GeoProject} from "../src/schema";
 import {parseCsv} from "../src/io";
@@ -217,5 +217,30 @@ describe("grouping nearby logs as one location",()=>{
     const csv=parseCsv(validationCsv(validateDisagreement(pair(),{...selected,groupRadius:3})));
     expect(csv[0][csv[0].indexOf("group_radius_m")]).toBe("group_radius_m");
     expect(csv[1][csv[0].indexOf("group_radius_m")]).toBe("3");
+  });
+
+  it("preserves rounded positions, moved identities and radius chains without merging different record kinds",()=>{
+    const p=project(),hole=p.boreholes[0];
+    p.boreholes=[{...hole,id:"moved",x:-10,y:0},{...hole,id:"rounded",x:-9.9996,y:.0004},{...hole,id:"shared",x:100,y:0}];
+    const q=structuredClone(p);q.boreholes[0].x=10;
+    q.cpts=[{id:"near",x:14,y:0,z:10,depth:[1],qc:[1]},{id:"chain",x:18,y:0,z:10,depth:[1],qc:[1]},
+      {id:"outside",x:22.01,y:0,z:10,depth:[1],qc:[1]},{id:"shared",x:200,y:0,z:10,depth:[1],qc:[1]}];
+    const input=cases(p,q),before=structuredClone(input),groupFor=locationGroups(input,4),group=groupFor(p.boreholes[0]);
+    expect(group.keys).toEqual(new Set(["-10000,0","10000,0","14000,0","18000,0"]));
+    expect(group.boreholeIds).toEqual(new Set(["moved","rounded"]));expect(group.cptIds).toEqual(new Set(["near","chain"]));
+    expect(groupFor(q.cpts[1])).toBe(group);
+    expect(groupFor(p.boreholes[2]).cptIds.size).toBe(0);expect(groupFor(q.cpts[3]).boreholeIds.size).toBe(0);
+    expect(groupFor({x:300,y:0})).toEqual({keys:new Set(["300000,0"]),boreholeIds:new Set(),cptIds:new Set()});
+    const exact=locationGroups(input,0)(p.boreholes[0]);expect(exact.keys).toEqual(new Set(["-10000,0","10000,0"]));expect(exact.cptIds.size).toBe(0);
+    expect(input).toEqual(before);
+  });
+
+  it("connects the inclusive radius across negative cell boundaries and preserves membership when records are reordered",()=>{
+    const p=project(),hole=p.boreholes[0];
+    p.boreholes=[{...hole,id:"left",x:-5,y:0},{...hole,id:"middle",x:0,y:0},{...hole,id:"right",x:5,y:0},{...hole,id:"outside",x:10.01,y:0}];
+    const input=cases(p,structuredClone(p)),forward=locationGroups(input,5)(p.boreholes[0]);
+    expect(forward.boreholeIds).toEqual(new Set(["left","middle","right"]));
+    for(const c of input)c.project.boreholes.reverse();input.reverse();
+    const reverse=locationGroups(input,5)({x:-5,y:0});expect(reverse).toEqual(forward);
   });
 });

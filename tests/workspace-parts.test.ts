@@ -97,6 +97,20 @@ describe("workspace project parts (format 4)",()=>{
     expect(parseWorkspace({...expanded,version:3})).toEqual(doc);
   });
 
+  it("keeps concurrent workspace caches independent when their histories grow",()=>{
+    const first=history(3),firstJson=toWorkspaceJson(first),other=site();
+    other.name="Another workspace";other.cpts![0].qc[1]=42;other.terrain!.z[0]=99;
+    const second=history(2,other),secondJson=toWorkspaceJson(second);
+    const changed=structuredClone(first.revisions.at(-1)!.project);changed.boreholes[0].z+=1;
+    const next=checkpoint(first,changed,"New collar");
+    expect(parseWorkspace(JSON.parse(toWorkspaceJson(next)))).toEqual(next);
+    // Serializing another workspace or a new history must not invalidate cached snapshots or leak its parts.
+    expect(toWorkspaceJson(first)).toBe(firstJson);expect(toWorkspaceJson(second)).toBe(secondJson);
+    expect(parseWorkspace(JSON.parse(firstJson))).toEqual(first);
+    expect(parseWorkspace(JSON.parse(secondJson))).toEqual(second);
+    expect(next.revisions.at(-1)!.project.cpts![0]).toBe(first.revisions.at(-1)!.project.cpts![0]);
+  });
+
   it("keeps autosaves after a long history fast and small on a sample site",()=>{
     const base=JSON.parse(readFileSync("src/data/rotterdam-site.json","utf8")) as GeoProject;
     let doc=history(30,base);
