@@ -1,10 +1,10 @@
-// Inline the worker so comparison also works in the standalone HTML without fetching another script.
-import ComparisonWorker from "./comparison.worker?worker&inline";
+// The shared inline worker: comparison also works in the standalone HTML without fetching another script.
+import ModelWorker from "./model.worker?worker&inline";
 import type {ComparisonOptions,ProjectComparison} from "./comparison";
 import type {GeoProject} from "./schema";
 import {createModelJob,ModelJob} from "./modelJob";
 
 export type ComparisonJob=ModelJob<ProjectComparison>;
 export function createComparisonJob(before:GeoProject,after:GeoProject,options:ComparisonOptions):ComparisonJob{
-  return createModelJob(()=>new ComparisonWorker(),before,after,options,"comparison");
+  return createModelJob(()=>new ModelWorker(),before,after,options,"comparison","comparison");
 }

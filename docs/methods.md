@@ -121,10 +121,10 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 - `src/ar.ts`: models for augmented reality (USDZ and GLB)
 - `src/alignment.ts`: sections along an alignment, chainage, cross-sections square to the line, lines crossing straight sections, and the table by chainage
 - `src/corridor.ts`: bounded station sampling, design-level readouts and corridor screening flags
-- `src/corridorView.ts`, `src/corridorJob.ts`, `src/corridor.worker.ts`: corridor dashboard and cancelable offline calculation worker
+- `src/corridorView.ts`, `src/corridorJob.ts`, `src/model.worker.ts`: corridor dashboard and cancelable offline calculation worker
 - `src/investigation.ts`: candidate selection, spacing/depth constraints and monetary investigation budgets
 - `src/information.ts`: exact weighted conditional entropy of finite-case contact-observation bins
-- `src/investigationView.ts`, `src/investigationJob.ts`, `src/investigation.worker.ts`: pinned investigation-plan review and export, with a cancelable offline worker
+- `src/investigationView.ts`, `src/investigationJob.ts`, `src/model.worker.ts`: pinned investigation-plan review and export, with a cancelable offline worker
 - `src/landxml.ts`: LandXML and J-LandXML alignments (straights, arcs, clothoids, design profiles)
 - `src/cpt.ts`: cone penetration tests: GEF, BRO and DOV readers, the friction ratio, readings at a depth and averages over depth
 - `src/sbt.ts`: the soil behaviour type of CPTs (Robertson 2009) and the layers it gives
@@ -148,14 +148,14 @@ The modelling kernel has no rendering dependencies. It is tested in Node, and th
 - `src/evidenceView.ts`: source-page inspector, independent of the PDF reader
 - `src/groundwater.ts`: shared observation selection and groundwater policies
 - `src/comparison.ts`: comparisons at fixed coordinates, matched by unit identity
-- `src/comparisonJob.ts`, `src/comparison.worker.ts`: cancellable inline comparison worker
+- `src/comparisonJob.ts`, `src/model.worker.ts`: cancellable inline comparison worker
 - `src/comparisonView.ts`: pinned-revision comparison controls and overlays
 - `src/disagreement.ts`: complete selected-interpretation contact envelopes on fixed map/path samples
 - `src/disagreementValidation.ts`: observed-contact validation with identity/location holdouts across every interpretation
 - `src/calibration.ts`: training/calibration/audit group splits and conformal contact-envelope correction
-- `src/disagreementView.ts`, `src/disagreementJob.ts`, `src/disagreement.worker.ts`: pinned maps, section ranges, empirical checks and cancelable offline analysis
+- `src/disagreementView.ts`, `src/disagreementJob.ts`, `src/model.worker.ts`: pinned maps, section ranges, empirical checks and cancelable offline analysis
 - `src/impact.ts`: changed-input inventories and prior-model checks against newly added borehole logs
-- `src/impactJob.ts`, `src/impact.worker.ts`, `src/modelJob.ts`: cancelable local numerical jobs, with source-page images excluded
+- `src/impactJob.ts`, `src/model.worker.ts` (one shared inline worker for all numerical jobs), `src/modelJob.ts`: cancelable local numerical jobs, with source-page images excluded
 - `src/impactView.ts`: new-data impact map, ranked boreholes, contact details and export
 - `src/workspace.ts`: versioned drafts, immutable project revisions, restore and workspace JSON
 - `src/storage.ts`: transactional browser saves and migration of earlier input-table saves
