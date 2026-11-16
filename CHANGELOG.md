@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## 0.29.0 — 2026-11-16
+
+### Changed
+- Workspaces store unchanged revision content once (workspace format 4). Boreholes, CPTs, alignments, terrain, evidence and core-photo registrations that did not change between builds are shared in memory and written once to a `projectParts` pool. On the Maasvlakte 2 sample site, 40 builds now make a 1.7 MB workspace instead of 55 MB, and an autosave takes about 50 ms regardless of the history's length. Workspace files of versions 1–3 still import.
+- The comparison, impact, corridor, investigation and disagreement calculations share one inline worker, so the app carries the model kernel once. The standalone file shrinks from 4.42 MB to 3.34 MB (1.16 MB to 0.86 MB compressed).
+- Local AI descriptions of core photographs are an opt-in lab, shown only with `?labs=core-ai` in the address: no model has passed a geologist's review, and SmolVLM 500M gave no useful answer on the eight images of the real-core pilot. Manual core-photo logging, recovery and RQD are unchanged.
+- The corridor dashboard counts screening conditions (cover, water above the design top, design position, log distance) apart from missing data (outside the model, no design level, unknown groundwater, no logs). On a site without groundwater data every station had been counted as flagged.
+- Held-out checks and calibration splits treat logs within 5 m of each other as one location, so a CPT beside a held-out borehole no longer stays in the training models. The distance is set in **Model disagreement** and recorded in the exports; 0 restores the exact-position rule.
+- Exports that would contain page previews or core photographs say how many first, and can leave out the page previews while keeping the source text, highlights and review history.
+- The browser tests run in CI against the production build in `dist/`, including the AI workflow tests, which previously needed the development server.
+
 ## 0.28.0 — 2026-11-15
 
 - Add a depth-linked core log with aligned photo annotations and current borehole intervals, explicit unrepresented/reviewed missing-core spans, and unit-label comparison without an accuracy score.
