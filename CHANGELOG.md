@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 0.29.2 — 2026-11-16
+
+### Fixed
+- Keep core-photo row overlays translucent while hovered, including sticky hover after a mobile tap. The general button hover style previously covered the photograph with an opaque background.
+
 ## 0.29.1 — 2026-11-16
 
 ### Fixed

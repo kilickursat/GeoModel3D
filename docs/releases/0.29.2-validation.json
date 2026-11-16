@@ -1,0 +1,67 @@
+{
+  "version": "0.29.2",
+  "recordedAt": "2026-11-16T03:13:55.433891+00:00",
+  "baseCommit": "87c0668c3a6c4a8c506532520d463493e3aae060",
+  "scope": "One CSS specificity correction; production calculations and project formats unchanged.",
+  "baselineRegression": {
+    "appVersion": "0.29.1",
+    "failed": 3,
+    "reason": "Actual selected-row hover painted an opaque alpha of 255 in desktop, mobile and offline contexts.",
+    "standaloneSha256": "165039b995105c7078455c70f5e9b47ed2bc059957ee9f7a6cd602af69c96b3d"
+  },
+  "targetedPlaywright": {
+    "passed": 6,
+    "retries": 0,
+    "workers": 2,
+    "productionBuild": true,
+    "hoverBackgroundAlphaThreshold": 128,
+    "screenshotsVisuallyInspected": true,
+    "mobileScope": "Chromium emulation; not physical iPhone validation"
+  },
+  "build": {
+    "typescript": "passed",
+    "production": "passed",
+    "benchmark": "passed",
+    "standalone": "passed",
+    "arModels": "passed"
+  },
+  "ci": "The full 711-unit and 81-production-browser suites are required by the PR and main workflows; consult the commit Actions result.",
+  "sourceSha256": {
+    "src/corePhoto.css": "a47c2226aa975598d4484142edc888e9520815c74e590c94c60c04bfc6054520",
+    "tests/browser/core-depth-log.spec.ts": "7f8a2d4da4e72c38391a5e22d4d709baacf2e1e7ef59986d92ad480be501705a",
+    "package.json": "58fd6c46fe1127c987f305d94d9344b9ce8c5d2a908fc4dabcf4a55cf94cd921",
+    "package-lock.json": "be6967301c230eda8c6d70aa7de01e5f019b650d46d27d809885538fc2ce7781"
+  },
+  "standaloneArtifact": {
+    "bytes": 3349531,
+    "sha256": "410a2826534ffe75eb5f54d33b37e9f769c69d7f3a2c2d9749b251e1052909d9"
+  },
+  "logs": {
+    "build": {
+      "path": "0.29.2-build.log.gz",
+      "sha256": "6f4949671413cff15a1eec82ff2163b6efd085c19ee12a6ac2a64353c93c2520",
+      "uncompressedSha256": "8e49b0021455051f04a318f92c484acf3f4507af6cdd1f226c0ec3f3c7733d62"
+    },
+    "targeted-playwright": {
+      "path": "0.29.2-targeted-playwright.log.gz",
+      "sha256": "e0f0e4ed4a8013691f7e724a352bbffd4371c00172c5c7d8772a259b89fcbd8b",
+      "uncompressedSha256": "077eb5b0a4a2ae0f262aad33d43768257f4ace6dcfb624d586b95e03967d11a0"
+    },
+    "hover-before": {
+      "path": "0.29.2-hover-before.log.gz",
+      "sha256": "78347a1bfa972486e8d3edb54a7ea21f6d5d8f9393a99369c76047571fca81d2",
+      "uncompressedSha256": "248bb2e0082badcbab0203b9d7896f58736ad8207532f9f01410c8ff2d9feabc"
+    }
+  },
+  "screenshots": [
+    {
+      "path": "0.29.2-mobile-hover-before.png",
+      "sha256": "bdfca8e145e621951268105ff3a5f50919dea78e413956d40bb9a96549ef9b6b"
+    },
+    {
+      "path": "0.29.2-mobile-hover-after.png",
+      "sha256": "a30bb32e1a6b55d8812cc628f3cc280f85e5a21dbf2dc251058b73d2b2b945f1"
+    }
+  ],
+  "evidenceScope": "Synthetic photographs and software UI checks. No AI inference or new geological-quality claim."
+}
