@@ -2,7 +2,7 @@ import {test,expect,Page,Dialog} from "@playwright/test";
 import {existsSync,readFileSync} from "node:fs";
 import {readFile} from "node:fs/promises";
 import {resolve} from "node:path";
-import {build,downloadJson,importJson,openInput,prepare,resume,saved} from "./helpers";
+import {build,downloadJson,importJson,openInput,prepare,resume,saved,APP_ORIGIN} from "./helpers";
 import {evidenceProject} from "./fixtures/evidence-project";
 
 async function step(page:Page,name:string){
@@ -89,7 +89,7 @@ async function variantWorkspace(page:Page,changes:{crs?:string;groundwater?:unkn
     Object.assign(project,changes);
     document=w.updateDraft(document,t.tablesFromProject(project),project);
     document=w.checkpoint(document,project,"Comparison fixture");
-    return JSON.parse(w.toWorkspaceJson(document));
+    return w.expandWorkspaceParts(JSON.parse(w.toWorkspaceJson(document)));
   },{wire,changes});
 }
 
@@ -315,7 +315,7 @@ test("standalone scenario workspace reopens and compares in a worker with networ
   await page.route("**/*",route=>route.request().isNavigationRequest()
     ?route.fulfill({status:200,contentType:"text/html",body:html}):route.abort());
   await context.setOffline(true);page.on("pageerror",error=>errors.push(error.message));
-  await page.goto("http://127.0.0.1:4173/standalone-scenarios.html?backend=webgl#input");
+  await page.goto(`${APP_ORIGIN}/standalone-scenarios.html?backend=webgl#input`);
   await openInput(page);await importJson(page,project,"scenario-project.json");await saved(page);
   const original:any=await downloadJson(page),before=original.activeRevisionId;
   await createScenario(page,"Offline alternative",before);

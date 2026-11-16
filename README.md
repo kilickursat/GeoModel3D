@@ -99,6 +99,7 @@ The logs give the elevation of each contact at each borehole. The horizons are t
 npm ci
 npm test        # unit tests
 npm run build   # dist/ and dist/geomodel3d-offline.html
+npm run test:ui # browser tests on the build (Playwright)
 ```
 
 The build is static: `dist/` can be served from any web host, and the offline file needs none.

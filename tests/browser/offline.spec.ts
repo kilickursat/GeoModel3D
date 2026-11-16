@@ -1,7 +1,7 @@
 import {test,expect} from "@playwright/test";
 import {existsSync,readFileSync} from "node:fs";
 import {resolve} from "node:path";
-import {build,downloadJson,expectComplete,importFixture,importJson,openInput,rename,saved} from "./helpers";
+import {build,downloadJson,expectComplete,importFixture,importJson,openInput,rename,saved,APP_ORIGIN} from "./helpers";
 import {evidenceProject} from "./fixtures/evidence-project";
 
 test("standalone HTML can import, build and export a complete workspace without a network",async({page,context})=>{
@@ -15,7 +15,7 @@ test("standalone HTML can import, build and export a complete workspace without 
   await context.setOffline(true);
   const errors:string[]=[];
   page.on("pageerror",error=>errors.push(error.message));
-  await page.goto("http://127.0.0.1:4173/standalone-test.html?backend=webgl#input");
+  await page.goto(`${APP_ORIGIN}/standalone-test.html?backend=webgl#input`);
   await importFixture(page);
   await rename(page,"Offline review");
   await build(page);
@@ -43,7 +43,7 @@ test("standalone HTML reopens saved source evidence and highlights with networki
   await context.setOffline(true);
   const errors:string[]=[];
   page.on("pageerror",error=>errors.push(error.message));
-  await page.goto("http://127.0.0.1:4173/standalone-evidence-test.html?backend=webgl#input");
+  await page.goto(`${APP_ORIGIN}/standalone-evidence-test.html?backend=webgl#input`);
   await openInput(page);await importJson(page,project,"evidence-project.json");await saved(page);
   await build(page);
   const exported:any=await downloadJson(page);

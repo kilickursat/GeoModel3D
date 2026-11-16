@@ -2,7 +2,7 @@ import {test,expect,Page} from "@playwright/test";
 import {existsSync,readFileSync,writeFileSync} from "node:fs";
 import {readFile} from "node:fs/promises";
 import {resolve} from "node:path";
-import {downloadJson,importJson,openInput,prepare,saved} from "./helpers";
+import {downloadJson,importJson,openInput,prepare,saved,APP_ORIGIN} from "./helpers";
 
 const appVersion=JSON.parse(readFileSync(resolve("package.json"),"utf8")).version as string;
 function csvRows(text:string){
@@ -40,7 +40,7 @@ async function fixture(page:Page,small=false){
       doc=w.updateDraft(doc,t.tablesFromProject(projects[i]),projects[i]);doc=w.checkpoint(doc,projects[i],`Saved contact hypothesis ${i+1}`);
       doc=w.updateDraft(doc,t.tablesFromProject({...projects[i],name:`Unfinished case ${i+1} draft`}),projects[i]);
     }
-    return JSON.parse(w.toWorkspaceJson(doc));
+    return w.expandWorkspaceParts(JSON.parse(w.toWorkspaceJson(doc)));
   },small);
 }
 
@@ -148,7 +148,7 @@ test("standalone calibrated workflow computes intervals and priced information p
   test.setTimeout(120_000);await prepare(page);await page.goto("/?backend=webgl#input");const document=await fixture(page),filename=resolve("dist/geomodel3d-offline.html");
   expect(existsSync(filename),"Build the standalone HTML before browser validation").toBe(true);const html=readFileSync(filename,"utf8"),errors:string[]=[];
   await page.route("**/*",route=>route.request().isNavigationRequest()?route.fulfill({status:200,contentType:"text/html",body:html}):route.abort());await context.setOffline(true);
-  page.on("pageerror",error=>errors.push(error.message));await page.goto("http://127.0.0.1:4173/standalone-calibrated.html?backend=webgl#input");
+  page.on("pageerror",error=>errors.push(error.message));await page.goto(`${APP_ORIGIN}/standalone-calibrated.html?backend=webgl#input`);
   await openInput(page);await importJson(page,document);await saved(page);await expect(page.locator(".title span")).toHaveText(appVersion);
   const dialog=await analysis(page,document),output=await archive(page);expect(output.calibration.quantile).toBeCloseTo(0,8);await expect(dialog.locator(".disagreement-calibration-map svg")).toBeVisible();
   const planner=await informationPlan(page,dialog),p=await plan(page);expect(p.proposals).toHaveLength(2);expect(p.summary.cumulativeInformationBits).toBeCloseTo(2,8);expect(p.summary.totalCost).toBeCloseTo(340,6);

@@ -2,7 +2,7 @@ import {test,expect,Page,Dialog} from "@playwright/test";
 import {existsSync,readFileSync} from "node:fs";
 import {readFile} from "node:fs/promises";
 import {resolve} from "node:path";
-import {downloadJson,importJson,openInput,prepare,saved} from "./helpers";
+import {downloadJson,importJson,openInput,prepare,saved,APP_ORIGIN} from "./helpers";
 
 const appVersion=JSON.parse(readFileSync(resolve("package.json"),"utf8")).version as string;
 type Variant="outlier"|"flat"|"missing"|"grid";
@@ -40,7 +40,7 @@ async function fixture(page:Page,variant:Variant="outlier"){
     after.cpts[0].layers=top(6);if(variant==="missing")after.cpts[0].x+=20;
     if(variant==="grid")after.crs="Different local survey grid";
     doc=w.updateDraft(doc,t.tablesFromProject(after),after);doc=w.checkpoint(doc,after,"Alternative range review");
-    return JSON.parse(w.toWorkspaceJson(doc));
+    return w.expandWorkspaceParts(JSON.parse(w.toWorkspaceJson(doc)));
   },variant);
 }
 
@@ -158,7 +158,7 @@ test("standalone model disagreement evaluates ranges and held-out validation wit
   await prepare(page);await page.goto("/?backend=webgl#input");const document=await fixture(page),filename=resolve("dist/geomodel3d-offline.html");
   expect(existsSync(filename),"Run npm run build before the standalone browser check").toBe(true);const html=readFileSync(filename,"utf8"),errors:string[]=[];
   await page.route("**/*",route=>route.request().isNavigationRequest()?route.fulfill({status:200,contentType:"text/html",body:html}):route.abort());
-  await context.setOffline(true);page.on("pageerror",error=>errors.push(error.message));await page.goto("http://127.0.0.1:4173/standalone-disagreement.html?backend=webgl#input");
+  await context.setOffline(true);page.on("pageerror",error=>errors.push(error.message));await page.goto(`${APP_ORIGIN}/standalone-disagreement.html?backend=webgl#input`);
   await expect(page.locator(".title span")).toHaveText(appVersion);await openInput(page);await importJson(page,document);await saved(page);
   const dialog=await analysis(page,document);await expect(dialog.locator(".disagreement-csv")).toBeEnabled();
   const validation=await downloadRows(page,".disagreement-validation-csv"),centre=validation.rows.find(row=>row.borehole_id==="BH-CENTRE")!;

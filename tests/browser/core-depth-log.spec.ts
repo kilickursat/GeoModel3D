@@ -4,7 +4,7 @@ import {readFile} from "node:fs/promises";
 import {resolve} from "node:path";
 import type {GeoProject} from "../../src/schema";
 import {acceptCoreRun} from "../../src/corePhoto";
-import {build,downloadJson,importJson,openInput,prepare,saved} from "./helpers";
+import {build,downloadJson,importJson,openInput,prepare,saved,APP_ORIGIN} from "./helpers";
 
 const maliciousDescription='=HYPERLINK("https://example.invalid","<img src=x onerror=globalThis.depthInjected=true>")';
 const modelRequest=(url:string)=>/core(?:Ai|Benchmark)[.-]worker|https:\/\/(?:[^/]+\.)?(?:huggingface\.co|hf\.co|hf\.space|xethub\.hf\.co)\//i.test(url);
@@ -162,7 +162,7 @@ test("standalone core depth log maps and exports photo evidence with networking 
   expect(existsSync(file),"Build the standalone HTML before browser validation").toBe(true);const html=readFileSync(file,"utf8"),errors:string[]=[],requests:string[]=[];
   await page.route("**/*",route=>route.request().isNavigationRequest()?route.fulfill({status:200,contentType:"text/html",body:html}):route.abort());await context.setOffline(true);
   page.on("pageerror",e=>errors.push(e.message));page.on("request",r=>{if(modelRequest(r.url()))requests.push(r.url())});
-  await page.goto("http://127.0.0.1:4173/standalone-core-depth-log.html?backend=webgl#input");await openInput(page);await importJson(page,p);await saved(page);const before:any=await downloadJson(page,".ws-json");
+  await page.goto(`${APP_ORIGIN}/standalone-core-depth-log.html?backend=webgl#input`);await openInput(page);await importJson(page,p);await saved(page);const before:any=await downloadJson(page,".ws-json");
   const dialog=await openDepth(page);await selectInterval(dialog,3.2,3.5);expect((await selectedBox(dialog)).width).toBeCloseTo(16,6);
   const csv=await exportCsv(page);expect(csv.rows.length).toBeGreaterThan(5);await dialog.locator(".core-depth-chart").scrollIntoViewIfNeeded();await page.screenshot({path:testInfo.outputPath("core-depth-log-offline.png"),fullPage:true});
   await close(page);expect(await downloadJson(page,".ws-json")).toEqual(before);expect(requests).toEqual([]);expect(errors).toEqual([]);

@@ -1,15 +1,36 @@
 import {expect,Page} from "@playwright/test";
 import {readFile} from "node:fs/promises";
 import {fileURLToPath} from "node:url";
+import {createUiResponder} from "./serve.mjs";
 import type {WorkspaceDocument} from "../../src/workspace";
 
 export const fixturePath=fileURLToPath(new URL("./fixtures/complete-project.json",import.meta.url));
+// The app's address in the tests (playwright.config.ts): the test server, or a name that is never contacted when the
+// requests are answered by routing (GEOMODEL3D_UI_ROUTE=1).
+export const APP_ORIGIN=process.env.GEOMODEL3D_UI_ROUTE?"https://geomodel3d.invalid":"http://127.0.0.1:4173";
+let responder:ReturnType<typeof createUiResponder>|undefined;
+const routed=new WeakSet<object>();
 
 export async function prepare(page:Page){
   // Sample sites request public tiles at startup; none are needed for these local-data workflows.
-  await page.route("**/*",route=>{
+  if(!process.env.GEOMODEL3D_UI_ROUTE){
+    await page.route("**/*",route=>{
+      const url=new URL(route.request().url());
+      return !["http:","https:"].includes(url.protocol)||["127.0.0.1","localhost"].includes(url.hostname)?route.continue():route.abort();
+    });
+    return;
+  }
+  // Context routing also covers worker requests. Tests' own page routes still take precedence.
+  const context=page.context();
+  if(routed.has(context))return;
+  routed.add(context);
+  const respond=await (responder??=createUiResponder());
+  await context.route("**/*",async route=>{
     const url=new URL(route.request().url());
-    return !["http:","https:"].includes(url.protocol)||["127.0.0.1","localhost"].includes(url.hostname)?route.continue():route.abort();
+    if(!["http:","https:"].includes(url.protocol))return route.continue();
+    if(url.origin!==APP_ORIGIN)return route.abort();
+    const result=await respond(url.pathname,url.search);
+    return route.fulfill({status:result.status,contentType:result.type,body:typeof result.body==="string"?result.body:Buffer.from(result.body)});
   });
 }
 

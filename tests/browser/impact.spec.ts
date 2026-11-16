@@ -2,7 +2,7 @@ import {test,expect,Page,Dialog} from "@playwright/test";
 import {existsSync,readFileSync} from "node:fs";
 import {readFile} from "node:fs/promises";
 import {resolve} from "node:path";
-import {downloadJson,importJson,openInput,prepare,saved} from "./helpers";
+import {downloadJson,importJson,openInput,prepare,saved,APP_ORIGIN} from "./helpers";
 
 type Variant="interior"|"outside"|"assumptions"|"grid";
 
@@ -43,7 +43,7 @@ async function fixture(page:Page,variant:Variant="interior"){
       intervals:[{from:0,to:4,unit:"fill"},{from:4,to:12,unit:"sand"}]});
     doc=w.updateDraft(doc,t.tablesFromProject(after),after);
     doc=w.checkpoint(doc,after,"New-data review fixture");
-    return JSON.parse(w.toWorkspaceJson(doc));
+    return w.expandWorkspaceParts(JSON.parse(w.toWorkspaceJson(doc)));
   },variant);
 }
 
@@ -186,7 +186,7 @@ test("standalone new-data impact runs the inline worker with networking disabled
   await page.route("**/*",route=>route.request().isNavigationRequest()
     ?route.fulfill({status:200,contentType:"text/html",body:html}):route.abort());
   await context.setOffline(true);page.on("pageerror",error=>errors.push(error.message));
-  await page.goto("http://127.0.0.1:4173/standalone-impact.html?backend=webgl#input");
+  await page.goto(`${APP_ORIGIN}/standalone-impact.html?backend=webgl#input`);
   await openInput(page);await importJson(page,document);await saved(page);
   const dialog=await review(page,document);
   await expect(dialog.locator(".impact-csv")).toBeEnabled();

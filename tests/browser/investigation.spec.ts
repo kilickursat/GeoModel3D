@@ -2,7 +2,7 @@ import {test,expect,Page,Dialog} from "@playwright/test";
 import {existsSync,readFileSync} from "node:fs";
 import {readFile} from "node:fs/promises";
 import {resolve} from "node:path";
-import {build,downloadJson,importJson,openInput,prepare,saved} from "./helpers";
+import {build,downloadJson,importJson,openInput,prepare,saved,APP_ORIGIN} from "./helpers";
 
 type Variant="inside"|"outside"|"unknown";
 const appVersion=JSON.parse(readFileSync(resolve("package.json"),"utf8")).version as string;
@@ -136,7 +136,7 @@ test("standalone investigation planner runs the inline worker with networking di
   const html=readFileSync(filename,"utf8"),errors:string[]=[];
   await page.route("**/*",route=>route.request().isNavigationRequest()?route.fulfill({status:200,contentType:"text/html",body:html}):route.abort());
   await context.setOffline(true);page.on("pageerror",error=>errors.push(error.message));
-  await page.goto("http://127.0.0.1:4173/standalone-investigation.html?backend=webgl#input");await loadProject(page);
+  await page.goto(`${APP_ORIGIN}/standalone-investigation.html?backend=webgl#input`);await loadProject(page);
   await expect(page.locator(".title span")).toHaveText(appVersion);
   const dialog=await planner(page);await expect(dialog.locator(".planner-csv")).toBeEnabled();
   const rows=(await csvDownload(page)).rows.filter(row=>row.proposal_id);expect(rows).toHaveLength(2);expect(Number(rows[0].x_m)).toBeCloseTo(50,6);

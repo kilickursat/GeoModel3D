@@ -35,7 +35,7 @@ async function fixture(page:Page,options:FixtureOptions={}){
     const u=new URL(route.request().url());activity.cases.push({caseId:u.searchParams.get("caseId")!,sha256:u.searchParams.get("sha256")!,mode:u.searchParams.get("mode")!,active:Number(u.searchParams.get("active"))});
     return route.fulfill({contentType:"application/json",body:"{}"});
   });
-  await page.route("**/src/coreBenchmark.worker.ts*",route=>{
+  await page.route(/\/(src\/coreBenchmark\.worker\.ts|assets\/coreBenchmark\.worker-[\w-]+\.js)(\?|$)/,route=>{
     activity.workers++;
     return route.fulfill({contentType:"text/javascript",body:`
 import {CORE_BENCHMARK_MODEL as config,CORE_BENCHMARK_PROMPT,CORE_BENCHMARK_PROMPT_VERSION,CORE_BENCHMARK_RUNTIME_VERSION,CORE_BENCHMARK_ONNX_VERSION,coreBenchmarkTokenLimit} from '/src/coreBenchmark.ts';
