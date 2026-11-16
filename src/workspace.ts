@@ -19,7 +19,7 @@ export interface WorkspaceScenario {
   draft?:WorkspaceDraft;
 }
 export interface WorkspaceDocument {
-  format:"geomodel3d-workspace"; version:3; id:string; savedAt:string;
+  format:"geomodel3d-workspace"; version:4; id:string; savedAt:string;
   draft:WorkspaceDraft; revisions:WorkspaceRevision[]; activeRevisionId?:string;
   scenarios:WorkspaceScenario[]; activeScenarioId:string;
 }
@@ -43,13 +43,13 @@ const identifier=()=>globalThis.crypto?.randomUUID?.()??`local-${Date.now().toSt
 
 export function createWorkspace(tables:EditorTables,base?:GeoProject):WorkspaceDocument{
   const id=identifier(),at=now(),baseline=id+":baseline";
-  return {format:"geomodel3d-workspace",version:3,id,savedAt:at,
+  return {format:"geomodel3d-workspace",version:4,id,savedAt:at,
     draft:{tables:clone(tables),...(base?{base:clone(base)}:{})},revisions:freeze([]),
     scenarios:freeze([{id:baseline,name:"Baseline",createdAt:at}]),activeScenarioId:baseline};
 }
 
 export function updateDraft(doc:WorkspaceDocument,tables:EditorTables,base?:GeoProject):WorkspaceDocument{
-  return {...doc,version:3,savedAt:now(),revisions:history(doc.revisions),scenarios:scenarioHistory(doc.scenarios),
+  return {...doc,version:4,savedAt:now(),revisions:history(doc.revisions),scenarios:scenarioHistory(doc.scenarios),
     draft:{tables:clone(tables),...(base?{base:clone(base)}:{})}};
 }
 function setActiveHead(doc:WorkspaceDocument,id:string|undefined){
@@ -113,13 +113,43 @@ function ordered(value:unknown):unknown{
 }
 const fingerprint=(p:GeoProject)=>JSON.stringify(ordered(JSON.parse(toProjectJson(p))));
 
+// Workspace format 4 keeps repeated project content once. In memory every revision is still a complete project, but
+// a checkpoint reuses the frozen boreholes, CPTs, alignments, terrain grid, evidence and core-photo registrations of
+// the revision it follows wherever they are unchanged, and the file stores each distinct part once (projectParts).
+// Only these slots may hold part references, so text inside a project can never be mistaken for one.
+const PART_REFERENCE="workspace-part:";
+const PART_LISTS=["boreholes","cpts","alignments"] as const,PART_VALUES=["terrain","evidence","corePhotos"] as const;
+const partKey=(item:unknown)=>item&&typeof item==="object"?(item as Record<string,unknown>).id??(item as Record<string,unknown>).name:undefined;
+// Exact structural equality (Object.is for values): a NaN reading only matches NaN, never null or a missing key.
+function same(a:unknown,b:unknown):boolean{
+  if(Object.is(a,b))return true;
+  if(!a||!b||typeof a!=="object"||typeof b!=="object"||Array.isArray(a)!==Array.isArray(b))return false;
+  if(Array.isArray(a)){const c=b as unknown[];if(a.length!==c.length)return false;for(let i=0;i<a.length;i++)if(!same(a[i],c[i]))return false;return true}
+  const x=a as Record<string,unknown>,y=b as Record<string,unknown>,keys=Object.keys(x);
+  if(keys.length!==Object.keys(y).length)return false;
+  for(const key of keys)if(!Object.hasOwn(y,key)||!same(x[key],y[key]))return false;
+  return true;
+}
+function shareUnchanged(project:GeoProject,previous:GeoProject|undefined):GeoProject{
+  if(!previous)return project;
+  const now=project as unknown as Record<string,unknown>,before=previous as unknown as Record<string,unknown>;
+  for(const key of PART_LISTS){
+    const items=now[key],old=before[key];
+    if(!Array.isArray(items)||!Array.isArray(old))continue;
+    const byKey=new Map(old.map(item=>[partKey(item),item]));
+    now[key]=items.map(item=>{const match=byKey.get(partKey(item));return match!==undefined&&same(match,item)?match:item});
+  }
+  for(const key of PART_VALUES)if(now[key]!==undefined&&before[key]!==undefined&&same(before[key],now[key]))now[key]=before[key];
+  return project;
+}
+
 export function checkpoint(doc:WorkspaceDocument,project:GeoProject,reason:string):WorkspaceDocument{
   const next=updateDraft(doc,doc.draft.tables,project),active=next.revisions.find(r=>r.id===next.activeRevisionId);
   if(active&&fingerprint(active.project)===fingerprint(project))return next;
   let id=identifier();
   while(next.revisions.some(r=>r.id===id))id=identifier();
   next.revisions=freeze([...next.revisions,{id,...(active?{parentId:active.id}:{}),createdAt:now(),reason,
-    engineVersion:pkg.version,project:clone(project),scenarioId:next.activeScenarioId}]);
+    engineVersion:pkg.version,project:shareUnchanged(clone(project),active?.project),scenarioId:next.activeScenarioId}]);
   setActiveHead(next,id);
   return next;
 }
@@ -362,22 +392,76 @@ function parseProject(value:unknown,path:string,image:ImageResolver):GeoProject{
   return project;
 }
 
-function parseDraft(value:unknown,image:ImageResolver,path:string):WorkspaceDraft{
+// Part references are resolved before the ordinary project validation, which then sees a complete project.
+interface PartResolver {
+  resolve(value:unknown,path:string):unknown;
+  // Map each slot to the part it came from, so identical parts of different revisions can share one object.
+  share(project:GeoProject,ids:PartIds):void;
+  check():void;
+}
+interface PartIds { lists:Partial<Record<typeof PART_LISTS[number],Array<string|undefined>>>;values:Partial<Record<typeof PART_VALUES[number],string>> }
+const referencedPart=(value:unknown)=>typeof value==="string"&&value.startsWith(PART_REFERENCE)?value.slice(PART_REFERENCE.length):undefined;
+function workspacePartResolver(d:RecordValue):PartResolver{
+  if(d.version!==4&&d.projectParts!==undefined)invalid("projectParts",`is not supported by workspace version ${String(d.version)}`);
+  const pool=d.projectParts===undefined?{}:record(d.projectParts,"projectParts"),used=new Set<string>(),canonical=new Map<string,unknown>();
+  for(const [id,value] of Object.entries(pool)){
+    if(!/^[A-Za-z0-9_-]{1,128}$/.test(id)||["__proto__","constructor","prototype"].includes(id))invalid("projectParts","contains an invalid part ID");
+    record(value,`projectParts.${id}`);
+  }
+  return {
+    resolve(value,path){
+      const id=referencedPart(value);
+      if(id===undefined)return value;
+      if(d.version!==4)invalid(path,"contains a part reference unsupported by this workspace version");
+      if(!Object.hasOwn(pool,id))invalid(path,"does not name a workspace project part");
+      used.add(id);return pool[id];
+    },
+    share(project,ids){
+      const p=project as unknown as Record<string,unknown>;
+      const one=(id:string|undefined,value:unknown)=>{
+        if(id===undefined||value===undefined)return value;
+        const known=canonical.get(id);if(known!==undefined)return known;
+        canonical.set(id,value);return value;
+      };
+      for(const key of PART_LISTS){const list=p[key],refs=ids.lists[key];if(Array.isArray(list)&&refs)p[key]=list.map((item,i)=>one(refs[i],item))}
+      for(const key of PART_VALUES)if(p[key]!==undefined)p[key]=one(ids.values[key],p[key]);
+    },
+    // Unused pool entries are rejected like unused images: arbitrary payloads must not hide in a valid workspace.
+    check(){for(const id of Object.keys(pool))if(!used.has(id))invalid(`projectParts.${id}`,"is not used by any project")}
+  };
+}
+function unpackProject(value:unknown,parts:PartResolver,path:string):{value:unknown;ids:PartIds}{
+  const ids:PartIds={lists:{},values:{}};
+  if(!value||typeof value!=="object"||Array.isArray(value))return {value,ids};
+  const p={...(value as RecordValue)};
+  for(const key of PART_LISTS)if(Array.isArray(p[key])){
+    ids.lists[key]=(p[key] as unknown[]).map(referencedPart);
+    p[key]=(p[key] as unknown[]).map((item,i)=>parts.resolve(item,`${path}.${key}[${i}]`));
+  }
+  for(const key of PART_VALUES)if(p[key]!==undefined){ids.values[key]=referencedPart(p[key]);p[key]=parts.resolve(p[key],`${path}.${key}`)}
+  return {value:p,ids};
+}
+function parsePackedProject(value:unknown,path:string,image:ImageResolver,parts:PartResolver,share:boolean):GeoProject{
+  const unpacked=unpackProject(value,parts,path),project=parseProject(unpacked.value,path,image);
+  if(share)parts.share(project,unpacked.ids);
+  return project;
+}
+function parseDraft(value:unknown,image:ImageResolver,parts:PartResolver,path:string,share=false):WorkspaceDraft{
   const draft=record(value,path);
-  return {tables:parseTables(draft.tables,image,`${path}.tables`),...(draft.base===undefined?{}:{base:parseProject(draft.base,`${path}.base`,image)})};
+  return {tables:parseTables(draft.tables,image,`${path}.tables`),...(draft.base===undefined?{}:{base:parsePackedProject(draft.base,`${path}.base`,image,parts,share)})};
 }
 export function parseWorkspace(value:unknown):WorkspaceDocument{
   const d=record(value,"document");
   if(d.format!=="geomodel3d-workspace")invalid("format","must be geomodel3d-workspace");
-  if(d.version!==1&&d.version!==2&&d.version!==3)invalid("version","is not supported");
-  const legacy=d.version!==3;
+  if(d.version!==1&&d.version!==2&&d.version!==3&&d.version!==4)invalid("version","is not supported");
+  const legacy=d.version===1||d.version===2;
   if(legacy&&(Object.hasOwn(d,"scenarios")||Object.hasOwn(d,"activeScenarioId")))invalid("version","cannot declare a legacy format while containing scenario metadata");
-  const image=workspaceImageResolver(d),id=text(d.id,"id",true),savedAt=date(d.savedAt,"savedAt"),baseline=id+":baseline";
+  const image=workspaceImageResolver(d),parts=workspacePartResolver(d),id=text(d.id,"id",true),savedAt=date(d.savedAt,"savedAt"),baseline=id+":baseline";
   const revisions=records(d.revisions,"revisions").map((r,i):WorkspaceRevision=>{
     const at=`revisions[${i}]`;
     return {id:text(r.id,`${at}.id`,true),...(r.parentId===undefined?{}:{parentId:text(r.parentId,`${at}.parentId`,true)}),
       createdAt:date(r.createdAt,`${at}.createdAt`),reason:text(r.reason,`${at}.reason`),engineVersion:text(r.engineVersion,`${at}.engineVersion`,true),
-      project:parseProject(r.project,`${at}.project`,image),
+      project:parsePackedProject(r.project,`${at}.project`,image,parts,true),
       ...(legacy?{scenarioId:baseline}:r.scenarioId===undefined?{}:{scenarioId:text(r.scenarioId,`${at}.scenarioId`,true)})};
   });
   const byId=new Map(revisions.map(r=>[r.id,r]));
@@ -396,7 +480,7 @@ export function parseWorkspace(value:unknown):WorkspaceDocument{
   const active=d.activeRevisionId===undefined?undefined:text(d.activeRevisionId,"activeRevisionId",true);
   if(active!==undefined&&!byId.has(active))invalid("activeRevisionId","does not name a checkpoint");
   if(legacy&&revisions.length&&active===undefined)invalid("activeRevisionId","is required when checkpoints exist");
-  const draft=parseDraft(d.draft,image,"draft");
+  const draft=parseDraft(d.draft,image,parts,"draft");
   let scenarios:WorkspaceScenario[],activeScenarioId:string;
   if(legacy){
     activeScenarioId=baseline;
@@ -421,7 +505,7 @@ export function parseWorkspace(value:unknown):WorkspaceDocument{
       return {id:scenarioId,name,createdAt:date(s.createdAt,`${at}.createdAt`),
         ...(s.parentScenarioId===undefined?{}:{parentScenarioId:text(s.parentScenarioId,`${at}.parentScenarioId`,true)}),
         ...(from===undefined?{}:{fromRevisionId:from}),...(head===undefined?{}:{headRevisionId:head}),
-        ...(isActive?{}:{draft:freeze(parseDraft(s.draft,image,`${at}.draft`))})};
+        ...(isActive?{}:{draft:freeze(parseDraft(s.draft,image,parts,`${at}.draft`,true))})};
     });
     const byScenario=new Map(scenarios.map(s=>[s.id,s]));
     if(byScenario.size!==scenarios.length)invalid("scenarios","contains duplicate IDs");
@@ -440,19 +524,21 @@ export function parseWorkspace(value:unknown):WorkspaceDocument{
     }
     for(const revision of revisions)if(revision.scenarioId!==undefined&&!byScenario.has(revision.scenarioId))invalid(`revision ${revision.id}.scenarioId`,"does not name a scenario");
   }
-  return {format:"geomodel3d-workspace",version:3,id,savedAt,draft,revisions:freeze(revisions),
+  parts.check();
+  return {format:"geomodel3d-workspace",version:4,id,savedAt,draft,revisions:freeze(revisions),
     scenarios:freeze(scenarios),activeScenarioId,...(active===undefined?{}:{activeRevisionId:active})};
 }
 
 // Content IDs are deterministic pool keys, not security fingerprints. A detected collision rejects the save
 // instead of aliasing two different images. Source-document SHA-256 digests remain separate evidence metadata.
-function imageId(image:string):string{
+function contentId(prefix:string,value:string):string{
   let a=0x811c9dc5,b=0x9e3779b9;
-  for(let i=0;i<image.length;i++){
-    const c=image.charCodeAt(i);a=Math.imul(a^c,0x01000193);b=Math.imul(b^c,0x85ebca6b);
+  for(let i=0;i<value.length;i++){
+    const c=value.charCodeAt(i);a=Math.imul(a^c,0x01000193);b=Math.imul(b^c,0x85ebca6b);
   }
-  return `png-${image.length.toString(36)}-${(a>>>0).toString(16)}-${(b>>>0).toString(16)}`;
+  return `${prefix}-${value.length.toString(36)}-${(a>>>0).toString(16)}-${(b>>>0).toString(16)}`;
 }
+const imageId=(image:string)=>contentId("png",image);
 interface PackedImages {
   values:Map<string,string>;
   add(image:unknown,path:string):string;
@@ -476,41 +562,93 @@ function packedImages():PackedImages{
     const id=imageId(image);include(id,image);return IMAGE_REFERENCE+id;
   }};
 }
-function packedProject(p:GeoProject,pool:PackedImages):unknown{
-  return JSON.parse(toProjectJson(p.evidence?{...p,evidence:mapEvidenceImages(p.evidence,pool.add,"project.evidence") as EvidenceCollection}:p));
+// One string per distinct part, shared by every cached revision: merging their pools then compares references, so
+// the cost of a save does not grow with the length of the history.
+const partText=new Map<string,string>();
+interface PackedParts {
+  values:Map<string,string>;
+  add(value:unknown):string;
+  include(id:string,json:string):void;
 }
-function packedDraft(draft:WorkspaceDraft,pool:PackedImages,path:string):unknown{
+function packedParts():PackedParts{
+  const values=new Map<string,string>();
+  const include=(id:string,json:string)=>{
+    const existing=values.get(id);
+    if(existing!==undefined&&existing!==json)throw new Error("Workspace project part ID collision; the workspace was not saved.");
+    values.set(id,json);
+  };
+  return {values,include,add(value){
+    let json=JSON.stringify(value);
+    const id=contentId("part",json),known=partText.get(id);
+    if(known===undefined)partText.set(id,json);
+    else if(known!==json)throw new Error("Workspace project part ID collision; the workspace was not saved.");
+    else json=known;
+    include(id,json);return PART_REFERENCE+id;
+  }};
+}
+function packedProject(p:GeoProject,pool:PackedImages,parts:PackedParts):unknown{
+  const value=JSON.parse(toProjectJson(p.evidence?{...p,evidence:mapEvidenceImages(p.evidence,pool.add,"project.evidence") as EvidenceCollection}:p)) as RecordValue;
+  for(const key of PART_LISTS)if(Array.isArray(value[key]))value[key]=(value[key] as unknown[]).map(item=>parts.add(item));
+  for(const key of PART_VALUES)if(value[key]!==undefined)value[key]=parts.add(value[key]);
+  return value;
+}
+function packedDraft(draft:WorkspaceDraft,pool:PackedImages,parts:PackedParts,path:string):unknown{
   const tables=draft.tables.evidence?{...draft.tables,evidence:mapEvidenceImages(draft.tables.evidence,pool.add,`${path}.tables.evidence`)}:draft.tables;
-  return {tables,...(draft.base?{base:packedProject(draft.base,pool)}:{})};
+  return {tables,...(draft.base?{base:packedProject(draft.base,pool,parts)}:{})};
 }
-interface PackedSnapshot { json:string;images:Map<string,string> }
+interface PackedSnapshot { json:string;images:Map<string,string>;parts:Map<string,string> }
 const revisionJson=new WeakMap<WorkspaceRevision,PackedSnapshot>(),scenarioJson=new WeakMap<WorkspaceScenario,PackedSnapshot>();
+// A workspace file with every part reference replaced by its content: complete projects in the revision and draft
+// slots, as format 3 wrote them. The result is still a valid format 4 file (an empty part pool). Images stay pooled.
+export function expandWorkspaceParts<T=any>(value:unknown):T{
+  const d=record(structuredClone(value),"document");
+  if(d.projectParts===undefined)return d as T;
+  const pool=record(d.projectParts,"projectParts");
+  const expand=(project:unknown)=>{
+    if(!project||typeof project!=="object"||Array.isArray(project))return project;
+    const p=project as RecordValue,resolve=(v:unknown)=>{const id=referencedPart(v);return id!==undefined&&Object.hasOwn(pool,id)?structuredClone(pool[id]):v};
+    for(const key of PART_LISTS)if(Array.isArray(p[key]))p[key]=(p[key] as unknown[]).map(resolve);
+    for(const key of PART_VALUES)if(p[key]!==undefined)p[key]=resolve(p[key]);
+    return p;
+  };
+  const draft=(value:unknown)=>{if(value&&typeof value==="object"&&!Array.isArray(value)){const w=value as RecordValue;if(w.base!==undefined)w.base=expand(w.base)}};
+  if(Array.isArray(d.revisions))for(const r of d.revisions)if(r&&typeof r==="object")(r as RecordValue).project=expand((r as RecordValue).project);
+  draft(d.draft);
+  if(Array.isArray(d.scenarios))for(const sc of d.scenarios)if(sc&&typeof sc==="object")draft((sc as RecordValue).draft);
+  delete d.projectParts;
+  return d as T;
+}
 export function toWorkspaceJson(doc:WorkspaceDocument):string{
-  // Page PNGs are pooled once across active/inactive drafts and immutable revisions. Cached immutable JSON keeps
-  // large CPT/terrain histories out of the autosave hot path even after an engineer adds more scenarios.
-  const pool=packedImages();
-  const metadata={format:doc.format,version:3,id:doc.id,savedAt:doc.savedAt,activeScenarioId:doc.activeScenarioId,
+  // Page PNGs and project parts are pooled once across active/inactive drafts and immutable revisions. Cached
+  // immutable JSON keeps large CPT/terrain histories out of the autosave hot path, and pooled parts keep a saved
+  // history proportional to what changed between builds rather than to the number of builds.
+  const pool=packedImages(),parts=packedParts();
+  const metadata={format:doc.format,version:4,id:doc.id,savedAt:doc.savedAt,activeScenarioId:doc.activeScenarioId,
     ...(doc.activeRevisionId===undefined?{}:{activeRevisionId:doc.activeRevisionId})};
-  const draft=packedDraft(doc.draft,pool,"draft");
+  const draft=packedDraft(doc.draft,pool,parts,"draft");
+  const collect=(packed:PackedSnapshot)=>{
+    for(const [id,image] of packed.images)pool.include(id,image);
+    for(const [id,json] of packed.parts)parts.include(id,json);
+    return packed.json;
+  };
   const revisions=doc.revisions.map(r=>{
     let packed=revisionJson.get(r);
     if(packed===undefined){
-      const images=packedImages();
-      packed={json:JSON.stringify({...r,project:packedProject(r.project,images)},null,1),images:images.values};
+      const images=packedImages(),own=packedParts();
+      packed={json:JSON.stringify({...r,project:packedProject(r.project,images,own)},null,1),images:images.values,parts:own.values};
       if(frozen.has(r))revisionJson.set(r,packed);
     }
-    for(const [id,image] of packed.images)pool.include(id,image);
-    return packed.json;
+    return collect(packed);
   });
   const scenarios=doc.scenarios.map(s=>{
     let packed=scenarioJson.get(s);
     if(packed===undefined){
-      const images=packedImages();
-      packed={json:JSON.stringify({...s,...(s.draft?{draft:packedDraft(s.draft,images,`scenario ${s.id}.draft`)}:{})},null,1),images:images.values};
+      const images=packedImages(),own=packedParts();
+      packed={json:JSON.stringify({...s,...(s.draft?{draft:packedDraft(s.draft,images,own,`scenario ${s.id}.draft`)}:{})},null,1),images:images.values,parts:own.values};
       if(frozen.has(s))scenarioJson.set(s,packed);
     }
-    for(const [id,image] of packed.images)pool.include(id,image);
-    return packed.json;
+    return collect(packed);
   });
-  return `${JSON.stringify(metadata,null,1).slice(0,-2)},\n "evidenceImages": ${JSON.stringify(Object.fromEntries(pool.values))},\n "draft": ${JSON.stringify(draft,null,1)},\n "revisions": [${revisions.length?`\n${revisions.join(",\n")}\n`:""}],\n "scenarios": [${scenarios.length?`\n${scenarios.join(",\n")}\n`:""}]\n}\n`;
+  const projectParts=[...parts.values].map(([id,json])=>`  ${JSON.stringify(id)}: ${json}`).join(",\n");
+  return `${JSON.stringify(metadata,null,1).slice(0,-2)},\n "evidenceImages": ${JSON.stringify(Object.fromEntries(pool.values))},\n "projectParts": {${projectParts?`\n${projectParts}\n `:""}},\n "draft": ${JSON.stringify(draft,null,1)},\n "revisions": [${revisions.length?`\n${revisions.join(",\n")}\n`:""}],\n "scenarios": [${scenarios.length?`\n${scenarios.join(",\n")}\n`:""}]\n}\n`;
 }

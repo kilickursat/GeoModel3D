@@ -174,6 +174,14 @@ Fields of the project file:
 - **Alignments:** `alignments` lists the lines of the project, each with a `name` and its `points` (`x`, `y`, and a `chainage` at every point or at none). It may also have a `start` chainage and `design` levels: `chainage` and `top`, and `bottom` for a crown and invert.
 - **CPTs:** `cpts` lists the cone penetration tests, each with an `id`, its position `x`, `y` and start level `z` (`null` to start at the model's ground), and its readings as lists of one length: `depth` (m below the start), `qc` (MPa) and, where measured, `fs` (kPa), `u2` (kPa), `rf` (%) and `qt` (MPa), with `null` for a missing reading. It may also have the cone's net area ratio `a`, a `date`, a `predrill` depth, and its `layers` (`from`, `to`, `unit`, and the soil as `name`). `cptLayers: true` builds the model with the CPT layers, and `cptRules` give them their units (else `rules` do).
 
+## Workspace JSON
+
+**Save workspace** writes `format: "geomodel3d-workspace"`, `version: 4`: the unfinished tables (`draft`), the revision history (`revisions`, each with a complete project), named `scenarios`, and two pools that store repeated content once:
+- `evidenceImages` holds each saved page preview or core photograph once; evidence pages refer to it as `workspace-image:<id>`.
+- `projectParts` holds each distinct borehole, CPT, alignment, terrain grid, evidence collection and core-photo collection once. In a revision's or draft's project, an entry of `boreholes`, `cpts` or `alignments`, or the value of `terrain`, `evidence` or `corePhotos`, may be the string `workspace-part:<id>` instead of the object itself.
+
+A part ID names its content, so unchanged parts of later revisions point to the same entry. Every pool entry must be used, and an unknown reference is rejected. Versions 1–3 of the workspace file, which store every revision in full, still import.
+
 **Export** also writes:
 - **Boreholes (CSV)**, with descriptions and water depths;
 - **Tests (CSV)**;

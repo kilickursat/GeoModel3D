@@ -1,15 +1,36 @@
 import {expect,Page} from "@playwright/test";
 import {readFile} from "node:fs/promises";
 import {fileURLToPath} from "node:url";
+import {createUiResponder} from "./serve.mjs";
 import type {WorkspaceDocument} from "../../src/workspace";
 
 export const fixturePath=fileURLToPath(new URL("./fixtures/complete-project.json",import.meta.url));
+// The app's address in the tests (playwright.config.ts): the test server, or a name that is never contacted when the
+// requests are answered by routing (GEOMODEL3D_UI_ROUTE=1).
+export const APP_ORIGIN=process.env.GEOMODEL3D_UI_ROUTE?"https://geomodel3d.invalid":"http://127.0.0.1:4173";
+let responder:ReturnType<typeof createUiResponder>|undefined;
+const routed=new WeakSet<object>();
 
 export async function prepare(page:Page){
   // Sample sites request public tiles at startup; none are needed for these local-data workflows.
-  await page.route("**/*",route=>{
+  if(!process.env.GEOMODEL3D_UI_ROUTE){
+    await page.route("**/*",route=>{
+      const url=new URL(route.request().url());
+      return !["http:","https:"].includes(url.protocol)||["127.0.0.1","localhost"].includes(url.hostname)?route.continue():route.abort();
+    });
+    return;
+  }
+  // Context routing also covers worker requests. Tests' own page routes still take precedence.
+  const context=page.context();
+  if(routed.has(context))return;
+  routed.add(context);
+  const respond=await (responder??=createUiResponder());
+  await context.route("**/*",async route=>{
     const url=new URL(route.request().url());
-    return !["http:","https:"].includes(url.protocol)||["127.0.0.1","localhost"].includes(url.hostname)?route.continue():route.abort();
+    if(!["http:","https:"].includes(url.protocol))return route.continue();
+    if(url.origin!==APP_ORIGIN)return route.abort();
+    const result=await respond(url.pathname,url.search);
+    return route.fulfill({status:result.status,contentType:result.type,body:typeof result.body==="string"?result.body:Buffer.from(result.body)});
   });
 }
 
@@ -29,12 +50,32 @@ export async function saved(page:Page){
   await expect(page.locator(".ws-save-status")).toHaveText("Saved in this browser");
 }
 
+// Workspace files (format 4) store repeated project content once and refer to it as workspace-part:<id>. Tests read
+// complete projects, as src/workspace.ts expandWorkspaceParts gives them; the result is still a valid workspace file.
+function expandParts(value:any){
+  if(value?.format!=="geomodel3d-workspace"||!value.projectParts)return value;
+  const pool=value.projectParts,resolve=(v:unknown)=>typeof v==="string"&&v.startsWith("workspace-part:")?structuredClone(pool[v.slice(15)]):v;
+  const project=(p:any)=>{
+    if(!p||typeof p!=="object")return;
+    for(const key of ["boreholes","cpts","alignments"])if(Array.isArray(p[key]))p[key]=p[key].map(resolve);
+    for(const key of ["terrain","evidence","corePhotos"])if(p[key]!==undefined)p[key]=resolve(p[key]);
+  };
+  for(const r of value.revisions??[])project(r.project);
+  project(value.draft?.base);
+  for(const s of value.scenarios??[])project(s.draft?.base);
+  delete value.projectParts;
+  return value;
+}
+
 export async function downloadJson<T=WorkspaceDocument>(page:Page,selector=".ws-workspace"):Promise<T>{
   const pending=page.waitForEvent("download");
   await page.locator(selector).click();
+  // A file with page images or core photographs asks first (src/exportImages.ts); these tests keep the images.
+  const ask=page.locator("dialog.export-images");
+  if(await ask.count())await ask.locator('button[value="include"]').click();
   const download=await pending,path=await download.path();
   expect(path).not.toBeNull();
-  return JSON.parse(await readFile(path!,"utf8")) as T;
+  return expandParts(JSON.parse(await readFile(path!,"utf8"))) as T;
 }
 
 export async function importJson(page:Page,document:unknown,name="review.workspace.geomodel3d.json"){

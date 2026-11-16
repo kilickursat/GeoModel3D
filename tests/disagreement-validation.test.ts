@@ -184,3 +184,38 @@ describe("held-out selected-interpretation envelopes",()=>{
     const units=project();units.units.push(units.units[0]);expect(()=>validateDisagreement(cases(units),selected)).toThrow(/Unit IDs/);
   });
 });
+
+describe("grouping nearby logs as one location",()=>{
+  // A CPT pushed 2 m from the centre borehole, whose layers would otherwise give the held-out contact almost exactly.
+  const paired=(p:GeoProject):GeoProject=>({...p,cptLayers:true,cpts:[{id:"CPT-beside",x:22,y:20,z:10,depth:[1,2,3],qc:[1,1,1],
+    layersSource:"reviewed",layers:[{from:0,to:4,unit:"fill"},{from:4,to:12,unit:"sand"}]}]});
+  const pair=()=>cases(paired(project(2,4)),paired(project(2,4)));
+
+  it("removes logs within the default 5 m with the held-out borehole",()=>{
+    const result=validateDisagreement(pair(),selected),row=middle(result);
+    expect(result.groupRadius).toBe(5);
+    for(const p of row.predictions)expect(p).toMatchObject({removedBoreholes:1,removedCpts:1});
+    expect(result.notes.join(" ")).toMatch(/within 5 m of each other/);
+  });
+
+  it("keeps the former exact-position behaviour at a radius of 0",()=>{
+    const result=validateDisagreement(pair(),{...selected,groupRadius:0}),row=middle(result);
+    for(const p of row.predictions)expect(p).toMatchObject({removedBoreholes:1,removedCpts:0});
+    expect(result.notes.join(" ")).toMatch(/grouping distance is 0/);
+  });
+
+  it("chains links between logs closer than the radius",()=>{
+    const chain=(p:GeoProject):GeoProject=>({...p,cpts:[
+      {id:"CPT-a",x:24,y:20,z:10,depth:[1],qc:[1]},{id:"CPT-b",x:28,y:20,z:10,depth:[1],qc:[1]}]});
+    const row=middle(validateDisagreement(cases(chain(project()),chain(project())),selected));
+    // CPT-b is 8 m from the borehole but 4 m from CPT-a, which is 4 m from the borehole.
+    for(const p of row.predictions)expect(p.removedCpts).toBe(2);
+  });
+
+  it("rejects an invalid grouping distance and records it in the CSV",()=>{
+    for(const groupRadius of [-1,NaN,Infinity,1001])expect(()=>validateDisagreement(pair(),{...selected,groupRadius})).toThrow(/grouping distance/);
+    const csv=parseCsv(validationCsv(validateDisagreement(pair(),{...selected,groupRadius:3})));
+    expect(csv[0][csv[0].indexOf("group_radius_m")]).toBe("group_radius_m");
+    expect(csv[1][csv[0].indexOf("group_radius_m")]).toBe("3");
+  });
+});

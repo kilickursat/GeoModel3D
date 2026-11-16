@@ -1,5 +1,6 @@
 import {test,expect,Page} from "@playwright/test";
 import {fileURLToPath} from "node:url";
+import {readFile} from "node:fs/promises";
 import {build,downloadJson,importJson,openInput,prepare,resume,saved} from "./helpers";
 import {evidenceProject} from "./fixtures/evidence-project";
 
@@ -241,4 +242,22 @@ test("mobile evidence inspector keeps controls usable and returns focus after cl
   await dialog.locator(".ev-close").click();
   await expect(dialog).toHaveCount(0);
   await expect(trigger).toBeFocused();
+});
+
+test("exports with page images say so, can leave the previews out, and cancel exports nothing",async({page})=>{
+  await openEvidenceProject(page);
+  const ask=page.locator("dialog.export-images");
+  await page.locator(".ws-json").click();
+  await expect(ask).toBeVisible();await expect(ask).toContainText("1 page image from your PDFs or scans");
+  await expect(ask).toContainText("Source file names and the text read from them are included either way");
+  let downloads=0;page.on("download",()=>{downloads++});
+  await ask.locator('button[value="cancel"]').click();
+  await expect(ask).toHaveCount(0);await page.waitForTimeout(300);expect(downloads).toBe(0);
+  const pending=page.waitForEvent("download");
+  await page.locator(".ws-json").click();await ask.locator('button[value="without-pages"]').click();
+  const file=await (await pending).path();
+  const exported=JSON.parse(await readFile(file!,"utf8"));
+  const pages=exported.evidence.sources[0].pages;
+  expect(pages).toHaveLength(2);for(const p of pages){expect(p.image).toBeUndefined();expect(p.width).toBe(600)}
+  expect(exported.evidence.records.map((r:any)=>r.id)).toContain("collar-bh1");
 });

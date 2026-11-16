@@ -9,6 +9,9 @@ export function calculationProject(project:GeoProject):GeoProject{
     ...(project.cpts?{cpts:project.cpts.map(c=>({...c,...(c.layers?{layers:c.layers.map(({evidenceId,...i})=>i)}:{})}))}:{})};
 }
 export interface ModelJob<T> { result:Promise<T>;cancel():void }
+// The calculations of src/model.worker.ts. A message names its kind; tests may omit it with a stand-in worker.
+export type ModelJobKind="comparison"|"impact"|"corridor"|"investigation"|"disagreement";
+const tagged=(kind:ModelJobKind|undefined,message:Record<string,unknown>)=>kind?{kind,...message}:message;
 
 // Each view shares termination, cancellation and structured-clone error handling.
 function workerJob<T>(makeWorker:()=>Worker,message:()=>unknown,label:string):ModelJob<T>{
@@ -41,12 +44,12 @@ function workerJob<T>(makeWorker:()=>Worker,message:()=>unknown,label:string):Mo
   }};
 }
 
-export function createModelJob<T>(makeWorker:()=>Worker,before:GeoProject,after:GeoProject,options:unknown,label:string):ModelJob<T>{
-  return workerJob(makeWorker,()=>({before:calculationProject(before),after:calculationProject(after),options}),label);
+export function createModelJob<T>(makeWorker:()=>Worker,before:GeoProject,after:GeoProject,options:unknown,label:string,kind?:ModelJobKind):ModelJob<T>{
+  return workerJob(makeWorker,()=>tagged(kind,{before:calculationProject(before),after:calculationProject(after),options}),label);
 }
-export function createProjectJob<T>(makeWorker:()=>Worker,project:GeoProject,options:unknown,label:string):ModelJob<T>{
-  return workerJob(makeWorker,()=>({project:calculationProject(project),options}),label);
+export function createProjectJob<T>(makeWorker:()=>Worker,project:GeoProject,options:unknown,label:string,kind?:ModelJobKind):ModelJob<T>{
+  return workerJob(makeWorker,()=>tagged(kind,{project:calculationProject(project),options}),label);
 }
-export function createProjectsJob<T>(makeWorker:()=>Worker,projects:GeoProject[],options:unknown,label:string):ModelJob<T>{
-  return workerJob(makeWorker,()=>({projects:projects.map(calculationProject),options}),label);
+export function createProjectsJob<T>(makeWorker:()=>Worker,projects:GeoProject[],options:unknown,label:string,kind?:ModelJobKind):ModelJob<T>{
+  return workerJob(makeWorker,()=>tagged(kind,{projects:projects.map(calculationProject),options}),label);
 }

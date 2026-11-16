@@ -28,6 +28,7 @@ import {showCorePhotos} from "./corePhotoView";
 import {calculateCoreRun} from "./corePhoto";
 import {showCorridor} from "./corridorView";
 import {agreement,askAgreement,withdrawAgreement} from "./agreement";
+import {chooseImageExport,exportImages,projectWithoutPagePreviews} from "./exportImages";
 import {loadReader} from "./reader";
 import {modelCacheSize,removeModelCache} from "./modelcache";
 import {crossValidation,CrossValidation} from "./validation";
@@ -1605,7 +1606,13 @@ function exportAs(kind:string){
     else download(`${slug}-${slugOf(line.name)||"line"}.csv`,toAlignmentCsv(line),"text/csv");
     return;
   }
-  if(kind==="project")download(`${slug}.geomodel3d.json`,toProjectJson(project),"application/json");
+  if(kind==="project"){
+    const exported=project;
+    void chooseImageExport(exportImages(exported),"project file").then(choice=>{
+      if(choice!=="cancel")download(`${slug}.geomodel3d.json`,toProjectJson(choice==="without-pages"?projectWithoutPagePreviews(exported):exported),"application/json");
+    });
+    return;
+  }
   if(kind==="boreholes")download(`${slug}-boreholes.csv`,toBoreholeCsv(project),"text/csv");
   if(kind==="tests")download(`${slug}-tests.csv`,toTestsCsv(project),"text/csv");
   if(kind==="cpts")download(`${slug}-cpts.csv`,toCptCsv(project),"text/csv");

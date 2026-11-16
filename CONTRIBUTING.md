@@ -20,8 +20,11 @@ cd GeoModel3D
 npm ci
 npm test         # unit tests (vitest)
 npm run build    # type-check, then build dist/ and dist/geomodel3d-offline.html
+npm run test:ui  # browser tests (Playwright) on the build in dist/: desktop, phone and the standalone file
 npm run dev      # Vite's development server, where you can run one
 ```
+
+The browser tests check what is published: `scripts/ui-test-server.mjs` serves `dist/`, so run `npm run build` first. Test fixtures that import source modules in the page get them through Vite in-process; the app itself always comes from the build. Where local servers are not allowed, `GEOMODEL3D_UI_ROUTE=1 npm run test:ui` answers the same requests through Playwright's request routing instead, without opening a port.
 
 Where a local server cannot be used, build and open `dist/geomodel3d-offline.html` from disk: it is the whole app in one file.
 
@@ -38,7 +41,7 @@ The modelling kernel (`src/model.ts`, `src/fields.ts`, `src/io.ts` and the other
 1. Fork the repository and create a branch from `main`, named for the change: `fix/collar-notes`, `feat/cpt-import`, `docs/templates`.
 2. Keep a pull request to one topic. Small pull requests are reviewed sooner.
 3. Add or update tests in `tests/` for any change to the kernel, the importers or the calculations. Calculations are tested against hand calculations or published examples.
-4. Run `npm test` and `npm run build`. Both run on every pull request and must pass.
+4. Run `npm test`, `npm run build` and `npm run test:ui`. All three run on every pull request and must pass.
 5. When the app's behaviour changes, update the README, and add a line to `CHANGELOG.md` under an **Unreleased** heading.
 6. Sign off your commits with `git commit -s`. The sign-off certifies the [Developer Certificate of Origin](https://developercertificate.org/): that you wrote the change, or otherwise have the right to submit it under the project's licence.
 7. Open the pull request against `main`. Say what changed and why, and how you checked it; for anything visible, name the browser and the dataset, and add a screenshot.

@@ -4,7 +4,7 @@ import {acceptCoreRun} from "../src/corePhoto";
 import {importFiles,toProjectJson} from "../src/io";
 import {tablesFromProject,projectFromTables,projectForCorePhotos,emptyTables} from "../src/tables";
 import {buildGeologicalModel} from "../src/model";
-import {checkpoint,createWorkspace,createScenario,parseWorkspace,restoreRevision,switchScenario,toWorkspaceJson,updateDraft} from "../src/workspace";
+import {checkpoint,createWorkspace,createScenario,parseWorkspace,restoreRevision,switchScenario,toWorkspaceJson,updateDraft,expandWorkspaceParts} from "../src/workspace";
 
 // Generated one-pixel PNG: a source-image transport fixture, not a geological observation.
 const png="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aBLkAAAAASUVORK5CYII=";
@@ -20,7 +20,7 @@ function project():GeoProject{
     }]}]}};
 }
 const load=(p:GeoProject)=>importFiles([{name:"photo.geomodel3d.json",text:toProjectJson(p)}]).project;
-const wire=(value:ReturnType<typeof createWorkspace>)=>JSON.parse(toWorkspaceJson(value));
+const wire=(value:ReturnType<typeof createWorkspace>)=>expandWorkspaceParts(JSON.parse(toWorkspaceJson(value)));
 const accepted=()=>acceptCoreRun(project(),"run",{reviewer:"Fixture reviewer",replaceExisting:true});
 
 describe("core-photo persistence",()=>{
@@ -58,7 +58,7 @@ describe("core-photo persistence",()=>{
     run.rows[0].pieces[0].description="Alternative, not accepted";
     doc=updateDraft(doc,edited,doc.draft.base);
     doc=switchScenario(doc,baseline);
-    const json=toWorkspaceJson(doc),stored=JSON.parse(json),parsed=parseWorkspace(stored);
+    const json=toWorkspaceJson(doc),stored=expandWorkspaceParts(JSON.parse(json)),parsed=parseWorkspace(JSON.parse(json));
     expect(Object.values(stored.evidenceImages)).toEqual([png]);expect(json.split(png)).toHaveLength(2);
     expect(parsed).toEqual(doc);
     expect(parsed.draft.tables.corePhotos!.runs[0].status).toBe("accepted");

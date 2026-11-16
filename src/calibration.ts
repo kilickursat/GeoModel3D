@@ -3,12 +3,12 @@
 import type {Borehole,GeoProject} from "./schema";
 import {buildDisagreement,prepareDisagreementModels,sampleDisagreement} from "./disagreement";
 import type {DisagreementCase,DisagreementOptions,DisagreementReport,PreparedDisagreementCase} from "./disagreement";
-import {location,locationGroups,observedTop,withinTrainingHull} from "./disagreementValidation";
+import {groupRadius,location,locationGroups,observedTop,withinTrainingHull} from "./disagreementValidation";
 import {compatibleCrs} from "./comparison";
 import {toCsv} from "./io";
 
 export interface CalibrationOptions extends DisagreementOptions {
-  coverage?:number;seed?:number;trainingFraction?:number;calibrationFraction?:number;
+  coverage?:number;seed?:number;trainingFraction?:number;calibrationFraction?:number;groupRadius?:number;
 }
 export type CalibrationRole="training"|"calibration"|"audit";
 export interface CalibrationGroup {
@@ -36,7 +36,7 @@ export interface CalibrationAuditStats {
 }
 export interface ContactCalibration {
   format:"geomodel3d-contact-calibration";version:1;caseIds:string[];unitId:string;
-  options:DisagreementOptions&{coverage:number;seed:number;trainingFraction:number;calibrationFraction:number};
+  options:DisagreementOptions&{coverage:number;seed:number;trainingFraction:number;calibrationFraction:number;groupRadius:number};
   partition:CalibrationPartition;rows:CalibrationRow[];rank:number;nCalibration:number;finiteCalibration:number;
   quantile?:number;report?:DisagreementReport;intervals:{grid:CalibratedSample[];path:CalibratedSample[]};
   audit:{all:CalibrationAuditStats;interior:CalibrationAuditStats;extrapolation:CalibrationAuditStats};
@@ -83,7 +83,7 @@ export function calibrateDisagreement(cases:DisagreementCase[],options:Calibrati
     if(new Set(c.project.units.map(unit=>unit.id)).size!==c.project.units.length)throw new Error("Calibration unit IDs must be unique.");
     for(const [kind,logs] of [["Borehole",c.project.boreholes],["CPT",c.project.cpts??[]]] as const)if(new Set(logs.map(log=>log.id)).size!==logs.length)throw new Error(`${kind} IDs must be unique within each calibration interpretation.`);
   }
-  const reference=cases[0].project,groupFor=locationGroups(cases),excludedReferences:CalibrationPartition["excludedReferences"]=[],representatives=new Map<string,{hole:Borehole;logged:number;group:CalibrationGroup}>();
+  const radius=groupRadius(options.groupRadius),reference=cases[0].project,groupFor=locationGroups(cases,radius),excludedReferences:CalibrationPartition["excludedReferences"]=[],representatives=new Map<string,{hole:Borehole;logged:number;group:CalibrationGroup}>();
   const ordered=reference.boreholes.slice().sort((a,b)=>a.id.localeCompare(b.id)||a.x-b.x||a.y-b.y);
   for(const hole of ordered){
     const observation=observedTop(hole,reference,options.unitId);
@@ -111,12 +111,12 @@ export function calibrateDisagreement(cases:DisagreementCase[],options:Calibrati
     const project:GeoProject={...c.project,boreholes,...(c.project.cpts?{cpts}:{})};
     return {...c,project};
   });
-  const normalized={...structuredClone(options),coverage,seed,trainingFraction,calibrationFraction};
+  const normalized={...structuredClone(options),coverage,seed,trainingFraction,calibrationFraction,groupRadius:radius};
   const partition:CalibrationPartition={groups,trainingCount,calibrationCount,auditCount:groups.length-trainingCount-calibrationCount,
     excludedReferenceCount:excludedReferences.length,excludedReferences,removals};
   const notes=[
     "Split conformal envelope expansion: score = max(training minimum − logged top, logged top − training maximum, 0). The expansion is the ceil((n + 1) × target coverage)-th calibration score. A rank above n or reaching an unbounded score supplies no finite interval; it is never clamped.",
-    "Whole physical groups are split before fitting. Rounded 1 mm positions and matching borehole/CPT IDs link observations across every selected interpretation, including moved collars. One observed reference top per group is selected by stable ID order. The seeded shuffle uses no elevations or residuals. Renamed and relocated observations without a shared identity or position cannot be linked automatically.",
+    `Whole physical groups are split before fitting. Logs within ${radius} m of each other in plan (chaining), rounded 1 mm positions and matching borehole/CPT IDs link observations across every selected interpretation, including moved collars.`+" One observed reference top per group is selected by stable ID order. The seeded shuffle uses no elevations or residuals. Renamed and relocated observations without a shared identity or position cannot be linked automatically.",
     "All calibration and audit groups, including their linked records, are removed from every fitted interpretation together. Audit observations never set the expansion. Groundwater-dependent automatic CPT interpretations and terrain collar corrections are recomputed from remaining inputs; unit rules, definitions and the external terrain remain fixed assumptions.",
     "The map, path, calibration predictions and audit predictions use the same fixed, fully built training-only models. These are different models from the full-data disagreement map. The fitted models are not extended to reach removed locations. Missing calibration predictions retain unbounded scores rather than disappearing from n.",
     "The nominal coverage property is marginal for a future exchangeable physical group, conditional on fixed training and interpretation assumptions. Spatially dependent or adaptively investigated geology need not be exchangeable. No site-specific, simultaneous path, or unconditional spatial coverage guarantee is asserted. Repeated seed, case or coverage selection after inspecting results can invalidate the interpretation.",
@@ -168,8 +168,8 @@ export function calibrateDisagreement(cases:DisagreementCase[],options:Calibrati
 }
 
 export function calibrationCsv(result:ContactCalibration):string{
-  const header=["record_type","group_id","reference_borehole_id","x_m","y_m","distance_m","logged_elevation_m","training_min_m","training_max_m","calibration_score_m","score_unbounded","lower_m","upper_m","width_m","covered","extrapolated","unavailable_reason","predictions","unit_id","case_ids","target_coverage","split_seed","corrected_rank","calibration_groups","finite_calibration_scores","expansion_m","training_fraction","calibration_fraction","partition","review_notes"];
-  const meta=[result.unitId,JSON.stringify(result.caseIds),result.options.coverage,result.options.seed,result.rank,result.nCalibration,result.finiteCalibration,result.quantile,result.options.trainingFraction,result.options.calibrationFraction,JSON.stringify(result.partition),JSON.stringify(result.notes)];
+  const header=["record_type","group_id","reference_borehole_id","x_m","y_m","distance_m","logged_elevation_m","training_min_m","training_max_m","calibration_score_m","score_unbounded","lower_m","upper_m","width_m","covered","extrapolated","unavailable_reason","predictions","unit_id","case_ids","target_coverage","split_seed","corrected_rank","calibration_groups","finite_calibration_scores","expansion_m","training_fraction","calibration_fraction","group_radius_m","partition","review_notes"];
+  const meta=[result.unitId,JSON.stringify(result.caseIds),result.options.coverage,result.options.seed,result.rank,result.nCalibration,result.finiteCalibration,result.quantile,result.options.trainingFraction,result.options.calibrationFraction,result.options.groupRadius,JSON.stringify(result.partition),JSON.stringify(result.notes)];
   // Partition membership and method notes belong to the entire export; repeating them for every map sample can
   // turn a small analysis into tens of megabytes. An explicit metadata record preserves them once, including for
   // an empty result. Each numerical row still identifies its cases, target, split and expansion independently.

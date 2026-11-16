@@ -10,6 +10,10 @@ import {toCsv} from "./io";
 export interface CorridorOptions { step?:number;minCover?:number;maxSupportDistance?:number;maxSamples?:number }
 export type CorridorPosition="inside"|"above-ground"|"below-model"|"outside-model";
 export type CorridorFlag="outside-model"|"missing-design"|"above-ground"|"below-model"|"low-cover"|"water-above-design"|"water-unknown"|"distant-support"|"no-support";
+// A screening condition is a sampled state the user may want to act on. A missing-data flag says that a value could not
+// be assessed there; counting the two together made every station "flagged" on a site without groundwater data.
+export const CORRIDOR_CONDITIONS:ReadonlySet<CorridorFlag>=new Set<CorridorFlag>(["low-cover","water-above-design","above-ground","below-model","distant-support"]);
+export const CORRIDOR_MISSING_DATA:ReadonlySet<CorridorFlag>=new Set<CorridorFlag>(["outside-model","missing-design","water-unknown","no-support"]);
 export interface CorridorUnit { id:string;name:string;color:string }
 export interface CorridorLog { id:string;kind:"borehole"|"cpt";x:number;y:number }
 export interface CorridorStation {
@@ -24,7 +28,8 @@ export interface CorridorReport {
   options:{step:number;minCover?:number;maxSupportDistance?:number;maxSamples:number};
   range:{start:number;end:number;actualStep:number};units:CorridorUnit[];stations:CorridorStation[];
   usedLogs:CorridorLog[];modelBase?:number;
-  summary:{stationCount:number;insideCount:number;designCount:number;flaggedStationCount:number;counts:Record<CorridorFlag,number>;
+  // flaggedStationCount counts stations with any flag; conditionStationCount and missingDataStationCount separate them.
+  summary:{stationCount:number;insideCount:number;designCount:number;flaggedStationCount:number;conditionStationCount:number;missingDataStationCount:number;counts:Record<CorridorFlag,number>;
     minCover?:CorridorExtremum;maxWaterHead?:CorridorExtremum;maxLogDistance?:CorridorExtremum};
   notes:string[];
 }
@@ -113,7 +118,8 @@ export function analyzeCorridor(project:GeoProject,alignment:Alignment,options:C
     options:{step,maxSamples:cap,...(options.minCover===undefined?{}:{minCover:options.minCover}),...(options.maxSupportDistance===undefined?{}:{maxSupportDistance:options.maxSupportDistance})},
     range:{start,end,actualStep},units,stations,usedLogs,...(model.triangles.length&&finite(model.base)?{modelBase:model.base}:{}),
     summary:{stationCount:stations.length,insideCount:stations.filter(s=>s.inside).length,designCount:stations.filter(s=>s.top!==undefined).length,
-      flaggedStationCount:stations.filter(s=>s.flags.length).length,counts,...(minCover?{minCover}:{}),...(maxWaterHead?{maxWaterHead}:{}),...(maxLogDistance?{maxLogDistance}:{})},notes};
+      flaggedStationCount:stations.filter(s=>s.flags.length).length,conditionStationCount:stations.filter(s=>s.flags.some(f=>CORRIDOR_CONDITIONS.has(f))).length,
+      missingDataStationCount:stations.filter(s=>s.flags.some(f=>CORRIDOR_MISSING_DATA.has(f))).length,counts,...(minCover?{minCover}:{}),...(maxWaterHead?{maxWaterHead}:{}),...(maxLogDistance?{maxLogDistance}:{})},notes};
 }
 
 export function corridorCsv(report:CorridorReport):string{

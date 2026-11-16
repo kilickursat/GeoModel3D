@@ -2,7 +2,7 @@ import {test,expect,Page,Dialog} from "@playwright/test";
 import {existsSync,readFileSync} from "node:fs";
 import {readFile} from "node:fs/promises";
 import {resolve} from "node:path";
-import {build,downloadJson,importJson,openInput,prepare,saved} from "./helpers";
+import {build,downloadJson,importJson,openInput,prepare,saved,APP_ORIGIN} from "./helpers";
 
 type Variant="design"|"unknown"|"outside";
 function project(variant:Variant="design"){
@@ -172,7 +172,7 @@ test("standalone corridor dashboard runs the inline worker with networking disab
   const html=readFileSync(filename,"utf8"),errors:string[]=[];
   await page.route("**/*",route=>route.request().isNavigationRequest()?route.fulfill({status:200,contentType:"text/html",body:html}):route.abort());
   await context.setOffline(true);page.on("pageerror",error=>errors.push(error.message));
-  await page.goto("http://127.0.0.1:4173/standalone-corridor.html?backend=webgl#input");
+  await page.goto(`${APP_ORIGIN}/standalone-corridor.html?backend=webgl#input`);
   await loadProject(page);const dialog=await dashboard(page);await expect(dialog.locator(".corridor-csv")).toBeEnabled();
   const csv=await csvDownload(page),row=csv.rows.find(row=>Number(row.chainage_m)===130)!;
   expect(Number(row.cover_m)).toBeCloseTo(3,6);expect(Number(row.water_head_above_design_m)).toBeCloseTo(2,6);

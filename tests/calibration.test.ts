@@ -154,3 +154,26 @@ describe("group-separated contact calibration",()=>{
     const q=project();q.crs="Other grid";expect(()=>calibrateDisagreement(cases(project(),q),settings)).toThrow(/different local grids/);
   });
 });
+
+describe("calibration groups of nearby logs",()=>{
+  // A twin borehole 3 m from BH-000: by default the two are one physical location, never split across roles.
+  const twin=()=>{const p=project();p.boreholes.push({...structuredClone(p.boreholes[0]),id:"BH-twin",x:3,y:0});return p};
+
+  it("keeps logs within the default 5 m in one group and in one role",()=>{
+    const result=calibrateDisagreement(cases(twin()),settings);
+    expect(result.options.groupRadius).toBe(5);
+    const group=result.partition.groups.find(g=>g.boreholeIds.includes("BH-000"))!;
+    expect(group.boreholeIds).toEqual(["BH-000","BH-twin"]);
+    expect(result.partition.groups.some(g=>g.referenceId==="BH-twin")).toBe(false);
+    expect(result.notes.join(" ")).toMatch(/within 5 m of each other/);
+    const csv=parseCsv(calibrationCsv(result));
+    expect(csv[1][csv[0].indexOf("group_radius_m")]).toBe("5");
+  });
+
+  it("splits the twin into its own group at a radius of 0",()=>{
+    const result=calibrateDisagreement(cases(twin()),{...settings,groupRadius:0});
+    expect(result.partition.groups.find(g=>g.boreholeIds.includes("BH-000"))!.boreholeIds).toEqual(["BH-000"]);
+    expect(result.partition.groups.some(g=>g.referenceId==="BH-twin")).toBe(true);
+    expect(()=>calibrateDisagreement(cases(twin()),{...settings,groupRadius:-2})).toThrow(/grouping distance/);
+  });
+});

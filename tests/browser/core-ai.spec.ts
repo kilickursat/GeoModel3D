@@ -1,7 +1,7 @@
 import {test,expect,Page,Locator} from "@playwright/test";
 import {existsSync,readFileSync} from "node:fs";
 import {resolve} from "node:path";
-import {downloadJson,importJson,openInput,prepare,saved} from "./helpers";
+import {downloadJson,importJson,openInput,prepare,saved,APP_ORIGIN} from "./helpers";
 
 const modelHost=(url:string)=>/https:\/\/(?:[^/]+\.)?(?:huggingface\.co|hf\.co|hf\.space|xethub\.hf\.co)\//.test(url);
 const attack='<img src=x onerror="globalThis.coreAiInjected=true">';
@@ -78,7 +78,7 @@ async function openAi(page:Page){
 async function closeAi(page:Page){await page.locator(".core-ai-close").click();await expect(page.locator(".core-ai-dialog")).toHaveCount(0)}
 async function closePhotos(page:Page){await page.locator(".core-close").click();await expect(page.locator(".core-dialog")).toHaveCount(0)}
 async function load(page:Page,supported=true,makeFixture=fixture){
-  await prepare(page);await gpuSupport(page,supported);await page.goto("/?backend=webgl#input");await openInput(page);
+  await prepare(page);await gpuSupport(page,supported);await page.goto("/?backend=webgl&labs=core-ai#input");await openInput(page);
   const project=await makeFixture(page);await importJson(page,project,"core-ai-project.json");await saved(page);return project;
 }
 
@@ -86,7 +86,7 @@ async function workerFixture(page:Page,delayMs=25,includeFrameHash=false){
   const activity={workers:0,models:[] as string[],methods:[] as string[]};
   // Route the Worker module, not the UI or CoreAiClient. Messages still cross a real Worker boundary, and
   // cancellation terminates that Worker. No Transformers code or real model weights run in these tests.
-  await page.route("**/src/coreAi.worker.ts*",route=>{
+  await page.route(/\/(src\/coreAi\.worker\.ts|assets\/coreAi\.worker-[\w-]+\.js)(\?|$)/,route=>{
     activity.workers++;
     return route.fulfill({status:200,contentType:"text/javascript",body:`
 import {CORE_AI_MODELS,CORE_AI_DTYPE_LABEL,CORE_AI_RUNTIME_VERSION,CORE_AI_ONNX_VERSION,CORE_AI_PROMPT_VERSION} from '/src/coreAi.ts';
@@ -287,11 +287,11 @@ test("mobile core AI comparison fits iPhone Chromium emulation and keeps review 
 });
 
 test("standalone core AI explains its limit while manual core review remains available offline",async({page,context},testInfo)=>{
-  await prepare(page);await gpuSupport(page,true);await page.goto("/?backend=webgl#input");const project=await fixture(page),file=resolve("dist/geomodel3d-offline.html");
+  await prepare(page);await gpuSupport(page,true);await page.goto("/?backend=webgl&labs=core-ai#input");const project=await fixture(page),file=resolve("dist/geomodel3d-offline.html");
   expect(existsSync(file),"Build the standalone HTML before browser validation").toBe(true);const html=readFileSync(file,"utf8"),modelRequests:string[]=[],errors:string[]=[];
   await page.route("**/*",route=>route.request().isNavigationRequest()?route.fulfill({status:200,contentType:"text/html",body:html}):route.abort());await context.setOffline(true);
   page.on("request",request=>{if(modelHost(request.url())||request.url().includes("coreAi.worker"))modelRequests.push(request.url())});page.on("pageerror",error=>errors.push(error.message));
-  await page.goto("http://127.0.0.1:4173/standalone-core-ai.html?backend=webgl#input");await openInput(page);await importJson(page,project);await saved(page);
+  await page.goto(`${APP_ORIGIN}/standalone-core-ai.html?backend=webgl&labs=core-ai#input`);await openInput(page);await importJson(page,project);await saved(page);
   await openPhotos(page);const dialog=await openAi(page);await expect(dialog.locator(".core-ai-crop")).toBeVisible();
   await expect(dialog.locator(".core-ai-support")).toContainText(/unavailable in the standalone HTML/i);await expect(dialog.locator(".core-ai-run")).toBeDisabled();await expect(dialog.locator(".core-ai-compare")).toBeDisabled();
   expect(modelRequests).toEqual([]);expect(errors).toEqual([]);await page.screenshot({path:testInfo.outputPath("core-ai-standalone-limit.png"),fullPage:true});

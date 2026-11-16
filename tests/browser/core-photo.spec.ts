@@ -1,7 +1,7 @@
 import {test,expect,Page,Locator} from "@playwright/test";
 import {existsSync,readFileSync,writeFileSync} from "node:fs";
 import {resolve} from "node:path";
-import {build,downloadJson,importJson,openInput,prepare,resume,saved} from "./helpers";
+import {build,downloadJson,importJson,openInput,prepare,resume,saved,APP_ORIGIN} from "./helpers";
 
 const appVersion=JSON.parse(readFileSync(resolve("package.json"),"utf8")).version as string;
 
@@ -75,6 +75,8 @@ test("core photo upload registers recovered rows and accepts only reviewed RQD w
   await dialog.locator(".core-add-row").click();
   for(const depth of ["0.08","0.16","0.5"]){await dialog.locator(".core-cut-depth").fill(depth);await dialog.locator(".core-add-cut").click()}
   await expect(dialog.locator(".core-piece")).toHaveCount(4);
+  // Local AI descriptions are an opt-in lab (?labs=core-ai): the ordinary review offers no model.
+  await expect(dialog.locator(".core-ai-open, .core-ai-piece-open")).toHaveCount(0);
   await expect(dialog.locator(".core-result")).toContainText(/pending|review|unavailable/i);
   if(await dialog.locator(".core-accept").isEnabled())await dialog.locator(".core-accept").click();
   await expect(dialog.locator(".core-result")).toContainText(/pending|review|unavailable/i);
@@ -194,7 +196,7 @@ test("standalone core photo workflow reviews images, saves evidence and builds w
   test.setTimeout(90_000);await prepare(page);await page.goto("/?backend=webgl#input");const p=project(await photo(page)),file=resolve("dist/geomodel3d-offline.html");
   expect(existsSync(file),"Build the standalone HTML before browser validation").toBe(true);const html=readFileSync(file,"utf8"),errors:string[]=[];
   await page.route("**/*",route=>route.request().isNavigationRequest()?route.fulfill({status:200,contentType:"text/html",body:html}):route.abort());await context.setOffline(true);
-  page.on("pageerror",error=>errors.push(error.message));await page.goto("http://127.0.0.1:4173/standalone-core-photo.html?backend=webgl#input");
+  page.on("pageerror",error=>errors.push(error.message));await page.goto(`${APP_ORIGIN}/standalone-core-photo.html?backend=webgl#input`);
   await openInput(page);await importJson(page,p);await saved(page);await expect(page.locator(".title span")).toHaveText(appVersion);
   const dialog=await openCore(page);await expect(dialog.locator(".core-photo")).toBeVisible();await review(dialog);await accept(dialog);
   await page.screenshot({path:testInfo.outputPath("core-photo-offline.png"),fullPage:true});await closeCore(page);await build(page);

@@ -1,7 +1,7 @@
 // A deterministic spacing plan on a fixed corridor station grid. Proposed positions are hypothetical geometry;
 // they never enter the ground model as observations or imply a quantified reduction in geological uncertainty.
 import type {Alignment,GeoProject} from "./schema";
-import {analyzeCorridor,CorridorFlag,CorridorLog,CorridorReport,CorridorStation} from "./corridor";
+import {analyzeCorridor,CorridorFlag,CorridorLog,CorridorReport,CorridorStation,CORRIDOR_CONDITIONS} from "./corridor";
 import {DisagreementCase,prepareDisagreementModels,sampleDisagreement} from "./disagreement";
 import {sampleModel} from "./model";
 import {contactBins,conditionalCaseEntropy,conditionalInformationGain,informationSettings,InformationOptions,InformationSettings} from "./information";
@@ -49,7 +49,7 @@ export interface InvestigationPlan {
 }
 const finite=(n:unknown):n is number=>typeof n==="number"&&Number.isFinite(n);
 const coincident=.001,tolerance=1e-9;
-const priorityFlags=new Set<CorridorFlag>(["low-cover","water-above-design","above-ground","below-model","distant-support"]);
+const priorityFlags=CORRIDOR_CONDITIONS;
 const distance=(a:{x:number;y:number},b:{x:number;y:number})=>Math.hypot(a.x-b.x,a.y-b.y);
 const tooClose=(d:number,spacing:number)=>d<=coincident||d<spacing-tolerance;
 function nearest(point:{x:number;y:number},points:Array<{x:number;y:number}>):number|undefined{

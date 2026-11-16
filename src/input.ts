@@ -5,6 +5,7 @@
 // and go through the importer, so typed data are checked exactly as imported files are.
 import {GeoProject} from "./schema";
 import {WorkspaceDocument,createWorkspace,updateDraft,checkpoint,restoreRevision,toWorkspaceJson,createScenario,switchScenario,renameScenario} from "./workspace";
+import {chooseImageExport,exportImages,projectWithoutPagePreviews,workspaceWithoutPagePreviews} from "./exportImages";
 import {createWorkspaceStore} from "./storage";
 import {changeEvidenceField,acceptEvidenceField,evidenceRecord} from "./evidence";
 import {showEvidence} from "./evidenceView";
@@ -521,7 +522,13 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
     if(b.classList.contains("ws-workspace")&&workspaceDocument){
       try{
         workspaceDocument=updateDraft(workspaceDocument,t,base);persist(true);
-        o.download(`${slug(t.project.name)}.workspace.geomodel3d.json`,toWorkspaceJson(workspaceDocument),"application/json");
+        const doc=workspaceDocument,name=`${slug(t.project.name)}.workspace.geomodel3d.json`;
+        // Page previews and core photographs travel with the file: say so first, and offer to leave out the previews.
+        void chooseImageExport(exportImages(doc),"workspace").then(choice=>{
+          if(choice==="cancel")return;
+          try{o.download(name,toWorkspaceJson(choice==="without-pages"?workspaceWithoutPagePreviews(doc):doc),"application/json")}
+          catch(error){message=`Workspace export failed: ${(error as Error).message}`;status.textContent=message;status.title=message}
+        });
       }catch(error){message=`Workspace export failed: ${(error as Error).message}`;status.textContent=message;status.title=message}
       return;
     }
@@ -536,7 +543,13 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
       return;
     }
     if(b.classList.contains("ws-json")){
-      try{o.download(`${slug(t.project.name)}.geomodel3d.json`,toProjectJson(projectFromTables(t,base).project),"application/json")}catch(err){message=(err as Error).message;status.textContent=message}
+      try{
+        const project=projectFromTables(t,base).project,name=`${slug(t.project.name)}.geomodel3d.json`;
+        void chooseImageExport(exportImages(project),"project file").then(choice=>{
+          if(choice==="cancel")return;
+          try{o.download(name,toProjectJson(choice==="without-pages"?projectWithoutPagePreviews(project):project),"application/json")}catch(err){message=(err as Error).message;status.textContent=message}
+        });
+      }catch(err){message=(err as Error).message;status.textContent=message}
       return;
     }
     if(b.classList.contains("ws-discard")){if(origin&&confirm("Discard the edits made since this case was opened?")){t=copy(origin);base=originBase?structuredClone(originBase):undefined;message="Edits discarded";render();refresh(true)}return}

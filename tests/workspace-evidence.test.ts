@@ -3,7 +3,7 @@ import type {GeoProject} from "../src/schema";
 import type {EvidenceCollection,EvidenceField} from "../src/evidence";
 import {acceptEvidenceField,changeEvidenceField} from "../src/evidence";
 import {tablesFromProject,emptyTables} from "../src/tables";
-import {checkpoint,createWorkspace,parseWorkspace,restoreRevision,toWorkspaceJson,updateDraft} from "../src/workspace";
+import {checkpoint,createWorkspace,parseWorkspace,restoreRevision,toWorkspaceJson,updateDraft,expandWorkspaceParts} from "../src/workspace";
 
 const png="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aBLkAAAAASUVORK5CYII=";
 const field=(value:string):EvidenceField=>({original:value,current:value,boxes:[{page:2,x0:0.1,y0:0.2,x1:0.8,y1:0.3,text:`Source ${value}`}],status:"unreviewed",events:[]});
@@ -54,10 +54,10 @@ describe("workspace source evidence",()=>{
   it("rejects dangling or structurally misaligned input-row bindings rather than guessing a source",()=>{
     const p=project(),document=checkpoint(createWorkspace(tablesFromProject(p),p),p,"Review");
     for(const bindings of [{logs:["missing"]},{logs:[]},{unexpected:["layer"]},{logs:[1]}]){
-      const invalid=JSON.parse(toWorkspaceJson(document));invalid.draft.tables.evidenceRows=bindings;
+      const invalid=expandWorkspaceParts(JSON.parse(toWorkspaceJson(document)));invalid.draft.tables.evidenceRows=bindings;
       expect(()=>parseWorkspace(invalid)).toThrow(/draft.tables.evidenceRows/);
     }
-    const missingCollection=JSON.parse(toWorkspaceJson(document));delete missingCollection.draft.tables.evidence;
+    const missingCollection=expandWorkspaceParts(JSON.parse(toWorkspaceJson(document)));delete missingCollection.draft.tables.evidence;
     expect(()=>parseWorkspace(missingCollection)).toThrow(/draft.tables.evidenceRows/);
   });
 
@@ -65,7 +65,7 @@ describe("workspace source evidence",()=>{
     const p=project(),document=checkpoint(createWorkspace(tablesFromProject(p),p),p,"Review");
     for(const branch of ["revision","base"]){
       for(const target of ["header","layer","water"]){
-        const invalid=JSON.parse(toWorkspaceJson(document));
+        const invalid=expandWorkspaceParts(JSON.parse(toWorkspaceJson(document)));
         const saved=branch==="revision"?invalid.revisions[0].project:invalid.draft.base;
         if(target==="header")saved.boreholes[0].evidenceId="missing";
         if(target==="layer")saved.boreholes[0].intervals[0].evidenceId="missing";
@@ -73,19 +73,19 @@ describe("workspace source evidence",()=>{
         expect(()=>parseWorkspace(invalid)).toThrow(/evidenceId.*does not name/);
       }
     }
-    const invalid=JSON.parse(toWorkspaceJson(document));delete invalid.revisions[0].project.evidence;
+    const invalid=expandWorkspaceParts(JSON.parse(toWorkspaceJson(document)));delete invalid.revisions[0].project.evidence;
     expect(()=>parseWorkspace(invalid)).toThrow(/evidenceId/);
   });
 
   it("rejects malformed source history and unsafe images at workspace import",()=>{
     const p=project(),document=checkpoint(createWorkspace(tablesFromProject(p),p),p,"Review");
-    const invalidImage=JSON.parse(toWorkspaceJson(document));
+    const invalidImage=expandWorkspaceParts(JSON.parse(toWorkspaceJson(document)));
     invalidImage.draft.tables.evidence.sources[0].pages[0].image="https://example.com/leak.png";
     expect(()=>parseWorkspace(invalidImage)).toThrow(/draft.tables.evidence/);
-    const invalidBox=JSON.parse(toWorkspaceJson(document));
+    const invalidBox=expandWorkspaceParts(JSON.parse(toWorkspaceJson(document)));
     invalidBox.revisions[0].project.evidence.records[0].fields.z.boxes[0].page=99;
     expect(()=>parseWorkspace(invalidBox)).toThrow(/revisions\[0\].project.evidence/);
-    const invalidHistory=JSON.parse(toWorkspaceJson(document));
+    const invalidHistory=expandWorkspaceParts(JSON.parse(toWorkspaceJson(document)));
     invalidHistory.draft.base.evidence.records[1].fields.to.current="100";
     expect(()=>parseWorkspace(invalidHistory)).toThrow(/draft.base.evidence/);
   });
@@ -94,8 +94,8 @@ describe("workspace source evidence",()=>{
     const p=project(),first=checkpoint(createWorkspace(tablesFromProject(p),p),p,"First");
     const renamed={...p,name:"Second interpretation"};
     const document=checkpoint(first,renamed,"Second");
-    const json=toWorkspaceJson(document),wire=JSON.parse(json);
-    expect(wire.version).toBe(3);
+    const json=toWorkspaceJson(document),wire=expandWorkspaceParts(JSON.parse(json));
+    expect(wire.version).toBe(4);
     expect(Object.values(wire.evidenceImages)).toEqual([png]);
     expect(json.split(png)).toHaveLength(2);
     expect(wire.draft.tables.evidence.sources[0].pages[0].image).toMatch(/^workspace-image:/);
@@ -113,23 +113,23 @@ describe("workspace source evidence",()=>{
     expect(migrated.activeRevisionId).toBe(document.activeRevisionId);
     expect(migrated.scenarios).toHaveLength(1);
     expect(migrated.scenarios[0].name).toBe("Baseline");
-    expect(migrated.version).toBe(3);
+    expect(migrated.version).toBe(4);
     expect(migrated.draft.tables.evidence!.records[0].fields.id.note).toBe("workspace-image:missing-is-only-text");
-    expect(JSON.parse(toWorkspaceJson(migrated)).evidenceImages).toBeDefined();
+    expect(expandWorkspaceParts(JSON.parse(toWorkspaceJson(migrated))).evidenceImages).toBeDefined();
   });
 
   it("rejects missing pool references, unsafe unused pool entries and version-1 pooled references",()=>{
     const p=project(),document=checkpoint(createWorkspace(tablesFromProject(p),p),p,"Review");
-    const missing=JSON.parse(toWorkspaceJson(document));missing.evidenceImages={};
+    const missing=expandWorkspaceParts(JSON.parse(toWorkspaceJson(document)));missing.evidenceImages={};
     expect(()=>parseWorkspace(missing)).toThrow(/does not name a pooled workspace image/);
-    const unsafe=JSON.parse(toWorkspaceJson(document));unsafe.evidenceImages.unused="https://example.com/leak.png";
+    const unsafe=expandWorkspaceParts(JSON.parse(toWorkspaceJson(document)));unsafe.evidenceImages.unused="https://example.com/leak.png";
     expect(()=>parseWorkspace(unsafe)).toThrow(/PNG data URL/);
-    const legacy=JSON.parse(toWorkspaceJson(document));legacy.version=1;delete legacy.evidenceImages;delete legacy.scenarios;delete legacy.activeScenarioId;
+    const legacy=expandWorkspaceParts(JSON.parse(toWorkspaceJson(document)));legacy.version=1;delete legacy.evidenceImages;delete legacy.scenarios;delete legacy.activeScenarioId;
     expect(()=>parseWorkspace(legacy)).toThrow(/image reference unsupported by workspace version 1/);
   });
 
   it("bounds the complete image pool before attempting PNG decoding",()=>{
-    const wire=JSON.parse(toWorkspaceJson(createWorkspace(emptyTables())));
+    const wire=expandWorkspaceParts(JSON.parse(toWorkspaceJson(createWorkspace(emptyTables()))));
     // Deliberately hostile payloads: their collective length alone must reject before decoding any image.
     for(let i=0;i<17;i++)wire.evidenceImages[`large-${i}`]="data:image/png;base64,"+"A".repeat(2_796_196)+String(i).padStart(4,"0");
     expect(()=>parseWorkspace(wire)).toThrow(/32 MiB unique image limit/);
@@ -143,9 +143,9 @@ describe("workspace source evidence",()=>{
     for(const c of type+data){crc^=c.charCodeAt(0);for(let bit=0;bit<8;bit++)crc=(crc>>>1)^((crc&1)?0xedb88320:0)}
     const other="data:image/png;base64,"+btoa(raw.slice(0,-12)+uint(data.length)+type+data+uint((crc^0xffffffff)>>>0)+raw.slice(-12));
     const p=project(),document=checkpoint(createWorkspace(tablesFromProject(p),p),p,"Cached first image");
-    const before=JSON.parse(toWorkspaceJson(document));
+    const before=expandWorkspaceParts(JSON.parse(toWorkspaceJson(document)));
     const tables=tablesFromProject(p);tables.evidence!.sources[0].pages[0].image=other;
-    const changed=updateDraft(document,tables,p),wire=JSON.parse(toWorkspaceJson(changed));
+    const changed=updateDraft(document,tables,p),wire=expandWorkspaceParts(JSON.parse(toWorkspaceJson(changed)));
     expect(Object.values(wire.evidenceImages)).toHaveLength(2);
     expect(wire.revisions[0].project.evidence.sources[0].pages[0].image).toBe(before.revisions[0].project.evidence.sources[0].pages[0].image);
     const parsed=parseWorkspace(wire);
