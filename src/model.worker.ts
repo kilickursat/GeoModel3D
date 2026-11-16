@@ -22,7 +22,7 @@ const jobs:Record<ModelJobKind,(data:any)=>unknown>={
   disagreement:(data:{projects:GeoProject[];options:{cases:Omit<DisagreementCase,"project">[];settings:DisagreementJobOptions}})=>{
     const {projects,options}=data,cases=projects.map((project,i)=>({...options.cases[i],project}));
     const report=buildDisagreement(cases,options.settings);
-    const validation=validateDisagreement(cases,{unitId:options.settings.unitId,maxHoldouts:options.settings.maxHoldouts});
+    const validation=validateDisagreement(cases,{unitId:options.settings.unitId,maxHoldouts:options.settings.maxHoldouts,groupRadius:options.settings.groupRadius});
     const {calibration:calibrationSettings,maxHoldouts:_,...pathSettings}=options.settings;
     const calibration=calibrationSettings?calibrateDisagreement(cases,{...pathSettings,...calibrationSettings}):undefined;
     return {report,validation,...(calibration?{calibration}:{})};

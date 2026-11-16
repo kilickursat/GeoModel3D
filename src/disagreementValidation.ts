@@ -8,7 +8,7 @@ import {convexHull} from "./terrain";
 import {toCsv} from "./io";
 import type {XY} from "./tin";
 
-export interface DisagreementValidationOptions { unitId:string;maxHoldouts?:number }
+export interface DisagreementValidationOptions { unitId:string;maxHoldouts?:number;groupRadius?:number }
 export interface DisagreementFoldPrediction {
   caseId:string;prediction?:number;extrapolated:boolean;unavailableReason?:string;
   removedBoreholes:number;removedCpts:number;warnings?:string[];
@@ -22,7 +22,7 @@ export interface DisagreementValidationStats {
   nScored:number;nCovered:number;empiricalCoverage?:number;mae?:number;rmse?:number;bias?:number;meanRangeWidth?:number;
 }
 export interface DisagreementValidation {
-  format:"geomodel3d-disagreement-validation";version:1;caseIds:string[];referenceCaseId:string;unitId:string;maxHoldouts:number;
+  format:"geomodel3d-disagreement-validation";version:1;caseIds:string[];referenceCaseId:string;unitId:string;maxHoldouts:number;groupRadius:number;
   availableLocations:number;eligibleLocations:number;selectedLocations:number;omittedLocations:number;
   rows:DisagreementValidationRow[];summary:DisagreementValidationStats;interior:DisagreementValidationStats;
   extrapolation:DisagreementValidationStats;notes:string[];
@@ -31,15 +31,34 @@ const finite=(n:unknown):n is number=>typeof n==="number"&&Number.isFinite(n);
 const epsilon=1e-6;
 export const location=(p:XY)=>`${Math.round(p.x*1000)},${Math.round(p.y*1000)}`;
 
+// Logs closer than this are one location for held-out checks and calibration splits: a CPT pushed a few metres from
+// a borehole nearly fixes that borehole's contacts, so leaving only one of them out would score a near-observation.
+export const DEFAULT_GROUP_RADIUS=5;
+export function groupRadius(value:unknown=DEFAULT_GROUP_RADIUS):number{
+  if(typeof value!=="number"||!Number.isFinite(value)||value<0||value>1000)throw new Error("The log grouping distance must be from 0 to 1000 m.");
+  return value;
+}
+
 // A moved observation can have a co-located CPT under another ID in one interpretation. Follow the identity /
 // position links to their closure so such a CPT cannot enter a fold after the matching borehole was removed.
-export function locationGroups(cases:DisagreementCase[]){
-  const links=new Map<string,Set<string>>();
+// Positions within the grouping radius are linked too, and links chain (single linkage): a group can be wider than
+// the radius where logs form a chain. A radius of 0 links only identical positions (to 1 mm) and matching IDs.
+export function locationGroups(cases:DisagreementCase[],radius=0){
+  const links=new Map<string,Set<string>>(),positions=new Map<string,XY>();
   const connect=(a:string,b:string)=>{if(!links.has(a))links.set(a,new Set());links.get(a)!.add(b)};
   for(const c of cases)for(const [kind,logs] of [["borehole",c.project.boreholes],["cpt",c.project.cpts??[]]] as const)for(const log of logs){
     if(!finite(log.x)||!finite(log.y))continue;
-    const p=`position:${location(log)}`,id=`${kind}:${log.id}`;
+    const key=location(log),p=`position:${key}`,id=`${kind}:${log.id}`;
+    if(!positions.has(key))positions.set(key,{x:log.x,y:log.y});
     connect(p,id);connect(id,p);
+  }
+  if(radius>0){
+    const cell=(v:number)=>Math.floor(v/radius),buckets=new Map<string,string[]>();
+    for(const [key,p] of positions){const b=`${cell(p.x)},${cell(p.y)}`;if(!buckets.has(b))buckets.set(b,[]);buckets.get(b)!.push(key)}
+    for(const [key,p] of positions)for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++)for(const other of buckets.get(`${cell(p.x)+dx},${cell(p.y)+dy}`)??[]){
+      const q=positions.get(other)!;
+      if(other!==key&&Math.hypot(p.x-q.x,p.y-q.y)<=radius+1e-9)connect(`position:${key}`,`position:${other}`);
+    }
   }
   return (hole:XY)=>{
     const keys=new Set<string>(),boreholeIds=new Set<string>(),cptIds=new Set<string>(),seen=new Set<string>(),queue=[`position:${location(hole)}`];
@@ -134,7 +153,7 @@ export function validateDisagreement(cases:DisagreementCase[],options:Disagreeme
   if(cases.length<2||cases.length>6)throw new Error("Select two to six interpretations for held-out validation.");
   if(cases.some(c=>!c.id?.trim())||new Set(cases.map(c=>c.id)).size!==cases.length)throw new Error("Interpretation IDs must be nonempty and unique for held-out validation.");
   if(typeof options.unitId!=="string"||!options.unitId.trim())throw new Error("Choose a stable unit ID for held-out validation.");
-  const maxHoldouts=options.maxHoldouts??12;
+  const maxHoldouts=options.maxHoldouts??12,radius=groupRadius(options.groupRadius);
   if(!Number.isInteger(maxHoldouts)||maxHoldouts<1||maxHoldouts>24)throw new Error("The held-out location limit must be an integer from 1 to 24.");
   for(const c of cases){
     compatibleCrs(cases[0].project,c.project);
@@ -142,6 +161,7 @@ export function validateDisagreement(cases:DisagreementCase[],options:Disagreeme
     for(const [name,logs] of [["Borehole",c.project.boreholes],["CPT",c.project.cpts??[]]] as const)if(new Set(logs.map(log=>log.id)).size!==logs.length)throw new Error(`${name} IDs must be unique within each interpretation for held-out validation.`);
   }
   const caseIds=cases.map(c=>c.id),reference=cases[0],notes=[
+    radius>0?`Logs within ${radius} m of each other in plan are one location: holding out a borehole also removes every borehole and CPT linked to it within that distance, and such links chain.`:"The log grouping distance is 0: only records at the same position (to 1 mm) or with matching IDs are removed together.",
     "Each selected reference borehole is held out of every interpretation before prediction. All linked boreholes/CPTs are removed: rounded 1 mm positions connect co-located records, and matching record IDs connect their positions across interpretations, including moved collars and co-located records at those moved positions. Renamed and relocated observations without a shared identity or position link cannot be identified automatically.",
     "Reference targets are directly observed raw tops of the selected stable unit ID. Gap contacts, partial starts, overlapping intervals and repeated or out-of-order tops are unavailable, not inferred observations.",
     "Fold models retain their supplied extent and are not extended to reach a held-out location. The probe-node calculation evaluates the remaining model at the requested point without building its full refined mesh; terrain/erosion are evaluated there as in the existing cross-validation method.",
@@ -158,7 +178,7 @@ export function validateDisagreement(cases:DisagreementCase[],options:Disagreeme
   const selected=subset(holes,maxHoldouts),eligibleLocations=holes.filter(hole=>observedTop(hole,reference.project,options.unitId).logged!==undefined).length;
   if(selected.length<holes.length)notes.push(`The held-out limit selected ${selected.length} of ${holes.length} admitted reference boreholes. Selection starts nearest the collar centroid, then spreads by farthest horizontal distance; it precedes contact eligibility checks and does not use residuals. Observations of rare-unit tops may be omitted. The validation does not cover omitted locations.`);
   if(!holes.length)notes.push("There are no admitted reference borehole locations to hold out. CPT interpretations alone are not treated as independent borehole observations.");
-  const groupFor=locationGroups(cases);
+  const groupFor=locationGroups(cases,radius);
   const rows=selected.map((hole):DisagreementValidationRow=>{
     const observed=observedTop(hole,reference.project,options.unitId),{keys,boreholeIds,cptIds}=groupFor(hole);
     const row:DisagreementValidationRow={id:hole.id,x:hole.x,y:hole.y,...(observed.logged===undefined?{}:{logged:observed.logged}),
@@ -192,14 +212,14 @@ export function validateDisagreement(cases:DisagreementCase[],options:Disagreeme
     row.min=min;row.max=max;row.rangeWidth=width;row.covered=observed.logged>=min-epsilon&&observed.logged<=max+epsilon;
     return row;
   });
-  return {format:"geomodel3d-disagreement-validation",version:1,caseIds,referenceCaseId:reference.id,unitId:options.unitId,maxHoldouts,
+  return {format:"geomodel3d-disagreement-validation",version:1,caseIds,referenceCaseId:reference.id,unitId:options.unitId,maxHoldouts,groupRadius:radius,
     availableLocations:holes.length,eligibleLocations,selectedLocations:selected.length,omittedLocations:holes.length-selected.length,rows,
     summary:stats(rows),interior:stats(rows.filter(r=>!r.extrapolated)),extrapolation:stats(rows.filter(r=>r.extrapolated)),notes};
 }
 
 export function validationCsv(result:DisagreementValidation):string{
-  const header=["borehole_id","x_m","y_m","logged_elevation_m","min_elevation_m","max_elevation_m","range_width_m","reference_prediction_m","reference_error_m","covered","extrapolated","missing_case_ids","unavailable_reason","predictions","unit_id","reference_case_id","case_ids","max_holdouts","available_locations","eligible_locations","selected_locations","omitted_locations","review_notes"];
-  const meta=[result.unitId,result.referenceCaseId,JSON.stringify(result.caseIds),result.maxHoldouts,result.availableLocations,result.eligibleLocations,result.selectedLocations,result.omittedLocations,JSON.stringify(result.notes)];
+  const header=["borehole_id","x_m","y_m","logged_elevation_m","min_elevation_m","max_elevation_m","range_width_m","reference_prediction_m","reference_error_m","covered","extrapolated","missing_case_ids","unavailable_reason","predictions","unit_id","reference_case_id","case_ids","max_holdouts","available_locations","eligible_locations","selected_locations","omitted_locations","group_radius_m","review_notes"];
+  const meta=[result.unitId,result.referenceCaseId,JSON.stringify(result.caseIds),result.maxHoldouts,result.availableLocations,result.eligibleLocations,result.selectedLocations,result.omittedLocations,result.groupRadius,JSON.stringify(result.notes)];
   const rows=result.rows.map(row=>[row.id,row.x,row.y,row.logged,row.min,row.max,row.rangeWidth,row.referencePrediction,row.referenceError,
     row.covered===undefined?undefined:String(row.covered),String(row.extrapolated),JSON.stringify(row.missingCaseIds),row.unavailableReason,JSON.stringify(row.predictions),...meta]);
   if(!rows.length)rows.push([...Array(14).fill(""),...meta]);
