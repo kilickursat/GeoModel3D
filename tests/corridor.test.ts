@@ -25,6 +25,21 @@ describe("corridor station screening",()=>{
     expect([p,a]).toEqual(before);expect(JSON.parse(JSON.stringify(r))).toEqual(r);
   });
 
+  it("counts screening conditions apart from missing data, so unknown groundwater does not flag every station",()=>{
+    const dry=project();for(const b of dry.boreholes)delete b.water;
+    const r=analyzeCorridor(dry,line(),{step:5,minCover:4});
+    const inside=r.stations.filter(s=>s.inside);
+    expect(inside.length).toBeGreaterThan(0);
+    for(const s of inside)expect(s.flags).toContain("water-unknown");
+    // Before the split this was the only count shown, and it equalled the number of stations.
+    expect(r.summary.flaggedStationCount).toBe(r.stations.length);
+    expect(r.summary.missingDataStationCount).toBe(r.stations.length);
+    expect(r.summary.conditionStationCount).toBe(0);
+    const low=analyzeCorridor(dry,line(),{step:5,minCover:6});
+    expect(low.summary.conditionStationCount).toBe(low.stations.filter(s=>s.flags.includes("low-cover")).length);
+    expect(low.summary.conditionStationCount).toBeGreaterThan(0);
+  });
+
   it("keeps outside endpoints and model-entry boundaries, without inventing ground or head",()=>{
     const r=analyzeCorridor(project(),line(),{step:20});
     expect(r.stations[0].chainage).toBe(100);expect(r.stations.at(-1)!.chainage).toBe(120);

@@ -1,6 +1,7 @@
 // A pinned alignment is screened at explicit stations. The dashboard never turns missing inputs into safe results.
 import type {Alignment,GeoProject} from "./schema";
 import type {CorridorFlag,CorridorOptions,CorridorPosition,CorridorReport,CorridorStation} from "./corridor";
+import {CORRIDOR_CONDITIONS,CORRIDOR_MISSING_DATA} from "./corridor";
 import {corridorCsv} from "./corridor";
 import {createCorridorJob} from "./corridorJob";
 import {showInvestigationPlanner} from "./investigationView";
@@ -79,7 +80,7 @@ export function showCorridor(source:GeoProject,line:Alignment,options:CorridorVi
       request=createCorridorJob(project,alignment,specification);const report=await request.result;
       if(closed||token!==generation)return;
       result=report;selected=0;render();csvButton.disabled=false;
-      status.textContent=`Dashboard ready: ${format(report.summary.stationCount,0)} stations; ${format(report.summary.insideCount,0)} within the model; ${format(report.summary.flaggedStationCount,0)} with screening flags.`;
+      status.textContent=`Dashboard ready: ${format(report.summary.stationCount,0)} stations; ${format(report.summary.insideCount,0)} within the model; ${format(report.summary.conditionStationCount,0)} with screening conditions; ${format(report.summary.missingDataStationCount,0)} with missing data.`;
     }catch(err){
       if(closed||token!==generation)return;
       error.textContent=err instanceof Error?err.message:String(err);error.hidden=false;status.textContent="Dashboard could not be completed.";
@@ -94,12 +95,14 @@ export function showCorridor(source:GeoProject,line:Alignment,options:CorridorVi
   function render(){
     if(!result)return;
     const r=result,s=r.summary;
-    results.innerHTML=`<dl class="corridor-summary"><div><dt>Stations within model / total</dt><dd>${format(s.insideCount,0)} / ${format(s.stationCount,0)}</dd></div><div><dt>Sampled minimum cover</dt><dd>${extreme(s.minCover)}</dd></div><div><dt>Sampled maximum water − design top</dt><dd>${extreme(s.maxWaterHead)}</dd></div><div><dt>Stations with screening flags</dt><dd>${format(s.flaggedStationCount,0)}</dd></div></dl>
+    const counted=(group:ReadonlySet<CorridorFlag>)=>Object.entries(s.counts).filter(([flag,count])=>count>0&&group.has(flag as CorridorFlag)).map(([flag,count])=>`<span>${flagNames[flag as CorridorFlag]}: <b>${format(count,0)}</b></span>`).join("");
+    results.innerHTML=`<dl class="corridor-summary"><div><dt>Stations within model / total</dt><dd>${format(s.insideCount,0)} / ${format(s.stationCount,0)}</dd></div><div><dt>Sampled minimum cover</dt><dd>${extreme(s.minCover)}</dd></div><div><dt>Sampled maximum water − design top</dt><dd>${extreme(s.maxWaterHead)}</dd></div><div><dt>Stations with screening conditions</dt><dd>${format(s.conditionStationCount,0)}</dd></div><div><dt>Stations with missing data</dt><dd>${format(s.missingDataStationCount,0)}</dd></div></dl>
 <p class="corridor-sampling">Chainage ${format(r.range.start)}–${format(r.range.end)} m. Regular spacing ${format(r.range.actualStep,4)} chainage m, plus alignment, design and model-boundary stations. Counts describe stations, not corridor length. Conditions between stations may be missed.</p>
 <h3>Longitudinal profile</h3><div class="corridor-legend"><span class="corridor-ground-key">Ground</span><span class="corridor-water-key">Groundwater</span><span class="corridor-top-key">Design top</span><span class="corridor-bottom-key">Design bottom</span></div><div class="corridor-plot" tabindex="0" role="group" aria-label="Corridor elevation profile; use left and right arrows to select a station">${plot()}</div><p class="corridor-caption">All elevations use the same scale. Gaps indicate unavailable values. Select a station from the profile or table; use left and right arrows on the profile to move between stations.</p>
 <section class="corridor-detail"><div class="corridor-station-actions"><label>Selected chainage (m)<select class="corridor-station">${r.stations.map((station,index)=>`<option value="${index}">${format(station.chainage)}</option>`).join("")}</select></label>${options.onSelectChainage?'<button type="button" class="corridor-view corridor-view-chainage">View at chainage</button>':""}</div><div class="corridor-selected"></div></section>
-<h3>Screening flag counts</h3><p>Flags can overlap at a station. No flags means only that none of these screens triggered at that sampled location.</p><div class="corridor-flag-counts">${Object.entries(s.counts).filter(([,count])=>count>0).map(([flag,count])=>`<span>${flagNames[flag as CorridorFlag]}: <b>${format(count,0)}</b></span>`).join("")||"No screening flags at the sampled stations."}</div>
-<h3>Stations by chainage</h3><label class="corridor-filter-label">Show stations<select class="corridor-filter"><option value="all">All stations</option><option value="flagged">With screening flags</option><option value="outside-model">Outside model</option><option value="low-cover">Cover below screen</option><option value="water-above-design">Water above design top</option><option value="distant-support">Log distance above screen</option></select></label><div class="corridor-table-wrap" tabindex="0" aria-label="Corridor station values; scroll horizontally on small screens"><table class="corridor-stations"><thead><tr><th>Chainage (m)</th><th>Model coverage</th><th>Ground (m)</th><th>Design top (m)</th><th>Cover (m)</th><th>Water − top (m)</th><th>Unit at top</th><th>Unit at bottom</th><th>Nearest used log</th><th>Plan distance (m)</th><th>Screening flags</th></tr></thead><tbody>${stationRows(r)}</tbody></table></div>
+<h3>Screening conditions</h3><p>Sampled states the screens above detected. They can overlap at a station; none means only that no screen triggered at the sampled locations.</p><div class="corridor-flag-counts">${counted(CORRIDOR_CONDITIONS)||"No screening conditions at the sampled stations."}</div>
+<h3>Missing data</h3><p>Values that could not be assessed at a station. These are gaps in the inputs, not conditions found.</p><div class="corridor-flag-counts">${counted(CORRIDOR_MISSING_DATA)||"No missing data at the sampled stations."}</div>
+<h3>Stations by chainage</h3><label class="corridor-filter-label">Show stations<select class="corridor-filter"><option value="all">All stations</option><option value="conditions">With screening conditions</option><option value="missing">With missing data</option><option value="outside-model">Outside model</option><option value="low-cover">Cover below screen</option><option value="water-above-design">Water above design top</option><option value="distant-support">Log distance above screen</option></select></label><div class="corridor-table-wrap" tabindex="0" aria-label="Corridor station values; scroll horizontally on small screens"><table class="corridor-stations"><thead><tr><th>Chainage (m)</th><th>Model coverage</th><th>Ground (m)</th><th>Design top (m)</th><th>Cover (m)</th><th>Water − top (m)</th><th>Unit at top</th><th>Unit at bottom</th><th>Nearest used log</th><th>Plan distance (m)</th><th>Screening flags</th></tr></thead><tbody>${stationRows(r)}</tbody></table></div>
 <details class="corridor-methods"><summary>How to read this dashboard</summary><ul>${r.notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul><p>Cover = ground elevation − design top. Water above design top = water elevation − design top; negative values mean water below that level. This is a geometric water-level difference, not a groundwater flow calculation. All results refer to the snapshot named above.</p></details>`;
     results.hidden=false;renderSelected();
   }
@@ -134,7 +137,7 @@ export function showCorridor(source:GeoProject,line:Alignment,options:CorridorVi
   function filter(value:string){
     if(!result)return;
     for(const row of results.querySelectorAll<HTMLElement>("[data-corridor-row]")){
-      const station=result.stations[Number(row.dataset.corridorRow)];row.hidden=value==="all"?false:value==="flagged"?!station.flags.length:!station.flags.includes(value as CorridorFlag);
+      const station=result.stations[Number(row.dataset.corridorRow)];row.hidden=value==="all"?false:value==="conditions"?!station.flags.some(f=>CORRIDOR_CONDITIONS.has(f)):value==="missing"?!station.flags.some(f=>CORRIDOR_MISSING_DATA.has(f)):!station.flags.includes(value as CorridorFlag);
     }
   }
   function exportCsv(){

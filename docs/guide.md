@@ -309,7 +309,7 @@ The dashboard shows:
 - sampled cover (**ground − design top**) and water head (**water − design top**), in metres;
 - the units at design top and bottom, or explicit above-ground/below-model positions;
 - the nearest borehole or CPT layer log actually used by the geological model, with horizontal distance;
-- station flags for missing coverage/design/water, design levels outside the model, water above design, and the selected cover/distance screens.
+- station flags in two groups, counted separately: **screening conditions** (design top above ground or below the model, water above the design top, and the selected cover and log-distance screens) and **missing data** (outside the model, no design level, unknown groundwater, no logs). On a site without groundwater data every station has missing data, but that is not a condition found there.
 
 Select a station to inspect it, or **View at chainage** to move the existing model's alignment marker there. **Download corridor CSV** preserves station values, flags, settings, alignment geometry/design, snapshot time, engine version and scenario label where available. Cancel or close stops the worker. The dashboard runs locally and in the standalone HTML.
 
