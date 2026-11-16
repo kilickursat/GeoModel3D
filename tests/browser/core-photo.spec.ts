@@ -75,6 +75,8 @@ test("core photo upload registers recovered rows and accepts only reviewed RQD w
   await dialog.locator(".core-add-row").click();
   for(const depth of ["0.08","0.16","0.5"]){await dialog.locator(".core-cut-depth").fill(depth);await dialog.locator(".core-add-cut").click()}
   await expect(dialog.locator(".core-piece")).toHaveCount(4);
+  // Local AI descriptions are an opt-in lab (?labs=core-ai): the ordinary review offers no model.
+  await expect(dialog.locator(".core-ai-open, .core-ai-piece-open")).toHaveCount(0);
   await expect(dialog.locator(".core-result")).toContainText(/pending|review|unavailable/i);
   if(await dialog.locator(".core-accept").isEnabled())await dialog.locator(".core-accept").click();
   await expect(dialog.locator(".core-result")).toContainText(/pending|review|unavailable/i);
