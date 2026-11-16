@@ -63,6 +63,17 @@ async function selectedBox(dialog:Locator){
   const selected=dialog.locator(".core-photo-depth-selection.selected");await expect(selected).toHaveCount(1);
   return selected.evaluate(el=>({left:parseFloat(el.style.left),top:parseFloat(el.style.top),width:parseFloat(el.style.width),height:parseFloat(el.style.height)}));
 }
+async function expectPhotographVisibleOnHover(dialog:Locator,screenshotPath:string){
+  const row=dialog.locator(".core-photo-row.selected");await row.hover();
+  const painted=await row.evaluate(el=>{
+    const canvas=document.createElement("canvas");canvas.width=canvas.height=1;const context=canvas.getContext("2d")!;
+    context.fillStyle=getComputedStyle(el).backgroundColor;context.fillRect(0,0,1,1);
+    return {hovered:el.matches(":hover"),alpha:context.getImageData(0,0,1,1).data[3]};
+  });
+  await dialog.page().screenshot({path:screenshotPath,fullPage:true});
+  expect(painted.hovered,"The source row must actually be hovered").toBe(true);
+  expect(painted.alpha,"The hovered row overlay must leave the photograph visible").toBeLessThan(128);
+}
 function csvRows(text:string){
   const rows:string[][]=[];let row:string[]=[],value="",quoted=false;
   for(let i=0;i<text.length;i++){
@@ -106,7 +117,7 @@ test("core depth log aligns unsorted rows and gaps, maps RTL selection, and leav
   expect(csv.rows.find(r=>Number(r.from_m)===2.5)).toMatchObject({piece_id:"piece-d",photo_piece_break_after:"end",segment_ends_piece:"false"});
   expect(Number(split.photo_box_x0)).toBeCloseTo(.1,9);expect(Number(split.photo_box_x1)).toBeCloseTo(.26,9);expect(Number(split.photo_piece_from_m)).toBe(2.5);expect(Number(split.photo_piece_to_m)).toBe(3.5);
   expect(csv.rows.reduce((sum,r)=>sum+Number(r.length_m),0)).toBeCloseTo(4,9);
-  await selectInterval(dialog,3.2,3.5);await dialog.locator(".core-photo-sheet").scrollIntoViewIfNeeded();await page.screenshot({path:testInfo.outputPath("core-depth-log-source.png"),fullPage:true});
+  await selectInterval(dialog,3.2,3.5);await expectPhotographVisibleOnHover(dialog,testInfo.outputPath("core-depth-log-source.png"));
   await dialog.locator(".core-depth-chart").scrollIntoViewIfNeeded();await page.screenshot({path:testInfo.outputPath("core-depth-log-desktop.png"),fullPage:true});
   page.once("dialog",()=>{throw new Error("Read-only navigation must not prompt about unsaved annotations")});await close(page);
   expect(await downloadJson(page,".ws-json")).toEqual(beforeProject);const after:any=await downloadJson(page);
@@ -154,6 +165,7 @@ test("mobile core depth log fits and supports keyboard source selection without 
   expect(await dialog.locator(".core-depth-view").evaluate(el=>el.scrollWidth<=el.clientWidth+1)).toBe(true);
   for(let i=0;i<18;i++){await page.keyboard.press("Tab");expect(await dialog.evaluate(el=>el.contains(document.activeElement))).toBe(true)}
   await dialog.locator(".core-depth-chart").scrollIntoViewIfNeeded();await page.screenshot({path:testInfo.outputPath("core-depth-log-mobile.png"),fullPage:true});
+  await expectPhotographVisibleOnHover(dialog,testInfo.outputPath("core-depth-log-mobile-photo-hover.png"));
   await close(page);await expect(page.locator(".ws-core-photos")).toBeFocused();expect(await downloadJson(page,".ws-json")).toEqual(before);
 });
 
@@ -165,5 +177,6 @@ test("standalone core depth log maps and exports photo evidence with networking 
   await page.goto(`${APP_ORIGIN}/standalone-core-depth-log.html?backend=webgl#input`);await openInput(page);await importJson(page,p);await saved(page);const before:any=await downloadJson(page,".ws-json");
   const dialog=await openDepth(page);await selectInterval(dialog,3.2,3.5);expect((await selectedBox(dialog)).width).toBeCloseTo(16,6);
   const csv=await exportCsv(page);expect(csv.rows.length).toBeGreaterThan(5);await dialog.locator(".core-depth-chart").scrollIntoViewIfNeeded();await page.screenshot({path:testInfo.outputPath("core-depth-log-offline.png"),fullPage:true});
+  await expectPhotographVisibleOnHover(dialog,testInfo.outputPath("core-depth-log-offline-photo-hover.png"));
   await close(page);expect(await downloadJson(page,".ws-json")).toEqual(before);expect(requests).toEqual([]);expect(errors).toEqual([]);
 });
