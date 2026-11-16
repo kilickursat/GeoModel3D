@@ -562,27 +562,24 @@ function packedImages():PackedImages{
     const id=imageId(image);include(id,image);return IMAGE_REFERENCE+id;
   }};
 }
-// One string per distinct part, shared by every cached revision: merging their pools then compares references, so
-// the cost of a save does not grow with the length of the history.
-const partText=new Map<string,string>();
+// Intern text only for the current save. Existing snapshots seed this pool, but keep their strings alive through
+// the weak revision/scenario caches below, so replacing a workspace can release its old terrain and CPT content.
+function internPart(text:Map<string,string>,id:string,json:string):string{
+  const known=text.get(id);
+  if(known!==undefined&&known!==json)throw new Error("Workspace project part ID collision; the workspace was not saved.");
+  if(known===undefined)text.set(id,json);
+  return known??json;
+}
 interface PackedParts {
   values:Map<string,string>;
   add(value:unknown):string;
   include(id:string,json:string):void;
 }
-function packedParts():PackedParts{
+function packedParts(text:Map<string,string>):PackedParts{
   const values=new Map<string,string>();
-  const include=(id:string,json:string)=>{
-    const existing=values.get(id);
-    if(existing!==undefined&&existing!==json)throw new Error("Workspace project part ID collision; the workspace was not saved.");
-    values.set(id,json);
-  };
+  const include=(id:string,json:string)=>{values.set(id,internPart(text,id,json))};
   return {values,include,add(value){
-    let json=JSON.stringify(value);
-    const id=contentId("part",json),known=partText.get(id);
-    if(known===undefined)partText.set(id,json);
-    else if(known!==json)throw new Error("Workspace project part ID collision; the workspace was not saved.");
-    else json=known;
+    const json=JSON.stringify(value),id=contentId("part",json);
     include(id,json);return PART_REFERENCE+id;
   }};
 }
@@ -622,7 +619,12 @@ export function toWorkspaceJson(doc:WorkspaceDocument):string{
   // Page PNGs and project parts are pooled once across active/inactive drafts and immutable revisions. Cached
   // immutable JSON keeps large CPT/terrain histories out of the autosave hot path, and pooled parts keep a saved
   // history proportional to what changed between builds rather than to the number of builds.
-  const pool=packedImages(),parts=packedParts();
+  const pool=packedImages(),text=new Map<string,string>();
+  // Reuse strings already owned by live immutable snapshots before packing the editable draft or new revisions.
+  // The interning pool itself is never retained between saves or shared across unrelated workspaces.
+  for(const r of doc.revisions)for(const [id,json] of revisionJson.get(r)?.parts??[])internPart(text,id,json);
+  for(const s of doc.scenarios)for(const [id,json] of scenarioJson.get(s)?.parts??[])internPart(text,id,json);
+  const parts=packedParts(text);
   const metadata={format:doc.format,version:4,id:doc.id,savedAt:doc.savedAt,activeScenarioId:doc.activeScenarioId,
     ...(doc.activeRevisionId===undefined?{}:{activeRevisionId:doc.activeRevisionId})};
   const draft=packedDraft(doc.draft,pool,parts,"draft");
@@ -634,7 +636,7 @@ export function toWorkspaceJson(doc:WorkspaceDocument):string{
   const revisions=doc.revisions.map(r=>{
     let packed=revisionJson.get(r);
     if(packed===undefined){
-      const images=packedImages(),own=packedParts();
+      const images=packedImages(),own=packedParts(text);
       packed={json:JSON.stringify({...r,project:packedProject(r.project,images,own)},null,1),images:images.values,parts:own.values};
       if(frozen.has(r))revisionJson.set(r,packed);
     }
@@ -643,7 +645,7 @@ export function toWorkspaceJson(doc:WorkspaceDocument):string{
   const scenarios=doc.scenarios.map(s=>{
     let packed=scenarioJson.get(s);
     if(packed===undefined){
-      const images=packedImages(),own=packedParts();
+      const images=packedImages(),own=packedParts(text);
       packed={json:JSON.stringify({...s,...(s.draft?{draft:packedDraft(s.draft,images,own,`scenario ${s.id}.draft`)}:{})},null,1),images:images.values,parts:own.values};
       if(frozen.has(s))scenarioJson.set(s,packed);
     }

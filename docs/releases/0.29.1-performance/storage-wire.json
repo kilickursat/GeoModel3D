@@ -1,0 +1,20 @@
+{
+  "wireBytesIdentical": true,
+  "bytes": 6307,
+  "sha256": "a75b77a08c21a6a17f02a1b3a7949c1a463eebe12e54acc514fe12c643e0742b",
+  "roundtrip": "all six pooled slots, images, NaN readings, multiple revisions and inactive scenario draft",
+  "before": {
+    "historyRevisions": 30,
+    "savedBytes": 1597822,
+    "warmSamples": 10,
+    "medianMs": 24.15117700000019,
+    "maxMs": 31.387071000000105
+  },
+  "after": {
+    "historyRevisions": 30,
+    "savedBytes": 1597822,
+    "warmSamples": 10,
+    "medianMs": 24.73475950000011,
+    "maxMs": 37.132519999999204
+  }
+}

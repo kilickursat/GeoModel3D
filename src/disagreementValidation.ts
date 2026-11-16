@@ -43,34 +43,42 @@ export function groupRadius(value:unknown=DEFAULT_GROUP_RADIUS):number{
 // position links to their closure so such a CPT cannot enter a fold after the matching borehole was removed.
 // Positions within the grouping radius are linked too, and links chain (single linkage): a group can be wider than
 // the radius where logs form a chain. A radius of 0 links only identical positions (to 1 mm) and matching IDs.
+interface LocationGroup {keys:ReadonlySet<string>;boreholeIds:ReadonlySet<string>;cptIds:ReadonlySet<string>}
 export function locationGroups(cases:DisagreementCase[],radius=0){
-  const links=new Map<string,Set<string>>(),positions=new Map<string,XY>();
-  const connect=(a:string,b:string)=>{if(!links.has(a))links.set(a,new Set());links.get(a)!.add(b)};
+  // Keep component membership, not every edge: a dense group otherwise needs quadratic adjacency storage and
+  // calibration repeatedly walks that same graph for each of its reference logs.
+  const nodes=new Map<string,number>(),parents:number[]=[],sizes:number[]=[];
+  const positions=new Map<string,XY&{node:number}>();
+  const node=(key:string)=>{let index=nodes.get(key);if(index===undefined){index=parents.length;nodes.set(key,index);parents.push(index);sizes.push(1)}return index};
+  const root=(index:number)=>{while(parents[index]!==index){parents[index]=parents[parents[index]];index=parents[index]}return index};
+  const join=(a:number,b:number)=>{a=root(a);b=root(b);if(a===b)return;if(sizes[a]<sizes[b])[a,b]=[b,a];parents[b]=a;sizes[a]+=sizes[b]};
   for(const c of cases)for(const [kind,logs] of [["borehole",c.project.boreholes],["cpt",c.project.cpts??[]]] as const)for(const log of logs){
     if(!finite(log.x)||!finite(log.y))continue;
-    const key=location(log),p=`position:${key}`,id=`${kind}:${log.id}`;
-    if(!positions.has(key))positions.set(key,{x:log.x,y:log.y});
-    connect(p,id);connect(id,p);
+    const key=location(log),position=node(`position:${key}`);
+    if(!positions.has(key))positions.set(key,{x:log.x,y:log.y,node:position});
+    join(position,node(`${kind}:${log.id}`));
   }
   if(radius>0){
-    const cell=(v:number)=>Math.floor(v/radius),buckets=new Map<string,string[]>();
-    for(const [key,p] of positions){const b=`${cell(p.x)},${cell(p.y)}`;if(!buckets.has(b))buckets.set(b,[]);buckets.get(b)!.push(key)}
-    for(const [key,p] of positions)for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++)for(const other of buckets.get(`${cell(p.x)+dx},${cell(p.y)+dy}`)??[]){
-      const q=positions.get(other)!;
-      if(other!==key&&Math.hypot(p.x-q.x,p.y-q.y)<=radius+1e-9)connect(`position:${key}`,`position:${other}`);
+    const cell=(v:number)=>Math.floor(v/radius),buckets=new Map<string,Array<XY&{node:number}>>();
+    for(const p of positions.values()){
+      const x=cell(p.x),y=cell(p.y);
+      // Compare with earlier positions only. An already connected pair cannot change the component.
+      for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++)for(const q of buckets.get(`${x+dx},${y+dy}`)??[]){
+        if(root(p.node)!==root(q.node)&&Math.hypot(p.x-q.x,p.y-q.y)<=radius+1e-9)join(p.node,q.node);
+      }
+      const bucket=`${x},${y}`;if(!buckets.has(bucket))buckets.set(bucket,[]);buckets.get(bucket)!.push(p);
     }
   }
-  return (hole:XY)=>{
-    const keys=new Set<string>(),boreholeIds=new Set<string>(),cptIds=new Set<string>(),seen=new Set<string>(),queue=[`position:${location(hole)}`];
-    for(let at=0;at<queue.length;at++){
-      const item=queue[at];if(seen.has(item))continue;seen.add(item);
-      if(item.startsWith("position:"))keys.add(item.slice(9));
-      else if(item.startsWith("borehole:"))boreholeIds.add(item.slice(9));
-      else if(item.startsWith("cpt:"))cptIds.add(item.slice(4));
-      for(const next of links.get(item)??[])if(!seen.has(next))queue.push(next);
-    }
-    return {keys,boreholeIds,cptIds};
+  const groups=new Map<number,{keys:Set<string>;boreholeIds:Set<string>;cptIds:Set<string>}>(),byPosition=new Map<string,LocationGroup>();
+  for(const [key,index] of nodes){
+    const component=root(index);let group=groups.get(component);
+    if(!group){group={keys:new Set(),boreholeIds:new Set(),cptIds:new Set()};groups.set(component,group)}
+    if(key.startsWith("position:")){group.keys.add(key.slice(9));byPosition.set(key.slice(9),group)}
+    else if(key.startsWith("borehole:"))group.boreholeIds.add(key.slice(9));
+    else group.cptIds.add(key.slice(4));
   };
+  // Every known member gets the same read-only component; callers must not mutate shared membership sets.
+  return (hole:XY):LocationGroup=>byPosition.get(location(hole))??{keys:new Set([location(hole)]),boreholeIds:new Set(),cptIds:new Set()};
 }
 
 // A contact is observed only where its first, unambiguous run begins at the collar or directly follows another

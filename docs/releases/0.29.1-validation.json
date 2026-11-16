@@ -1,0 +1,107 @@
+{
+  "version": "0.29.1",
+  "recordedAt": "2026-11-16T02:47:31.857802+00:00",
+  "baseCommit": "37dfeb6927466a442cb221f6693e4dd5647cbf9a",
+  "unit": {
+    "passed": 711,
+    "files": 61
+  },
+  "targetedPlaywright": {
+    "passed": 19,
+    "workers": 2,
+    "retries": 0,
+    "productionBuild": true,
+    "timeoutOverrides": false,
+    "projects": [
+      "desktop",
+      "scenarios",
+      "scenarios-offline",
+      "calibrated-investigation",
+      "calibrated-investigation-offline",
+      "offline"
+    ]
+  },
+  "fullBrowserRegression": {
+    "scope": "81 production Playwright tests",
+    "execution": "Required by .github/workflows/build.yml for the pull request before merge, and again for main deployment; consult the commit Actions results."
+  },
+  "build": {
+    "status": "passed",
+    "typescript": true,
+    "hosted": true,
+    "benchmark": true,
+    "standalone": true,
+    "arModels": true
+  },
+  "releaseMetadataValidation": "RELEASE_TAG=v0.29.1 node scripts/release-assets.mjs validate . passed",
+  "initialDevelopmentFailure": "The first focused grouping run had 36 passes and one failure: a new boundary fixture unintentionally used the helper default second interpretation, which added another co-located borehole. The fixture was changed to clone its first interpretation. The final focused run passed 37 tests and full unit run passed 711.",
+  "sourceSha256": {
+    "src/workspace.ts": "a07ff5b1ae0ff26c354625cfa2c0e1ba494fb14a1394408324c03137fdebe280",
+    "src/disagreementValidation.ts": "806958a77550d8ebde46618a4b9ae910813593c86f0098a14385ecdab139e580",
+    "src/calibration.ts": "98039b3b85931108d2ac3dbe1a8ddf9322a759a78e24c0b9ba5094d8f49c033c",
+    "scripts/release-assets.mjs": "8a51fc48168b5d995337535d8899a395e3a0367a34e858c920b04ff0d43a0204",
+    "tests/workspace-parts.test.ts": "f9674b19b09012a2dc4618ca030aaf8fdf3bfca1bb2565a184ac9cb07c50dfc7",
+    "tests/workspace-memory.test.ts": "375857c42303407d48c68c92572631aeb2b6a9701acd261132a7aaf62a848b9d",
+    "tests/fixtures/workspace-memory.mjs": "60700d17e385946fe570e11d22a5b2f8c75b797b5adecce368d53cbeea3cd611",
+    "tests/disagreement-validation.test.ts": "10bf0db87a00f46a2e6ba5228a3bd24fd07750e827dcf0b7071f943a7ef462ce",
+    "tests/calibration.test.ts": "a2fa3bc189fa3ce89a5e987ff809cdb7bb00389e1f7fe8e1f499f50b437220bc",
+    "tests/release.test.ts": "043114ecd6cd48e5fede75941dbe3c09c00c68d7964713ea4b6427b370e760d0",
+    "package.json": "6f63fb96d9c223c170a640003c961abc6c626e147394a519e9c5a180ede2c0de",
+    "package-lock.json": "350b8a85b00e95fa1129d139b7b8fa000061e23625abccd94b9d099408a4db21"
+  },
+  "frozenHistoricalInputsAndInferenceSourceUnchanged": [
+    "docs/benchmarks",
+    "public/core-benchmark-v026",
+    "src/coreBenchmark.worker.ts",
+    "src/coreBenchmark.ts",
+    "src/coreBenchmarkClient.ts",
+    "src/coreAi.ts",
+    "src/coreAi.worker.ts"
+  ],
+  "standaloneArtifact": {
+    "filename": "geomodel3d-offline.html",
+    "bytes": 3349510,
+    "sha256": "165039b995105c7078455c70f5e9b47ed2bc059957ee9f7a6cd602af69c96b3d"
+  },
+  "benchmarkWorkerArtifact": {
+    "filename": "coreBenchmark.worker-BWHLncoB.js",
+    "sha256": "33b8b7d504cb6a1b5cd53d7a42c7ce4f7507e51e26b35f754e713576882efb2a",
+    "identicalToVersion": "0.29.0"
+  },
+  "performanceEvidenceSha256": {
+    "README.md": "d24a7764421b900d393fb6d50a215a381d6790f22ac33bb14e9e9e1c655e58e8",
+    "group-after.jsonl": "e11a216823e68a3ec3a48d40bccde464b5a1668a0818d0f1f64f38843e8a1917",
+    "group-before.jsonl": "ff8e1e000682b8175e19740f57e3d437979ce747700d7fc1afdcf240f92a0a63",
+    "group-benchmark.ts": "7f8c1cb56ad41e4d7ca450a5794b54dda0e97bb7744741ff5893e0989510d40a",
+    "group-build.mjs": "1b5ab2b3f51ac9f048c5fb1729fa2510ac7696a1c00fe8d908d31de41755e28f",
+    "group-differential.mjs": "88784c588865acbe54a899a7b18db0b02c22fec469a12a2889dc804c1d4712b3",
+    "group-performance.json": "ffc56ece014860ba12ce12609635f203fc81b67ced5393a75bcdf0865a9dbb84",
+    "storage-measure.mjs": "fb230c28e952f28f1b91046aeef205df1c50aea214623c811f0e580081febb38",
+    "storage-memory.json": "238e07cade7aa48f9db8d651d2f87cc70e3465f4244dc3e34e948d8e66fa3628",
+    "storage-wire.json": "e1b985261813bc636c884906f4c34d15c99cccc58610fd5c944e287b213de403",
+    "storage-wire.mjs": "97c37a72263fea6eb636086e7e9d20b0e48ac68ae99a512931a7b3576986c77e"
+  },
+  "logs": {
+    "unit": {
+      "path": "0.29.1-unit.log.gz",
+      "sha256": "896027491f1a921dc11f6200eb627f384b5d914a2b5f9b07093aabc4721208d3",
+      "uncompressedSha256": "4eddb2f28097bf70bc6974b3c6c99f8e8ecaabf9e4057fe1e5aba56e30564d06"
+    },
+    "build": {
+      "path": "0.29.1-build.log.gz",
+      "sha256": "746cee1eafc3d89931f03135343241a7843eebdf2fb25e59abc58c2c5566063f",
+      "uncompressedSha256": "1ad0ed16ebcd1afc80c10513a7e9207c8101f6d5b90f9a7a84c0dc6ea596d2af"
+    },
+    "targeted-playwright": {
+      "path": "0.29.1-targeted-playwright.log.gz",
+      "sha256": "b1c0b15b1e4246bbe2c5b8b2aa098aae76d3cccc1f2b1a63bb704457adc8cb8b",
+      "uncompressedSha256": "a95d6699abdea316adf6a9cec96416b254046866a8e8dd3e58fc91cd762ca733"
+    },
+    "initial-group-tests": {
+      "path": "0.29.1-initial-group-tests.log.gz",
+      "sha256": "a82d022bcebb415e9494785b52f9dc0d7f0e7e23242176c70e64900a1396c036",
+      "uncompressedSha256": "3e9521777a14fc26931b091d18ac3cdb663fbb7b22c820ab1b9ed5bacec6d7e6"
+    }
+  },
+  "evidenceScope": "Software validation and local synthetic Node diagnostics. Explicit-GC heap observations exclude native/GPU memory. Grouping timings are one ascending workload trial per implementation on a shared host. No new Qwen inference or hardware-GPU benchmark."
+}

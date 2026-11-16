@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.29.1 — 2026-11-16
+
+### Fixed
+- Release serialized project-part text with discarded workspaces instead of retaining every opened project's data for the browser session. Preserve format 4 pooling and cached revision serialization.
+- Reuse connected location groups during held-out checks and calibration, avoiding dense adjacency graphs and repeated traversal. Preserve the grouping radius, identity links, chained locations and existing scoring rules.
+- Publish release assets through the numeric release ID returned by GitHub instead of depending on immediate draft visibility in tag/list lookups. Retain tag verification, immutable asset checksums, interrupted-upload recovery and manually managed draft state.
+
 ## 0.29.0 — 2026-11-16
 
 ### Changed
