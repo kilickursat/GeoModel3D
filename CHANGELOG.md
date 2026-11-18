@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## 0.29.3 — 2026-11-18
+
+### Fixed
+- Read borehole logs that give each sample's depths at the start of its description ("(1.5-1.95 m) Brown clayey SAND…", "- same materials -") instead of boundary depths beside the log. Every page of such logs was reported as "looks like a log, but no layers found". A layer starts at each sample with a new description; a change between two samples is placed at the top of the new one, or at a depth the log notes ("change of stratum at 4.60 m"), and flagged. Recovery notes, sample markers, runs that brought up nothing and notes under the log are left out of the descriptions, and the review says the layers were read from the sample depths.
+- Follow a log over all its sheets. A note under the log that names a description ("* = field description") is no longer taken for the column heading, which hid the last samples of a sheet; text printed twice over itself (a header in imitated bold) is read once; sheets without a readable sheet number keep their order in the document; each header value comes from the first sheet that gives it; and a last sheet too short for a depth scale closes the log down to its final depth, flagged.
+- Stop reading a laboratory value that fits its place on the depth scale by chance ("Gs = 2.68" at 2.7 m) as a layer boundary, while still reading a boundary column that prints each boundary's elevation beside its depth.
+- Start a new line where a run of text begins at a table column's left edge, so a description that reaches the next column is not joined to that column's sample numbers.
+- Read "GWT: Ground level" as a water depth of 0 m, flagged, and a header's "ELEVATION: 14.20 m" as the ground level.
+
 ## 0.29.2 — 2026-11-16
 
 ### Fixed

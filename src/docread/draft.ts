@@ -18,9 +18,10 @@ export const FIELDS:Array<{key:Field;label:string;numeric:boolean}>=[
 // `flag` says why the reader is unsure of the layer's base depth; `autoUnit` is set while the unit is the rules' choice,
 // so it follows an edited description.
 export interface DraftLayer { from:string; to:string; unit:string; description:string; flag?:string; autoUnit:boolean; src:TextLine[]; evidence?:EvidenceRecord }
-// `ocr`: read by the reading model from a scanned page or an image, not from the document's own text.
+// `ocr`: read by the reading model from a scanned page or an image, not from the document's own text. `samples`: the
+// layers were read from the sample depths that start the descriptions.
 export interface DraftHole {
-  use:boolean; doc:number; file:string; pages:number[]; kind:"scale"|"table"; ocr:boolean;
+  use:boolean; doc:number; file:string; pages:number[]; kind:"scale"|"table"; ocr:boolean; samples?:boolean;
   values:Record<Field,string>; flags:Partial<Record<Field,string>>; src:Partial<Record<Field,TextLine>>;
   layers:DraftLayer[]; evidence?:EvidenceRecord; waterEvidence?:EvidenceRecord; ocrPages?:number[];
 }
@@ -48,7 +49,7 @@ export function draftHoles(doc:number,file:string,logs:ReadLog[],scanned:Readonl
     if(log.groundFlag)flags.ground=log.groundFlag;
     if(log.waterFlag)flags.water=log.waterFlag;
     if(log.xyFlag){flags.x=log.xyFlag;flags.y=log.xyFlag}
-    return {use:true,doc,file,pages:log.pages,kind:log.kind,ocr:log.pages.some(p=>scanned.has(p)),ocrPages:[...scanned],
+    return {use:true,doc,file,pages:log.pages,kind:log.kind,...(log.samples?{samples:true}:{}),ocr:log.pages.some(p=>scanned.has(p)),ocrPages:[...scanned],
       values:{id:log.src?.id?log.id??"":`Page ${log.pages[0]}`,x:text(log.x),y:text(log.y),lat:text(log.lat),lon:text(log.lon),
         ground:text(log.ground),final:text(log.final),water:text(log.water)},
       flags,src:{...log.src},
