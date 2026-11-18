@@ -52,7 +52,7 @@ export function createReview(host:ReviewHost){
   function renderChecks(){
     const used=holes.filter(h=>h.use).length;
     const shown=checks.filter(c=>c.level!=="note"),errors=checks.filter(c=>c.level==="error").length;
-    const summary=!holes.length?"<p><b>No borehole log was read.</b> Logs drawn with a depth scale, and logs set out as tables with From and To columns, are read from digital PDFs. You can type the boreholes in under Input data.</p>"
+    const summary=!holes.length?"<p><b>No borehole log was read.</b> Logs drawn with a depth scale (with the depths of their boundaries, or of their samples at the start of the descriptions), and logs set out as tables with From and To columns, are read from digital PDFs. You can type the boreholes in under Input data.</p>"
       :`<p><b>${plural(holes.length,"borehole")} read</b>${used<holes.length?`, ${used} to use`:""}. ${errors?`<span class="dr-n-error">${plural(errors,"problem")}</span> to fix before use. `:""}${shown.length-errors?`${plural(shown.length-errors,"value")} to check against the page.`:errors?"":"Nothing marked: still compare the values with the page."}</p>`;
     const item=(c:Check)=>`<li class="${c.level}"><button data-hole="${c.hole}" data-go="${where(c)}"><b>${esc(label(holes[c.hole]))}</b> ${esc(c.text)}</button></li>`;
     const order={error:0,warn:1,note:2},list=[...checks].sort((a,b)=>order[a.level]-order[b.level]||a.hole-b.hole);
@@ -84,7 +84,7 @@ export function createReview(host:ReviewHost){
         l.flag?`<tr class="dr-why" data-key="${key}"><td></td><td colspan="5">${esc(l.to)} m: ${esc(l.flag)} <button class="dr-ok" data-ok="${key}">Looks right</button></td></tr>`:""}`;
     };
     panel.innerHTML=`<div class="dr-fields">${FIELDS.map(field).join("")}</div>
-<div class="dr-layers-head"><b>Layers</b><span>${h.kind==="table"?"read from the From and To columns of a table":"read by the depth scale on the page"}${h.ocr?", by OCR from a scanned page":""}</span><button class="dr-add">Add layer</button></div>
+<div class="dr-layers-head"><b>Layers</b><span>${h.kind==="table"?"read from the From and To columns of a table":h.samples?"read from the sample depths that start the descriptions, by the depth scale on the page":"read by the depth scale on the page"}${h.ocr?", by OCR from a scanned page":""}</span><button class="dr-add">Add layer</button></div>
 <div class="dr-table-wrap"><table class="dr-layers"><thead><tr><th></th><th>From (m)</th><th>To (m)</th><th>Unit</th><th>Description</th><th></th></tr></thead><tbody>${h.layers.map(layer).join("")}</tbody></table>${
       h.layers.length?"":'<p class="dr-empty">No layers: add them, or leave this borehole out.</p>'}</div>`;
     $("#dr-units").innerHTML=[...new Set([...holes.flatMap(h=>h.layers.map(l=>l.unit.trim())),...RULE_UNITS])].filter(Boolean).map(u=>`<option value="${esc(u)}">`).join("");

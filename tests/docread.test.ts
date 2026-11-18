@@ -104,6 +104,103 @@ describe("reading a drawn log",()=>{
     expect(log.layers).toEqual([]);
     expect(log.error).toBe("no depth scale found");
   });
+  it("reads a column of boundaries that prints each boundary's elevation above its depth",()=>{
+    // Elevations far outside the log's depths are no misread depths: the column still gives the boundaries, and the
+    // pairs give the ground level.
+    const lines=[...drawnLog().filter(e=>!/Ground level|12\.30/.test(e.text)),
+      ...[1.2,4.5,9.8].map(d=>L((48.25-d).toFixed(2),900,yAt(d)-8,48))];
+    const [log]=readPage(lines,1000,800);
+    expect(log.layers.map(l=>l.to)).toEqual([1.2,4.5,9.8]);
+    expect([log.ground,log.groundFlag]).toEqual([48.25,"from the elevations and depths at the boundaries"]);
+  });
+  it("ends a log over two sheets on a last sheet too short for a depth scale",()=>{
+    // The last sheet holds only the end of the log: the rest of its description and the depth of the end of the hole.
+    const end=[L("Borehole No",40,40),L("BH-7",160,40),L("DESCRIPTION",300,150),L("Continued",300,190),
+      L("SAND: dense, grey,",300,210),L("wet (Continued)",300,226),L("END OF BOREHOLE",300,250),L("10.40",900,250,40)];
+    const r=readDocument([{page:1,width:1000,height:800,lines:drawnLog()},{page:2,width:1000,height:800,lines:end}]);
+    expect(r.logs).toHaveLength(1);
+    const [log]=r.logs;
+    expect([log.pages,log.final]).toEqual([[1,2],10.4]);
+    expect(log.layers.at(-1)).toMatchObject({from:9.8,to:10.4,description:"SAND: dense, grey, wet",flagged:true});
+    expect(log.layers.at(-1)!.why).toMatch(/page 2, which ends the log with no depth scale/);
+    expect(r.unread).toEqual([]);
+  });
+});
+
+describe("logs that describe their samples",()=>{
+  // Depths at the start of each sample's description, a scale of whole metres at x 40, and no boundary depths.
+  const at=(d:number)=>yAt(d)+8;
+  const sheet=(head:string[],labels:number[],rows:Array<[number,string]>,extra:TextLine[]=[])=>[
+    ...head.map((t,k)=>L(t,40,40+20*k)),L("SAMPLE DESCRIPTION",300,150),...labels.map(d=>L(String(d),40,yAt(d),10)),
+    ...rows.map(([y,t])=>L(t,300,y,7*t.length)),...extra];
+  const HEAD=["BORING NO.: BH-9","FINAL DEPTH: 6.45 m.","GWT: 2.10 m.","ELEVATION: 12.50 m.","SHEET NO. 1 of 1"];
+  it("takes a layer from each new description, flags where the change lies between samples, and reads the header",()=>{
+    const lines=sheet(HEAD,[1,2,3,4,5,6,7,8,9,10],[
+      [at(1),"(1.0-1.45 m) Brown clayey SAND, fine-"],[at(1)+16,"grained, loose. (Rec: 38/45 cm.)"],
+      [at(2),"(2.0-2.45 m) - same materials -"],[at(2)+16,"(Rec: 41/45 cm.)"],
+      [at(3),"(3.0-3.45 m) Gray CLAY, soft, high plasticity."],
+      [at(4),"(4.0-4.45 m) - same materials -, but with shell fragments."],[at(4)+16,"Approx. change of stratum at 4.60 m."],
+      [at(5),"x (5.0-5.45 m) Yellowish brown sandy GRAVEL, dense."],[at(6),"(6.0-6.45 m) - same materials -"],
+      [at(7),"Note:"],[at(7)+16,"* = field description"],[at(7.5),"End of Borehole @ 6.45 m."]],
+      // A laboratory result that fits its place on the scale by chance is no boundary.
+      [L("Gs =",900,yAt(2.7)-14,32),L("2.68",900,yAt(2.7),32)]);
+    const [log]=readPage(lines,1000,800);
+    expect(log.layers.map(l=>[l.from,l.to,l.description])).toEqual([
+      [1,3,"Brown clayey SAND, fine-grained, loose."],[3,4.6,"Gray CLAY, soft, high plasticity; but with shell fragments."],[4.6,6.45,"Yellowish brown sandy GRAVEL, dense."]]);
+    expect(log.flagged).toEqual([3,4.6]);
+    expect(log.layers[0].why).toBe("the change lies between the samples ending at 2.45 m and starting at 3 m; placed where the new description starts");
+    expect(log.layers[1].why).toBe("the log notes “Approx. change of stratum at 4.60 m.”; the samples end at 4.45 m and start again at 5 m");
+    expect(log.layers[2].flagged).toBeUndefined();
+    expect([log.id,log.final,log.water,log.ground]).toEqual(["BH-9",6.45,2.1,12.5]);
+    const [hole]=draftHoles(0,"log.pdf",readDocument([{page:1,width:1000,height:800,lines}]).logs);
+    expect(hole.samples).toBe(true);
+  });
+  it("skips runs that brought up nothing and joins runs described in the same words",()=>{
+    const lines=sheet(["BORING NO.: BH-2","FINAL DEPTH: 6.00 m."],[1,2,3,4,5,6,7,8,9,10],[
+      [at(1),"(1.0-2.0 m) Reddish brown gravelly SAND, dense."],[at(2),"(2.0-2.0 m) No penetration, test refused."],
+      [at(2)+16,"(2.0-3.0 m) No Recovery"],[at(3),"(3.0-4.0 m) Dark gray weathered BASALT, moderately strong."],
+      [at(4),"(4.0-5.0 m) Dark gray weathered BASALT, moderately strong."],[at(5),"(5.0-6.0 m) - same materials -"]]);
+    const [log]=readPage(lines,1000,800);
+    expect(log.layers.map(l=>[l.from,l.to,l.description,!!l.flagged])).toEqual([
+      [1,3,"Reddish brown gravelly SAND, dense.",true],[3,6,"Dark gray weathered BASALT, moderately strong.",false]]);
+  });
+  it("joins the sheets of one log, the last read below a note under the log and with its header unreadable",()=>{
+    const first=sheet(["BORING NO.: BH-9","SHEET NO. 1 of 2","GWT: 2.10 m."],[1,2,3,4,5,6,7,8,9,10],[
+      [at(1),"(1.0-1.45 m) Brown clayey SAND, loose."],[at(2),"(2.0-2.45 m) - same materials -"],[at(3),"(3.0-3.45 m) Gray CLAY, soft."]]);
+    // The last sheet runs from 4 m, its first label (5) below the last sample, with a note under the log close below
+    // it; its ID and sheet number are not read, its elevation and final depth are.
+    const y2=(d:number)=>200+40*(d-4);
+    const last=[L("ELEVATION: 12.50 m.",40,40),L("FINAL DEPTH: 4.45 m.",40,60),L("SAMPLE DESCRIPTION",300,150),
+      ...[5,6,7,8,9,10,11,12,13].map(d=>L(String(d),40,y2(d),10)),L("(4.0-4.45 m) - same materials -",300,y2(4)+8,217),
+      L("Note:",300,y2(4.6),35),L("* = field description",300,y2(5.2),140),L("End of Borehole @ 4.45 m.",300,y2(5.8),175)];
+    const r=readDocument([{page:1,width:1000,height:800,lines:first},{page:2,width:1000,height:800,lines:last}]);
+    expect(r.unread).toEqual([]);
+    expect(r.logs).toHaveLength(1);
+    const [log]=r.logs;
+    expect([log.id,log.pages,log.samples,log.water,log.ground,log.final]).toEqual(["BH-9",[1,2],true,2.1,12.5,4.45]);
+    expect(log.layers.map(l=>[l.from,l.to,l.description])).toEqual([[1,3,"Brown clayey SAND, loose."],[3,4.45,"Gray CLAY, soft."]]);
+  });
+});
+
+describe("text from a PDF's own text layer",()=>{
+  // Page pixels at twice the PDF's points, y down.
+  const view=[2,0,0,-2,0,1600];
+  const run=(str:string,x:number,y:number,width:number):PdfTextItem=>({str,transform:[9,0,0,9,x,y],width,height:9});
+  const texts=(items:PdfTextItem[])=>linesFromItems(items,view).map(l=>l.text);
+  it("reads text printed twice over itself once",()=>{
+    expect(texts([run("BOREHOLE NO.: BH-12",330,740,90),run("BOREHOLE NO.: BH-12",329.34,740,90)])).toEqual(["BOREHOLE NO.: BH-12"]);
+  });
+  it("starts a line where a column of a table starts, however close the text before it",()=>{
+    const lines=texts([
+      run("(6.0-6.45 m) Gray clayey SILT, low plasticity, firm,",110,700,174),run("S-6",290,700,18),run("Firm",313.5,700,17),
+      run("with some fine sand.",110,680,70),run("S-7",290,680,18),run("(Rec: 38/45 cm.)",110,660,60),run("S-8",290,660,18),
+      run("(8.0-8.45 m) - same materials -",110,640,110),run("S-9",290,640,18),
+      // Text set word by word, its words as far apart as the columns above, but where no line starts.
+      run("Samples",110,600,32),run("were",148,600,18),run("taken",172,600,24),run("daily",202,600,22)]);
+    expect(lines).toContain("(6.0-6.45 m) Gray clayey SILT, low plasticity, firm,");
+    expect(lines).toContain("S-6 Firm");
+    expect(lines).toContain("Samples were taken daily");
+  });
 });
 
 describe("header values",()=>{
@@ -120,6 +217,13 @@ describe("header values",()=>{
     expect(header([L("孔内水位",40,40,60),L("GL-9.80m",40,60,60)]).water).toBe(9.8);
     const table=[L("Date",40,40,40),L("Water Depth (m)",120,40,120),L("Mar 3, 2024",40,60,80),L("2.4",170,60,30),L("Mar 9, 2024",40,80,80),L("2.6",170,80,30)];
     expect(header(table).water).toBe(2.4);
+  });
+  it("reads water standing at ground level as a depth of 0, flagged, but not a heading beside a water heading",()=>{
+    expect(header([L("GWT: Ground level",40,40)])).toMatchObject({water:0,waterFlag:"read as “at ground level”: a depth of 0 m"});
+    expect(header([L("Water level",40,40),L("Ground level",200,40)]).water).toBeUndefined();
+  });
+  it("reads a header's elevation with its colon as the ground level",()=>{
+    expect(header([L("BORING NO.: BH-3",40,40),L("ELEVATION: 14.20 m.",40,60)])).toMatchObject({id:"BH-3",ground:14.2});
   });
 });
 
