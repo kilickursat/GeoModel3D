@@ -94,6 +94,32 @@ export function depthScale(els:TextLine[],width:number):DepthScale|null{
   return {a,b,kind:best.kind,labels:best.inl,depthAt:y=>(y-a)/b,yAt:d=>a+b*d};
 }
 
+// A log too short for its scale to show more than its top (a hand-auger hole to 0.9 m) may still print, at each
+// boundary, its elevation over its depth ("48.3" over "0.4"): pairs that add up to one ground level are depths, and
+// their places with the ground surface's give the scale. Only for a titled log whose numbers give no scale otherwise.
+export function pairScale(els:TextLine[],width:number):DepthScale|null{
+  const decs=els.filter(isDecimal),h=decs.map(e=>e.y1-e.y0).sort((a,b)=>a-b)[decs.length>>1]||12;
+  const pairs:Array<{depth:TextLine;sum:number}>=[];
+  for(const d of decs){
+    const e=decs.filter(e=>e!==d&&Math.abs(e.cx-d.cx)<0.05*width&&d.cy-e.cy>0.4*h&&d.cy-e.cy<2.5*h).sort((p,q)=>q.cy-p.cy)[0];
+    if(e&&num(d.text)<num(e.text))pairs.push({depth:d,sum:num(e.text)+num(d.text)});
+  }
+  let best:typeof pairs=[];
+  for(const p of pairs){const near=pairs.filter(q=>Math.abs(q.sum-p.sum)<=0.05);if(near.length>best.length)best=near}
+  if(best.length<2)return null;
+  const ground=best[0].sum,top=Math.min(...best.map(p=>p.depth.cy));
+  // The ground surface: its words, or its elevation alone above the first boundary.
+  const surface=els.find(e=>/^(?:ground surface|ground level|existing grade|top of (?:ground|hole))$/i.test(e.text.trim())&&e.cy<top)??
+    decs.find(e=>Math.abs(num(e.text)-ground)<=0.05&&e.cy<top);
+  if(!surface)return null;
+  const xs=[0,...best.map(p=>num(p.depth.text))],ys=[surface.cy,...best.map(p=>p.depth.cy)],n=xs.length;
+  if(new Set(xs).size<3)return null;
+  const mx=xs.reduce((s,v)=>s+v)/n,my=ys.reduce((s,v)=>s+v)/n;
+  const b=xs.reduce((s,v,k)=>s+(v-mx)*(ys[k]-my),0)/xs.reduce((s,v)=>s+(v-mx)**2,0),a=my-b*mx;
+  if(!(b>0)||xs.some((v,k)=>Math.abs(a+b*v-ys[k])>Math.max(1.5*h,0.15*b)))return null;
+  return {a,b,kind:"decimals",labels:best.map(p=>p.depth),depthAt:y=>(y-a)/b,yAt:d=>a+b*d};
+}
+
 // ---------- header values ----------
 
 // A header value. Every text matching the label is tried in turn until one gives a value that passes `ok`: the rest of
@@ -128,6 +154,9 @@ const DATE=/\d{1,2}[./-]\d{1,2}[./-]\d{2,4}/;
 const isId=(t:string)=>/^[A-Za-z.#\-]{0,6}\s?\d[\w.\-/]{0,12}$/.test(t.trim());
 const isNum=(t:string)=>/^\D{0,3}\d/.test(t)&&!DATE.test(t);
 const isDec=(t:string)=>/^\D{0,3}\d+[.,]\d/.test(t)&&!DATE.test(t);
+const REMARK=/^\s*\d+(?:[.,]\d+)?\s*m\s*:\s*\p{L}/u;
+// A thickness ("80mm ASPHALT", under "GROUND SURFACE") is no level.
+const isLevel=(t:string)=>isNum(t)&&!/^\D{0,3}\d+(?:[.,]\d+)?\s?(?:mm|cm)\b/i.test(t);
 
 // Page order: lines top to bottom, each left to right. Text within half a line height of a line's first item is on
 // that line, so two headings side by side keep their order whatever their boxes' heights. (A PDF's own text comes in
@@ -175,11 +204,12 @@ export function header(lines:TextLine[]):LogHeader&{mark?:number}{
     sheet:sheet?[+sheet[1],+sheet[2]]:undefined,
     // The ground level may stand before its words ("12.30 Ground Surface").
     // A header's "ELEVATION: 14.20 m" (with its colon, so not an elevation column's heading) is the ground level too.
-    ground:take("ground",fieldAt(els,/(?:ground (?:level|surface)|(?:ground|surface|collar) elev(?:ation)?\.?|maaiveld(?:hoogte)?|cote du terrain|niveau du sol|gel[äa]ndeh[öo]he|ansatzh[öo]he)(?![a-z])|^孔口標高|^地盤高/i,isNum)??fieldAt(els,/^elev(?:ation)?\.?\s*[:=]/i,isDec),firstNum),
+    ground:take("ground",fieldAt(els,/(?:ground (?:level|surface)|(?:ground|surface|collar) elev(?:ation)?\.?|maaiveld(?:hoogte)?|cote du terrain|niveau du sol|gel[äa]ndeh[öo]he|ansatzh[öo]he)(?![a-z])|^孔口標高|^地盤高/i,isLevel)??fieldAt(els,/^elev(?:ation)?\.?\s*[:=]/i,isDec),firstNum),
     // The depth the hole was taken to ("TERMINATION DEPTH (M) : 10.00", "END OF BOREHOLE AT 6.50 mbgs", 総掘進長).
     final:take("final",fieldAt(els,/^(?:termination(?:\s*depth)?|final depth|total depth|depth of (?:bore ?hole|hole)|hole depth|end of (?:bore ?hole|hole)(?: at)?)(?![a-z])|^総掘進長|^掘進長/i,isDec),firstNum),
     // A table of readings first, then a labelled value, then the water mark on the log.
-    water:take("water",reading??fieldAt(els,/^(?:groundwater|ground water|grondwater(?:stand)?|nappe|grundwasser|water level|w\.\s*l\.|gwl|gwt|g\.\s*w\.\s*t\.|swl|swt|static water(?: level| table)?)(?![a-z])|^孔内水位|^地下水位/i,isDec)??gwl,firstNum),
+    // A remark under a heading that names the water level ("0.6m: sample disturbed" in a comments column) is none.
+    water:take("water",reading??fieldAt(els,/^(?:groundwater|ground water|grondwater(?:stand)?|nappe|grundwasser|water level|w\.\s*l\.|gwl|gwt|g\.\s*w\.\s*t\.|swl|swt|static water(?: level| table)?)(?![a-z])|^孔内水位|^地下水位/i,t=>isDec(t)&&!REMARK.test(t))??gwl,firstNum),
     // "×" is a common reading of "X".
     x:take("x",match(/(?:^|[^A-Za-z])[X×]\s*[=:]?\s*(-?[\d.,]{4,})/m),firstNum),y:take("y",match(/(?:^|[^A-Za-z])Y\s*[=:]?\s*(-?[\d.,]{4,})/m),firstNum)};
   // Northing and easting where there is no X and Y. In UTM the northing is the one in millions: labels the other way
@@ -435,7 +465,7 @@ function closingText(els:TextLine[]):{description:string;src:TextLine[]}|undefin
 }
 
 export function rebuild(els:TextLine[],width:number,height=Infinity):PageLog{
-  const scale=depthScale(els,width),head=header(els),title=titled(els),evidence=logEvidence(els);
+  const title=titled(els),scale=depthScale(els,width)??(title?pairScale(els,width):null),head=header(els),evidence=logEvidence(els);
   const empty=(error:string,looks:boolean):PageLog=>({...head,kind:"scale",layers:[],used:new Set(),flagged:[],bounds:[],texts:[],error,evidence:looks});
   if(!scale){const closing=evidence?closingText(els):undefined;return {...empty("no depth scale found",evidence),...(closing?{closing}:{})}}
   // Numbers in a report's text or in a table of results can pass for a depth scale; a log page says it is one. Without
