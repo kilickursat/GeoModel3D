@@ -5,8 +5,9 @@
 
 // A line of text and its box, in page pixels (y down), and the page it is on once a document is read.
 export interface TextLine { text:string; x0:number; y0:number; x1:number; y1:number; cx:number; cy:number; page?:number }
-// A flagged layer says why its base depth needs checking.
-export interface ReadLayer { from:number; to:number; description:string; flagged?:boolean; why?:string; src:TextLine[] }
+// A flagged layer says why its base depth needs checking. `gap`: the untested interval its base lies in, where the
+// log describes samples (see sampleLayers).
+export interface ReadLayer { from:number; to:number; description:string; flagged?:boolean; why?:string; gap?:[number,number]; src:TextLine[] }
 export type HeaderField="id"|"ground"|"final"|"water"|"x"|"y"|"lat"|"lon";
 // `src` keeps the line each header value was read from.
 export interface LogHeader {
@@ -418,7 +419,7 @@ function sampleLayers(samples:Sample[],final?:number):{layers:ReadLayer[];flagge
         if(x.from-reached>0.05){
           const noted=changes.find(c=>c.depth>=reached-0.005&&c.depth<=x.from+0.005);
           if(noted)from=noted.depth;
-          last.flagged=true;
+          last.flagged=true;last.gap=[+reached.toFixed(3),x.from];
           last.why=noted?`the log notes “${noted.note}”; the samples end at ${+reached.toFixed(3)} m and start again at ${x.from} m`
             :`the change lies between the samples ending at ${+reached.toFixed(3)} m and starting at ${x.from} m; placed where the new description starts`;
           flagged.push(from);

@@ -17,7 +17,8 @@ export const FIELDS:Array<{key:Field;label:string;numeric:boolean}>=[
 ];
 // `flag` says why the reader is unsure of the layer's base depth; `autoUnit` is set while the unit is the rules' choice,
 // so it follows an edited description.
-export interface DraftLayer { from:string; to:string; unit:string; description:string; flag?:string; autoUnit:boolean; src:TextLine[]; evidence?:EvidenceRecord }
+// `gap`: where a log describes samples, the untested interval its base lies in.
+export interface DraftLayer { from:string; to:string; unit:string; description:string; flag?:string; gap?:[number,number]; autoUnit:boolean; src:TextLine[]; evidence?:EvidenceRecord }
 // `ocr`: read by the reading model, not from the document's own text, and `ocrWhy` why (a scanned page, unusable PDF
 // text). `samples`: the layers were read from the sample depths that start the descriptions.
 export interface DraftHole {
@@ -56,7 +57,7 @@ export function draftHoles(doc:number,file:string,logs:ReadLog[],scanned:Readonl
         ground:text(log.ground),final:text(log.final),water:text(log.water)},
       flags,src:{...log.src},
       layers:log.layers.map(l=>({from:text(l.from),to:text(l.to),unit:unitFor(l.description),description:l.description,
-        ...(l.flagged?{flag:l.why??"check this depth against the page"}:{}),autoUnit:true,src:l.src}))};
+        ...(l.flagged?{flag:l.why??"check this depth against the page"}:{}),...(l.gap?{gap:l.gap}:{}),autoUnit:true,src:l.src}))};
   });
 }
 
@@ -103,6 +104,10 @@ export function captureDraftEvidence(holes:DraftHole[],sources:EvidenceSource[],
 export interface Check { hole:number; field?:Field; layer?:number; level:"error"|"warn"|"note"; text:string }
 export function checkDraft(holes:DraftHole[]):Check[]{
   const out:Check[]=[],used=holes.filter(h=>h.use),many=used.length>1;
+  const placed=(h:DraftHole)=>{const x=num(h.values.x),y=num(h.values.y),la=num(h.values.lat),lo=num(h.values.lon),ok=(v:number|undefined)=>v!==undefined&&Number.isFinite(v);return (ok(x)&&ok(y))||(ok(la)&&ok(lo))};
+  // Where no borehole in use has a position, that is said once: the model cannot place any of them.
+  const nowhere=many&&!used.some(placed);
+  if(nowhere)out.push({hole:holes.indexOf(used[0]),field:"x",level:"warn",text:`No borehole has a position: none of the ${used.length} boreholes in use gives an easting and northing, or a latitude and longitude, so the model cannot place them. Type them here, or under Input data.`});
   const named=new Map<string,number>();
   for(const h of used){const id=h.values.id.trim();if(id)named.set(id,(named.get(id)??0)+1)}
   holes.forEach((h,i)=>{
@@ -121,7 +126,7 @@ export function checkDraft(holes:DraftHole[]):Check[]{
     if(v.lon!==undefined&&Math.abs(v.lon)>180)add("error","Longitude: it lies between −180 and 180.",{field:"lon"});
     const has=(k:Field)=>v[k]!==undefined&&Number.isFinite(v[k]);
     // One borehole on its own needs neither a position nor a ground level (Input data places it at 0, 0 and 0 m).
-    if(many&&!(has("x")&&has("y"))&&!(has("lat")&&has("lon")))add("warn","No position: type an easting and northing, or a latitude and longitude, or this borehole is not placed with the others.",{field:"x"});
+    if(many&&!nowhere&&!(has("x")&&has("y"))&&!(has("lat")&&has("lon")))add("warn","No position: type an easting and northing, or a latitude and longitude, or this borehole is not placed with the others.",{field:"x"});
     if(many&&!has("ground")&&!Number.isNaN(v.ground))add("warn","No ground level: type it, or this borehole is not placed.",{field:"ground"});
     const valid:Array<{l:DraftLayer;k:number;from:number;to:number}>=[];
     h.layers.forEach((l,k)=>{
@@ -133,11 +138,20 @@ export function checkDraft(holes:DraftHole[]):Check[]{
     valid.sort((p,q)=>p.from-q.from);
     if(!valid.length){add("error",h.layers.length?"No layer has depths that can be used: correct them, or leave this borehole out.":"No layers: add them, or leave this borehole out.");return}
     if(valid[0].from>0)add("note",`The log starts at ${fmt(valid[0].from)} m: nothing is logged above it.`,{layer:valid[0].k});
+    // Boundaries between samples are one check per log: each keeps its own gap and reason on its layer. A gap much
+    // wider than the log's usual one is a check of its own.
+    const between=valid.filter(q=>q.l.flag&&q.l.gap),widths=between.map(q=>q.l.gap![1]-q.l.gap![0]).sort((a,b)=>a-b);
+    const usual=widths[widths.length>>1]??0,wide=(q:typeof valid[number])=>q.l.gap![1]-q.l.gap![0]>Math.max(1,2*usual)+0.005;
+    const grouped=between.length>=2?between.filter(q=>!wide(q)):[];
+    if(grouped.length){
+      const lo=Math.min(...grouped.map(q=>q.l.gap![1]-q.l.gap![0])),hi=Math.max(...grouped.map(q=>q.l.gap![1]-q.l.gap![0]));
+      add("warn",`${grouped.length} layer boundaries lie between samples, in untested gaps of ${fmt(lo)}${hi>lo+0.005?`–${fmt(hi)}`:""} m: each is placed at the top of the sample with the new description, or where the log notes the change, and is marked on its layer.`,{layer:grouped[0].k});
+    }
     valid.forEach((q,j)=>{
       const prev=valid[j-1];
       if(prev&&q.from>prev.to+0.005)add("warn",`A gap from ${fmt(prev.to)} to ${fmt(q.from)} m: no layer is there.`,{layer:q.k});
       if(prev&&q.from<prev.to-0.005)add("warn",`Layers overlap from ${fmt(q.from)} to ${fmt(Math.min(prev.to,q.to))} m.`,{layer:q.k});
-      if(q.l.flag)add("warn",`${fmt(q.to)} m: ${q.l.flag}.`,{layer:q.k});
+      if(q.l.flag&&!grouped.includes(q))add("warn",`${fmt(q.to)} m: ${q.l.flag}${q.l.gap&&between.length>=2?`; a wider gap than this log's usual ${fmt(usual)} m`:""}.`,{layer:q.k});
       if(!q.l.unit.trim())add("error",`Layer ${fmt(q.from)}–${fmt(q.to)} m: no unit. Type one, or a description.`,{layer:q.k});
       else if(q.l.autoUnit&&q.l.unit===q.l.description.trim()&&q.l.unit.length>24)add("note",`Layer ${fmt(q.from)}–${fmt(q.to)} m: no rule gives its description a unit, so the description is its unit. Type a shorter one.`,{layer:q.k});
     });
