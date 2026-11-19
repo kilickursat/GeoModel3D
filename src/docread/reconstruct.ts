@@ -329,10 +329,23 @@ function thinStack(layers:ReadLayer[]):number[]{
   if(!fills)made.push({from:thin[thin.length-1].to,to:first.to,description:first.description,src:[]});
   else if(first.description&&layers[1]&&TITLE.test(first.description))layers[1].description=(first.description+" "+layers[1].description).trim();
   else if(first.description)made[made.length-1].description+=": "+first.description;
+  for(const l of made.slice(0,thin.length))THIN_MADE.add(l);
   layers.splice(0,1,...made);
   return made.map(l=>l.to).filter(v=>v!==first.to);
 }
 const THIN="from the thicknesses written in the descriptions";
+// The layers made from thicknesses. Where the rest of the first interval is still empty once the titles are dealt (see
+// fixTitles), nothing else is described there: the last thin layer reaches the boundary written below it, flagged, as
+// the log draws its base there though its thickness says less.
+const THIN_MADE=new WeakSet<ReadLayer>();
+function absorbRest(layers:ReadLayer[]){
+  for(let k=1;k<layers.length;k++){
+    const above=layers[k-1],rest=layers[k];
+    if(!THIN_MADE.has(above)||rest.description.trim()||THIN_MADE.has(rest))continue;
+    above.flagged=true;above.why=`its thickness as written ends at ${above.to} m; the boundary below it is written at ${rest.to} m`;
+    above.to=rest.to;layers.splice(k,1);k--;
+  }
+}
 
 // Each layer's evidence: the depth written at its base and the lines whose text is in its description, taken from the
 // lines at the layer's depths (`depth` of a line, where known), so two layers with the same description keep their own;
@@ -636,6 +649,7 @@ export function rebuild(els:TextLine[],width:number,height=Infinity):PageLog{
   }
   for(const v of thinStack(layers)){flagged.push(v);why.set(v,THIN)}
   fixTitles(layers);
+  absorbRest(layers);
   layers.forEach(l=>{if(flagged.includes(l.to)){l.flagged=true;l.why=why.get(l.to)}});
   attach(layers,lines,labels,depthOf);
   // Logs that print each boundary's elevation beside its depth give the ground level as elevation + depth, many times
@@ -740,6 +754,7 @@ export function rebuildTable(els:TextLine[],width:number):PageLog{
   const used=new Set<TextLine>([f,t,...chain.flatMap(r=>r.els),...described]);
   const flagged=thinStack(layers);
   fixTitles(layers);
+  absorbRest(layers);
   layers.forEach(l=>{if(flagged.includes(l.to)){l.flagged=true;l.why=THIN}});
   attach(layers,lines,chain.map(r=>r.els[1]),depth);
   return {...head,kind:"table",layers,used,flagged,bounds:layers.map(l=>l.to),texts:[],evidence:true};
@@ -807,6 +822,7 @@ function joinBody(pages:Array<PageLog&{page:number}>,head:LogHeader,at:number[],
   const flagged=pages.flatMap(p=>p.flagged),reasons=pages.flatMap(p=>p.layers).filter(l=>l.why),thin=thinStack(layers);
   for(const v of thin)if(!flagged.includes(v))flagged.push(v);
   fixTitles(layers);
+  absorbRest(layers);
   layers.forEach(l=>{if(flagged.includes(l.to)){l.flagged=true;l.why=thin.includes(l.to)?THIN:reasons.find(r=>Math.abs(r.to-l.to)<0.03)?.why}});
   const textDepth=new Map(pages.flatMap(p=>p.texts.map(t=>[t.src,t.depth] as const)));
   attach(layers,[...textDepth.keys()],pages.flatMap(p=>[...p.used].filter(e=>/[.,]\d/.test(e.text))),e=>textDepth.get(e));
