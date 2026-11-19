@@ -5,7 +5,7 @@
 // anywhere else. Scripts in a PDF never run: PDF.js 6 has no eval path, and its scripting is not used.
 import * as pdfjs from "pdfjs-dist";
 import workerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
-import {linesFromItems,textChars,PdfTextItem} from "./textlines";
+import {linesFromItems,textChars,judgeText,PdfTextItem,TextLayer} from "./textlines";
 import type {TextLine} from "./reconstruct";
 
 pdfjs.GlobalWorkerOptions.workerSrc=workerUrl;
@@ -69,12 +69,14 @@ export async function openPdf(name:string,data:Uint8Array):Promise<Doc&{doc:pdfj
   };
 }
 
-export interface PageText { page:number; width:number; height:number; lines:TextLine[]; scanned:boolean }
+// `layer` says whether the page's own text can be used (see judgeText); `share` is how much of it reads as words.
+export interface PageText { page:number; width:number; height:number; lines:TextLine[]; scanned:boolean; layer?:TextLayer; share?:number }
 export async function pageText(d:Doc&{doc:pdfjs.PDFDocumentProxy},n:number):Promise<PageText>{
   const page=await d.doc.getPage(n),view=page.getViewport({scale:READ_SCALE});
   // Marked-content items have no text; linesFromItems passes over them.
   const items=(await page.getTextContent()).items as unknown as PdfTextItem[];
-  const text={page:n,width:view.width,height:view.height,lines:linesFromItems(items,view.transform),scanned:textChars(items)<MIN_CHARS};
+  const judged=judgeText(items.map(i=>i.str??""),textChars(items),MIN_CHARS);
+  const text={page:n,width:view.width,height:view.height,lines:linesFromItems(items,view.transform),scanned:judged.layer==="none",layer:judged.layer,share:judged.share};
   page.cleanup();
   return text;
 }

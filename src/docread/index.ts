@@ -1,24 +1,35 @@
 // Borehole logs read from documents on this device, loaded only when one is dropped or picked (and the user has agreed):
-// each PDF is opened with PDF.js and the text of each page read; pages without text (scans), log pages whose text gives
-// no depth scale (a typed header over a scanned log) and images are read by the reading model (OCR) instead. All pages
-// of a document then go through the reconstruction together (reconstruct.ts), so a log can run on over pages, and the
-// review opens on the logs. What is being read shows as it goes; Cancel stops it, the reading model too.
+// each PDF is opened with PDF.js and the text of each page read. The reading model (OCR) reads instead: pages without
+// text (scans), pages whose text is unusable (fonts without a map to characters give text that is not text), log pages
+// whose text gives no depth scale (a typed header over a scanned log), and images. A page whose text is doubtful is read
+// by both, and its own text kept where OCR confirms it. All pages of a document then go through the reconstruction
+// together (reconstruct.ts), so a log can run on over pages, and the review opens on the logs. What is being read shows
+// as it goes; Cancel stops it, the reading model too. In the review, any page read from its text can be read again by
+// OCR on request: the document's logs are then read again.
 import {openPdf,openImage,pageText,PageText,Doc} from "./pdftext";
 import {readDocument,textLine} from "./reconstruct";
 import {draftHoles,DraftHole} from "./draft";
-import {createReview,ReviewHost,Unread} from "./review";
+import {createReview,ReviewHost,Unread,OcrRead} from "./review";
 import {createOcr,Ocr} from "./ocrclient";
+import {agreement} from "./textlines";
 import {newEvidenceId,EvidenceSource} from "../evidence";
 
 export const isImage=(f:File)=>/\.(png|jpe?g|webp)$/i.test(f.name)||/^image\/(png|jpeg|webp)$/.test(f.type);
 const mb=(n:number)=>(n/1e6).toFixed(n<1e7?1:0);
+const pct=(v:number)=>`${Math.round(100*v)} %`;
+// Where OCR confirms at least this share of a doubtful page's words, the page keeps its own text (and its exact boxes).
+const CONFIRMED=0.6;
+
+// What the reader keeps of each document for reading pages again: the pages as read, which were read by OCR and why.
+interface DocState { d:Doc; file:string; pages:PageText[]; read:Set<number>; why:Map<number,string> }
 
 export async function readPdfs(files:File[],host:ReviewHost){
   const review=createReview(host);
   document.body.appendChild(review.element);
-  const holes:DraftHole[]=[],unread:Unread[]=[],problems:string[]=[];
+  const holes:DraftHole[]=[],unread:Unread[]=[],problems:string[]=[],states:DocState[]=[];
   const reader:{ocr:Ocr|null;backend:string;status:string}={ocr:null,backend:"",status:""};
-  review.onClose(()=>reader.ocr?.close());
+  const stopOcr=()=>{reader.ocr?.close();reader.ocr=null};
+  review.onClose(stopOcr);
   // The reading model starts with the first page that needs it, downloading the model the first time.
   const startOcr=async()=>{
     if(!reader.ocr){
@@ -29,10 +40,31 @@ export async function readPdfs(files:File[],host:ReviewHost){
       });
       review.progress("Starting the reading model…");
     }
-    const on=await reader.ocr.ready;
-    // Where the model reads, for the progress line: "WebGPU, nvidia"; nothing on the processor.
-    reader.backend=on.backend==="webgpu"?`WebGPU${on.gpu?`, ${on.gpu}`:""}`:"";
+    try{
+      const on=await reader.ocr.ready;
+      // Where the model reads, for the progress line: "WebGPU, nvidia"; nothing on the processor.
+      reader.backend=on.backend==="webgpu"?`WebGPU${on.gpu?`, ${on.gpu}`:""}`:"";
+    }catch(err){stopOcr();throw err}
     return reader.ocr;
+  };
+  // A page read by OCR, as a page of lines in the pixels it was read in.
+  const ocrPage=async(doc:number,s:DocState,n:number):Promise<PageText>=>{
+    const ocr=await startOcr();
+    reader.status=`Reading ${s.file}${s.d.pages>1?`: page ${n} of ${s.d.pages}`:""} by OCR${reader.backend?` (${reader.backend})`:""}`;
+    review.progress(reader.status+"…");
+    const img=await s.d.image(n),lines=await ocr.read(img);
+    // The boxes on the review's page are in the pixels the page was read in.
+    review.size(doc,n,img.width,img.height);
+    return {page:n,width:img.width,height:img.height,scanned:true,lines:lines.map(l=>textLine(l.text,l.x0,l.y0,l.x1,l.y1))};
+  };
+  const put=(s:DocState,t:PageText)=>{const at=s.pages.findIndex(p=>p.page===t.page);if(at>=0)s.pages.splice(at,1);s.pages.push(t)};
+  // The logs of a document as read so far, for the review.
+  const result=(doc:number,s:DocState)=>{
+    s.pages.sort((a,b)=>a.page-b.page);
+    const r=readDocument(s.pages);
+    return {holes:draftHoles(doc,s.file,r.logs,s.read,s.why),
+      unread:r.unread.map(u=>({doc,page:u.page,id:u.id,error:u.error,log:u.log,text:!s.read.has(u.page)&&s.d.kind==="pdf"})) as Unread[],
+      ocr:[...s.why].filter(([n])=>s.read.has(n)).map(([page,why])=>({doc,page,why})) as OcrRead[]};
   };
   for(const f of files){
     if(review.closed)return;
@@ -49,48 +81,67 @@ export async function readPdfs(files:File[],host:ReviewHost){
     }
     catch(err){problems.push(`${f.name}: not read, as ${(err as Error).message}.`);continue}
     if(review.closed){void d.close();return}
-    const doc=review.addDoc(d,source),pages:PageText[]=[],scan:number[]=[];
-    if(image){review.size(doc,1,image.width,image.height);scan.push(1)}
+    const doc=review.addDoc(d,source),s:DocState={d,file:f.name,pages:[],read:new Set(),why:new Map()};
+    states[doc]=s;
+    // The pages to read by OCR, and those whose text OCR should confirm.
+    const scan:number[]=[],doubt:number[]=[];
+    if(image){review.size(doc,1,image.width,image.height);scan.push(1);s.why.set(1,"an image")}
     else if(pdf)for(let n=1;n<=pdf.pages;n++){
       if(review.closed)return;
       review.progress(`Reading ${f.name}: page ${n} of ${pdf.pages}`);
       try{
         const t=await pageText(pdf,n);
         review.size(doc,n,t.width,t.height);
-        if(t.scanned)scan.push(n);else pages.push(t);
+        if(t.layer==="none"){scan.push(n);s.why.set(n,"a scanned page")}
+        else if(t.layer==="garbled"){scan.push(n);s.why.set(n,`unusable PDF text (${pct(t.share??0)} of it reads as words)`)}
+        else{s.pages.push(t);if(t.layer==="doubtful")doubt.push(n)}
       }catch(err){unread.push({doc,page:n,error:`it could not be read (${(err as Error).message})`})}
     }
-    // A log page whose text gives no depth scale may carry the log as an image: it is read by OCR too.
-    for(const u of readDocument(pages).unread)if(u.log&&u.error==="no depth scale found"&&!scan.includes(u.page))scan.push(u.page);
+    // A log page whose text gives no depth scale may carry the log as an image (a typed header over a scanned log): it is
+    // read by OCR too, unless its text is prose (five lines or more of eight words or more), as a page of a report is.
+    const prose=(n:number)=>(s.pages.find(p=>p.page===n)?.lines??[]).filter(l=>l.text.trim().split(/\s+/).length>=8).length>=5;
+    for(const u of readDocument(s.pages).unread)if(u.log&&u.error==="no depth scale found"&&!scan.includes(u.page)&&!doubt.includes(u.page)&&!prose(u.page)){
+      scan.push(u.page);s.why.set(u.page,"a log page whose text gives no depth scale");
+    }
     scan.sort((a,b)=>a-b);
-    const read=new Set<number>();
-    if(scan.length){
-      let why="",ocr:Ocr|undefined;
-      try{ocr=await startOcr()}catch(err){why=`the reading model could not start (${(err as Error).message})`}
-      for(const n of scan){
-        if(review.closed)return;
-        if(!ocr){if(!pages.some(p=>p.page===n))unread.push({doc,page:n,scanned:true,error:why});continue}
-        reader.status=`Reading ${f.name}${d.pages>1?`: page ${n} of ${d.pages}`:""} by OCR${reader.backend?` (${reader.backend})`:""}`;
-        review.progress(reader.status+"…");
-        try{
-          const img=await d.image(n),lines=await ocr.read(img);
-          // The boxes on the review's page are in the pixels the page was read in.
-          review.size(doc,n,img.width,img.height);
-          const at=pages.findIndex(p=>p.page===n);
-          if(at>=0)pages.splice(at,1);
-          pages.push({page:n,width:img.width,height:img.height,scanned:true,lines:lines.map(l=>textLine(l.text,l.x0,l.y0,l.x1,l.y1))});
-          read.add(n);
-        }catch(err){
-          if(review.closed)return;
-          if(!pages.some(p=>p.page===n))unread.push({doc,page:n,scanned:true,error:`the reading model failed (${(err as Error).message})`});
+    let failed="";
+    for(const n of [...scan,...doubt]){
+      if(review.closed)return;
+      const text=s.pages.find(p=>p.page===n);
+      if(failed){if(!text)unread.push({doc,page:n,scanned:true,error:failed});continue}
+      try{
+        const read=await ocrPage(doc,s,n);
+        if(doubt.includes(n)&&text){
+          // Doubtful text: kept where OCR reads the same words, replaced where it does not.
+          const agree=agreement(text.lines.map(l=>l.text),read.lines.map(l=>l.text));
+          if(agree>=CONFIRMED){review.size(doc,n,text.width,text.height);continue}
+          s.why.set(n,`PDF text that OCR did not confirm (${pct(agree)} of its words read the same)`);
         }
+        put(s,read);s.read.add(n);
+      }catch(err){
+        if(review.closed)return;
+        const started=reader.ocr!==null;
+        if(!started)failed=`the reading model could not start (${(err as Error).message})`;
+        if(!text)unread.push({doc,page:n,scanned:true,error:started?`the reading model failed (${(err as Error).message})`:failed});
+        else if(doubt.includes(n))review.size(doc,n,text.width,text.height);
       }
     }
-    pages.sort((a,b)=>a.page-b.page);
-    const result=readDocument(pages);
-    holes.push(...draftHoles(doc,f.name,result.logs,read));
-    for(const u of result.unread)unread.push({doc,page:u.page,id:u.id,error:u.error,log:u.log});
+    const r=result(doc,s);
+    holes.push(...r.holes);
+    unread.push(...r.unread);
+    review.ocrRead(r.ocr);
   }
-  reader.ocr?.close();
-  if(!review.closed)review.show(holes,unread.sort((a,b)=>a.doc-b.doc||a.page-b.page),problems);
+  stopOcr();
+  if(review.closed)return;
+  // A page read from its text, read again by OCR on request: the document's logs are read again.
+  review.onReread(async(doc,page)=>{
+    const s=states[doc];
+    if(!s)throw new Error("this document is no longer open");
+    try{
+      put(s,await ocrPage(doc,s,page));
+      s.read.add(page);s.why.set(page,"read by OCR on request");
+      return result(doc,s);
+    }finally{stopOcr()}
+  });
+  review.show(holes,unread.sort((a,b)=>a.doc-b.doc||a.page-b.page),problems);
 }

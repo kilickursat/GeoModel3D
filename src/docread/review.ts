@@ -12,7 +12,12 @@ import {newEvidenceId,changeEvidenceField,acceptEvidenceField,EvidenceSource,Evi
 
 export interface ReviewHost { onUse(tables:EditorTables,message:string,notes:string[]):boolean|void; onClose():void }
 // A page no log was read from: a scanned image, a page that looked like a log but could not be read, or any other.
-export interface Unread { doc:number; page:number; id?:string; error:string; scanned?:boolean; log?:boolean }
+// `text`: the page was read from its own text, so it can be read by OCR on request.
+export interface Unread { doc:number; page:number; id?:string; error:string; scanned?:boolean; log?:boolean; text?:boolean }
+// A page read by OCR, and why ("a scanned page", "unusable PDF text (2 % of it reads as words)").
+export interface OcrRead { doc:number; page:number; why:string }
+// Reads a page of a document by OCR on request, and gives the document's logs read again.
+export type Rereader=(doc:number,page:number)=>Promise<{holes:DraftHole[];unread:Unread[];ocr:OcrRead[]}>;
 
 const esc=(s:string)=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]!));
 const plural=(n:number,word:string)=>`${n} ${word}${n===1?"":"s"}`;
@@ -24,7 +29,10 @@ export function createReview(host:ReviewHost){
   let holes:DraftHole[]=[],checks:Check[]=[],unread:Unread[]=[],problems:string[]=[];
   let current=0,active="",edited=false,closed=false,ready=false,timer:ReturnType<typeof setTimeout>|undefined;
   const view={doc:0,page:1,zoom:0};
-  let job:{cancel():void}|null=null,shown="",saving=false;
+  let job:{cancel():void}|null=null,shown="",saving=false,busy=false;
+  let rereader:Rereader|null=null;
+  // The pages read by OCR, by `doc#page`, and why.
+  const ocrDone=new Map<string,string>();
   let captureJob:{cancel():void}|null=null;
 
   const el=document.createElement("section");
@@ -37,12 +45,14 @@ export function createReview(host:ReviewHost){
 <div class="dr-main">
   <div class="dr-side"><div class="dr-checks"></div><div class="dr-tabs" role="tablist" aria-label="Boreholes read"></div><div class="dr-hole" role="tabpanel"></div><div class="dr-unread"></div></div>
   <div class="dr-view"><div class="dr-bar"><button class="dr-prev" aria-label="Previous page">‹</button><span class="dr-pageno"></span><button class="dr-next" aria-label="Next page">›</button>
+    <span class="dr-readby"></span><button class="dr-ocr" title="Read this page by OCR instead of its own text" hidden>Read by OCR</button>
     <span class="dr-gap"></span><button class="dr-zoom" data-zoom="-1" aria-label="Zoom out">−</button><button class="dr-zoom" data-zoom="0">Fit width</button><button class="dr-zoom" data-zoom="1" aria-label="Zoom in">+</button></div>
     <div class="dr-scroll"><div class="dr-sheet"><canvas></canvas><div class="dr-boxes"></div></div><p class="dr-page-note"></p></div></div>
 </div><datalist id="dr-units"></datalist>`;
   const $=<T extends Element>(s:string)=>el.querySelector<T&HTMLElement>(s)!;
   const sub=$(".dr-sub"),sayEl=$(".dr-say"),useButton=$<HTMLButtonElement>(".dr-use"),checksEl=$(".dr-checks"),tabs=$(".dr-tabs"),panel=$(".dr-hole"),unreadEl=$(".dr-unread");
   const scroller=$(".dr-scroll"),sheet=$(".dr-sheet"),boxes=$(".dr-boxes"),pageNo=$(".dr-pageno"),pageNote=$(".dr-page-note");
+  const readBy=$(".dr-readby"),ocrButton=$<HTMLButtonElement>(".dr-ocr");
   const say=(text:string)=>{sayEl.textContent=text};
 
   // ---------- the side: checks, boreholes, the borehole shown, pages not read ----------
@@ -84,7 +94,7 @@ export function createReview(host:ReviewHost){
         l.flag?`<tr class="dr-why" data-key="${key}"><td></td><td colspan="5">${esc(l.to)} m: ${esc(l.flag)} <button class="dr-ok" data-ok="${key}">Looks right</button></td></tr>`:""}`;
     };
     panel.innerHTML=`<div class="dr-fields">${FIELDS.map(field).join("")}</div>
-<div class="dr-layers-head"><b>Layers</b><span>${h.kind==="table"?"read from the From and To columns of a table":h.samples?"read from the sample depths that start the descriptions, by the depth scale on the page":"read by the depth scale on the page"}${h.ocr?", by OCR from a scanned page":""}</span><button class="dr-add">Add layer</button></div>
+<div class="dr-layers-head"><b>Layers</b><span>${h.kind==="table"?"read from the From and To columns of a table":h.samples?"read from the sample depths that start the descriptions, by the depth scale on the page":"read by the depth scale on the page"}${h.ocr?`, by OCR (${esc(h.ocrWhy??"a scanned page")})`:""}</span><button class="dr-add">Add layer</button></div>
 <div class="dr-table-wrap"><table class="dr-layers"><thead><tr><th></th><th>From (m)</th><th>To (m)</th><th>Unit</th><th>Description</th><th></th></tr></thead><tbody>${h.layers.map(layer).join("")}</tbody></table>${
       h.layers.length?"":'<p class="dr-empty">No layers: add them, or leave this borehole out.</p>'}</div>`;
     $("#dr-units").innerHTML=[...new Set([...holes.flatMap(h=>h.layers.map(l=>l.unit.trim())),...RULE_UNITS])].filter(Boolean).map(u=>`<option value="${esc(u)}">`).join("");
@@ -100,11 +110,29 @@ export function createReview(host:ReviewHost){
         const pages=scanned.filter(u=>u.error===why).map(u=>u.page);
         parts.push(`<li>${esc(name)}${pages.length===1?"Page":"Pages"} ${pageRanges(pages)}: scanned, not read: ${esc(why)}.</li>`);
       }
-      for(const u of logs)parts.push(`<li>${esc(name)}${go(u)}${u.id?` (${esc(u.id)})`:""}: looks like a log, but ${esc(u.error)}.</li>`);
+      for(const u of logs)parts.push(`<li>${esc(name)}${go(u)}${u.id?` (${esc(u.id)})`:""}: looks like a log, but ${esc(u.error)}.${
+        u.text&&rereader?` <button class="dr-ocr-page" data-reread-doc="${i}" data-reread-page="${u.page}">Read by OCR</button>`:""}</li>`);
       if(other.length)parts.push(`<li>${esc(name)}${other.length===1?"Page":"Pages"} ${pageRanges(other)}: no borehole log found.</li>`);
     });
     const n=unread.length;
-    unreadEl.innerHTML=parts.length?`<details${holes.length?"":" open"}><summary>${n?`${plural(n,"page")} not read`:"Not read"}</summary><ul>${parts.join("")}</ul></details>`:"";
+    // The pages read by OCR, grouped by why: a reason with a share in it ("2 % of it reads as words") gives the range.
+    const read:string[]=[];
+    docs.forEach((d,i)=>{
+      const name=docs.length>1?`${d.name}: `:"",groups=new Map<string,{pages:number[];shares:number[]}>();
+      for(const [k,why] of ocrDone){
+        const [doc,page]=k.split("#").map(Number);
+        if(doc!==i)continue;
+        const share=/(\d+) %/.exec(why),g=why.replace(/\d+ %/,"#");
+        const e=groups.get(g)??{pages:[],shares:[]};e.pages.push(page);if(share)e.shares.push(+share[1]);groups.set(g,e);
+      }
+      for(const [g,e] of groups){
+        const lo=Math.min(...e.shares),hi=Math.max(...e.shares),why=e.shares.length?g.replace("#",lo===hi?`${lo} %`:`${lo}–${hi} %`):g;
+        read.push(`<li>${esc(name)}${e.pages.length===1?"Page":"Pages"} ${pageRanges(e.pages)}: ${esc(why)}.</li>`);
+      }
+    });
+    const m=ocrDone.size;
+    unreadEl.innerHTML=(read.length?`<details><summary>${plural(m,"page")} read by OCR</summary><ul>${read.join("")}</ul></details>`:"")+
+      (parts.length?`<details${holes.length?"":" open"}><summary>${n?`${plural(n,"page")} not read`:"Not read"}</summary><ul>${parts.join("")}</ul></details>`:"");
   }
   function renderAll(){checks=checkDraft(holes);renderChecks();renderTabs();renderHole();renderUnread()}
   // The checks follow the typing, without redrawing the field being typed in.
@@ -126,6 +154,11 @@ export function createReview(host:ReviewHost){
     pageNo.textContent=`Page ${view.page} of ${d.pages}${docs.length>1?` · ${d.name}`:""}`;
     $<HTMLButtonElement>(".dr-prev").disabled=view.page<=1;
     $<HTMLButtonElement>(".dr-next").disabled=view.page>=d.pages;
+    // How this page was read: by OCR, and why; or from its own text, which can be read by OCR instead.
+    const by=ocrDone.get(key(view.doc,view.page));
+    readBy.textContent=by?`Read by OCR: ${by}`:"";
+    ocrButton.hidden=!!by||!rereader||d.kind!=="pdf";
+    ocrButton.disabled=busy;
     const size=sizes.get(key(view.doc,view.page))??{width:1275,height:1650};
     const fit=Math.max(240,scroller.clientWidth-24),css=Math.round(fit*(ZOOMS[view.zoom]??1));
     sheet.style.width=`${css}px`;
@@ -217,6 +250,8 @@ export function createReview(host:ReviewHost){
     if(boxEl){go(current,boxEl.dataset.key!);return}
     if(!b)return;
     if(b.classList.contains("dr-cancel")){cancel();return}
+    if(b.classList.contains("dr-ocr")){void reread(view.doc,view.page);return}
+    if(b.dataset.rereadPage){void reread(Number(b.dataset.rereadDoc),Number(b.dataset.rereadPage));return}
     if(b.classList.contains("dr-use")){void use();return}
     if(b.dataset.go!==undefined){go(Number(b.dataset.hole),b.dataset.go);return}
     if(b.dataset.hole!==undefined){select(Number(b.dataset.hole));return}
@@ -263,6 +298,31 @@ export function createReview(host:ReviewHost){
     if(k&&k!==active)setActive(k);
   });
   el.addEventListener("keydown",e=>{if(e.key==="Escape"&&!(e.target as Element).closest("input,textarea,select")){e.stopPropagation();cancel()}});
+
+  // ---------- reading a page again by OCR ----------
+
+  // The page is read by OCR and the document's logs read again; the corrections made to its boreholes are lost, so
+  // that is asked first where any were made.
+  async function reread(doc:number,page:number){
+    if(!rereader||busy||saving)return;
+    if(edited&&holes.some(h=>h.doc===doc)&&!confirm(`Read page ${page} by OCR? The boreholes of ${docs[doc].name} are read again, and the corrections made to them are lost.`))return;
+    busy=true;showPage();say(`Reading page ${page} of ${docs[doc].name} by OCR…`);
+    try{
+      const r=await rereader(doc,page);
+      if(closed)return;
+      holes=[...holes.filter(h=>h.doc<doc),...r.holes,...holes.filter(h=>h.doc>doc)];
+      unread=[...unread.filter(u=>u.doc!==doc),...r.unread].sort((a,b)=>a.doc-b.doc||a.page-b.page);
+      for(const k of [...ocrDone.keys()])if(k.startsWith(`${doc}#`))ocrDone.delete(k);
+      for(const o of r.ocr)ocrDone.set(key(o.doc,o.page),o.why);
+      captureDraftEvidence(r.holes,sources,(d,p)=>sizes.get(key(d,p)));
+      busy=false;
+      renderAll();
+      const at=holes.findIndex(h=>h.doc===doc&&h.pages.includes(page));
+      if(at>=0)select(at);else{current=Math.min(current,Math.max(0,holes.length-1));renderTabs();renderHole();view.doc=doc;view.page=page;showPage()}
+      say(at>=0?`Page ${page} read by OCR: ${label(holes[at])} read again.`:`Page ${page} read by OCR: no borehole log found on it.`);
+    }catch(err){if(!closed)say(`Page ${page} could not be read by OCR: ${(err as Error).message}`)}
+    finally{busy=false;if(!closed)showPage()}
+  }
 
   // ---------- leaving ----------
 
@@ -349,6 +409,10 @@ export function createReview(host:ReviewHost){
     onClose(f:()=>void){closing.push(f)},
     addDoc(d:Doc,source?:EvidenceSource){docs.push(d);sources.push(source??{id:newEvidenceId(),name:d.name,pages:[]});return docs.length-1},
     size(doc:number,page:number,width:number,height:number){sizes.set(key(doc,page),{width,height})},
+    // The pages of a document read by OCR, and why.
+    ocrRead(read:OcrRead[]){for(const o of read)ocrDone.set(key(o.doc,o.page),o.why)},
+    // How to read a page again by OCR, once all documents are read.
+    onReread(f:Rereader){rereader=f},
     show(read:DraftHole[],notRead:Unread[],failed:string[]){
       holes=read;unread=notRead;problems=failed;ready=true;
       captureDraftEvidence(holes,sources,(doc,page)=>sizes.get(key(doc,page)));

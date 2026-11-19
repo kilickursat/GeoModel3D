@@ -18,10 +18,10 @@ export const FIELDS:Array<{key:Field;label:string;numeric:boolean}>=[
 // `flag` says why the reader is unsure of the layer's base depth; `autoUnit` is set while the unit is the rules' choice,
 // so it follows an edited description.
 export interface DraftLayer { from:string; to:string; unit:string; description:string; flag?:string; autoUnit:boolean; src:TextLine[]; evidence?:EvidenceRecord }
-// `ocr`: read by the reading model from a scanned page or an image, not from the document's own text. `samples`: the
-// layers were read from the sample depths that start the descriptions.
+// `ocr`: read by the reading model, not from the document's own text, and `ocrWhy` why (a scanned page, unusable PDF
+// text). `samples`: the layers were read from the sample depths that start the descriptions.
 export interface DraftHole {
-  use:boolean; doc:number; file:string; pages:number[]; kind:"scale"|"table"; ocr:boolean; samples?:boolean;
+  use:boolean; doc:number; file:string; pages:number[]; kind:"scale"|"table"; ocr:boolean; ocrWhy?:string; samples?:boolean;
   values:Record<Field,string>; flags:Partial<Record<Field,string>>; src:Partial<Record<Field,TextLine>>;
   layers:DraftLayer[]; evidence?:EvidenceRecord; waterEvidence?:EvidenceRecord; ocrPages?:number[];
 }
@@ -41,15 +41,17 @@ export function unitFor(description:string){
 }
 
 // The logs of one document as drafts. A log whose ID was not read is named after its first page, and flagged.
-// `scanned` lists the pages read by the reading model.
-export function draftHoles(doc:number,file:string,logs:ReadLog[],scanned:ReadonlySet<number>=new Set()):DraftHole[]{
+// `scanned` lists the pages read by the reading model, and `why` why each was.
+export function draftHoles(doc:number,file:string,logs:ReadLog[],scanned:ReadonlySet<number>=new Set(),why:ReadonlyMap<number,string>=new Map()):DraftHole[]{
   return logs.map(log=>{
+    const reasons=[...new Set(log.pages.filter(p=>scanned.has(p)).map(p=>why.get(p)).filter((w):w is string=>!!w))];
     const flags:Partial<Record<Field,string>>={};
     if(!log.src?.id)flags.id="no borehole ID read: type its name";
     if(log.groundFlag)flags.ground=log.groundFlag;
     if(log.waterFlag)flags.water=log.waterFlag;
     if(log.xyFlag){flags.x=log.xyFlag;flags.y=log.xyFlag}
-    return {use:true,doc,file,pages:log.pages,kind:log.kind,...(log.samples?{samples:true}:{}),ocr:log.pages.some(p=>scanned.has(p)),ocrPages:[...scanned],
+    return {use:true,doc,file,pages:log.pages,kind:log.kind,...(log.samples?{samples:true}:{}),ocr:log.pages.some(p=>scanned.has(p)),
+      ...(reasons.length?{ocrWhy:reasons.join("; ")}:{}),ocrPages:[...scanned],
       values:{id:log.src?.id?log.id??"":`Page ${log.pages[0]}`,x:text(log.x),y:text(log.y),lat:text(log.lat),lon:text(log.lon),
         ground:text(log.ground),final:text(log.final),water:text(log.water)},
       flags,src:{...log.src},
@@ -108,7 +110,7 @@ export function checkDraft(holes:DraftHole[]):Check[]{
     const add=(level:Check["level"],text:string,at:{field?:Field;layer?:number}={})=>out.push({hole:i,level,text,...at});
     const v=Object.fromEntries(FIELDS.map(f=>[f.key,f.numeric?num(h.values[f.key]):undefined])) as Record<Field,number|undefined>;
     const id=h.values.id.trim();
-    if(h.ocr)add("warn","Read by OCR from a scanned page: compare every value and description with the page.");
+    if(h.ocr)add("warn",`Read by OCR (${h.ocrWhy??"a scanned page"}): compare every value and description with the page.`);
     if(!id)add("error","No borehole ID: type its name.",{field:"id"});
     else if(named.get(id)!>1)add("error",`Another borehole is also named ${id}: rename one.`,{field:"id"});
     for(const f of FIELDS){
