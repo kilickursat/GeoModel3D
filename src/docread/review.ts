@@ -96,9 +96,20 @@ export function createReview(host:ReviewHost){
     panel.innerHTML=`<div class="dr-fields">${FIELDS.map(field).join("")}</div>
 <div class="dr-layers-head"><b>Layers</b><span>${h.kind==="table"?"read from the From and To columns of a table":h.samples?"read from the sample depths that start the descriptions, by the depth scale on the page":"read by the depth scale on the page"}${h.ocr?`, by OCR (${esc(h.ocrWhy??"a scanned page")})`:""}</span><button class="dr-add">Add layer</button></div>
 <div class="dr-table-wrap"><table class="dr-layers"><thead><tr><th></th><th>From (m)</th><th>To (m)</th><th>Unit</th><th>Description</th><th></th></tr></thead><tbody>${h.layers.map(layer).join("")}</tbody></table>${
-      h.layers.length?"":'<p class="dr-empty">No layers: add them, or leave this borehole out.</p>'}</div>`;
+      h.layers.length?"":'<p class="dr-empty">No layers: add them, or leave this borehole out.</p>'}</div>${core(h)}`;
     $("#dr-units").innerHTML=[...new Set([...holes.flatMap(h=>h.layers.map(l=>l.unit.trim())),...RULE_UNITS])].filter(Boolean).map(u=>`<option value="${esc(u)}">`).join("");
     panel.querySelectorAll("textarea").forEach(fit);
+  }
+  // The runs of the borehole's rock core logs: records to compare with the page, not layers, and not used in the model.
+  function core(h:DraftHole){
+    const c=h.core;
+    if(!c)return "";
+    const v=(n:number|undefined,unit="")=>n===undefined?"–":`${n}${unit}`;
+    const notes=(r:typeof c.runs[number])=>r.notes.length>2?`${esc(r.notes.slice(0,2).join("; "))}; <small>${r.notes.length-2} more</small>`:esc(r.notes.join("; "));
+    const rows=c.runs.map((r,k)=>`<tr class="dr-run" data-key="c:${k}" tabindex="0" title="${esc(r.notes.join("\n"))}"><td>${esc(r.run)}</td><td>${v(r.from)}</td><td>${v(r.to)}</td><td>${v(r.tcr," %")}</td><td>${v(r.scr," %")}</td><td>${v(r.rqd," %")}</td><td>${notes(r)}</td></tr>`).join("");
+    return `<div class="dr-core"><div class="dr-layers-head"><b>Rock core runs</b><span>from the rock core log, ${c.pages.length===1?"page":"pages"} ${pageRanges(c.pages)}: for review, not used in the model</span></div>
+<div class="dr-table-wrap"><table class="dr-layers dr-runs"><thead><tr><th>Run</th><th>From (m)</th><th>To (m)</th><th>TCR</th><th>SCR</th><th>RQD</th><th>Notes</th></tr></thead><tbody>${rows}</tbody></table>${
+      c.runs.length?"":'<p class="dr-empty">No runs were read from the core log.</p>'}</div>${c.text?`<p class="dr-core-text"><b>The rock on the core log:</b> ${esc(c.text)}</p>`:""}</div>`;
   }
   function renderUnread(){
     const parts:string[]=[...problems.map(p=>`<li class="error">${esc(p)}</li>`)];
@@ -145,6 +156,7 @@ export function createReview(host:ReviewHost){
   function evidence(h:DraftHole,k:string):TextLine[]{
     if(k.startsWith("f:")){const s=h.src[k.slice(2) as Field];return s?[s]:[]}
     if(k.startsWith("l:"))return h.layers[Number(k.slice(2))]?.src??[];
+    if(k.startsWith("c:"))return h.core?.runs[Number(k.slice(2))]?.src??[];
     return [];
   }
   function showPage(){
@@ -184,6 +196,7 @@ export function createReview(host:ReviewHost){
     };
     for(const f of FIELDS){const s=h.src[f.key];if(s)box(s,`f:${f.key}`,!!h.flags[f.key],`${f.label}: ${h.values[f.key]}`)}
     h.layers.forEach((l,k)=>l.src.forEach(s=>box(s,`l:${k}`,!!l.flag,`Layer ${k+1}: ${l.from}–${l.to} m${l.unit?`, ${l.unit}`:""}`)));
+    h.core?.runs.forEach((r,k)=>r.src.forEach(s=>box(s,`c:${k}`,false,`Core run ${r.run}: ${r.from??"?"}–${r.to??"?"} m`)));
     boxes.innerHTML=out.join("");
     if(!out.length)pageNote.textContent=h.pages.includes(view.page)?"":`Nothing of ${label(h)} was read on this page.`;
   }

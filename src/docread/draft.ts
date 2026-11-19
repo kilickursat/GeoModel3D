@@ -2,7 +2,7 @@
 // line of the page it was read from and, where the reader is unsure of it, why. The draft is checked as it is edited,
 // and becomes the Input data tables, where it is checked again as typed data. Nothing is fixed silently: problems are
 // reported, and the engineer decides.
-import type {ReadLog,TextLine,HeaderField} from "./reconstruct";
+import type {ReadLog,TextLine,HeaderField,CoreSheet} from "./reconstruct";
 import {applyUnitRules,lithologyRules,japaneseLithologyRules} from "../rules";
 import {inferUnitOrder} from "../io";
 import {COLUMNS,EditorTables,emptyTables} from "../tables";
@@ -21,8 +21,10 @@ export const FIELDS:Array<{key:Field;label:string;numeric:boolean}>=[
 export interface DraftLayer { from:string; to:string; unit:string; description:string; flag?:string; gap?:[number,number]; autoUnit:boolean; src:TextLine[]; evidence?:EvidenceRecord }
 // `ocr`: read by the reading model, not from the document's own text, and `ocrWhy` why (a scanned page, unusable PDF
 // text). `samples`: the layers were read from the sample depths that start the descriptions.
+// `core`: the runs of the borehole's rock core logs, kept for the review and not used in the model.
 export interface DraftHole {
   use:boolean; doc:number; file:string; pages:number[]; kind:"scale"|"table"; ocr:boolean; ocrWhy?:string; samples?:boolean;
+  core?:CoreSheet&{pages:number[]};
   values:Record<Field,string>; flags:Partial<Record<Field,string>>; src:Partial<Record<Field,TextLine>>;
   layers:DraftLayer[]; evidence?:EvidenceRecord; waterEvidence?:EvidenceRecord; ocrPages?:number[];
 }
@@ -52,7 +54,7 @@ export function draftHoles(doc:number,file:string,logs:ReadLog[],scanned:Readonl
     if(log.waterFlag)flags.water=log.waterFlag;
     if(log.xyFlag){flags.x=log.xyFlag;flags.y=log.xyFlag}
     return {use:true,doc,file,pages:log.pages,kind:log.kind,...(log.samples?{samples:true}:{}),ocr:log.pages.some(p=>scanned.has(p)),
-      ...(reasons.length?{ocrWhy:reasons.join("; ")}:{}),ocrPages:[...scanned],
+      ...(reasons.length?{ocrWhy:reasons.join("; ")}:{}),...(log.core?{core:log.core}:{}),ocrPages:[...scanned],
       values:{id:log.src?.id?log.id??"":`Page ${log.pages[0]}`,x:text(log.x),y:text(log.y),lat:text(log.lat),lon:text(log.lon),
         ground:text(log.ground),final:text(log.final),water:text(log.water)},
       flags,src:{...log.src},

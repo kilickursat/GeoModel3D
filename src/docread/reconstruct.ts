@@ -20,13 +20,18 @@ export interface LogHeader {
 // read rather than a page of something else.
 // `samples`: a drawn log read from the sample depths written at the start of its descriptions (see readSamples).
 // `closing`: the text of a last sheet that holds only the end of a log, with no depth scale (see closingText).
-// `top`: the depth where the page's log starts, so the sheets of one log follow one another downwards.
+// `top`: the depth where the page's log starts, so the sheets of one log follow one another downwards. `core`: the
+// runs of a rock core log (see readCore).
 export interface PageLog extends LogHeader {
   kind:"scale"|"table"; layers:ReadLayer[]; used:Set<TextLine>; flagged:number[]; bounds:number[];
   texts:Array<{depth:number;text:string;src:TextLine}>; error?:string; evidence?:boolean; samples?:Sample[];
-  closing?:{description:string;src:TextLine[]}; top?:number;
+  closing?:{description:string;src:TextLine[]}; top?:number; core?:CoreSheet;
 }
-export interface ReadLog extends LogHeader { kind:"scale"|"table"; pages:number[]; layers:ReadLayer[]; flagged:number[]; samples?:boolean }
+// `core`: the rock core logs of the borehole, by their pages: runs and the rock described, kept for the review.
+export interface ReadLog extends LogHeader {
+  kind:"scale"|"table"; pages:number[]; layers:ReadLayer[]; flagged:number[]; samples?:boolean;
+  core?:CoreSheet&{pages:number[]};
+}
 
 // NFKC: full-width brackets and digits (common in Japanese documents) become plain ones, and Kangxi radicals that some
 // PDF producers put in the text layer for kanji ("⼝" for 口, "⾼" for 高) become the kanji. The radicals supplement has
@@ -465,6 +470,66 @@ function closingText(els:TextLine[]):{description:string;src:TextLine[]}|undefin
   return description?{description,src}:undefined;
 }
 
+// ---------- rock core logs ----------
+
+// A rock core log ("ROCK CORE LOG 214") gives the runs cored in the rock: each run's depths, its recovery (TCR, SCR) and
+// RQD, the make-up of the run ("Run 1: 60% sandstone 40% mudstone") and notes on its fractures ("5.2/ 46.8m: 40mm
+// broken zone"). A run is a measurement over a drilled length, not a stratum: the runs are kept as records beside
+// the borehole's layers, and the rock the sheet describes is kept with them as written (see readDocument).
+export interface CoreRun { run:string; from?:number; to?:number; tcr?:number; scr?:number; rqd?:number; notes:string[]; src:TextLine[] }
+export interface CoreSheet { runs:CoreRun[]; text:string; src:TextLine[] }
+// The title is the whole line, perhaps with the borehole's ID: "(see Rock / Core Log 12) below 3.5m", a sentence
+// wrapped on a log, is none.
+const CORE_TITLE=/^(?:rock\s+)?(?:core|coring)\s+(?:log|record)(?:\s+(?:no\.?\s*)?[A-Za-z]{0,6}[-\s]?\d[\w./-]{0,12})?$/i;
+const RUN_LABEL=/^(?:R|Run)\s*#?\s*(\d{1,3})$/i,RUN_MAKEUP=/^Run\s*#?\s*(\d{1,3})\s*:/i;
+const RECOVERED=/\b(TCR|SCR|RQD)\s*[=:]\s*(\d{1,3}(?:[.,]\d)?)\s*%/i;
+const FRACTURE=/^(\d+(?:[.,]\d+)?)\s*\/\s*\d+(?:[.,]\d+)?\s*m?\s*(?:-\s*\d+(?:[.,]\d+)?\s*\/\s*\d+(?:[.,]\d+)?\s*m?\s*)?:/;
+export const coreTitled=(els:TextLine[])=>els.some(e=>CORE_TITLE.test(e.text.trim()));
+function readCore(els:TextLine[],scale:DepthScale):CoreSheet{
+  const h=els.map(e=>e.y1-e.y0).sort((a,b)=>a-b)[els.length>>1]||12;
+  // The runs: labels "R1", "R2" in one column (under the "Run" heading where there is one: strength grades R0–R6
+  // elsewhere on the sheet are no runs), between the depths of the runs' ends in the column beside them.
+  const heading=els.find(e=>/^run(?:\s*(?:no\.?|#))?$/i.test(e.text.trim()));
+  let labels=els.filter(e=>RUN_LABEL.test(e.text.trim()));
+  if(heading)labels=labels.filter(e=>Math.abs(e.cx-heading.cx)<3*Math.max(heading.x1-heading.x0,h));
+  else{const col=columns(labels).sort((p,q)=>q.els.length-p.els.length)[0];labels=col?col.els:[]}
+  labels.sort((p,q)=>p.cy-q.cy);
+  const cx=labels.length?labels.reduce((t,e)=>t+e.cx,0)/labels.length:NaN;
+  const ends=els.filter(e=>isDecimal(e)&&Math.abs(scale.depthAt(e.cy)-num(e.text))<0.6&&(!labels.length||Math.abs(e.cx-cx)<6*h)).sort((p,q)=>p.cy-q.cy);
+  const runs:CoreRun[]=labels.map(e=>{
+    const above=ends.filter(d=>d.cy<e.cy).at(-1),below=ends.find(d=>d.cy>e.cy);
+    return {run:`R${RUN_LABEL.exec(e.text.trim())![1]}`,...(above?{from:num(above.text)}:{}),...(below?{to:num(below.text)}:{}),notes:[],src:[e,...(above?[above]:[]),...(below?[below]:[])]};
+  });
+  // Recovery and RQD go to the nearest run label; fracture notes and a run's make-up to the run they name or lie in.
+  const nearest=(y:number)=>{let k=-1,d=Infinity;labels.forEach((e,i)=>{const v=Math.abs(e.cy-y);if(v<d){d=v;k=i}});return k};
+  for(const e of els){
+    const m=RECOVERED.exec(e.text);
+    if(m){const k=nearest(e.cy);if(k>=0){runs[k][m[1].toLowerCase() as "tcr"|"scr"|"rqd"]=num(m[2]);runs[k].src.push(e)}}
+  }
+  const used=new Set<TextLine>();
+  for(const e of els.filter(e=>FRACTURE.test(e.text.trim())).sort((p,q)=>p.cy-q.cy)){
+    const d=num(FRACTURE.exec(e.text.trim())![1]),r=runs.find(r=>r.from!==undefined&&r.to!==undefined&&d>=r.from-0.005&&d<r.to);
+    if(!r)continue;
+    // A note may wrap: a short line just below it, in its column, is the rest of it.
+    const rest=els.filter(c=>c!==e&&!FRACTURE.test(c.text.trim())&&Math.abs(c.x0-e.x0)<h&&c.cy>e.cy&&c.cy-e.cy<1.6*h);
+    r.notes.push([e,...rest].map(c=>c.text.trim()).join(" "));r.src.push(e,...rest);used.add(e);rest.forEach(c=>used.add(c));
+  }
+  const makeups=els.filter(e=>RUN_MAKEUP.test(e.text.trim()));
+  for(const e of makeups){
+    const n=RUN_MAKEUP.exec(e.text.trim())![1],r=runs.find(r=>r.run===`R${n}`);
+    const parts=els.filter(c=>c!==e&&c.x0>=e.x1-2&&c.x0-e.x1<4*h&&c.cy>e.cy-0.6*h&&c.cy<e.cy+1.8*h).sort((p,q)=>p.cy-q.cy||p.x0-q.x0);
+    const text=[e.text.replace(RUN_MAKEUP,"").trim(),...parts.map(c=>c.text.trim())].filter(Boolean).join(" ");
+    used.add(e);parts.forEach(c=>used.add(c));
+    if(r){r.notes.unshift(`Run ${n}: ${text}`);r.src.push(e,...parts)}
+  }
+  // The rock as the sheet describes it: its description column, under its heading, without the runs' make-up.
+  const head=els.filter(e=>HEADING.test(e.text)&&short(e.text,5)).sort((p,q)=>p.cy-q.cy)[0];
+  const body=els.filter(e=>!used.has(e)&&!Number.isFinite(num(e.text))&&letters(e.text)>=2&&(!head||e.cy>head.y1)&&scale.depthAt(e.cy)>=0);
+  const col=head?columns(body).find(c=>c.x0<head.x1&&c.x1>head.x0):undefined;
+  const src=[...(col?.els??[])].sort((p,q)=>p.cy-q.cy);
+  return {runs,text:src.map(e=>clean(e.text)).join(" ").replace(/\s+/g," ").trim(),src};
+}
+
 export function rebuild(els:TextLine[],width:number,height=Infinity):PageLog{
   const title=titled(els),scale=depthScale(els,width)??(title?pairScale(els,width):null),head=header(els),evidence=logEvidence(els);
   const empty=(error:string,looks:boolean):PageLog=>({...head,kind:"scale",layers:[],used:new Set(),flagged:[],bounds:[],texts:[],error,evidence:looks});
@@ -486,7 +551,7 @@ export function rebuild(els:TextLine[],width:number,height=Infinity):PageLog{
     const at=end&&els.filter(e=>isDecimal(e)&&agree(e)&&e.cy<=end.cy+0.6*h&&end.cy-e.cy<=2.5*h).sort((p,q)=>Math.abs(end.cy-p.cy)-Math.abs(end.cy-q.cy))[0];
     if(at){head.final=num(at.text);head.src={...head.src,final:at}}
   }
-  const extra={top:Math.max(0,+scale.depthAt(Math.min(...scale.labels.map(e=>e.cy))-0.5*scale.b).toFixed(2))};
+  const core=coreTitled(els)?readCore(els,scale):undefined,extra={top:Math.max(0,+scale.depthAt(Math.min(...scale.labels.map(e=>e.cy))-0.5*scale.b).toFixed(2)),...(core?{core}:{})};
   const bcol=columns(els.filter(isDecimal)).sort((p,q)=>q.els.filter(agree).length-p.els.filter(agree).length)[0];
   // A column where most values do not fit their places (laboratory results, sample numbers) is no column of
   // boundaries: a value that fits by chance there ("2.68" beside 2.7 m) is no boundary either. Only values that could
@@ -756,18 +821,36 @@ export const sameId=(id:string|undefined)=>{
   const s=id.normalize("NFKC").toUpperCase().trim();
   return s.replace(/^(?:BORE\s*HOLE|BORING|LOG|BH)(?:\s*(?:NO\.?|#))?[\s\-_.#:]*/,"").replace(/[\s\-_./#]/g,"").replace(/^([A-Z]*)0+(?=\d)/,"$1")||s;
 };
+// The runs of the rock core logs of one borehole, sheet after sheet: a run over two sheets is one run.
+function joinCores(cores:Array<PageLog&{page:number}>):CoreSheet&{pages:number[]}{
+  const runs:CoreRun[]=[];
+  for(const c of cores)for(const r of c.core!.runs){
+    const same=runs.find(q=>q.run===r.run);
+    if(!same){runs.push({...r,notes:[...r.notes],src:[...r.src]});continue}
+    if(r.from!==undefined)same.from=Math.min(same.from??r.from,r.from);
+    if(r.to!==undefined)same.to=Math.max(same.to??r.to,r.to);
+    same.tcr??=r.tcr;same.scr??=r.scr;same.rqd??=r.rqd;same.notes.push(...r.notes);same.src.push(...r.src);
+  }
+  runs.sort((p,q)=>(p.from??Infinity)-(q.from??Infinity));
+  return {pages:cores.map(c=>c.page),runs,text:cores.map(c=>c.core!.text).filter(Boolean).join(" "),src:cores.flatMap(c=>c.core!.src)};
+}
 // The logs of a document: each page's logs, and the pages of one borehole joined in order of their sheet numbers (in
-// document order where a page gives none). The pages of a log follow one another and go deeper: a page joins the log
-// of the same ID (see sameId) on the page before, or on the same page, where its log starts below the top of the page
-// before; a page whose ID was not read joins the drawn log just before it in the same way. A log from a table is
-// complete on its page, and a page part without layers joins no log, unless it closes the log of its ID. `unread` lists
-// the parts that join none, saying whether each looked like a log.
+// document order where a page gives none). The pages of a log follow one another (only rock core logs may lie between
+// them) and go deeper: a page joins the log of the same ID (see sameId) on the page before, or on the same page, where
+// its log starts below the top of the page before; a page whose ID was not read joins the drawn log just before it in
+// the same way. A log from a table is complete on its page, and a page part without layers joins no log, unless it
+// closes the log of its ID. The rock core logs of a borehole whose log is read go with that log as records, never as
+// its layers (see readCore); one with no log of its ID is read as a log itself. `unread` lists the parts that join
+// none, saying whether each looked like a log.
 export function readDocument(pages:Array<{page:number;lines:TextLine[];width:number;height:number}>){
   const parts=pages.flatMap(p=>readPage(p.lines.map(l=>({...l,page:p.page})),p.width,p.height).map(log=>({...log,page:p.page})));
+  const logIds=new Set(parts.filter(p=>!p.core&&p.layers.length&&p.id).map(p=>sameId(p.id)));
+  const cores=parts.filter(p=>p.core&&p.id&&logIds.has(sameId(p.id))),corePages=new Set(cores.map(p=>p.page));
   const groups:Array<{id:string;pages:Array<PageLog&{page:number}>}>=[];
   const next=(g:{pages:Array<{page:number}>},page:number)=>{
     const last=g.pages[g.pages.length-1].page;
-    return page>=last&&page-last<=1;
+    for(let p=last+1;p<page;p++)if(!corePages.has(p))return false;
+    return page>=last;
   };
   const deeper=(g:{pages:Array<PageLog&{page:number}>},part:PageLog)=>{
     const prev=g.pages[g.pages.length-1];
@@ -775,6 +858,7 @@ export function readDocument(pages:Array<{page:number;lines:TextLine[];width:num
   };
   const closed=new Set<PageLog>();
   for(const part of parts){
+    if(cores.includes(part))continue;
     // A sheet that only closes a log goes with the log of its ID on the page before.
     if(!part.layers.length){
       const g=part.closing&&part.id?groups.find(g=>sameId(g.id)===sameId(part.id)&&next(g,part.page)):undefined;
@@ -788,6 +872,14 @@ export function readDocument(pages:Array<{page:number;lines:TextLine[];width:num
   }
   // Pages in order of their sheet numbers where every page gives one; else in their order in the document.
   const logs=groups.map(g=>({...joinPages(g.pages.every(p=>p.sheet)?g.pages.sort((p,q)=>p.sheet![0]-q.sheet![0]):g.pages),id:g.id}));
-  const unread=parts.filter(p=>!p.layers.length&&!closed.has(p)).map(p=>({page:p.page,id:p.id,error:p.error??"no layers found",log:!!p.evidence}));
+  // Each rock core log goes with the log of its ID nearest before it (or after it, where none is before).
+  const withCore=new Map<number,Array<PageLog&{page:number}>>();
+  for(const c of cores){
+    const same=logs.map((l,i)=>({l,i})).filter(({l})=>sameId(l.id)===sameId(c.id)&&l.layers.length);
+    const before=same.filter(({l})=>l.pages[0]<=c.page).at(-1)??same[0];
+    if(before)withCore.set(before.i,[...(withCore.get(before.i)??[]),c]);
+  }
+  for(const [i,cs] of withCore)logs[i].core=joinCores(cs);
+  const unread=parts.filter(p=>!p.layers.length&&!closed.has(p)&&!cores.includes(p)).map(p=>({page:p.page,id:p.id,error:p.error??"no layers found",log:!!p.evidence}));
   return {logs:logs.filter(l=>l.layers.length),unread,parts};
 }
