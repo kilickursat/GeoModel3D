@@ -1,8 +1,8 @@
 import {describe,it,expect} from "vitest";
 import {readFileSync} from "node:fs";
 import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
-import {TextLine,textLine,readDocument,readPage,header,ReadLog} from "../src/docread/reconstruct";
-import {linesFromItems,PdfTextItem} from "../src/docread/textlines";
+import {TextLine,textLine,readDocument,readPage,header,ReadLog,sameId} from "../src/docread/reconstruct";
+import {linesFromItems,PdfTextItem,judgeText,wordShare,agreement} from "../src/docread/textlines";
 import {draftHoles,checkDraft,draftTables,pageRanges,DraftHole} from "../src/docread/draft";
 import {projectFromTables} from "../src/tables";
 import {applyUnitRules,lithologyRules} from "../src/rules";
@@ -203,6 +203,101 @@ describe("text from a PDF's own text layer",()=>{
   });
 });
 
+describe("pages whose own text is unusable",()=>{
+  // A font with no map to characters gives its codes for letters: text that looks like text but is not.
+  const real=["Brown clayey SAND, medium dense","Grey silty CLAY, firm, wet"],garbled=["#$%& '()* +,-./","<=>? @#$% &'()","*+,- ./:;"];
+  it("reads a page's text as good, garbled or doubtful by how much of it reads as words",()=>{
+    expect(judgeText(real,60,30)).toMatchObject({layer:"good",share:1});
+    expect(judgeText(garbled,40,30)).toMatchObject({layer:"garbled",share:0});
+    expect(judgeText([...real.slice(0,1).map(t=>t.split(" ").slice(0,4).join(" ")),...garbled.slice(0,2)],60,30).layer).toBe("doubtful");
+    expect(judgeText(["ボーリング柱状図 孔口標高 12.30 m 土質区分 砂質シルト 粘土 記事 地下水位"],40,30).layer).toBe("good");
+    // Too little text to judge keeps its text; almost none is a scan.
+    expect(judgeText(["#$% &'("],8,5).layer).toBe("good");
+    expect(judgeText(["APPENDIX A"],9,30).layer).toBe("none");
+    // Bullets, dashes and leader dots are no words either way.
+    expect(wordShare(["• Clay ……… 12 — Sand"]).share).toBe(1);
+  });
+  it("keeps a doubtful page's own text where OCR reads the same words",()=>{
+    expect(agreement(["Brown clayey SAND, medium dense"],["brown clayey sand medium dense"])).toBe(1);
+    expect(agreement(["Brown clayey SAND, medium dense"],["#$% &'() *+,"])).toBe(0);
+  });
+});
+
+describe("the sheets of a log and its rock core log",()=>{
+  // A drawn log sheet: title with the ID, scale from `top` metres at x 40 (40 px a metre from y 200), boundary depths
+  // at x 900, descriptions at x 300.
+  const at=(top:number,d:number)=>200+40*(d-top);
+  const sheet=(title:string,top:number,bounds:number[],texts:Array<[number,string]>,extra:TextLine[]=[])=>[
+    L(title,600,40,8*title.length),L("DESCRIPTION",300,150),...Array.from({length:11},(_,k)=>L(String(top+k),40,at(top,top+k),10)),
+    ...bounds.map(b=>L(b.toFixed(2),900,at(top,b)+8,40)),...texts.map(([d,t])=>L(t,300,at(top,d))),...extra];
+  it("reads the ID after BOREHOLE LOG or ROCK CORE LOG, and compares IDs as one borehole's",()=>{
+    expect(header([L("BOREHOLE LOG 214",600,40,140)]).id).toBe("214");
+    expect(header([L("ROCK CORE LOG BH-7",600,40,150)]).id).toBe("BH-7");
+    expect(header([L("BOREHOLE LOG",600,40,110),L("Client : Public Works",600,60,160)]).id).toBeUndefined();
+    expect(new Set([sameId("Log 31"),sameId("LOG31"),sameId("31")]).size).toBe(1);
+    expect(new Set([sameId("BH-01"),sameId("BH1"),sameId("1"),sameId("Borehole No. 1")]).size).toBe(1);
+    expect(sameId("TP-1")).not.toBe(sameId("BH-1"));
+  });
+  it("joins sheets by their ID as one borehole's and in depth order, and keeps a log that starts again apart",()=>{
+    const first=sheet("BOREHOLE LOG 7",0,[1.2],[[0.5,"FILL: sand and gravel"],[1.5,"CLAY: soft, grey"],[9.8,"(continued)"]]);
+    const second=sheet("Borehole Log BH-07",10,[12.4,16.8],[[10.2,"CLAY: soft, grey (continued)"],[13,"SAND: dense"]],[L("END OF BOREHOLE",300,at(10,16.8)+18)]);
+    const again=sheet("BOREHOLE LOG 7",0,[2.0],[[1,"PEAT: black, spongy"]]);
+    const r=readDocument([{page:1,width:1000,height:800,lines:first},{page:2,width:1000,height:800,lines:second},{page:3,width:1000,height:800,lines:again}]);
+    expect(r.logs.map(l=>[l.id,l.pages])).toEqual([["7",[1,2]],["7",[3]]]);
+    const [log]=r.logs;
+    // The second sheet's repeat of the layer it continues adds nothing, and "(continued)" is no description.
+    expect(log.layers.map(l=>[l.from,l.to,l.description])).toEqual([[0,1.2,"FILL: sand and gravel"],[1.2,12.4,"CLAY: soft, grey"],[12.4,16.8,"SAND: dense"]]);
+    // The depth written where the log ends is its final depth; an elevation there is not.
+    expect([log.final,log.src?.final?.text]).toEqual([16.8,"16.80"]);
+  });
+  it("reads a final depth only where the log states it",()=>{
+    expect(readPage(drawnLog(),1000,800)[0].final).toBeUndefined();
+    expect(readPage([...drawnLog(),L("END OF BOREHOLE",300,yAt(9.8)+18)],1000,800)[0].final).toBe(9.8);
+  });
+  it("reads a log too short for a depth scale from the elevations printed over its depths",()=>{
+    // 140 px a metre from the ground surface at y 200: each boundary's elevation printed just above its depth.
+    const y=(d:number)=>200+140*d;
+    const lines=[L("BOREHOLE LOG 9",600,40,120),L("DESCRIPTION",300,150),L("52.0",110,y(0),32),L("GROUND SURFACE",160,y(0),120),
+      L("160mm TOPSOIL",300,y(0.05),104),L("51.8",110,y(0.2)-14,32),L("0.2",118,y(0.2),24),L("FILL, clayey sand, grey, damp",300,y(0.3)),
+      L("51.4",110,y(0.6)-14,32),L("0.6",118,y(0.6),24),L("END OF BOREHOLE",300,y(0.6)+16)];
+    const [log]=readPage(lines,1000,800);
+    expect(log.layers.map(l=>[l.from,l.to,l.description])).toEqual([[0,0.2,"160mm TOPSOIL"],[0.2,0.6,"FILL, clayey sand, grey, damp"]]);
+    // The ground level is the elevation on the ground surface's line, not the thickness under it.
+    expect([log.final,log.ground]).toEqual([0.6,52]);
+  });
+  it("keeps the runs of a rock core log as records beside the log of its borehole, never as its layers",()=>{
+    const log=sheet("BOREHOLE LOG 5",0,[1.2,4.5,9.8],[[0.5,"FILL: sand and gravel"],[2.5,"CLAY: stiff, brown"],[5,"GRANITE (see rock core log)"]],
+      [L("(refer to Rock",300,yAt(6)),L("Core Log 5) below 4.5 m",300,yAt(6.3))]);
+    // The core log: scale from 4 m at 60 px a metre, runs in the "Run" column between the depths of their ends.
+    const c=(d:number)=>200+60*(d-4);
+    const core=[L("ROCK CORE LOG 5",600,40,120),L("stratigraphy",150,150,96),L("Run",470,150,24),...[4,5,6,7,8,9,10].map(d=>L(String(d),40,c(d),10)),
+      ...[4.5,6,7.5,9].map(d=>L(d.toFixed(1),470,c(d),24)),
+      ...[["R1",5.25],["R2",6.75],["R3",8.25]].map(([r,d])=>L(r as string,470,c(d as number),16)),
+      L("TCR = 98%",520,c(5.25)-12,72),L("SCR = 90%",520,c(5.25),72),L("RQD = 61%",520,c(5.25)+12,72),L("RQD = 85%",520,c(6.75)+12,72),
+      L("5.2/ 46.8m: 40mm broken zone",980,c(5.2),220),L("GRANITE, grey, fresh, strong",150,c(4.7),220),L("Run 1:",150,c(5.6),48),L("100% granite",210,c(5.6),96)];
+    const r=readDocument([{page:1,width:1000,height:800,lines:log},{page:2,width:1100,height:800,lines:core}]);
+    expect(r.logs).toHaveLength(1);
+    const [l]=r.logs;
+    expect([l.id,l.pages,l.layers.map(x=>x.to)]).toEqual(["5",[1],[1.2,4.5,9.8]]);
+    expect(l.core?.pages).toEqual([2]);
+    expect(l.core?.runs.map(x=>[x.run,x.from,x.to,x.tcr,x.scr,x.rqd])).toEqual([["R1",4.5,6,98,90,61],["R2",6,7.5,undefined,undefined,85],["R3",7.5,9,undefined,undefined,undefined]]);
+    expect(l.core?.runs[0].notes).toEqual(["Run 1: 100% granite","5.2/ 46.8m: 40mm broken zone"]);
+    expect(l.core?.text).toBe("GRANITE, grey, fresh, strong");
+    // A sentence on the log that names the core log does not make the log one; a core log with no log of its ID is
+    // read as a log itself.
+    expect(readPage(log,1000,800)[0].core).toBeUndefined();
+    expect(readDocument([{page:2,width:1100,height:800,lines:core}]).logs[0].core).toBeUndefined();
+    // The review keeps the runs with the borehole, and the Input data tables leave them out.
+    const [hole]=draftHoles(0,"report.pdf",r.logs);
+    expect(hole.core?.runs).toHaveLength(3);
+    expect(draftTables([hole],["report.pdf"]).rows.logs).toHaveLength(3);
+  });
+  it("reads small capitals OCR gives for capitals in a layer's title",()=>{
+    const lines=drawnLog().map(e=>e.text==="CLAY: soft, grey"?{...e,text:"cLAY: soft, grey"}:e);
+    expect(readPage(lines,1000,800)[0].layers[1].description).toBe("CLAY: soft, grey");
+  });
+});
+
 describe("header values",()=>{
   it("reads positions given by easting and northing, also with the labels swapped (UTM)",()=>{
     const line=L("E: 512345, N: 5401234 (UTM 33U)",40,40,300),h=header([L("Project: Main Street",40,20,200),line]);
@@ -231,6 +326,13 @@ describe("unit rules for real logs",()=>{
   const unit=(name:string)=>applyUnitRules([{id:"b",x:0,y:0,z:0,intervals:[{from:0,to:1,unit:"",name}]}],lithologyRules).boreholes[0].intervals[0].unit;
   it("counts topsoil written in two words and road layers as made ground",()=>{
     for(const n of ["TOP SOIL (100 mm)","200mm AGGREGATE","GRANULAR BASE (250mm): gravelly sand","GRANULAR SUBBASE: sand with gravel"])expect(unit(n)).toBe("Made ground");
+  });
+  it("names igneous and metamorphic rocks as rock, and takes rock names as whole words",()=>{
+    for(const n of ["Dark green DUNITE, fresh, very strong","welded TUFF, highly weathered","SERPENTINITE, sheared","Grey GNEISS, fresh"])expect(unit(n)).toBe("Rock");
+    expect(unit("GREYWACKE, fresh")).toBe("Sandstone");
+    expect(unit("grey SHALES with thin limestone beds")).toBe("Mudstone and siltstone");
+    expect(unit("chalky CLAY")).toBe("Clay");
+    expect(unit("rockfill, sandy gravel")).toBe("Gravel");
   });
   it("takes a rock name only where it comes before the soil",()=>{
     expect(unit("SAND, some silt, trace gravel, trace rock fragments")).toBe("Sand");
@@ -290,6 +392,29 @@ describe("the review's draft, its checks and the Input data tables",()=>{
     expect(built.project.boreholes.map(b=>[b.id,b.intervals.length])).toEqual([["BH-7",3],["BH-8",2]]);
   });
   it("writes pages as ranges",()=>expect(pageRanges([9,4,5,6,12,11])).toBe("4–6, 9, 11–12"));
+  it("groups the boundaries placed between samples into one check per log, each keeping its own gap and reason",()=>{
+    const h=hole("BH-1",[["1","2"],["2","3"],["3","4"],["4","6"],["6","7"]]);
+    const gaps:Array<[number,number]>=[[1.45,2],[2.45,3],[3.45,4],[4.45,6]];
+    h.layers.slice(0,4).forEach((l,k)=>{l.flag=`the change lies between the samples ending at ${gaps[k][0]} m and starting at ${gaps[k][1]} m; placed where the new description starts`;l.gap=gaps[k]});
+    expect(checkDraft([h]).filter(c=>c.level==="warn").map(c=>[c.layer,c.text])).toEqual([
+      [0,"3 layer boundaries lie between samples, in untested gaps of 0.55 m: each is placed at the top of the sample with the new description, or where the log notes the change, and is marked on its layer."],
+      [3,"6 m: the change lies between the samples ending at 4.45 m and starting at 6 m; placed where the new description starts; a wider gap than this log's usual 0.55 m."]]);
+    // Every boundary still carries its own reason and gap.
+    expect(h.layers.slice(0,4).every(l=>l.flag&&l.gap)).toBe(true);
+  });
+  it("says once that no borehole has a position, where none has",()=>{
+    const a=hole("BH-1",[["0","2"]],{x:"",y:""}),b=hole("BH-2",[["0","3"]],{x:"",y:""});
+    expect(checkDraft([a,b]).filter(c=>/position/.test(c.text))).toEqual([{hole:0,field:"x",level:"warn",
+      text:"No borehole has a position: none of the 2 boreholes in use gives an easting and northing, or a latitude and longitude, so the model cannot place them. Type them here, or under Input data."}]);
+    b.values.x="5";b.values.y="7";
+    expect(checkDraft([a,b]).filter(c=>/position/.test(c.text)).map(c=>c.hole)).toEqual([0]);
+  });
+  it("says why a borehole was read by OCR",()=>{
+    const logs=readDocument([{page:1,width:1000,height:800,lines:drawnLog()}]).logs;
+    const [h]=draftHoles(0,"x.pdf",logs,new Set([1]),new Map([[1,"unusable PDF text (2 % of it reads as words)"]]));
+    expect(h.ocrWhy).toBe("unusable PDF text (2 % of it reads as words)");
+    expect(checkDraft([h]).map(c=>c.text)).toContain("Read by OCR (unusable PDF text (2 % of it reads as words)): compare every value and description with the page.");
+  });
 });
 
 describe("digital PDFs read with PDF.js",()=>{
