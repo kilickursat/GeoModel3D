@@ -45,17 +45,27 @@ const firstNoun=(soil:keyof typeof SOILS)=>{
   return `^(?:(?!\\b(?:${others})\\b).)*\\b(?:${SOILS[soil]})\\b`;
 };
 // Rock names count where they come before any soil noun: "SAND, some silt, trace rock fragments" is sand, "fractured
-// rock" and "MUDSTONE, weathered to clay" are rock.
+// rock" and "MUDSTONE, weathered to clay" are rock. The names are those of the BGS Rock Classification Scheme (British
+// Geological Survey, Open Government Licence v3.0), grouped by principal material: the sedimentary rocks by grain, the
+// igneous and metamorphic rocks together as rock. A rock name gives a unit only: layers named alike stay layers.
 const ALL_SOILS=Object.values(SOILS).join("|");
-const rockFirst=(names:string)=>`^(?:(?!\\b(?:${ALL_SOILS})\\b).)*(?:${names})`;
+const rockFirst=(names:string)=>`^(?:(?!\\b(?:${ALL_SOILS})\\b).)*\\b(?:${names})`;
+// Whole words, also in the plural: "shales" is shale, but "rockfill" and "chalky" are no rock.
+const words=(names:string)=>`(?:${names})(?:e?s)?\\b`;
+const IGNEOUS="granite|granodiorite|tonalite|monzonite|syenite|diorite|gabbro|norite|anorthosite|dolerite|diabase|"+
+  "peridotite|dunite|harzburgite|lherzolite|wehrlite|pyroxenite|hornblendite|serpentinite|kimberlite|lamprophyre|"+
+  "pegmatite|aplite|porphyry|felsite|basalt|andesite|dacite|rhyolite|trachyte|phonolite|latite|obsidian|pitchstone|"+
+  "ignimbrite|agglomerate|pumice|scoria|tuff|lapillistone|hyaloclastite|volcanic breccia";
+const METAMORPHIC="gneiss|schist|phyllite|slate|quartzite|marble|hornfels|amphibolite|eclogite|granulite|migmatite|"+
+  "mylonite|cataclasite|greenstone|metabasalt|metagabbro|skarn|serpentinised peridotite";
 export const lithologyRules:UnitRule[]=[
   // Road layers are made ground too: aggregate, granular base and subbase, base course.
   {match:"made ground|\\b(?:back)?fill\\b|top\\s?soil|concrete|asphalt|tarmac|rubble|hardcore|\\bbrick|\\bslag\\b|\\baggregate\\b|granular (?:base|sub-?base)|base course|\\bsub-?base\\b|antropogeen|ophoging|\\bpuin\\b|\\bbeton\\b|remblai|terrain rapporté|terre végétale|auff[üu]llung|mutterboden|relleno|aterro|riporto",unit:"Made ground"},
   {match:firstNoun("peat"),unit:"Peat"},
-  {match:rockFirst("mudstone|siltstone|claystone|shale|\\bmarl"),unit:"Mudstone and siltstone"},
-  {match:rockFirst("sandstone|conglomerate|breccia"),unit:"Sandstone"},
-  {match:rockFirst("limestone|chalk|dolomite|kalksteen|\\bkrijt\\b"),unit:"Limestone and chalk"},
-  {match:rockFirst("granite|basalt|andesite|rhyolite|diorite|gabbro|gneiss|schist|quartzite|slate|\\btuff\\b|\\brock\\b|bedrock"),unit:"Rock"},
+  {match:rockFirst(words("mudstone|siltstone|claystone|shale|marl|argillite|mudrock")),unit:"Mudstone and siltstone"},
+  {match:rockFirst(words("sandstone|conglomerate|(?<!volcanic )breccia|greywacke|graywacke|arkose|wacke|arenite|gritstone")),unit:"Sandstone"},
+  {match:rockFirst(`${words("limestone|chalk|dolomite|dolostone|travertine|tufa")}|kalksteen|krijt\\b`),unit:"Limestone and chalk"},
+  {match:rockFirst(words(`${IGNEOUS}|${METAMORPHIC}|chert|ironstone|rock|bedrock`)),unit:"Rock"},
   {match:firstNoun("gravel"),unit:"Gravel"},
   {match:firstNoun("sand"),unit:"Sand"},
   {match:firstNoun("silt"),unit:"Silt"},
