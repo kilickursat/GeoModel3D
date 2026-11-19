@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+## 0.30.0 — 2026-11-19
+
+### Added
+- Read pages whose PDF text is unusable by OCR. Some PDFs carry fonts with no map to their characters: their text looks like text but is not, so the logs on those pages were never found. Each page's text is judged by how much of it reads as words: below 35 % the page is read by OCR, and between 35 and 50 % OCR checks it, the page keeping its own text where both read the same words. The review says why each page was read by OCR, and any page read from its own text can be read by OCR on request (**Read by OCR** above the page).
+- Keep rock core logs as records beside their borehole's log: each run's depths, recovery (TCR, SCR), RQD, make-up and fracture notes, linked to their place on the page, in a table under the borehole's layers. Runs never become layers and are not used in the model.
+- Read a log too short for a depth scale (a hand-auger hole) from the elevations printed over its depths.
+
+### Changed
+- Join the sheets of a log by the borehole's name however it is written ("BOREHOLE LOG 214", "Log 214", "BH-0214", "214"), only where each sheet goes on deeper than the one before, and read the name after "BOREHOLE LOG" and "ROCK CORE LOG" titles.
+- Read the final depth written where a log ends ("END OF BOREHOLE"), only where the log states it.
+- List the boundaries placed between samples once per log in the checks; each keeps its own untested interval and reason on its layer, and a much wider gap than the log's usual one is listed on its own. Say once that no borehole has a position where none has.
+- Name igneous and metamorphic rocks as rock (dunite, serpentinite, gneiss…), after the BGS Rock Classification Scheme (Open Government Licence v3.0), and match rock names as whole words, so "chalky clay" is clay. Layers are never merged because they share a unit.
+- Read by OCR a log page whose text gives no depth scale only where its text is not prose.
+
+### Fixed
+- "(continued)" marks are no description, and a sheet's repeat of the layer it continues is not added twice; small capitals OCR gives for capitals ("SILTY cLAY") no longer hide a layer's title.
+- A thickness under "GROUND SURFACE" ("80mm ASPHALT") is no ground level, and a remark under a water-level heading ("0.6m: sample disturbed") is no water level.
+- Where the thicknesses written for the first layers end above the boundary drawn under them and nothing else is described there, the last of them reaches that boundary, flagged, instead of leaving an undescribed layer.
+
 ## 0.29.3 — 2026-11-18
 
 ### Fixed
