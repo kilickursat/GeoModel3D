@@ -19,10 +19,11 @@ export interface LogHeader {
 // read rather than a page of something else.
 // `samples`: a drawn log read from the sample depths written at the start of its descriptions (see readSamples).
 // `closing`: the text of a last sheet that holds only the end of a log, with no depth scale (see closingText).
+// `top`: the depth where the page's log starts, so the sheets of one log follow one another downwards.
 export interface PageLog extends LogHeader {
   kind:"scale"|"table"; layers:ReadLayer[]; used:Set<TextLine>; flagged:number[]; bounds:number[];
   texts:Array<{depth:number;text:string;src:TextLine}>; error?:string; evidence?:boolean; samples?:Sample[];
-  closing?:{description:string;src:TextLine[]};
+  closing?:{description:string;src:TextLine[]}; top?:number;
 }
 export interface ReadLog extends LogHeader { kind:"scale"|"table"; pages:number[]; layers:ReadLayer[]; flagged:number[]; samples?:boolean }
 
@@ -156,7 +157,9 @@ export function header(lines:TextLine[]):LogHeader&{mark?:number}{
     return value;
   };
   // A title "LOG OF BOREHOLE BH3 … 1 OF 3" gives the ID and the sheet, so the pages of one log can be joined.
-  const title=match(/(?:log|record) of\s+(?:bore ?hole|boring|test ?pit|drill ?hole)\s+([A-Za-z0-9][\w./-]*)/i);
+  // So does "BOREHOLE LOG 214" or "ROCK CORE LOG 214", the ID after the title on its line ("LOG" is no part of the ID).
+  const named=match(/(?:bore ?hole|boring|drill ?hole|test ?pit|(?:rock )?core)[ \t]+log[ \t]+(?:no\.?[ \t]*)?([A-Za-z0-9][\w./-]*)/i);
+  const title=match(/(?:log|record) of\s+(?:bore ?hole|boring|test ?pit|drill ?hole)\s+([A-Za-z0-9][\w./-]*)/i)??(named&&isId(named.text)?named:undefined);
   const sheet=/\b(\d+)\s+of\s+(\d+)\b/i.exec(all);
   // A table of readings ("Water Depth (m)" over a column of values) gives the first reading.
   let reading:{text:string;src:TextLine}|undefined;
@@ -222,7 +225,13 @@ const KANJI:Record<string,string>={"质":"質","风":"風","砾":"礫","软":"�
 const kanji=(t:string)=>/[぀-ヿ一-鿿]/.test(t)?t.replace(/[质风砾软层页碟王]/g,c=>KANJI[c]).replace(/[·‧∙⋅]/g,"・"):t;
 // Hatching read as text: short mixes of digits with D, b, p, q, O or U ("D0D", "bb0", "6DD"), runs of D, lone marks,
 // and one or two kanji inside Latin text.
+// A sheet's marks that a layer runs on ("(continued)", "Continued next page") are no description.
+const CONTINUED_MARK=/\(\s*continued[^)]*\)|\bcontinued\s+(?:on\s+|to\s+|from\s+)?(?:the\s+)?(?:next|previous|last)\s+(?:page|sheet)\b|^\s*continued\s*$/gi;
+// OCR reads some capitals as small letters of the same shape (c, o, s, v, w, x, z): "SILTY cLAY," is "SILTY CLAY,".
+const capitals=(t:string)=>t.replace(/\b[cosvwxz](?=[A-Z]{2,}\b)/g,c=>c.toUpperCase()).replace(/\b([A-Z]+)([cosvwxz])(?=[A-Z]{2,}\b)/g,(_,a,c)=>a+c.toUpperCase())
+  .replace(/\b([A-Z]{2,})([cosvwxz])(?=[A-Z]+\b)/g,(_,a,c)=>a+c.toUpperCase());
 function clean(t:string,latin=(t.match(/[A-Za-z]/g)??[]).length>=5){
+  t=capitals(t.replace(CONTINUED_MARK," "));
   return t.split(/\s+/).filter(w=>!(/^(?=.*\d)(?=.*[DdbpqOoUu])[0-9DdbpqOoUu]{2,4}$/.test(w)||/^[Dd]{2,}$/.test(w)||/^[?!)(\]\[}{|]+$/.test(w)||
     (latin&&/^[぀-ヿ一-鿿]{1,2}$/.test(w)))).join(" ").trim();
 }
@@ -439,6 +448,7 @@ export function rebuild(els:TextLine[],width:number,height=Infinity):PageLog{
   // Boundaries: the column of decimal numbers whose values agree with their positions on the scale (within 0.6 m).
   // Other columns of decimals (elevations, thicknesses) agree only by chance, so they lose to it.
   const agree=(e:TextLine)=>Math.abs(scale.depthAt(e.cy)-num(e.text))<0.6;
+  const extra={top:Math.max(0,+scale.depthAt(Math.min(...scale.labels.map(e=>e.cy))-0.5*scale.b).toFixed(2))};
   const bcol=columns(els.filter(isDecimal)).sort((p,q)=>q.els.filter(agree).length-p.els.filter(agree).length)[0];
   // A column where most values do not fit their places (laboratory results, sample numbers) is no column of
   // boundaries: a value that fits by chance there ("2.68" beside 2.7 m) is no boundary either. Only values that could
@@ -476,7 +486,7 @@ export function rebuild(els:TextLine[],width:number,height=Infinity):PageLog{
       const last=!head.sheet||head.sheet[0]>=head.sheet[1],read=sampleLayers(samples,last?head.final:undefined);
       for(const x of samples)for(const e of x.src)used.add(e);
       const texts=samples.map(x=>({depth:x.from,text:x.description,src:x.src[0]}));
-      return {...head,kind:"scale",layers:read.layers,used,flagged:read.flagged,texts,bounds:read.layers.map(l=>l.to),samples,evidence};
+      return {...head,kind:"scale",layers:read.layers,used,flagged:read.flagged,texts,bounds:read.layers.map(l=>l.to),samples,evidence,...extra,top:samples[0].from};
     }
   }
   const labels=[...bels];
@@ -542,7 +552,7 @@ export function rebuild(els:TextLine[],width:number,height=Infinity):PageLog{
   }
   // For logs over several pages: each description line with its depth.
   const texts=lines.map(e=>({depth:depthOf(e),text:clean(kanji(e.text),latin),src:e})).filter(t=>t.text);
-  return {...head,kind:"scale",layers,used,flagged,texts,bounds,evidence};
+  return {...head,kind:"scale",layers,used,flagged,texts,bounds,evidence,...extra};
 }
 
 // ---------- a log set out as a table ----------
@@ -682,9 +692,14 @@ function joinBody(pages:Array<PageLog&{page:number}>,head:LogHeader,at:number[],
   for(const p of pages)for(const b of p.bounds)if(!bounds.some(v=>Math.abs(v-b)<0.03))bounds.push(b);
   bounds.sort((a,b)=>a-b);
   const layers:ReadLayer[]=bounds.map((to,k)=>({from:k?bounds[k-1]:0,to,description:"",src:[]}));
+  // A sheet repeats the layer it continues from the sheet before ("MUDSTONE (see the rock core
+  // log)" again under "(continued)"): the repeat adds nothing to the layer, nor a title to deal (see fixTitles).
+  const key=(t:string)=>t.normalize("NFKD").replace(/\p{M}/gu,"").toLowerCase().replace(/\s+/g," ").trim();
   for(const p of pages)for(const t of p.texts){
     const l=layers.find(l=>t.depth>=l.from&&t.depth<l.to);
-    if(l)l.description=(l.description+" "+t.text).trim();
+    if(!l||!t.text.trim())continue;
+    if(p!==pages[0]&&key(l.description).includes(key(t.text)))continue;
+    l.description=(l.description+" "+t.text).trim();
   }
   const flagged=pages.flatMap(p=>p.flagged),reasons=pages.flatMap(p=>p.layers).filter(l=>l.why),thin=thinStack(layers);
   for(const v of thin)if(!flagged.includes(v))flagged.push(v);
@@ -695,27 +710,42 @@ function joinBody(pages:Array<PageLog&{page:number}>,head:LogHeader,at:number[],
   return {...head,kind:"scale",pages:at,layers,flagged};
 }
 
+// Borehole IDs as one borehole's: case, separators, leading zeros and the words of a label ("LOG", "BH", "Borehole",
+// "No.") make no difference: "Log 31" is "LOG31" is "31", and "BH-01" is "BH1" is "1". Other prefixes stay ("TP-1" and
+// "BH-1" are two holes).
+export const sameId=(id:string|undefined)=>{
+  if(id===undefined)return undefined;
+  const s=id.normalize("NFKC").toUpperCase().trim();
+  return s.replace(/^(?:BORE\s*HOLE|BORING|LOG|BH)(?:\s*(?:NO\.?|#))?[\s\-_.#:]*/,"").replace(/[\s\-_./#]/g,"").replace(/^([A-Z]*)0+(?=\d)/,"$1")||s;
+};
 // The logs of a document: each page's logs, and the pages of one borehole joined in order of their sheet numbers (in
-// document order where a page gives none). The
-// pages of a log follow one another: a page joins the log of the same ID on the page before (or the same page), and a
-// page whose ID was not read joins the drawn log just before it. A log from a table is complete on its page, and a page
-// part without layers joins no log, unless it closes the log of its ID. `unread` lists the parts that join none, saying
-// whether each looked like a log.
+// document order where a page gives none). The pages of a log follow one another and go deeper: a page joins the log
+// of the same ID (see sameId) on the page before, or on the same page, where its log starts below the top of the page
+// before; a page whose ID was not read joins the drawn log just before it in the same way. A log from a table is
+// complete on its page, and a page part without layers joins no log, unless it closes the log of its ID. `unread` lists
+// the parts that join none, saying whether each looked like a log.
 export function readDocument(pages:Array<{page:number;lines:TextLine[];width:number;height:number}>){
   const parts=pages.flatMap(p=>readPage(p.lines.map(l=>({...l,page:p.page})),p.width,p.height).map(log=>({...log,page:p.page})));
   const groups:Array<{id:string;pages:Array<PageLog&{page:number}>}>=[];
-  const next=(g:{pages:Array<{page:number}>},page:number)=>page-g.pages[g.pages.length-1].page<=1;
+  const next=(g:{pages:Array<{page:number}>},page:number)=>{
+    const last=g.pages[g.pages.length-1].page;
+    return page>=last&&page-last<=1;
+  };
+  const deeper=(g:{pages:Array<PageLog&{page:number}>},part:PageLog)=>{
+    const prev=g.pages[g.pages.length-1];
+    return part.top===undefined||prev.top===undefined||part.top>prev.top+0.1;
+  };
   const closed=new Set<PageLog>();
   for(const part of parts){
     // A sheet that only closes a log goes with the log of its ID on the page before.
     if(!part.layers.length){
-      const g=part.closing&&part.id?groups.find(g=>g.id===part.id&&next(g,part.page)):undefined;
+      const g=part.closing&&part.id?groups.find(g=>sameId(g.id)===sameId(part.id)&&next(g,part.page)):undefined;
       if(g){g.pages.push(part);closed.add(part)}
       continue;
     }
     const last=groups[groups.length-1];
-    const g=part.id?groups.find(g=>g.id===part.id&&next(g,part.page))
-      :part.kind==="scale"&&last&&last.pages[last.pages.length-1].kind==="scale"&&next(last,part.page)?last:undefined;
+    const g=part.id?groups.find(g=>sameId(g.id)===sameId(part.id)&&next(g,part.page)&&deeper(g,part))
+      :part.kind==="scale"&&last&&last.pages[last.pages.length-1].kind==="scale"&&next(last,part.page)&&deeper(last,part)?last:undefined;
     if(g)g.pages.push(part);else groups.push({id:part.id??`page ${part.page}`,pages:[part]});
   }
   // Pages in order of their sheet numbers where every page gives one; else in their order in the document.
