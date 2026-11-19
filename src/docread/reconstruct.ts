@@ -448,6 +448,13 @@ export function rebuild(els:TextLine[],width:number,height=Infinity):PageLog{
   // Boundaries: the column of decimal numbers whose values agree with their positions on the scale (within 0.6 m).
   // Other columns of decimals (elevations, thicknesses) agree only by chance, so they lose to it.
   const agree=(e:TextLine)=>Math.abs(scale.depthAt(e.cy)-num(e.text))<0.6;
+  // The depth written where the log ends ("12.40" at "END OF BOREHOLE", on its line or the line above, in the column of
+  // depths that fit the scale) is the final depth where the header gives none.
+  if(head.final===undefined){
+    const end=els.filter(e=>LOG_END.test(e.text.trim())).sort((p,q)=>p.cy-q.cy)[0],h=end?Math.max(end.y1-end.y0,1):0;
+    const at=end&&els.filter(e=>isDecimal(e)&&agree(e)&&e.cy<=end.cy+0.6*h&&end.cy-e.cy<=2.5*h).sort((p,q)=>Math.abs(end.cy-p.cy)-Math.abs(end.cy-q.cy))[0];
+    if(at){head.final=num(at.text);head.src={...head.src,final:at}}
+  }
   const extra={top:Math.max(0,+scale.depthAt(Math.min(...scale.labels.map(e=>e.cy))-0.5*scale.b).toFixed(2))};
   const bcol=columns(els.filter(isDecimal)).sort((p,q)=>q.els.filter(agree).length-p.els.filter(agree).length)[0];
   // A column where most values do not fit their places (laboratory results, sample numbers) is no column of
