@@ -261,3 +261,21 @@ test("exports with page images say so, can leave the previews out, and cancel ex
   expect(pages).toHaveLength(2);for(const p of pages){expect(p.image).toBeUndefined();expect(p.width).toBe(600)}
   expect(exported.evidence.records.map((r:any)=>r.id)).toContain("collar-bh1");
 });
+
+test("a page read from its own text can be read again by OCR, which says so on the page",async({page})=>{
+  test.setTimeout(240_000);
+  await prepare(page);await page.goto("/?backend=webgl#input");await openInput(page);
+  await page.locator(".pdf-file").setInputFiles(fileURLToPath(new URL("../fixtures/docread/bro-470162-strip.pdf",import.meta.url)));
+  await page.getByRole("button",{name:"Agree",exact:true}).click();
+  const review=page.getByRole("dialog",{name:"Borehole logs read from documents"});
+  await expect(review.locator("#dr-f-id")).not.toHaveValue("",{timeout:60_000});
+  // Read from the PDF's own text: no OCR label, and the override is offered.
+  await expect(review.locator(".dr-readby")).toHaveText("");
+  const ocr=review.locator(".dr-ocr");
+  await expect(ocr).toBeVisible();
+  await ocr.click();
+  await expect(review.locator(".dr-readby")).toHaveText("Read by OCR: read by OCR on request",{timeout:200_000});
+  await expect(ocr).toBeHidden();
+  await expect(review.locator(".dr-unread")).toContainText("1 page read by OCR");
+  await expect(review.locator(".dr-say")).toContainText(/Page 1 read by OCR/);
+});

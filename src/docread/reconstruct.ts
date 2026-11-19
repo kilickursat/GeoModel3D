@@ -5,8 +5,9 @@
 
 // A line of text and its box, in page pixels (y down), and the page it is on once a document is read.
 export interface TextLine { text:string; x0:number; y0:number; x1:number; y1:number; cx:number; cy:number; page?:number }
-// A flagged layer says why its base depth needs checking.
-export interface ReadLayer { from:number; to:number; description:string; flagged?:boolean; why?:string; src:TextLine[] }
+// A flagged layer says why its base depth needs checking. `gap`: the untested interval its base lies in, where the
+// log describes samples (see sampleLayers).
+export interface ReadLayer { from:number; to:number; description:string; flagged?:boolean; why?:string; gap?:[number,number]; src:TextLine[] }
 export type HeaderField="id"|"ground"|"final"|"water"|"x"|"y"|"lat"|"lon";
 // `src` keeps the line each header value was read from.
 export interface LogHeader {
@@ -19,12 +20,18 @@ export interface LogHeader {
 // read rather than a page of something else.
 // `samples`: a drawn log read from the sample depths written at the start of its descriptions (see readSamples).
 // `closing`: the text of a last sheet that holds only the end of a log, with no depth scale (see closingText).
+// `top`: the depth where the page's log starts, so the sheets of one log follow one another downwards. `core`: the
+// runs of a rock core log (see readCore).
 export interface PageLog extends LogHeader {
   kind:"scale"|"table"; layers:ReadLayer[]; used:Set<TextLine>; flagged:number[]; bounds:number[];
   texts:Array<{depth:number;text:string;src:TextLine}>; error?:string; evidence?:boolean; samples?:Sample[];
-  closing?:{description:string;src:TextLine[]};
+  closing?:{description:string;src:TextLine[]}; top?:number; core?:CoreSheet;
 }
-export interface ReadLog extends LogHeader { kind:"scale"|"table"; pages:number[]; layers:ReadLayer[]; flagged:number[]; samples?:boolean }
+// `core`: the rock core logs of the borehole, by their pages: runs and the rock described, kept for the review.
+export interface ReadLog extends LogHeader {
+  kind:"scale"|"table"; pages:number[]; layers:ReadLayer[]; flagged:number[]; samples?:boolean;
+  core?:CoreSheet&{pages:number[]};
+}
 
 // NFKC: full-width brackets and digits (common in Japanese documents) become plain ones, and Kangxi radicals that some
 // PDF producers put in the text layer for kanji ("⼝" for 口, "⾼" for 高) become the kanji. The radicals supplement has
@@ -93,6 +100,32 @@ export function depthScale(els:TextLine[],width:number):DepthScale|null{
   return {a,b,kind:best.kind,labels:best.inl,depthAt:y=>(y-a)/b,yAt:d=>a+b*d};
 }
 
+// A log too short for its scale to show more than its top (a hand-auger hole to 0.9 m) may still print, at each
+// boundary, its elevation over its depth ("48.3" over "0.4"): pairs that add up to one ground level are depths, and
+// their places with the ground surface's give the scale. Only for a titled log whose numbers give no scale otherwise.
+export function pairScale(els:TextLine[],width:number):DepthScale|null{
+  const decs=els.filter(isDecimal),h=decs.map(e=>e.y1-e.y0).sort((a,b)=>a-b)[decs.length>>1]||12;
+  const pairs:Array<{depth:TextLine;sum:number}>=[];
+  for(const d of decs){
+    const e=decs.filter(e=>e!==d&&Math.abs(e.cx-d.cx)<0.05*width&&d.cy-e.cy>0.4*h&&d.cy-e.cy<2.5*h).sort((p,q)=>q.cy-p.cy)[0];
+    if(e&&num(d.text)<num(e.text))pairs.push({depth:d,sum:num(e.text)+num(d.text)});
+  }
+  let best:typeof pairs=[];
+  for(const p of pairs){const near=pairs.filter(q=>Math.abs(q.sum-p.sum)<=0.05);if(near.length>best.length)best=near}
+  if(best.length<2)return null;
+  const ground=best[0].sum,top=Math.min(...best.map(p=>p.depth.cy));
+  // The ground surface: its words, or its elevation alone above the first boundary.
+  const surface=els.find(e=>/^(?:ground surface|ground level|existing grade|top of (?:ground|hole))$/i.test(e.text.trim())&&e.cy<top)??
+    decs.find(e=>Math.abs(num(e.text)-ground)<=0.05&&e.cy<top);
+  if(!surface)return null;
+  const xs=[0,...best.map(p=>num(p.depth.text))],ys=[surface.cy,...best.map(p=>p.depth.cy)],n=xs.length;
+  if(new Set(xs).size<3)return null;
+  const mx=xs.reduce((s,v)=>s+v)/n,my=ys.reduce((s,v)=>s+v)/n;
+  const b=xs.reduce((s,v,k)=>s+(v-mx)*(ys[k]-my),0)/xs.reduce((s,v)=>s+(v-mx)**2,0),a=my-b*mx;
+  if(!(b>0)||xs.some((v,k)=>Math.abs(a+b*v-ys[k])>Math.max(1.5*h,0.15*b)))return null;
+  return {a,b,kind:"decimals",labels:best.map(p=>p.depth),depthAt:y=>(y-a)/b,yAt:d=>a+b*d};
+}
+
 // ---------- header values ----------
 
 // A header value. Every text matching the label is tried in turn until one gives a value that passes `ok`: the rest of
@@ -127,6 +160,9 @@ const DATE=/\d{1,2}[./-]\d{1,2}[./-]\d{2,4}/;
 const isId=(t:string)=>/^[A-Za-z.#\-]{0,6}\s?\d[\w.\-/]{0,12}$/.test(t.trim());
 const isNum=(t:string)=>/^\D{0,3}\d/.test(t)&&!DATE.test(t);
 const isDec=(t:string)=>/^\D{0,3}\d+[.,]\d/.test(t)&&!DATE.test(t);
+const REMARK=/^\s*\d+(?:[.,]\d+)?\s*m\s*:\s*\p{L}/u;
+// A thickness ("80mm ASPHALT", under "GROUND SURFACE") is no level.
+const isLevel=(t:string)=>isNum(t)&&!/^\D{0,3}\d+(?:[.,]\d+)?\s?(?:mm|cm)\b/i.test(t);
 
 // Page order: lines top to bottom, each left to right. Text within half a line height of a line's first item is on
 // that line, so two headings side by side keep their order whatever their boxes' heights. (A PDF's own text comes in
@@ -156,7 +192,9 @@ export function header(lines:TextLine[]):LogHeader&{mark?:number}{
     return value;
   };
   // A title "LOG OF BOREHOLE BH3 … 1 OF 3" gives the ID and the sheet, so the pages of one log can be joined.
-  const title=match(/(?:log|record) of\s+(?:bore ?hole|boring|test ?pit|drill ?hole)\s+([A-Za-z0-9][\w./-]*)/i);
+  // So does "BOREHOLE LOG 214" or "ROCK CORE LOG 214", the ID after the title on its line ("LOG" is no part of the ID).
+  const named=match(/(?:bore ?hole|boring|drill ?hole|test ?pit|(?:rock )?core)[ \t]+log[ \t]+(?:no\.?[ \t]*)?([A-Za-z0-9][\w./-]*)/i);
+  const title=match(/(?:log|record) of\s+(?:bore ?hole|boring|test ?pit|drill ?hole)\s+([A-Za-z0-9][\w./-]*)/i)??(named&&isId(named.text)?named:undefined);
   const sheet=/\b(\d+)\s+of\s+(\d+)\b/i.exec(all);
   // A table of readings ("Water Depth (m)" over a column of values) gives the first reading.
   let reading:{text:string;src:TextLine}|undefined;
@@ -172,11 +210,12 @@ export function header(lines:TextLine[]):LogHeader&{mark?:number}{
     sheet:sheet?[+sheet[1],+sheet[2]]:undefined,
     // The ground level may stand before its words ("12.30 Ground Surface").
     // A header's "ELEVATION: 14.20 m" (with its colon, so not an elevation column's heading) is the ground level too.
-    ground:take("ground",fieldAt(els,/(?:ground (?:level|surface)|(?:ground|surface|collar) elev(?:ation)?\.?|maaiveld(?:hoogte)?|cote du terrain|niveau du sol|gel[äa]ndeh[öo]he|ansatzh[öo]he)(?![a-z])|^孔口標高|^地盤高/i,isNum)??fieldAt(els,/^elev(?:ation)?\.?\s*[:=]/i,isDec),firstNum),
+    ground:take("ground",fieldAt(els,/(?:ground (?:level|surface)|(?:ground|surface|collar) elev(?:ation)?\.?|maaiveld(?:hoogte)?|cote du terrain|niveau du sol|gel[äa]ndeh[öo]he|ansatzh[öo]he)(?![a-z])|^孔口標高|^地盤高/i,isLevel)??fieldAt(els,/^elev(?:ation)?\.?\s*[:=]/i,isDec),firstNum),
     // The depth the hole was taken to ("TERMINATION DEPTH (M) : 10.00", "END OF BOREHOLE AT 6.50 mbgs", 総掘進長).
     final:take("final",fieldAt(els,/^(?:termination(?:\s*depth)?|final depth|total depth|depth of (?:bore ?hole|hole)|hole depth|end of (?:bore ?hole|hole)(?: at)?)(?![a-z])|^総掘進長|^掘進長/i,isDec),firstNum),
     // A table of readings first, then a labelled value, then the water mark on the log.
-    water:take("water",reading??fieldAt(els,/^(?:groundwater|ground water|grondwater(?:stand)?|nappe|grundwasser|water level|w\.\s*l\.|gwl|gwt|g\.\s*w\.\s*t\.|swl|swt|static water(?: level| table)?)(?![a-z])|^孔内水位|^地下水位/i,isDec)??gwl,firstNum),
+    // A remark under a heading that names the water level ("0.6m: sample disturbed" in a comments column) is none.
+    water:take("water",reading??fieldAt(els,/^(?:groundwater|ground water|grondwater(?:stand)?|nappe|grundwasser|water level|w\.\s*l\.|gwl|gwt|g\.\s*w\.\s*t\.|swl|swt|static water(?: level| table)?)(?![a-z])|^孔内水位|^地下水位/i,t=>isDec(t)&&!REMARK.test(t))??gwl,firstNum),
     // "×" is a common reading of "X".
     x:take("x",match(/(?:^|[^A-Za-z])[X×]\s*[=:]?\s*(-?[\d.,]{4,})/m),firstNum),y:take("y",match(/(?:^|[^A-Za-z])Y\s*[=:]?\s*(-?[\d.,]{4,})/m),firstNum)};
   // Northing and easting where there is no X and Y. In UTM the northing is the one in millions: labels the other way
@@ -222,7 +261,13 @@ const KANJI:Record<string,string>={"质":"質","风":"風","砾":"礫","软":"�
 const kanji=(t:string)=>/[぀-ヿ一-鿿]/.test(t)?t.replace(/[质风砾软层页碟王]/g,c=>KANJI[c]).replace(/[·‧∙⋅]/g,"・"):t;
 // Hatching read as text: short mixes of digits with D, b, p, q, O or U ("D0D", "bb0", "6DD"), runs of D, lone marks,
 // and one or two kanji inside Latin text.
+// A sheet's marks that a layer runs on ("(continued)", "Continued next page") are no description.
+const CONTINUED_MARK=/\(\s*continued[^)]*\)|\bcontinued\s+(?:on\s+|to\s+|from\s+)?(?:the\s+)?(?:next|previous|last)\s+(?:page|sheet)\b|^\s*continued\s*$/gi;
+// OCR reads some capitals as small letters of the same shape (c, o, s, v, w, x, z): "SILTY cLAY," is "SILTY CLAY,".
+const capitals=(t:string)=>t.replace(/\b[cosvwxz](?=[A-Z]{2,}\b)/g,c=>c.toUpperCase()).replace(/\b([A-Z]+)([cosvwxz])(?=[A-Z]{2,}\b)/g,(_,a,c)=>a+c.toUpperCase())
+  .replace(/\b([A-Z]{2,})([cosvwxz])(?=[A-Z]+\b)/g,(_,a,c)=>a+c.toUpperCase());
 function clean(t:string,latin=(t.match(/[A-Za-z]/g)??[]).length>=5){
+  t=capitals(t.replace(CONTINUED_MARK," "));
   return t.split(/\s+/).filter(w=>!(/^(?=.*\d)(?=.*[DdbpqOoUu])[0-9DdbpqOoUu]{2,4}$/.test(w)||/^[Dd]{2,}$/.test(w)||/^[?!)(\]\[}{|]+$/.test(w)||
     (latin&&/^[぀-ヿ一-鿿]{1,2}$/.test(w)))).join(" ").trim();
 }
@@ -284,10 +329,23 @@ function thinStack(layers:ReadLayer[]):number[]{
   if(!fills)made.push({from:thin[thin.length-1].to,to:first.to,description:first.description,src:[]});
   else if(first.description&&layers[1]&&TITLE.test(first.description))layers[1].description=(first.description+" "+layers[1].description).trim();
   else if(first.description)made[made.length-1].description+=": "+first.description;
+  for(const l of made.slice(0,thin.length))THIN_MADE.add(l);
   layers.splice(0,1,...made);
   return made.map(l=>l.to).filter(v=>v!==first.to);
 }
 const THIN="from the thicknesses written in the descriptions";
+// The layers made from thicknesses. Where the rest of the first interval is still empty once the titles are dealt (see
+// fixTitles), nothing else is described there: the last thin layer reaches the boundary written below it, flagged, as
+// the log draws its base there though its thickness says less.
+const THIN_MADE=new WeakSet<ReadLayer>();
+function absorbRest(layers:ReadLayer[]){
+  for(let k=1;k<layers.length;k++){
+    const above=layers[k-1],rest=layers[k];
+    if(!THIN_MADE.has(above)||rest.description.trim()||THIN_MADE.has(rest))continue;
+    above.flagged=true;above.why=`its thickness as written ends at ${above.to} m; the boundary below it is written at ${rest.to} m`;
+    above.to=rest.to;layers.splice(k,1);k--;
+  }
+}
 
 // Each layer's evidence: the depth written at its base and the lines whose text is in its description, taken from the
 // lines at the layer's depths (`depth` of a line, where known), so two layers with the same description keep their own;
@@ -379,7 +437,7 @@ function sampleLayers(samples:Sample[],final?:number):{layers:ReadLayer[];flagge
         if(x.from-reached>0.05){
           const noted=changes.find(c=>c.depth>=reached-0.005&&c.depth<=x.from+0.005);
           if(noted)from=noted.depth;
-          last.flagged=true;
+          last.flagged=true;last.gap=[+reached.toFixed(3),x.from];
           last.why=noted?`the log notes “${noted.note}”; the samples end at ${+reached.toFixed(3)} m and start again at ${x.from} m`
             :`the change lies between the samples ending at ${+reached.toFixed(3)} m and starting at ${x.from} m; placed where the new description starts`;
           flagged.push(from);
@@ -425,8 +483,68 @@ function closingText(els:TextLine[]):{description:string;src:TextLine[]}|undefin
   return description?{description,src}:undefined;
 }
 
+// ---------- rock core logs ----------
+
+// A rock core log ("ROCK CORE LOG 214") gives the runs cored in the rock: each run's depths, its recovery (TCR, SCR) and
+// RQD, the make-up of the run ("Run 1: 60% sandstone 40% mudstone") and notes on its fractures ("5.2/ 46.8m: 40mm
+// broken zone"). A run is a measurement over a drilled length, not a stratum: the runs are kept as records beside
+// the borehole's layers, and the rock the sheet describes is kept with them as written (see readDocument).
+export interface CoreRun { run:string; from?:number; to?:number; tcr?:number; scr?:number; rqd?:number; notes:string[]; src:TextLine[] }
+export interface CoreSheet { runs:CoreRun[]; text:string; src:TextLine[] }
+// The title is the whole line, perhaps with the borehole's ID: "(see Rock / Core Log 12) below 3.5m", a sentence
+// wrapped on a log, is none.
+const CORE_TITLE=/^(?:rock\s+)?(?:core|coring)\s+(?:log|record)(?:\s+(?:no\.?\s*)?[A-Za-z]{0,6}[-\s]?\d[\w./-]{0,12})?$/i;
+const RUN_LABEL=/^(?:R|Run)\s*#?\s*(\d{1,3})$/i,RUN_MAKEUP=/^Run\s*#?\s*(\d{1,3})\s*:/i;
+const RECOVERED=/\b(TCR|SCR|RQD)\s*[=:]\s*(\d{1,3}(?:[.,]\d)?)\s*%/i;
+const FRACTURE=/^(\d+(?:[.,]\d+)?)\s*\/\s*\d+(?:[.,]\d+)?\s*m?\s*(?:-\s*\d+(?:[.,]\d+)?\s*\/\s*\d+(?:[.,]\d+)?\s*m?\s*)?:/;
+export const coreTitled=(els:TextLine[])=>els.some(e=>CORE_TITLE.test(e.text.trim()));
+function readCore(els:TextLine[],scale:DepthScale):CoreSheet{
+  const h=els.map(e=>e.y1-e.y0).sort((a,b)=>a-b)[els.length>>1]||12;
+  // The runs: labels "R1", "R2" in one column (under the "Run" heading where there is one: strength grades R0–R6
+  // elsewhere on the sheet are no runs), between the depths of the runs' ends in the column beside them.
+  const heading=els.find(e=>/^run(?:\s*(?:no\.?|#))?$/i.test(e.text.trim()));
+  let labels=els.filter(e=>RUN_LABEL.test(e.text.trim()));
+  if(heading)labels=labels.filter(e=>Math.abs(e.cx-heading.cx)<3*Math.max(heading.x1-heading.x0,h));
+  else{const col=columns(labels).sort((p,q)=>q.els.length-p.els.length)[0];labels=col?col.els:[]}
+  labels.sort((p,q)=>p.cy-q.cy);
+  const cx=labels.length?labels.reduce((t,e)=>t+e.cx,0)/labels.length:NaN;
+  const ends=els.filter(e=>isDecimal(e)&&Math.abs(scale.depthAt(e.cy)-num(e.text))<0.6&&(!labels.length||Math.abs(e.cx-cx)<6*h)).sort((p,q)=>p.cy-q.cy);
+  const runs:CoreRun[]=labels.map(e=>{
+    const above=ends.filter(d=>d.cy<e.cy).at(-1),below=ends.find(d=>d.cy>e.cy);
+    return {run:`R${RUN_LABEL.exec(e.text.trim())![1]}`,...(above?{from:num(above.text)}:{}),...(below?{to:num(below.text)}:{}),notes:[],src:[e,...(above?[above]:[]),...(below?[below]:[])]};
+  });
+  // Recovery and RQD go to the nearest run label; fracture notes and a run's make-up to the run they name or lie in.
+  const nearest=(y:number)=>{let k=-1,d=Infinity;labels.forEach((e,i)=>{const v=Math.abs(e.cy-y);if(v<d){d=v;k=i}});return k};
+  for(const e of els){
+    const m=RECOVERED.exec(e.text);
+    if(m){const k=nearest(e.cy);if(k>=0){runs[k][m[1].toLowerCase() as "tcr"|"scr"|"rqd"]=num(m[2]);runs[k].src.push(e)}}
+  }
+  const used=new Set<TextLine>();
+  for(const e of els.filter(e=>FRACTURE.test(e.text.trim())).sort((p,q)=>p.cy-q.cy)){
+    const d=num(FRACTURE.exec(e.text.trim())![1]),r=runs.find(r=>r.from!==undefined&&r.to!==undefined&&d>=r.from-0.005&&d<r.to);
+    if(!r)continue;
+    // A note may wrap: a short line just below it, in its column, is the rest of it.
+    const rest=els.filter(c=>c!==e&&!FRACTURE.test(c.text.trim())&&Math.abs(c.x0-e.x0)<h&&c.cy>e.cy&&c.cy-e.cy<1.6*h);
+    r.notes.push([e,...rest].map(c=>c.text.trim()).join(" "));r.src.push(e,...rest);used.add(e);rest.forEach(c=>used.add(c));
+  }
+  const makeups=els.filter(e=>RUN_MAKEUP.test(e.text.trim()));
+  for(const e of makeups){
+    const n=RUN_MAKEUP.exec(e.text.trim())![1],r=runs.find(r=>r.run===`R${n}`);
+    const parts=els.filter(c=>c!==e&&c.x0>=e.x1-2&&c.x0-e.x1<4*h&&c.cy>e.cy-0.6*h&&c.cy<e.cy+1.8*h).sort((p,q)=>p.cy-q.cy||p.x0-q.x0);
+    const text=[e.text.replace(RUN_MAKEUP,"").trim(),...parts.map(c=>c.text.trim())].filter(Boolean).join(" ");
+    used.add(e);parts.forEach(c=>used.add(c));
+    if(r){r.notes.unshift(`Run ${n}: ${text}`);r.src.push(e,...parts)}
+  }
+  // The rock as the sheet describes it: its description column, under its heading, without the runs' make-up.
+  const head=els.filter(e=>HEADING.test(e.text)&&short(e.text,5)).sort((p,q)=>p.cy-q.cy)[0];
+  const body=els.filter(e=>!used.has(e)&&!Number.isFinite(num(e.text))&&letters(e.text)>=2&&(!head||e.cy>head.y1)&&scale.depthAt(e.cy)>=0);
+  const col=head?columns(body).find(c=>c.x0<head.x1&&c.x1>head.x0):undefined;
+  const src=[...(col?.els??[])].sort((p,q)=>p.cy-q.cy);
+  return {runs,text:src.map(e=>clean(e.text)).join(" ").replace(/\s+/g," ").trim(),src};
+}
+
 export function rebuild(els:TextLine[],width:number,height=Infinity):PageLog{
-  const scale=depthScale(els,width),head=header(els),title=titled(els),evidence=logEvidence(els);
+  const title=titled(els),scale=depthScale(els,width)??(title?pairScale(els,width):null),head=header(els),evidence=logEvidence(els);
   const empty=(error:string,looks:boolean):PageLog=>({...head,kind:"scale",layers:[],used:new Set(),flagged:[],bounds:[],texts:[],error,evidence:looks});
   if(!scale){const closing=evidence?closingText(els):undefined;return {...empty("no depth scale found",evidence),...(closing?{closing}:{})}}
   // Numbers in a report's text or in a table of results can pass for a depth scale; a log page says it is one. Without
@@ -439,6 +557,14 @@ export function rebuild(els:TextLine[],width:number,height=Infinity):PageLog{
   // Boundaries: the column of decimal numbers whose values agree with their positions on the scale (within 0.6 m).
   // Other columns of decimals (elevations, thicknesses) agree only by chance, so they lose to it.
   const agree=(e:TextLine)=>Math.abs(scale.depthAt(e.cy)-num(e.text))<0.6;
+  // The depth written where the log ends ("12.40" at "END OF BOREHOLE", on its line or the line above, in the column of
+  // depths that fit the scale) is the final depth where the header gives none.
+  if(head.final===undefined){
+    const end=els.filter(e=>LOG_END.test(e.text.trim())).sort((p,q)=>p.cy-q.cy)[0],h=end?Math.max(end.y1-end.y0,1):0;
+    const at=end&&els.filter(e=>isDecimal(e)&&agree(e)&&e.cy<=end.cy+0.6*h&&end.cy-e.cy<=2.5*h).sort((p,q)=>Math.abs(end.cy-p.cy)-Math.abs(end.cy-q.cy))[0];
+    if(at){head.final=num(at.text);head.src={...head.src,final:at}}
+  }
+  const core=coreTitled(els)?readCore(els,scale):undefined,extra={top:Math.max(0,+scale.depthAt(Math.min(...scale.labels.map(e=>e.cy))-0.5*scale.b).toFixed(2)),...(core?{core}:{})};
   const bcol=columns(els.filter(isDecimal)).sort((p,q)=>q.els.filter(agree).length-p.els.filter(agree).length)[0];
   // A column where most values do not fit their places (laboratory results, sample numbers) is no column of
   // boundaries: a value that fits by chance there ("2.68" beside 2.7 m) is no boundary either. Only values that could
@@ -476,7 +602,7 @@ export function rebuild(els:TextLine[],width:number,height=Infinity):PageLog{
       const last=!head.sheet||head.sheet[0]>=head.sheet[1],read=sampleLayers(samples,last?head.final:undefined);
       for(const x of samples)for(const e of x.src)used.add(e);
       const texts=samples.map(x=>({depth:x.from,text:x.description,src:x.src[0]}));
-      return {...head,kind:"scale",layers:read.layers,used,flagged:read.flagged,texts,bounds:read.layers.map(l=>l.to),samples,evidence};
+      return {...head,kind:"scale",layers:read.layers,used,flagged:read.flagged,texts,bounds:read.layers.map(l=>l.to),samples,evidence,...extra,top:samples[0].from};
     }
   }
   const labels=[...bels];
@@ -523,6 +649,7 @@ export function rebuild(els:TextLine[],width:number,height=Infinity):PageLog{
   }
   for(const v of thinStack(layers)){flagged.push(v);why.set(v,THIN)}
   fixTitles(layers);
+  absorbRest(layers);
   layers.forEach(l=>{if(flagged.includes(l.to)){l.flagged=true;l.why=why.get(l.to)}});
   attach(layers,lines,labels,depthOf);
   // Logs that print each boundary's elevation beside its depth give the ground level as elevation + depth, many times
@@ -542,7 +669,7 @@ export function rebuild(els:TextLine[],width:number,height=Infinity):PageLog{
   }
   // For logs over several pages: each description line with its depth.
   const texts=lines.map(e=>({depth:depthOf(e),text:clean(kanji(e.text),latin),src:e})).filter(t=>t.text);
-  return {...head,kind:"scale",layers,used,flagged,texts,bounds,evidence};
+  return {...head,kind:"scale",layers,used,flagged,texts,bounds,evidence,...extra};
 }
 
 // ---------- a log set out as a table ----------
@@ -627,6 +754,7 @@ export function rebuildTable(els:TextLine[],width:number):PageLog{
   const used=new Set<TextLine>([f,t,...chain.flatMap(r=>r.els),...described]);
   const flagged=thinStack(layers);
   fixTitles(layers);
+  absorbRest(layers);
   layers.forEach(l=>{if(flagged.includes(l.to)){l.flagged=true;l.why=THIN}});
   attach(layers,lines,chain.map(r=>r.els[1]),depth);
   return {...head,kind:"table",layers,used,flagged,bounds:layers.map(l=>l.to),texts:[],evidence:true};
@@ -682,44 +810,92 @@ function joinBody(pages:Array<PageLog&{page:number}>,head:LogHeader,at:number[],
   for(const p of pages)for(const b of p.bounds)if(!bounds.some(v=>Math.abs(v-b)<0.03))bounds.push(b);
   bounds.sort((a,b)=>a-b);
   const layers:ReadLayer[]=bounds.map((to,k)=>({from:k?bounds[k-1]:0,to,description:"",src:[]}));
+  // A sheet repeats the layer it continues from the sheet before ("MUDSTONE (see the rock core
+  // log)" again under "(continued)"): the repeat adds nothing to the layer, nor a title to deal (see fixTitles).
+  const key=(t:string)=>t.normalize("NFKD").replace(/\p{M}/gu,"").toLowerCase().replace(/\s+/g," ").trim();
   for(const p of pages)for(const t of p.texts){
     const l=layers.find(l=>t.depth>=l.from&&t.depth<l.to);
-    if(l)l.description=(l.description+" "+t.text).trim();
+    if(!l||!t.text.trim())continue;
+    if(p!==pages[0]&&key(l.description).includes(key(t.text)))continue;
+    l.description=(l.description+" "+t.text).trim();
   }
   const flagged=pages.flatMap(p=>p.flagged),reasons=pages.flatMap(p=>p.layers).filter(l=>l.why),thin=thinStack(layers);
   for(const v of thin)if(!flagged.includes(v))flagged.push(v);
   fixTitles(layers);
+  absorbRest(layers);
   layers.forEach(l=>{if(flagged.includes(l.to)){l.flagged=true;l.why=thin.includes(l.to)?THIN:reasons.find(r=>Math.abs(r.to-l.to)<0.03)?.why}});
   const textDepth=new Map(pages.flatMap(p=>p.texts.map(t=>[t.src,t.depth] as const)));
   attach(layers,[...textDepth.keys()],pages.flatMap(p=>[...p.used].filter(e=>/[.,]\d/.test(e.text))),e=>textDepth.get(e));
   return {...head,kind:"scale",pages:at,layers,flagged};
 }
 
+// Borehole IDs as one borehole's: case, separators, leading zeros and the words of a label ("LOG", "BH", "Borehole",
+// "No.") make no difference: "Log 31" is "LOG31" is "31", and "BH-01" is "BH1" is "1". Other prefixes stay ("TP-1" and
+// "BH-1" are two holes).
+export const sameId=(id:string|undefined)=>{
+  if(id===undefined)return undefined;
+  const s=id.normalize("NFKC").toUpperCase().trim();
+  return s.replace(/^(?:BORE\s*HOLE|BORING|LOG|BH)(?:\s*(?:NO\.?|#))?[\s\-_.#:]*/,"").replace(/[\s\-_./#]/g,"").replace(/^([A-Z]*)0+(?=\d)/,"$1")||s;
+};
+// The runs of the rock core logs of one borehole, sheet after sheet: a run over two sheets is one run.
+function joinCores(cores:Array<PageLog&{page:number}>):CoreSheet&{pages:number[]}{
+  const runs:CoreRun[]=[];
+  for(const c of cores)for(const r of c.core!.runs){
+    const same=runs.find(q=>q.run===r.run);
+    if(!same){runs.push({...r,notes:[...r.notes],src:[...r.src]});continue}
+    if(r.from!==undefined)same.from=Math.min(same.from??r.from,r.from);
+    if(r.to!==undefined)same.to=Math.max(same.to??r.to,r.to);
+    same.tcr??=r.tcr;same.scr??=r.scr;same.rqd??=r.rqd;same.notes.push(...r.notes);same.src.push(...r.src);
+  }
+  runs.sort((p,q)=>(p.from??Infinity)-(q.from??Infinity));
+  return {pages:cores.map(c=>c.page),runs,text:cores.map(c=>c.core!.text).filter(Boolean).join(" "),src:cores.flatMap(c=>c.core!.src)};
+}
 // The logs of a document: each page's logs, and the pages of one borehole joined in order of their sheet numbers (in
-// document order where a page gives none). The
-// pages of a log follow one another: a page joins the log of the same ID on the page before (or the same page), and a
-// page whose ID was not read joins the drawn log just before it. A log from a table is complete on its page, and a page
-// part without layers joins no log, unless it closes the log of its ID. `unread` lists the parts that join none, saying
-// whether each looked like a log.
+// document order where a page gives none). The pages of a log follow one another (only rock core logs may lie between
+// them) and go deeper: a page joins the log of the same ID (see sameId) on the page before, or on the same page, where
+// its log starts below the top of the page before; a page whose ID was not read joins the drawn log just before it in
+// the same way. A log from a table is complete on its page, and a page part without layers joins no log, unless it
+// closes the log of its ID. The rock core logs of a borehole whose log is read go with that log as records, never as
+// its layers (see readCore); one with no log of its ID is read as a log itself. `unread` lists the parts that join
+// none, saying whether each looked like a log.
 export function readDocument(pages:Array<{page:number;lines:TextLine[];width:number;height:number}>){
   const parts=pages.flatMap(p=>readPage(p.lines.map(l=>({...l,page:p.page})),p.width,p.height).map(log=>({...log,page:p.page})));
+  const logIds=new Set(parts.filter(p=>!p.core&&p.layers.length&&p.id).map(p=>sameId(p.id)));
+  const cores=parts.filter(p=>p.core&&p.id&&logIds.has(sameId(p.id))),corePages=new Set(cores.map(p=>p.page));
   const groups:Array<{id:string;pages:Array<PageLog&{page:number}>}>=[];
-  const next=(g:{pages:Array<{page:number}>},page:number)=>page-g.pages[g.pages.length-1].page<=1;
+  const next=(g:{pages:Array<{page:number}>},page:number)=>{
+    const last=g.pages[g.pages.length-1].page;
+    for(let p=last+1;p<page;p++)if(!corePages.has(p))return false;
+    return page>=last;
+  };
+  const deeper=(g:{pages:Array<PageLog&{page:number}>},part:PageLog)=>{
+    const prev=g.pages[g.pages.length-1];
+    return part.top===undefined||prev.top===undefined||part.top>prev.top+0.1;
+  };
   const closed=new Set<PageLog>();
   for(const part of parts){
+    if(cores.includes(part))continue;
     // A sheet that only closes a log goes with the log of its ID on the page before.
     if(!part.layers.length){
-      const g=part.closing&&part.id?groups.find(g=>g.id===part.id&&next(g,part.page)):undefined;
+      const g=part.closing&&part.id?groups.find(g=>sameId(g.id)===sameId(part.id)&&next(g,part.page)):undefined;
       if(g){g.pages.push(part);closed.add(part)}
       continue;
     }
     const last=groups[groups.length-1];
-    const g=part.id?groups.find(g=>g.id===part.id&&next(g,part.page))
-      :part.kind==="scale"&&last&&last.pages[last.pages.length-1].kind==="scale"&&next(last,part.page)?last:undefined;
+    const g=part.id?groups.find(g=>sameId(g.id)===sameId(part.id)&&next(g,part.page)&&deeper(g,part))
+      :part.kind==="scale"&&last&&last.pages[last.pages.length-1].kind==="scale"&&next(last,part.page)&&deeper(last,part)?last:undefined;
     if(g)g.pages.push(part);else groups.push({id:part.id??`page ${part.page}`,pages:[part]});
   }
   // Pages in order of their sheet numbers where every page gives one; else in their order in the document.
   const logs=groups.map(g=>({...joinPages(g.pages.every(p=>p.sheet)?g.pages.sort((p,q)=>p.sheet![0]-q.sheet![0]):g.pages),id:g.id}));
-  const unread=parts.filter(p=>!p.layers.length&&!closed.has(p)).map(p=>({page:p.page,id:p.id,error:p.error??"no layers found",log:!!p.evidence}));
+  // Each rock core log goes with the log of its ID nearest before it (or after it, where none is before).
+  const withCore=new Map<number,Array<PageLog&{page:number}>>();
+  for(const c of cores){
+    const same=logs.map((l,i)=>({l,i})).filter(({l})=>sameId(l.id)===sameId(c.id)&&l.layers.length);
+    const before=same.filter(({l})=>l.pages[0]<=c.page).at(-1)??same[0];
+    if(before)withCore.set(before.i,[...(withCore.get(before.i)??[]),c]);
+  }
+  for(const [i,cs] of withCore)logs[i].core=joinCores(cs);
+  const unread=parts.filter(p=>!p.layers.length&&!closed.has(p)&&!cores.includes(p)).map(p=>({page:p.page,id:p.id,error:p.error??"no layers found",log:!!p.evidence}));
   return {logs:logs.filter(l=>l.layers.length),unread,parts};
 }

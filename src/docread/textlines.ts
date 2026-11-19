@@ -93,3 +93,32 @@ export function linesFromItems(items:PdfTextItem[],view:number[]):TextLine[]{
 }
 // The characters of a page's text layer: a page with almost none is a scanned image.
 export const textChars=(items:PdfTextItem[])=>items.reduce((s,it)=>s+(it.str?.replace(/\s/g,"").length??0),0);
+
+// How much of a page's text layer reads as words. A PDF whose fonts have no usable map to characters gives text that
+// looks like text but is not ("$$':?')& ,,&:A:&)#:$'"59"): PDF.js returns the font's codes as characters, with no
+// replacement marks to tell. A word here is a run of letters (any script) with ordinary punctuation around it, a
+// number, or a code such as "BH-01"; bullets, dashes and leader dots are left out of the count. On the reports tested,
+// garbled pages scored 0.00–0.31 and real text 0.53 or more (scanned pages have almost no text and are OCR'd anyway).
+const WORD=/^[(\["'“‘]*(?:[\p{L}][\p{L}\p{M}'’.\-]*|\d+(?:[.,:/\-]\d+)*%?|[\p{L}\d]+(?:[-/][\p{L}\d]+)+)[)\]"'”’.,;:!?%]*$/u;
+const DECOR=/^[•·▪■□●○◦‣⁃–—\-_.…|=~*]+$/u;
+export function wordShare(texts:string[]):{tokens:number;share:number}{
+  const tokens=texts.flatMap(t=>t.split(/\s+/)).filter(w=>w&&!DECOR.test(w));
+  return {tokens:tokens.length,share:tokens.length?tokens.filter(w=>WORD.test(w)).length/tokens.length:1};
+}
+// Below GARBLED the text layer is not used: the page is read by OCR. From GARBLED to TRUSTED it is compared with OCR
+// before it is used. A page with too few words to judge keeps its text layer.
+export const GARBLED=0.35,TRUSTED=0.5,MIN_WORDS=8;
+export type TextLayer="none"|"garbled"|"doubtful"|"good";
+export function judgeText(texts:string[],chars:number,minChars:number):{layer:TextLayer;share:number}{
+  if(chars<minChars)return {layer:"none",share:0};
+  const {tokens,share}=wordShare(texts);
+  if(tokens<MIN_WORDS)return {layer:"good",share};
+  return {layer:share<GARBLED?"garbled":share<TRUSTED?"doubtful":"good",share};
+}
+// For a doubtful page: how many of the text layer's words (of three letters or more) OCR also read. Where most are
+// there, the text layer is right and is kept, for its exact boxes.
+export function agreement(text:string[],ocr:string[]){
+  const words=(ts:string[])=>ts.flatMap(t=>t.toLowerCase().normalize("NFKC").split(/[^\p{L}\p{N}]+/u)).filter(w=>w.length>=3&&/\p{L}/u.test(w));
+  const own=words(text),seen=new Set(words(ocr));
+  return own.length?own.filter(w=>seen.has(w)).length/own.length:1;
+}
