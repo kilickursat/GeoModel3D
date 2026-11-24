@@ -1,0 +1,1015 @@
+{
+ "schema_version": "1.0.0",
+ "report_id": "jp-hirosaki-schools-h26-jitoku",
+ "status": "draft",
+ "provenance": {
+  "annotated_on": "2026-11-20",
+  "annotator_kind": "assistant",
+  "method": "Transcribed by eye from page images at 2x to 4x zoom (scanned, no text layer); checked against elevation = ground level - depth on every layer, the N-value plot beside each test, and the report's Table 4.2.1 of water levels. Names and telephone numbers on the logs are not transcribed."
+ },
+ "scope": {
+  "pages": "all",
+  "boreholes": "all",
+  "fields": [
+   "position",
+   "ground_elevation",
+   "final_depth",
+   "layers",
+   "spt",
+   "rqd",
+   "groundwater"
+  ]
+ },
+ "documents": [
+  {
+   "file": "20170308_hirosaki_gakkoudukuri_jitokushougakkou.pdf",
+   "pages": 22,
+   "sha256": "c847834760a672eb9a684da7bf320199f730bb351b2411f225024ac5466fc145"
+  }
+ ],
+ "pages": [
+  {
+   "doc": 0,
+   "page": 1,
+   "type": "front_matter"
+  },
+  {
+   "doc": 0,
+   "page": 2,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 3,
+   "type": "borehole_summary",
+   "boreholes": [
+    "No.1",
+    "No.2"
+   ],
+   "note": "quantities of drilling and tests per hole"
+  },
+  {
+   "doc": 0,
+   "page": 4,
+   "type": "site_plan",
+   "note": "location map of the site"
+  },
+  {
+   "doc": 0,
+   "page": 5,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 6,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 7,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 8,
+   "type": "drawing_other",
+   "note": "geological map"
+  },
+  {
+   "doc": 0,
+   "page": 9,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 10,
+   "type": "drawing_other",
+   "note": "land-classification map"
+  },
+  {
+   "doc": 0,
+   "page": 11,
+   "type": "text",
+   "note": "with a table of strata per hole"
+  },
+  {
+   "doc": 0,
+   "page": 12,
+   "type": "site_plan",
+   "note": "plan of the borehole positions, rotated"
+  },
+  {
+   "doc": 0,
+   "page": 13,
+   "type": "cross_section",
+   "note": "rotated"
+  },
+  {
+   "doc": 0,
+   "page": 14,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 15,
+   "type": "text",
+   "note": "with N-value histograms"
+  },
+  {
+   "doc": 0,
+   "page": 16,
+   "type": "text",
+   "note": "with N-value histograms"
+  },
+  {
+   "doc": 0,
+   "page": 17,
+   "type": "text",
+   "note": "with N-value histograms"
+  },
+  {
+   "doc": 0,
+   "page": 18,
+   "type": "text",
+   "note": "with N-value histograms"
+  },
+  {
+   "doc": 0,
+   "page": 19,
+   "type": "text",
+   "note": "with N-value histograms"
+  },
+  {
+   "doc": 0,
+   "page": 20,
+   "type": "text",
+   "note": "with Table 4.2.1, groundwater level per hole"
+  },
+  {
+   "doc": 0,
+   "page": 21,
+   "type": "borehole_log",
+   "boreholes": [
+    "No.1"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 22,
+   "type": "borehole_log",
+   "boreholes": [
+    "No.2"
+   ]
+  }
+ ],
+ "boreholes": [
+  {
+   "id": "No.1",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 21
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": null,
+   "ground_elevation": {
+    "value": -0.75,
+    "datum": "local (H=)",
+    "unit": "m",
+    "as_printed": "H= -0.75m",
+    "source": {
+     "doc": 0,
+     "page": 21
+    }
+   },
+   "final_depth": {
+    "value": 30.45,
+    "source": {
+     "doc": 0,
+     "page": 21
+    }
+   },
+   "layers": [
+    {
+     "top": 0,
+     "base": 0.9,
+     "description": "盛土：黒ボクを主体とし、コンクリート片及びφ40前後の亜円礫を混入する",
+     "principal": "made_ground",
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "top": 0.9,
+     "base": 2.0,
+     "description": "有機質シルト：分解の進んだ有機質土で、若干砂を混入する",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "top": 2.0,
+     "base": 2.9,
+     "description": "火山灰質砂質シルト",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "top": 2.9,
+     "base": 7.0,
+     "description": "火山灰質砂：4.00m付近まで粒径均一な微細砂を主体、以深はφ5〜10mmの軽石を混入する",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "top": 7.0,
+     "base": 7.6,
+     "description": "粘土：固結気味で、粘性はやや低い",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "top": 7.6,
+     "base": 9.1,
+     "description": "火山灰質砂質粘土：所々に石英砂と粗砂を混入する",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "top": 9.1,
+     "base": 12.0,
+     "description": "火山灰質シルト：所々にスコリア状の砂を混入、比較的均質",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "top": 12.0,
+     "base": 16.3,
+     "description": "火山灰質砂質シルト：所々、固結したシルトを互層状に挟む",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "top": 16.3,
+     "base": 20.5,
+     "description": "砂混じり火山灰質シルト",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "top": 20.5,
+     "base": 23.9,
+     "description": "礫混じり火山灰質砂質粘土：砂は細粒砂を主体とし、部分的に粘土分が多い",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "top": 23.9,
+     "base": 25.9,
+     "description": "礫混じり火山灰質粘土",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "top": 25.9,
+     "base": 26.9,
+     "description": "火山灰質砂質粘土",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "top": 26.9,
+     "base": 27.5,
+     "description": "火山灰質粘土：半固結状を呈す",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "top": 27.5,
+     "base": 28.7,
+     "description": "火山灰質砂質シルト",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "top": 28.7,
+     "base": 30.45,
+     "description": "礫混じり火山灰質粘土：固結したシルト塊を多く混入",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 2,
+     "source": {
+      "doc": 0,
+      "page": 21
+     },
+     "penetration_cm": 35
+    },
+    {
+     "depth": 2.15,
+     "n": 2,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 3.15,
+     "n": 23,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 4.15,
+     "n": 34,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 38,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 38,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 9,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 11,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 9.15,
+     "n": 5,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 10.15,
+     "n": 5,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 11.15,
+     "n": 3,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 12.15,
+     "n": 5,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 13.15,
+     "n": 9,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 14.15,
+     "n": 8,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 15.15,
+     "n": 10,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 16.15,
+     "n": 8,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 17.15,
+     "n": 5,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 18.15,
+     "n": 5,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 19.15,
+     "n": 5,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 20.15,
+     "n": 8,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 21.15,
+     "n": 19,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 22.15,
+     "n": 14,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 23.15,
+     "n": 12,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 24.15,
+     "n": 22,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 25.15,
+     "n": 21,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 26.15,
+     "n": 3,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 27.15,
+     "n": 18,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 28.15,
+     "n": 2,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 29.15,
+     "n": 28,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    },
+    {
+     "depth": 30.15,
+     "n": 24,
+     "source": {
+      "doc": 0,
+      "page": 21
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 1.0,
+      "kind": "unspecified",
+      "source": {
+       "doc": 0,
+       "page": 21
+      },
+      "date": "9/13"
+     }
+    ]
+   },
+   "note": "No latitude or longitude on the log."
+  },
+  {
+   "id": "No.2",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 22
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": null,
+   "ground_elevation": {
+    "value": -0.03,
+    "datum": "local (H=)",
+    "unit": "m",
+    "as_printed": "H= -0.03m",
+    "source": {
+     "doc": 0,
+     "page": 22
+    }
+   },
+   "final_depth": {
+    "value": 30.45,
+    "source": {
+     "doc": 0,
+     "page": 22
+    }
+   },
+   "layers": [
+    {
+     "top": 0,
+     "base": 0.65,
+     "description": "盛土：0.05mまで表土状、以深は黒ボクを主体とし、所々に礫を混入する",
+     "principal": "made_ground",
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "top": 0.65,
+     "base": 2.3,
+     "description": "火山灰質砂質シルト",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "top": 2.3,
+     "base": 6.3,
+     "description": "火山灰質砂：3.00m付近まで粒径均一な微細砂状の火山灰を主体、5.00m以深、φ5〜10mm程度の軽石を多く混入する",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "top": 6.3,
+     "base": 6.8,
+     "description": "粗砂：全体に軽石を混入し、密実",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "top": 6.8,
+     "base": 7.9,
+     "description": "粘土：全体に含水低く、均質で半固結状を呈する",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "top": 7.9,
+     "base": 8.5,
+     "description": "火山灰質砂質粘土：半固結状",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "top": 8.5,
+     "base": 18.9,
+     "description": "火山灰質シルト：10.0m付近まで、均質で軟質",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "top": 18.9,
+     "base": 22.8,
+     "description": "礫混じり火山灰質砂（名前は縦書きで判読困難）：砂はスコリア状の粗粒砂を主体とし、シルト質火山灰を挟む",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "top": 22.8,
+     "base": 27.7,
+     "description": "火山灰質砂質粘土",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "top": 27.7,
+     "base": 28.5,
+     "description": "火山灰質砂：砂は粗砂を主体とし、シルト分を帯びる",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "top": 28.5,
+     "base": 30.45,
+     "description": "火山灰質シルト",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 2,
+     "source": {
+      "doc": 0,
+      "page": 22
+     },
+     "penetration_cm": 35
+    },
+    {
+     "depth": 2.15,
+     "n": 8,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 3.15,
+     "n": 33,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 4.15,
+     "n": 36,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 34,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 39,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 17,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 19,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 9.15,
+     "n": 3,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 10.15,
+     "n": 6,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 11.15,
+     "n": 6,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 12.15,
+     "n": 5,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 13.15,
+     "n": 11,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 14.15,
+     "n": 5,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 15.15,
+     "n": 6,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 16.15,
+     "n": 8,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 17.15,
+     "n": 5,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 18.15,
+     "n": 6,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 19.15,
+     "n": 38,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 20.15,
+     "n": 17,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 21.15,
+     "n": 15,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 22.15,
+     "n": 41,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 23.15,
+     "n": 12,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 24.15,
+     "n": 5,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 25.15,
+     "n": 10,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 26.15,
+     "n": 9,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 27.15,
+     "n": 15,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 28.15,
+     "n": 36,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 29.15,
+     "n": 6,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    },
+    {
+     "depth": 30.15,
+     "n": 6,
+     "source": {
+      "doc": 0,
+      "page": 22
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 1.0,
+      "kind": "unspecified",
+      "source": {
+       "doc": 0,
+       "page": 22
+      },
+      "date": "9/1"
+     }
+    ]
+   },
+   "note": "No latitude or longitude on the log. The soil name of 18.90-22.80 m is printed vertically and hard to read; its note says sand."
+  }
+ ],
+ "readiness": {
+  "expected": "abstain",
+  "reasons": [
+   "no_positions"
+  ],
+  "positioned_boreholes": 0,
+  "note": "Two boreholes with levels on a local datum and no coordinates."
+ }
+}

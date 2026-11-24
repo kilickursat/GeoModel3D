@@ -1,0 +1,2247 @@
+{
+ "schema_version": "1.0.0",
+ "report_id": "jp-noshiro-r3-yorozumachi",
+ "status": "draft",
+ "provenance": {
+  "annotated_on": "2026-11-20",
+  "annotator_kind": "assistant",
+  "method": "Log values copied from each sheet's PDF text layer by column, checked against the page images of every log (first sheet at full page, second sheet by its text rows) and by consistency (refusal N = blows x 300 / penetration in mm; last base = total depth). Page types by eye. Names, telephone numbers and registration numbers on the logs are not transcribed."
+ },
+ "scope": {
+  "pages": "all",
+  "boreholes": "all",
+  "fields": [
+   "position",
+   "ground_elevation",
+   "final_depth",
+   "layers",
+   "spt",
+   "rqd",
+   "groundwater"
+  ]
+ },
+ "documents": [
+  {
+   "file": "位置案内図.pdf",
+   "pages": 1,
+   "sha256": "f0f3c48161627b0bd8cde9e530d031daab93957cdd1378e53f193a0dfe809e61"
+  },
+  {
+   "file": "調査位置平面図.pdf",
+   "pages": 1,
+   "sha256": "6447be053425e1be6a1ca8e275ead1546dfd87c441c6550b70c2060ddbc31185"
+  },
+  {
+   "file": "ボーリング柱状図(No_1).pdf",
+   "pages": 2,
+   "sha256": "3bac39ffaabe072e89b26b9f0295cd19004baefdd7f90274216723de77deb6f4"
+  },
+  {
+   "file": "ボーリング柱状図(No_2).pdf",
+   "pages": 2,
+   "sha256": "36acda3bee8ce8fa2b9b83d422191a320361cc8135631c129b4b32392f3489b1"
+  },
+  {
+   "file": "ボーリング柱状図(No_3).pdf",
+   "pages": 2,
+   "sha256": "c48dd876d729485c186e4150bc767cd7e70403fb26f213ffff2f23b55e2d5eb1"
+  },
+  {
+   "file": "ボーリング柱状図(No_4).pdf",
+   "pages": 2,
+   "sha256": "63519430d24afdf930b2a1b8b91ee153bb6929ba2ffe8eacd45935a0462589a4"
+  },
+  {
+   "file": "地質断面図(No_1-2).pdf",
+   "pages": 1,
+   "sha256": "7aa53887fceb6c53557f4fade8c331899984b10699f44e287ad3a4af787b20c6"
+  },
+  {
+   "file": "地質断面図(No_3-4).pdf",
+   "pages": 1,
+   "sha256": "a92090314cd3bdcd8f0105676e0e236cddc85f220f92aca4d9beafd5bdaa020f"
+  }
+ ],
+ "pages": [
+  {
+   "doc": 0,
+   "page": 1,
+   "type": "site_plan",
+   "scan_quality": "good_scan"
+  },
+  {
+   "doc": 1,
+   "page": 1,
+   "type": "site_plan",
+   "scan_quality": "good_scan"
+  },
+  {
+   "doc": 2,
+   "page": 1,
+   "type": "borehole_log",
+   "boreholes": [
+    "No.1"
+   ]
+  },
+  {
+   "doc": 2,
+   "page": 2,
+   "type": "borehole_log",
+   "boreholes": [
+    "No.1"
+   ]
+  },
+  {
+   "doc": 3,
+   "page": 1,
+   "type": "borehole_log",
+   "boreholes": [
+    "No.2"
+   ]
+  },
+  {
+   "doc": 3,
+   "page": 2,
+   "type": "borehole_log",
+   "boreholes": [
+    "No.2"
+   ]
+  },
+  {
+   "doc": 4,
+   "page": 1,
+   "type": "borehole_log",
+   "boreholes": [
+    "No.3"
+   ]
+  },
+  {
+   "doc": 4,
+   "page": 2,
+   "type": "borehole_log",
+   "boreholes": [
+    "No.3"
+   ]
+  },
+  {
+   "doc": 5,
+   "page": 1,
+   "type": "borehole_log",
+   "boreholes": [
+    "No.4"
+   ]
+  },
+  {
+   "doc": 5,
+   "page": 2,
+   "type": "borehole_log",
+   "boreholes": [
+    "No.4"
+   ]
+  },
+  {
+   "doc": 6,
+   "page": 1,
+   "type": "cross_section",
+   "scan_quality": "good_scan"
+  },
+  {
+   "doc": 7,
+   "page": 1,
+   "type": "cross_section",
+   "scan_quality": "good_scan"
+  }
+ ],
+ "boreholes": [
+  {
+   "id": "No.1",
+   "pages": [
+    {
+     "doc": 2,
+     "page": 1
+    },
+    {
+     "doc": 2,
+     "page": 2
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 40.2146944,
+    "lon": 140.0306389,
+    "crs": "unstated",
+    "as_printed": "北緯 40°12′52.9″ 東経 140°01′50.3″",
+    "source": {
+     "doc": 2,
+     "page": 1
+    }
+   },
+   "ground_elevation": {
+    "value": 3.18,
+    "datum": "T.P.",
+    "unit": "m",
+    "source": {
+     "doc": 2,
+     "page": 1
+    }
+   },
+   "final_depth": {
+    "value": 37.44,
+    "source": {
+     "doc": 2,
+     "page": 1
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 1.2,
+     "description": "盛土：細～中砂を主体とする盛土。木片を多く混入する。",
+     "principal": "made_ground",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "top": 1.2,
+     "base": 3.4,
+     "description": "砂：細～中砂を主体とする砂。深度2.90m以深粗砂を少量混入する。",
+     "principal": "sand",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "top": 3.4,
+     "base": 8.5,
+     "description": "砂礫：径2～5mmの亜角礫を主体とする砂礫。最大径30mmの礫が点在。間隙は細～粗砂の粒径幅の広い砂が充填する。深度8.40m付近でシルトを薄く挟在する。",
+     "principal": "gravel",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "top": 8.5,
+     "base": 10.25,
+     "description": "砂：深度9.60～9.90mで木片等の腐植物混入する。深度10.90～11.30mで粘土の薄層を挟む。",
+     "principal": "sand",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "top": 10.25,
+     "base": 15.7,
+     "description": "砂・シルト互層：細～粗砂を主体とする砂と概ね均質なシルトが互層をなす。全体的に砂が優勢。深度11.00～13.00mで粗砂を少量混入する。",
+     "principal": "sand",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "top": 15.7,
+     "base": 20.65,
+     "description": "砂：深度17.80mまで細～中砂を主体とする砂が分布し、粗砂を少量混入する。深度17.80～19.50mで細礫を混入する。",
+     "principal": "sand",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "top": 20.65,
+     "base": 25.9,
+     "description": "砂：深度21.00mまで礫を多く混入する。深度22.30m付近でシルトを薄く挟在する。全体的に中～粗砂を主体とするが、深度24.00m以深細～粗砂の粒径幅の広い砂が主体となる。度22.30m付近でシルトを薄く挟在する。全体的に中～粗砂を主体とするが、深度24.00m以深細～粗砂の粒径幅の広い砂が主体となる。",
+     "principal": "sand",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "top": 25.9,
+     "base": 26.35,
+     "description": "粘土質シルト：未炭化の植物片を混入する。",
+     "principal": "silt",
+     "source": {
+      "doc": 2,
+      "page": 2
+     }
+    },
+    {
+     "top": 26.35,
+     "base": 27.7,
+     "description": "砂：シルトを多く混入する砂。砂は細砂を主体とする。",
+     "principal": "sand",
+     "source": {
+      "doc": 2,
+      "page": 2
+     }
+    },
+    {
+     "top": 27.7,
+     "base": 31.8,
+     "description": "シルト混じり粘土：シルトを混入する粘土。やや粘性がある。黒色の腐植物片を少なく混入する。",
+     "principal": "clay",
+     "source": {
+      "doc": 2,
+      "page": 2
+     }
+    },
+    {
+     "top": 31.8,
+     "base": 36.95,
+     "description": "砂礫：径10mm未満の亜角礫を主体とし、最大径40mm程度の礫を含む砂礫。間隙は中～粗砂が充填する。",
+     "principal": "gravel",
+     "source": {
+      "doc": 2,
+      "page": 2
+     }
+    },
+    {
+     "top": 36.95,
+     "base": 37.44,
+     "description": "砂岩：固結度の低い細粒の砂岩。",
+     "principal": "rock",
+     "source": {
+      "doc": 2,
+      "page": 2
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 3.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     },
+     "penetration_cm": 43.0
+    },
+    {
+     "depth": 2.15,
+     "n": 4.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     },
+     "penetration_cm": 32.0
+    },
+    {
+     "depth": 3.15,
+     "n": 12.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 4.15,
+     "n": 7.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 32.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 30.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 16.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 23.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 9.15,
+     "n": 18.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 10.15,
+     "n": 11.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 11.15,
+     "n": 13.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 12.15,
+     "n": 12.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 13.15,
+     "n": 11.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 14.15,
+     "n": 10.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 15.15,
+     "n": 22.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 16.15,
+     "n": 19.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 17.15,
+     "n": 30.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 18.15,
+     "n": 50.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 19.15,
+     "n": 38.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 20.15,
+     "n": 44.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 21.15,
+     "n": 38.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 22.15,
+     "n": 20.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 23.15,
+     "n": 31.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 24.15,
+     "n": 34.0,
+     "source": {
+      "doc": 2,
+      "page": 2
+     }
+    },
+    {
+     "depth": 25.15,
+     "n": 46.0,
+     "source": {
+      "doc": 2,
+      "page": 2
+     }
+    },
+    {
+     "depth": 26.15,
+     "n": 15.0,
+     "source": {
+      "doc": 2,
+      "page": 2
+     }
+    },
+    {
+     "depth": 27.15,
+     "n": 24.0,
+     "source": {
+      "doc": 2,
+      "page": 2
+     }
+    },
+    {
+     "depth": 28.15,
+     "n": 11.0,
+     "source": {
+      "doc": 2,
+      "page": 2
+     }
+    },
+    {
+     "depth": 29.15,
+     "n": 10.0,
+     "source": {
+      "doc": 2,
+      "page": 2
+     }
+    },
+    {
+     "depth": 30.15,
+     "n": 11.0,
+     "source": {
+      "doc": 2,
+      "page": 2
+     }
+    },
+    {
+     "depth": 31.15,
+     "n": 11.0,
+     "source": {
+      "doc": 2,
+      "page": 2
+     }
+    },
+    {
+     "depth": 32.15,
+     "n": 75.0,
+     "source": {
+      "doc": 2,
+      "page": 2
+     },
+     "penetration_cm": 20.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 33.15,
+     "n": 115.0,
+     "source": {
+      "doc": 2,
+      "page": 2
+     },
+     "penetration_cm": 13.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 34.05,
+     "n": 83.0,
+     "source": {
+      "doc": 2,
+      "page": 2
+     },
+     "penetration_cm": 18.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 35.05,
+     "n": 125.0,
+     "source": {
+      "doc": 2,
+      "page": 2
+     },
+     "penetration_cm": 12.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 36.05,
+     "n": 147.0,
+     "source": {
+      "doc": 2,
+      "page": 2
+     },
+     "penetration_cm": 10.2,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 37.15,
+     "n": 52.0,
+     "source": {
+      "doc": 2,
+      "page": 2
+     },
+     "penetration_cm": 29.0,
+     "refusal": true,
+     "blows": 50.0
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 3.55,
+      "kind": "unspecified",
+      "source": {
+       "doc": 2,
+       "page": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "No.2",
+   "pages": [
+    {
+     "doc": 3,
+     "page": 1
+    },
+    {
+     "doc": 3,
+     "page": 2
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 40.2145,
+    "lon": 140.0310278,
+    "crs": "unstated",
+    "as_printed": "北緯 40°12′52.2″ 東経 140°01′51.7″",
+    "source": {
+     "doc": 3,
+     "page": 1
+    }
+   },
+   "ground_elevation": {
+    "value": 4.96,
+    "datum": "T.P.",
+    "unit": "m",
+    "source": {
+     "doc": 3,
+     "page": 1
+    }
+   },
+   "final_depth": {
+    "value": 38.38,
+    "source": {
+     "doc": 3,
+     "page": 1
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 2.0,
+     "description": "盛土：礫混じり砂からなる。",
+     "principal": "made_ground",
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "top": 2.0,
+     "base": 2.8,
+     "description": "有機質土：砂や木片が混じる。含水が高い。",
+     "principal": "peat_organic",
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "top": 2.8,
+     "base": 3.85,
+     "description": "礫混じり砂：径2～10mmの亜円礫が少量混じる。",
+     "principal": "sand",
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "top": 3.85,
+     "base": 7.3,
+     "description": "砂礫：礫は径5～20mmの亜円礫が主体。礫種は雑多である。",
+     "principal": "gravel",
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "top": 7.3,
+     "base": 8.35,
+     "description": "シルト：概ね均質なシルト。所々に砂が混じる。",
+     "principal": "silt",
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "top": 8.35,
+     "base": 10.0,
+     "description": "砂・シルト：砂とシルトが互層をなす。",
+     "principal": "sand",
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "top": 10.0,
+     "base": 25.7,
+     "description": "砂：粒径不均質な砂層が連続する。所々に層厚10～50mm程度のシルト薄層を挟在する。深度21.00m以深は径5mm前後の細礫が点在する。",
+     "principal": "sand",
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "top": 25.7,
+     "base": 31.5,
+     "description": "シルト：所々、細砂に富み不均質である。含水は低い。",
+     "principal": "silt",
+     "source": {
+      "doc": 3,
+      "page": 2
+     }
+    },
+    {
+     "top": 31.5,
+     "base": 37.15,
+     "description": "砂礫：径2～30mmの亜円～角礫と砂が主体。深度33.00m付近から褐色を呈し、締まった状態となる。",
+     "principal": "gravel",
+     "source": {
+      "doc": 3,
+      "page": 2
+     }
+    },
+    {
+     "top": 37.15,
+     "base": 38.38,
+     "description": "砂岩：細粒な砂岩。固結度は低い。",
+     "principal": "rock",
+     "source": {
+      "doc": 3,
+      "page": 2
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 20.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 2.15,
+     "n": 1.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 3.15,
+     "n": 19.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 4.15,
+     "n": 12.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 49.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 41.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 7.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 10.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 9.15,
+     "n": 9.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 10.15,
+     "n": 17.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 11.15,
+     "n": 20.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 12.15,
+     "n": 26.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 13.15,
+     "n": 25.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 14.15,
+     "n": 17.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 15.15,
+     "n": 11.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 16.15,
+     "n": 24.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 17.15,
+     "n": 28.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 18.15,
+     "n": 14.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 19.15,
+     "n": 35.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 20.15,
+     "n": 25.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 21.15,
+     "n": 32.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 22.15,
+     "n": 40.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 23.15,
+     "n": 43.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 24.15,
+     "n": 33.0,
+     "source": {
+      "doc": 3,
+      "page": 2
+     }
+    },
+    {
+     "depth": 25.15,
+     "n": 43.0,
+     "source": {
+      "doc": 3,
+      "page": 2
+     }
+    },
+    {
+     "depth": 26.15,
+     "n": 13.0,
+     "source": {
+      "doc": 3,
+      "page": 2
+     }
+    },
+    {
+     "depth": 27.15,
+     "n": 14.0,
+     "source": {
+      "doc": 3,
+      "page": 2
+     }
+    },
+    {
+     "depth": 28.15,
+     "n": 10.0,
+     "source": {
+      "doc": 3,
+      "page": 2
+     }
+    },
+    {
+     "depth": 29.15,
+     "n": 9.0,
+     "source": {
+      "doc": 3,
+      "page": 2
+     }
+    },
+    {
+     "depth": 30.15,
+     "n": 9.0,
+     "source": {
+      "doc": 3,
+      "page": 2
+     }
+    },
+    {
+     "depth": 31.15,
+     "n": 18.0,
+     "source": {
+      "doc": 3,
+      "page": 2
+     }
+    },
+    {
+     "depth": 32.15,
+     "n": 50.0,
+     "source": {
+      "doc": 3,
+      "page": 2
+     }
+    },
+    {
+     "depth": 33.15,
+     "n": 115.0,
+     "source": {
+      "doc": 3,
+      "page": 2
+     },
+     "penetration_cm": 13.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 34.02,
+     "n": 375.0,
+     "source": {
+      "doc": 3,
+      "page": 2
+     },
+     "penetration_cm": 4.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 35.0,
+     "n": 136.0,
+     "source": {
+      "doc": 3,
+      "page": 2
+     },
+     "penetration_cm": 11.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 36.15,
+     "n": 94.0,
+     "source": {
+      "doc": 3,
+      "page": 2
+     },
+     "penetration_cm": 16.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 37.15,
+     "n": 26.0,
+     "source": {
+      "doc": 3,
+      "page": 2
+     }
+    },
+    {
+     "depth": 38.15,
+     "n": 65.0,
+     "source": {
+      "doc": 3,
+      "page": 2
+     },
+     "penetration_cm": 23.0,
+     "refusal": true,
+     "blows": 50.0
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 2.23,
+      "kind": "unspecified",
+      "source": {
+       "doc": 3,
+       "page": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "No.3",
+   "pages": [
+    {
+     "doc": 4,
+     "page": 1
+    },
+    {
+     "doc": 4,
+     "page": 2
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 40.2143611,
+    "lon": 140.0307778,
+    "crs": "unstated",
+    "as_printed": "北緯 40°12′51.7″ 東経 140°01′50.8″",
+    "source": {
+     "doc": 4,
+     "page": 1
+    }
+   },
+   "ground_elevation": {
+    "value": 5.11,
+    "datum": "T.P.",
+    "unit": "m",
+    "source": {
+     "doc": 4,
+     "page": 1
+    }
+   },
+   "final_depth": {
+    "value": 40.44,
+    "source": {
+     "doc": 4,
+     "page": 1
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 1.5,
+     "description": "盛土：深度0.10mまでは表土。礫混じり砂からなる盛土。",
+     "principal": "made_ground",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 1.5,
+     "base": 1.7,
+     "description": "砂：細砂からなる。",
+     "principal": "sand",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 1.7,
+     "base": 2.3,
+     "description": "砂混じりシルト：細～中砂を混入するシルト。黒色の腐植物片を混じる。",
+     "principal": "silt",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 2.3,
+     "base": 4.5,
+     "description": "砂：細砂からなる。",
+     "principal": "sand",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 4.5,
+     "base": 7.7,
+     "description": "砂礫：深度4.50～5.50mは赤褐色、深度5.50～7.10mは暗褐灰色、深度7.10m以深は褐色を呈す。細砂～径5mm下の礫からなる基質に径30～50mmの礫が点在する。",
+     "principal": "gravel",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 7.7,
+     "base": 8.7,
+     "description": "シルト：細砂の薄層を挟在するシルト。",
+     "principal": "silt",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 8.7,
+     "base": 10.45,
+     "description": "砂・シルト互層：細砂とシルトの互層。シルトがやや優勢である。",
+     "principal": "sand",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 10.45,
+     "base": 14.65,
+     "description": "砂：深度9.40～12.80mは粘土の薄層を所々に挟在する細砂。深度12.80m以深は中砂からなり、下部には細砂を伴う。",
+     "principal": "sand",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 14.65,
+     "base": 15.2,
+     "description": "有機物混りシルト：砂層に挟在する有機物を伴うシルトの薄層。",
+     "principal": "silt",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 15.2,
+     "base": 22.35,
+     "description": "砂：深度15.20～15.90mはシルトを挟在する細砂。深度15.90～17.60m中砂を混入する粗砂。深度17.60～21.90mは中砂で、上部に径2～5mmの礫が点在する。深度21.90m以深は、細礫が混入する粗砂。",
+     "principal": "sand",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 22.35,
+     "base": 22.65,
+     "description": "砂礫：径2～10mmの礫と細砂。",
+     "principal": "gravel",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 22.65,
+     "base": 25.8,
+     "description": "砂：径2～10mmの礫を含む粗砂。",
+     "principal": "sand",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 25.8,
+     "base": 27.8,
+     "description": "シルト：未炭化の植物片が点在する。",
+     "principal": "silt",
+     "source": {
+      "doc": 4,
+      "page": 2
+     }
+    },
+    {
+     "top": 27.8,
+     "base": 31.8,
+     "description": "粘土：分解した有機物を混入する。",
+     "principal": "clay",
+     "source": {
+      "doc": 4,
+      "page": 2
+     }
+    },
+    {
+     "top": 31.8,
+     "base": 37.85,
+     "description": "砂礫：細粒分を混じる砂と径50mm以下の円礫が主体。径100～150mmの礫も伴う。",
+     "principal": "gravel",
+     "source": {
+      "doc": 4,
+      "page": 2
+     }
+    },
+    {
+     "top": 37.85,
+     "base": 40.44,
+     "description": "砂岩：細粒な砂岩。固結度低い。",
+     "principal": "rock",
+     "source": {
+      "doc": 4,
+      "page": 2
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 2.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 2.15,
+     "n": 2.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 3.15,
+     "n": 8.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 4.15,
+     "n": 18.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 36.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 45.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 29.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 11.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 9.15,
+     "n": 11.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 10.15,
+     "n": 13.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 11.15,
+     "n": 17.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 12.15,
+     "n": 18.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 13.15,
+     "n": 20.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 14.15,
+     "n": 20.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 15.15,
+     "n": 14.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 16.15,
+     "n": 17.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 17.15,
+     "n": 18.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 18.15,
+     "n": 19.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 19.15,
+     "n": 26.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 20.15,
+     "n": 29.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 21.15,
+     "n": 28.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 22.15,
+     "n": 32.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 23.15,
+     "n": 54.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     },
+     "penetration_cm": 28.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 24.15,
+     "n": 31.0,
+     "source": {
+      "doc": 4,
+      "page": 2
+     }
+    },
+    {
+     "depth": 25.15,
+     "n": 33.0,
+     "source": {
+      "doc": 4,
+      "page": 2
+     }
+    },
+    {
+     "depth": 26.15,
+     "n": 12.0,
+     "source": {
+      "doc": 4,
+      "page": 2
+     },
+     "penetration_cm": 32.0
+    },
+    {
+     "depth": 27.15,
+     "n": 14.0,
+     "source": {
+      "doc": 4,
+      "page": 2
+     }
+    },
+    {
+     "depth": 28.15,
+     "n": 11.0,
+     "source": {
+      "doc": 4,
+      "page": 2
+     }
+    },
+    {
+     "depth": 29.15,
+     "n": 12.0,
+     "source": {
+      "doc": 4,
+      "page": 2
+     }
+    },
+    {
+     "depth": 30.15,
+     "n": 11.0,
+     "source": {
+      "doc": 4,
+      "page": 2
+     }
+    },
+    {
+     "depth": 31.15,
+     "n": 10.0,
+     "source": {
+      "doc": 4,
+      "page": 2
+     }
+    },
+    {
+     "depth": 32.15,
+     "n": 48.0,
+     "source": {
+      "doc": 4,
+      "page": 2
+     }
+    },
+    {
+     "depth": 33.15,
+     "n": 54.0,
+     "source": {
+      "doc": 4,
+      "page": 2
+     },
+     "penetration_cm": 28.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 34.05,
+     "n": 94.0,
+     "source": {
+      "doc": 4,
+      "page": 2
+     },
+     "penetration_cm": 16.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 35.0,
+     "n": 250.0,
+     "source": {
+      "doc": 4,
+      "page": 2
+     },
+     "penetration_cm": 6.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 36.0,
+     "n": 188.0,
+     "source": {
+      "doc": 4,
+      "page": 2
+     },
+     "penetration_cm": 8.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 37.0,
+     "n": 150.0,
+     "source": {
+      "doc": 4,
+      "page": 2
+     },
+     "penetration_cm": 10.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 38.15,
+     "n": 41.0,
+     "source": {
+      "doc": 4,
+      "page": 2
+     }
+    },
+    {
+     "depth": 39.15,
+     "n": 71.0,
+     "source": {
+      "doc": 4,
+      "page": 2
+     },
+     "penetration_cm": 21.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 40.15,
+     "n": 52.0,
+     "source": {
+      "doc": 4,
+      "page": 2
+     },
+     "penetration_cm": 29.0,
+     "refusal": true,
+     "blows": 50.0
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 3.95,
+      "kind": "unspecified",
+      "source": {
+       "doc": 4,
+       "page": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "No.4",
+   "pages": [
+    {
+     "doc": 5,
+     "page": 1
+    },
+    {
+     "doc": 5,
+     "page": 2
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 40.2142222,
+    "lon": 140.0305278,
+    "crs": "unstated",
+    "as_printed": "北緯 40°12′51.2″ 東経 140°01′49.9″",
+    "source": {
+     "doc": 5,
+     "page": 1
+    }
+   },
+   "ground_elevation": {
+    "value": 5.55,
+    "datum": "T.P.",
+    "unit": "m",
+    "source": {
+     "doc": 5,
+     "page": 1
+    }
+   },
+   "final_depth": {
+    "value": 38.13,
+    "source": {
+     "doc": 5,
+     "page": 1
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 1.2,
+     "description": "盛土：ガラ、巨礫等を混入する砂質土。",
+     "principal": "made_ground",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 1.2,
+     "base": 4.45,
+     "description": "砂：深度1.20～2.00mは中～粗砂が主体。深度2.00～4.10mは細砂が分布する。4.10～4.45mは中～粗砂が主体で粗砂が優勢である。",
+     "principal": "sand",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 4.45,
+     "base": 8.2,
+     "description": "砂礫：径2～20mmの礫が多く、径40mm程度の礫が点在する。",
+     "principal": "gravel",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 8.2,
+     "base": 9.2,
+     "description": "シルト：細砂の薄層を挟在する。",
+     "principal": "silt",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 9.2,
+     "base": 12.3,
+     "description": "シルト・砂互層：細砂とシルトの互層。",
+     "principal": "silt",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 12.3,
+     "base": 16.1,
+     "description": "砂：深度12.30～14.00mは概ね均質な細砂。深度14.00～15.10mは細～中砂が主体で中砂が優勢である。深度15.10～16.10mは細砂。",
+     "principal": "sand",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 16.1,
+     "base": 16.3,
+     "description": "有機質土：未分解の葉等を混入する。",
+     "principal": "peat_organic",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 16.3,
+     "base": 17.9,
+     "description": "シルト：暗灰色のシルト。深度17.00m以深細砂分が混入する。",
+     "principal": "silt",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 17.9,
+     "base": 18.8,
+     "description": "シルト質細砂：葉等の有機物が混入する。",
+     "principal": "sand",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 18.8,
+     "base": 20.4,
+     "description": "砂：粗砂が主体の砂。深度19.10～19.40mに最大径30mmの礫を混入する砂礫を挟在する。砂礫には粘土を伴う。",
+     "principal": "sand",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 20.4,
+     "base": 21.8,
+     "description": "礫混り砂：礫は径2～10mm前後が多く、最大で径30mm。",
+     "principal": "sand",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 21.8,
+     "base": 26.05,
+     "description": "砂：中～粗砂を主体とし粗砂が優勢である砂径210程度の礫が混入する中～粗砂を主体とし粗砂が優勢である砂。径2～10mm程度の礫が混入する。",
+     "principal": "sand",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 26.05,
+     "base": 26.9,
+     "description": "粘土：含水低位で締まった粘土。",
+     "principal": "clay",
+     "source": {
+      "doc": 5,
+      "page": 2
+     }
+    },
+    {
+     "top": 26.9,
+     "base": 28.8,
+     "description": "シルト混じり砂：細砂を主体とする砂。",
+     "principal": "sand",
+     "source": {
+      "doc": 5,
+      "page": 2
+     }
+    },
+    {
+     "top": 28.8,
+     "base": 32.9,
+     "description": "粘土：深度29.25mまでシルト及び砂を少量混入する。未分解の有機物が点在する。",
+     "principal": "clay",
+     "source": {
+      "doc": 5,
+      "page": 2
+     }
+    },
+    {
+     "top": 32.9,
+     "base": 38.13,
+     "description": "砂礫：径10mm未満の亜角礫を主体とする砂礫。間隙は細～粗砂の粒径幅の広い砂が充填する。",
+     "principal": "gravel",
+     "source": {
+      "doc": 5,
+      "page": 2
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 3.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     },
+     "penetration_cm": 31.0
+    },
+    {
+     "depth": 2.15,
+     "n": 1.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 3.15,
+     "n": 3.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 4.15,
+     "n": 9.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 22.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 28.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 49.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 8.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     },
+     "penetration_cm": 31.0
+    },
+    {
+     "depth": 9.15,
+     "n": 11.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 10.15,
+     "n": 11.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 11.15,
+     "n": 9.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 12.15,
+     "n": 15.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 13.15,
+     "n": 29.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 14.15,
+     "n": 28.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 15.15,
+     "n": 20.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 16.15,
+     "n": 6.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     },
+     "penetration_cm": 32.0
+    },
+    {
+     "depth": 17.15,
+     "n": 8.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 18.15,
+     "n": 10.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 19.15,
+     "n": 17.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 20.15,
+     "n": 30.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 21.15,
+     "n": 39.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 22.15,
+     "n": 21.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 23.15,
+     "n": 19.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 24.15,
+     "n": 33.0,
+     "source": {
+      "doc": 5,
+      "page": 2
+     }
+    },
+    {
+     "depth": 25.15,
+     "n": 42.0,
+     "source": {
+      "doc": 5,
+      "page": 2
+     }
+    },
+    {
+     "depth": 26.15,
+     "n": 9.0,
+     "source": {
+      "doc": 5,
+      "page": 2
+     }
+    },
+    {
+     "depth": 27.15,
+     "n": 17.0,
+     "source": {
+      "doc": 5,
+      "page": 2
+     }
+    },
+    {
+     "depth": 28.15,
+     "n": 18.0,
+     "source": {
+      "doc": 5,
+      "page": 2
+     }
+    },
+    {
+     "depth": 29.15,
+     "n": 11.0,
+     "source": {
+      "doc": 5,
+      "page": 2
+     }
+    },
+    {
+     "depth": 30.15,
+     "n": 10.0,
+     "source": {
+      "doc": 5,
+      "page": 2
+     }
+    },
+    {
+     "depth": 31.15,
+     "n": 11.0,
+     "source": {
+      "doc": 5,
+      "page": 2
+     }
+    },
+    {
+     "depth": 32.15,
+     "n": 15.0,
+     "source": {
+      "doc": 5,
+      "page": 2
+     }
+    },
+    {
+     "depth": 33.15,
+     "n": 52.0,
+     "source": {
+      "doc": 5,
+      "page": 2
+     },
+     "penetration_cm": 29.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 34.15,
+     "n": 65.0,
+     "source": {
+      "doc": 5,
+      "page": 2
+     },
+     "penetration_cm": 23.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 35.05,
+     "n": 100.0,
+     "source": {
+      "doc": 5,
+      "page": 2
+     },
+     "penetration_cm": 15.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 36.05,
+     "n": 94.0,
+     "source": {
+      "doc": 5,
+      "page": 2
+     },
+     "penetration_cm": 16.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 37.05,
+     "n": 136.0,
+     "source": {
+      "doc": 5,
+      "page": 2
+     },
+     "penetration_cm": 11.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 38.05,
+     "n": 188.0,
+     "source": {
+      "doc": 5,
+      "page": 2
+     },
+     "penetration_cm": 8.0,
+     "refusal": true,
+     "blows": 50.0
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 4.95,
+      "kind": "unspecified",
+      "source": {
+       "doc": 5,
+       "page": 1
+      }
+     }
+    ]
+   }
+  }
+ ],
+ "readiness": {
+  "expected": "spatial_model",
+  "reasons": [],
+  "positioned_boreholes": 4
+ }
+}

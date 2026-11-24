@@ -1,0 +1,1275 @@
+{
+ "manifest_version": "1.0.0",
+ "created_on": "2026-11-20",
+ "reports": [
+  {
+   "id": "jp-tochigi-117100033",
+   "title": "栃木県 県土整備部 地質調査 117100033: 9 borehole logs",
+   "publisher": "栃木県 県土整備部 (Tochigi Prefecture, Department of Land Development)",
+   "country": "JP",
+   "languages": [
+    "ja"
+   ],
+   "landing_url": "https://data.bodik.jp/dataset/090000_boring-log",
+   "licence": {
+    "id": "CC-BY-2.1-JP",
+    "name": "Creative Commons Attribution 2.1 Japan",
+    "url": "https://creativecommons.org/licenses/by/2.1/jp/",
+    "evidence": "https://data.bodik.jp/api/3/action/package_show?id=090000_boring-log (license_id cc-by-21-jp, organisation 栃木県)",
+    "checked_on": "2026-11-20",
+    "attribution": "栃木県 県土整備部「ボーリング柱状図」(BODIK オープンデータ, data.bodik.jp), CC BY 2.1 JP",
+    "redistribution": "allowed with attribution",
+    "version_stated": true
+   },
+   "files": [
+    {
+     "name": "11710003301.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/4cc62581-9adf-4aaa-a970-79dd240494f4/download/72402_2014_boring-log1_04010.zip",
+     "member": "ボーリング柱状図1/11710003301.pdf",
+     "sha256": "bc788c7fc27383f81c91f5b736e3909e35590263d7d6af7658b08b9b76c9befd",
+     "bytes": 9658,
+     "pages": 1
+    },
+    {
+     "name": "11710003302.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/4cc62581-9adf-4aaa-a970-79dd240494f4/download/72402_2014_boring-log1_04010.zip",
+     "member": "ボーリング柱状図1/11710003302.pdf",
+     "sha256": "2e5873b2b54cc734139ff40849a8a94aae2dd40d3a829cc95a7e5368ee652557",
+     "bytes": 12831,
+     "pages": 1
+    },
+    {
+     "name": "11710003303.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/4cc62581-9adf-4aaa-a970-79dd240494f4/download/72402_2014_boring-log1_04010.zip",
+     "member": "ボーリング柱状図1/11710003303.pdf",
+     "sha256": "14e5705699a924c772201279e33aad48f6c425fad7244ce591f697ccbd79b36e",
+     "bytes": 11422,
+     "pages": 1
+    },
+    {
+     "name": "11710003304.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/4cc62581-9adf-4aaa-a970-79dd240494f4/download/72402_2014_boring-log1_04010.zip",
+     "member": "ボーリング柱状図1/11710003304.pdf",
+     "sha256": "5b96858db51e4e198bad2bafb798ddc5d73fc72d1a9f4856c7ff758a1b0252f3",
+     "bytes": 11128,
+     "pages": 1
+    },
+    {
+     "name": "11710003305.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/4cc62581-9adf-4aaa-a970-79dd240494f4/download/72402_2014_boring-log1_04010.zip",
+     "member": "ボーリング柱状図1/11710003305.pdf",
+     "sha256": "a5a0b9e947cc54cb65352bf3dfc954a6e810c000a510588d179230d8493f36b5",
+     "bytes": 10836,
+     "pages": 1
+    },
+    {
+     "name": "11710003306.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/4cc62581-9adf-4aaa-a970-79dd240494f4/download/72402_2014_boring-log1_04010.zip",
+     "member": "ボーリング柱状図1/11710003306.pdf",
+     "sha256": "4ce711501ed0c0bb2e143eb7e8e64b9393e65a7a043e9969b63a0e3425a1b844",
+     "bytes": 10434,
+     "pages": 1
+    },
+    {
+     "name": "11710003307.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/4cc62581-9adf-4aaa-a970-79dd240494f4/download/72402_2014_boring-log1_04010.zip",
+     "member": "ボーリング柱状図1/11710003307.pdf",
+     "sha256": "9028eaabddf73207a1a96b64913efb4e4a6478fd0441a77aab37ebdfe9fc5bd2",
+     "bytes": 11039,
+     "pages": 1
+    },
+    {
+     "name": "11710003308.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/4cc62581-9adf-4aaa-a970-79dd240494f4/download/72402_2014_boring-log1_04010.zip",
+     "member": "ボーリング柱状図1/11710003308.pdf",
+     "sha256": "6c65af690974bcb9a8bc28967ea3df594bd5efceb290709f223daf5c2a34c306",
+     "bytes": 9427,
+     "pages": 1
+    },
+    {
+     "name": "11710003309.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/4cc62581-9adf-4aaa-a970-79dd240494f4/download/72402_2014_boring-log1_04010.zip",
+     "member": "ボーリング柱状図1/11710003309.pdf",
+     "sha256": "4e76e0fe68af0ade224a7e62f20a93acf8b8ef953f056f1af7137f7fbde7469e",
+     "bytes": 11959,
+     "pages": 1
+    }
+   ],
+   "layout_family": "jp-denshi-chujozu",
+   "layout": [
+    "single_log_per_file",
+    "jacic_boring_log"
+   ],
+   "scan_quality": "born_digital",
+   "related_group": "jp-tochigi-117100033",
+   "split": "dev",
+   "note": "Soil over chert; RQD in the remarks; N-values with refusal."
+  },
+  {
+   "id": "jp-tochigi-118050690",
+   "title": "栃木県 県土整備部 地質調査 118050690: 7 borehole logs",
+   "publisher": "栃木県 県土整備部 (Tochigi Prefecture, Department of Land Development)",
+   "country": "JP",
+   "languages": [
+    "ja"
+   ],
+   "landing_url": "https://data.bodik.jp/dataset/090000_boring-log",
+   "licence": {
+    "id": "CC-BY-2.1-JP",
+    "name": "Creative Commons Attribution 2.1 Japan",
+    "url": "https://creativecommons.org/licenses/by/2.1/jp/",
+    "evidence": "https://data.bodik.jp/api/3/action/package_show?id=090000_boring-log (license_id cc-by-21-jp, organisation 栃木県)",
+    "checked_on": "2026-11-20",
+    "attribution": "栃木県 県土整備部「ボーリング柱状図」(BODIK オープンデータ, data.bodik.jp), CC BY 2.1 JP",
+    "redistribution": "allowed with attribution",
+    "version_stated": true
+   },
+   "files": [
+    {
+     "name": "11805069001.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/4cc62581-9adf-4aaa-a970-79dd240494f4/download/72402_2014_boring-log1_04010.zip",
+     "member": "ボーリング柱状図1/11805069001.pdf",
+     "sha256": "9f7763154588b32414385922d9f77e2cd96b6ad2d9b0d76410c5b16ac7629d9a",
+     "bytes": 31341,
+     "pages": 1
+    },
+    {
+     "name": "11805069002.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/4cc62581-9adf-4aaa-a970-79dd240494f4/download/72402_2014_boring-log1_04010.zip",
+     "member": "ボーリング柱状図1/11805069002.pdf",
+     "sha256": "d1bb8e56886c8690f7deb21275ffac2af7a85dd11fa8055f7a9291636975ef6b",
+     "bytes": 20676,
+     "pages": 1
+    },
+    {
+     "name": "11805069003.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/4cc62581-9adf-4aaa-a970-79dd240494f4/download/72402_2014_boring-log1_04010.zip",
+     "member": "ボーリング柱状図1/11805069003.pdf",
+     "sha256": "80abc7df4a469e711a386a826784ddd551cb9a7c2d0425d6b6853647de0a8beb",
+     "bytes": 28564,
+     "pages": 1
+    },
+    {
+     "name": "11805069004.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/4cc62581-9adf-4aaa-a970-79dd240494f4/download/72402_2014_boring-log1_04010.zip",
+     "member": "ボーリング柱状図1/11805069004.pdf",
+     "sha256": "6ac0edc24517d6145231dd085f9eef24f3650c92a9bf54e587d513c7e6ada6d6",
+     "bytes": 18459,
+     "pages": 1
+    },
+    {
+     "name": "11805069005.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/4cc62581-9adf-4aaa-a970-79dd240494f4/download/72402_2014_boring-log1_04010.zip",
+     "member": "ボーリング柱状図1/11805069005.pdf",
+     "sha256": "3353f021ae55c29527b439643ecb9a50b24c2d587976d4e6ecaad4a8426fc22b",
+     "bytes": 19283,
+     "pages": 1
+    },
+    {
+     "name": "11805069006.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/4cc62581-9adf-4aaa-a970-79dd240494f4/download/72402_2014_boring-log1_04010.zip",
+     "member": "ボーリング柱状図1/11805069006.pdf",
+     "sha256": "4d58ece7db039cb5e3022513b1e376442c31d9b71f718e57e98fa2636991c354",
+     "bytes": 23196,
+     "pages": 1
+    },
+    {
+     "name": "11805069007.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/4cc62581-9adf-4aaa-a970-79dd240494f4/download/72402_2014_boring-log1_04010.zip",
+     "member": "ボーリング柱状図1/11805069007.pdf",
+     "sha256": "e9e1e6813ba440ee81bcb2938c90f5137f91c2fc33e0244f039c449b2c2b5b9c",
+     "bytes": 29375,
+     "pages": 1
+    }
+   ],
+   "layout_family": "jp-denshi-chujozu",
+   "layout": [
+    "single_log_per_file",
+    "jacic_boring_log"
+   ],
+   "scan_quality": "born_digital",
+   "related_group": "jp-tochigi-118050690",
+   "split": "dev",
+   "note": "Road survey logs."
+  },
+  {
+   "id": "jp-tochigi-119070445",
+   "title": "栃木県 県土整備部 地質調査 119070445: 7 borehole logs",
+   "publisher": "栃木県 県土整備部 (Tochigi Prefecture, Department of Land Development)",
+   "country": "JP",
+   "languages": [
+    "ja"
+   ],
+   "landing_url": "https://data.bodik.jp/dataset/090000_boring-log",
+   "licence": {
+    "id": "CC-BY-2.1-JP",
+    "name": "Creative Commons Attribution 2.1 Japan",
+    "url": "https://creativecommons.org/licenses/by/2.1/jp/",
+    "evidence": "https://data.bodik.jp/api/3/action/package_show?id=090000_boring-log (license_id cc-by-21-jp, organisation 栃木県)",
+    "checked_on": "2026-11-20",
+    "attribution": "栃木県 県土整備部「ボーリング柱状図」(BODIK オープンデータ, data.bodik.jp), CC BY 2.1 JP",
+    "redistribution": "allowed with attribution",
+    "version_stated": true
+   },
+   "files": [
+    {
+     "name": "11907044501.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/4cc62581-9adf-4aaa-a970-79dd240494f4/download/72402_2014_boring-log1_04010.zip",
+     "member": "ボーリング柱状図1/11907044501.pdf",
+     "sha256": "f23caf1821b36590f29e7e9cacbc47d93ff8bcd4ce4c7a4888202c52315b0949",
+     "bytes": 102557,
+     "pages": 1
+    },
+    {
+     "name": "11907044502.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/4cc62581-9adf-4aaa-a970-79dd240494f4/download/72402_2014_boring-log1_04010.zip",
+     "member": "ボーリング柱状図1/11907044502.pdf",
+     "sha256": "28a5e23678a7caf11d772e9927ba3dc37f74cf095b0c35edd187ec6b39dab124",
+     "bytes": 87242,
+     "pages": 2
+    },
+    {
+     "name": "11907044503.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/4cc62581-9adf-4aaa-a970-79dd240494f4/download/72402_2014_boring-log1_04010.zip",
+     "member": "ボーリング柱状図1/11907044503.pdf",
+     "sha256": "6a499b9ab51253c613fb5f90d86c1325cf2fb635d5c2ebd6412432c820b2e468",
+     "bytes": 35225,
+     "pages": 1
+    },
+    {
+     "name": "11907044504.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/4cc62581-9adf-4aaa-a970-79dd240494f4/download/72402_2014_boring-log1_04010.zip",
+     "member": "ボーリング柱状図1/11907044504.pdf",
+     "sha256": "b3ffc076bc8a79b7c1dadf594876a9bb1571c1f88baa5bd39097e6616f6fedb6",
+     "bytes": 34261,
+     "pages": 1
+    },
+    {
+     "name": "11907044505.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/4cc62581-9adf-4aaa-a970-79dd240494f4/download/72402_2014_boring-log1_04010.zip",
+     "member": "ボーリング柱状図1/11907044505.pdf",
+     "sha256": "d9dab70a6c559eebd6241b31fda1ecee7137f56f6305361fbc2edf727ddaf7ee",
+     "bytes": 35599,
+     "pages": 1
+    },
+    {
+     "name": "11907044506.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/4cc62581-9adf-4aaa-a970-79dd240494f4/download/72402_2014_boring-log1_04010.zip",
+     "member": "ボーリング柱状図1/11907044506.pdf",
+     "sha256": "51ef95837799e26d94105900b518cf617c9bdec0aec845469e9b8114c1bec6b3",
+     "bytes": 45609,
+     "pages": 1
+    },
+    {
+     "name": "11907044507.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/4cc62581-9adf-4aaa-a970-79dd240494f4/download/72402_2014_boring-log1_04010.zip",
+     "member": "ボーリング柱状図1/11907044507.pdf",
+     "sha256": "320ceb5bccc7867335911589cdaad8814b4bfbd95a75e637d2a0e1881fa58799",
+     "bytes": 148856,
+     "pages": 2
+    }
+   ],
+   "layout_family": "jp-denshi-chujozu",
+   "layout": [
+    "single_log_per_file",
+    "jacic_boring_log"
+   ],
+   "scan_quality": "born_digital",
+   "related_group": "jp-tochigi-119070445",
+   "split": "dev",
+   "note": "Two logs run on to a second sheet."
+  },
+  {
+   "id": "jp-tochigi-120080167",
+   "title": "栃木県 県土整備部 地質調査 120080167: 8 borehole logs",
+   "publisher": "栃木県 県土整備部 (Tochigi Prefecture, Department of Land Development)",
+   "country": "JP",
+   "languages": [
+    "ja"
+   ],
+   "landing_url": "https://data.bodik.jp/dataset/090000_boring-log",
+   "licence": {
+    "id": "CC-BY-2.1-JP",
+    "name": "Creative Commons Attribution 2.1 Japan",
+    "url": "https://creativecommons.org/licenses/by/2.1/jp/",
+    "evidence": "https://data.bodik.jp/api/3/action/package_show?id=090000_boring-log (license_id cc-by-21-jp, organisation 栃木県)",
+    "checked_on": "2026-11-20",
+    "attribution": "栃木県 県土整備部「ボーリング柱状図」(BODIK オープンデータ, data.bodik.jp), CC BY 2.1 JP",
+    "redistribution": "allowed with attribution",
+    "version_stated": true
+   },
+   "files": [
+    {
+     "name": "12008016701.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/e25209e6-ec50-40ec-948b-1a638de92122/download/72402_2014_boring-log2_04024.zip",
+     "member": "ボーリング柱状図2/12008016701.pdf",
+     "sha256": "abdb6d82acbfa549a97bd9af0a7fc7607825690c0c7bdfbf53de884c3c163f80",
+     "bytes": 25003,
+     "pages": 1
+    },
+    {
+     "name": "12008016702.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/e25209e6-ec50-40ec-948b-1a638de92122/download/72402_2014_boring-log2_04024.zip",
+     "member": "ボーリング柱状図2/12008016702.pdf",
+     "sha256": "edc55af5e71914dea9c54603cb0a07117bef45bc2a100d87909421d20bdb6885",
+     "bytes": 27408,
+     "pages": 1
+    },
+    {
+     "name": "12008016703.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/e25209e6-ec50-40ec-948b-1a638de92122/download/72402_2014_boring-log2_04024.zip",
+     "member": "ボーリング柱状図2/12008016703.pdf",
+     "sha256": "6558edf22a2a3c3ad1fd585e191b03769b5a3aeea3fdcf56cab8c6a0f9739b53",
+     "bytes": 33651,
+     "pages": 1
+    },
+    {
+     "name": "12008016704.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/e25209e6-ec50-40ec-948b-1a638de92122/download/72402_2014_boring-log2_04024.zip",
+     "member": "ボーリング柱状図2/12008016704.pdf",
+     "sha256": "1ce7159668287d1598c5eb8470a9107110b7c897b254c14fe378c9df421ecaf0",
+     "bytes": 25381,
+     "pages": 1
+    },
+    {
+     "name": "12008016705.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/e25209e6-ec50-40ec-948b-1a638de92122/download/72402_2014_boring-log2_04024.zip",
+     "member": "ボーリング柱状図2/12008016705.pdf",
+     "sha256": "24036fa99d5142a8768b7940fc8f2510de86d71a21c5cfc9e7a3850f76e02e52",
+     "bytes": 22785,
+     "pages": 1
+    },
+    {
+     "name": "12008016706.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/e25209e6-ec50-40ec-948b-1a638de92122/download/72402_2014_boring-log2_04024.zip",
+     "member": "ボーリング柱状図2/12008016706.pdf",
+     "sha256": "95d7376bd1b905a20eec175d80e3cabd502ec8863321837f79e7c701d4cee936",
+     "bytes": 23619,
+     "pages": 1
+    },
+    {
+     "name": "12008016707.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/e25209e6-ec50-40ec-948b-1a638de92122/download/72402_2014_boring-log2_04024.zip",
+     "member": "ボーリング柱状図2/12008016707.pdf",
+     "sha256": "1f62c052ddd6708ff6105ced72dee15d5ab9362b344e3f88055771ef75100bd9",
+     "bytes": 30165,
+     "pages": 1
+    },
+    {
+     "name": "12008016708.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/e25209e6-ec50-40ec-948b-1a638de92122/download/72402_2014_boring-log2_04024.zip",
+     "member": "ボーリング柱状図2/12008016708.pdf",
+     "sha256": "9ef89fd0d0d01a7d705a61ee2903b8ebc116212a1fb0ebae3333885f5f15060d",
+     "bytes": 34951,
+     "pages": 1
+    }
+   ],
+   "layout_family": "jp-denshi-chujozu",
+   "layout": [
+    "single_log_per_file",
+    "jacic_boring_log"
+   ],
+   "scan_quality": "born_digital",
+   "related_group": "jp-tochigi-120080167",
+   "split": "validation",
+   "note": "Road survey logs."
+  },
+  {
+   "id": "jp-tochigi-121050413",
+   "title": "栃木県 県土整備部 地質調査 121050413: 6 borehole logs",
+   "publisher": "栃木県 県土整備部 (Tochigi Prefecture, Department of Land Development)",
+   "country": "JP",
+   "languages": [
+    "ja"
+   ],
+   "landing_url": "https://data.bodik.jp/dataset/090000_boring-log",
+   "licence": {
+    "id": "CC-BY-2.1-JP",
+    "name": "Creative Commons Attribution 2.1 Japan",
+    "url": "https://creativecommons.org/licenses/by/2.1/jp/",
+    "evidence": "https://data.bodik.jp/api/3/action/package_show?id=090000_boring-log (license_id cc-by-21-jp, organisation 栃木県)",
+    "checked_on": "2026-11-20",
+    "attribution": "栃木県 県土整備部「ボーリング柱状図」(BODIK オープンデータ, data.bodik.jp), CC BY 2.1 JP",
+    "redistribution": "allowed with attribution",
+    "version_stated": true
+   },
+   "files": [
+    {
+     "name": "12105041301.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/cf4d2f67-4d38-4a26-b14a-35cd8b660401/download/72402_2014_boring-log3_04025.zip",
+     "member": "ボーリング柱状図3/12105041301.pdf",
+     "sha256": "7ecc7077e31f524f73248d70f055f40fe6be1d51bd3c24cf45a85783acd478b7",
+     "bytes": 60922,
+     "pages": 2
+    },
+    {
+     "name": "12105041302.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/cf4d2f67-4d38-4a26-b14a-35cd8b660401/download/72402_2014_boring-log3_04025.zip",
+     "member": "ボーリング柱状図3/12105041302.pdf",
+     "sha256": "d47bcdacebd1722f58064e082bef85bca0f8b1df68a77f9eb4ee75134cba2a5b",
+     "bytes": 45622,
+     "pages": 1
+    },
+    {
+     "name": "12105041303.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/cf4d2f67-4d38-4a26-b14a-35cd8b660401/download/72402_2014_boring-log3_04025.zip",
+     "member": "ボーリング柱状図3/12105041303.pdf",
+     "sha256": "16d5d9358566d0666819bddf699ba52118250b1f05f661d1e7e8609afa08b4b1",
+     "bytes": 35245,
+     "pages": 1
+    },
+    {
+     "name": "12105041304.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/cf4d2f67-4d38-4a26-b14a-35cd8b660401/download/72402_2014_boring-log3_04025.zip",
+     "member": "ボーリング柱状図3/12105041304.pdf",
+     "sha256": "c27581f340a9d53fd1b638ad35edefd124d385e057b1fe6ae4ab5b5b5ac3896d",
+     "bytes": 42664,
+     "pages": 1
+    },
+    {
+     "name": "12105041305.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/cf4d2f67-4d38-4a26-b14a-35cd8b660401/download/72402_2014_boring-log3_04025.zip",
+     "member": "ボーリング柱状図3/12105041305.pdf",
+     "sha256": "f9f329c713820c7a5cb93650b23b73ee927599cf21774f9b9e010aa7ab78f036",
+     "bytes": 38314,
+     "pages": 1
+    },
+    {
+     "name": "12105041306.pdf",
+     "url": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/cf4d2f67-4d38-4a26-b14a-35cd8b660401/download/72402_2014_boring-log3_04025.zip",
+     "member": "ボーリング柱状図3/12105041306.pdf",
+     "sha256": "3eabb6fb0a760c33a38baf98092c8217810d98f122e454286d7a75c19edbffee",
+     "bytes": 43043,
+     "pages": 1
+    }
+   ],
+   "layout_family": "jp-denshi-chujozu",
+   "layout": [
+    "single_log_per_file",
+    "jacic_boring_log"
+   ],
+   "scan_quality": "born_digital",
+   "related_group": "jp-tochigi-121050413",
+   "split": "test",
+   "note": "One log runs on to a second sheet."
+  },
+  {
+   "id": "jp-noshiro-r3-yorozumachi",
+   "title": "R3 市営万町住宅地質調査 (Noshiro municipal housing site investigation, 2021)",
+   "publisher": "能代市 (Noshiro City)",
+   "country": "JP",
+   "languages": [
+    "ja"
+   ],
+   "landing_url": "https://www.city.noshiro.lg.jp/city/opendata/oopun/25464",
+   "licence": {
+    "id": "CC-BY",
+    "name": "Creative Commons Attribution (version not stated by the publisher)",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "evidence": "https://www.city.noshiro.lg.jp/city/opendata/oopun/25464 (ライセンス CC BY)",
+    "checked_on": "2026-11-20",
+    "attribution": "能代市「ボーリング柱状図等」(能代市オープンデータ), CC BY",
+    "redistribution": "allowed with attribution",
+    "version_stated": false,
+    "note": "The publisher marks the data 表示 (CC BY) without a version. Attribution is given as asked; the version should be confirmed with the publisher before the benchmark is called complete."
+   },
+   "files": [
+    {
+     "name": "位置案内図.pdf",
+     "url": "https://www.city.noshiro.lg.jp/up/files/www/city/opendata/oopun/%E4%BD%8D%E7%BD%AE%E6%A1%88%E5%86%85%E5%9B%B3.pdf",
+     "sha256": "f0f3c48161627b0bd8cde9e530d031daab93957cdd1378e53f193a0dfe809e61",
+     "bytes": 413616,
+     "pages": 1
+    },
+    {
+     "name": "調査位置平面図.pdf",
+     "url": "https://www.city.noshiro.lg.jp/up/files/www/city/opendata/oopun/%E8%AA%BF%E6%9F%BB%E4%BD%8D%E7%BD%AE%E5%B9%B3%E9%9D%A2%E5%9B%B3.pdf",
+     "sha256": "6447be053425e1be6a1ca8e275ead1546dfd87c441c6550b70c2060ddbc31185",
+     "bytes": 389818,
+     "pages": 1
+    },
+    {
+     "name": "ボーリング柱状図(No_1).pdf",
+     "url": "https://www.city.noshiro.lg.jp/up/files/www/city/opendata/oopun/%E3%83%9C%E3%83%BC%E3%83%AA%E3%83%B3%E3%82%B0%E6%9F%B1%E7%8A%B6%E5%9B%B3%28No_1%29.pdf",
+     "sha256": "3bac39ffaabe072e89b26b9f0295cd19004baefdd7f90274216723de77deb6f4",
+     "bytes": 199339,
+     "pages": 2
+    },
+    {
+     "name": "ボーリング柱状図(No_2).pdf",
+     "url": "https://www.city.noshiro.lg.jp/up/files/www/city/opendata/oopun/%E3%83%9C%E3%83%BC%E3%83%AA%E3%83%B3%E3%82%B0%E6%9F%B1%E7%8A%B6%E5%9B%B3%28No_2%29.pdf",
+     "sha256": "36acda3bee8ce8fa2b9b83d422191a320361cc8135631c129b4b32392f3489b1",
+     "bytes": 199909,
+     "pages": 2
+    },
+    {
+     "name": "ボーリング柱状図(No_3).pdf",
+     "url": "https://www.city.noshiro.lg.jp/up/files/www/city/opendata/oopun/%E3%83%9C%E3%83%BC%E3%83%AA%E3%83%B3%E3%82%B0%E6%9F%B1%E7%8A%B6%E5%9B%B3%28No_3%29.pdf",
+     "sha256": "c48dd876d729485c186e4150bc767cd7e70403fb26f213ffff2f23b55e2d5eb1",
+     "bytes": 229440,
+     "pages": 2
+    },
+    {
+     "name": "ボーリング柱状図(No_4).pdf",
+     "url": "https://www.city.noshiro.lg.jp/up/files/www/city/opendata/oopun/%E3%83%9C%E3%83%BC%E3%83%AA%E3%83%B3%E3%82%B0%E6%9F%B1%E7%8A%B6%E5%9B%B3%28No_4%29.pdf",
+     "sha256": "63519430d24afdf930b2a1b8b91ee153bb6929ba2ffe8eacd45935a0462589a4",
+     "bytes": 227809,
+     "pages": 2
+    },
+    {
+     "name": "地質断面図(No_1-2).pdf",
+     "url": "https://www.city.noshiro.lg.jp/up/files/www/city/opendata/oopun/%E5%9C%B0%E8%B3%AA%E6%96%AD%E9%9D%A2%E5%9B%B3%28No_1-2%29.pdf",
+     "sha256": "7aa53887fceb6c53557f4fade8c331899984b10699f44e287ad3a4af787b20c6",
+     "bytes": 491854,
+     "pages": 1
+    },
+    {
+     "name": "地質断面図(No_3-4).pdf",
+     "url": "https://www.city.noshiro.lg.jp/up/files/www/city/opendata/oopun/%E5%9C%B0%E8%B3%AA%E6%96%AD%E9%9D%A2%E5%9B%B3%28No_3-4%29.pdf",
+     "sha256": "a92090314cd3bdcd8f0105676e0e236cddc85f220f92aca4d9beafd5bdaa020f",
+     "bytes": 500317,
+     "pages": 1
+    }
+   ],
+   "layout_family": "jp-chujozu-consultant",
+   "layout": [
+    "report_set_of_files",
+    "jacic_boring_log",
+    "site_plan",
+    "cross_section"
+   ],
+   "scan_quality": "born_digital",
+   "related_group": "jp-noshiro-r3",
+   "split": "dev",
+   "note": "Logs are digital with a text layer; the location map, plan and sections are images."
+  },
+  {
+   "id": "jp-neyagawa-clean-center",
+   "title": "寝屋川市 新ごみ処理施設建設工事 地盤概要 (Neyagawa waste-plant ground summary sheets)",
+   "publisher": "寝屋川市 (Neyagawa City)",
+   "country": "JP",
+   "languages": [
+    "ja"
+   ],
+   "landing_url": "https://www.city.neyagawa.osaka.jp/organization_list/keieikikaku/johosuisinka/open_data/opendata/15885.html",
+   "licence": {
+    "id": "CC-BY",
+    "name": "Creative Commons Attribution (version not stated by the publisher)",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "evidence": "https://www.city.neyagawa.osaka.jp/organization_list/keieikikaku/johosuisinka/open_data/opendata/15885.html (ライセンス 表示(CC BY))",
+    "checked_on": "2026-11-20",
+    "attribution": "寝屋川市「ボーリング柱状図」(寝屋川市オープンデータ), CC BY",
+    "redistribution": "allowed with attribution",
+    "version_stated": false,
+    "note": "The publisher marks the data 表示 (CC BY) without a version. Attribution is given as asked; the version should be confirmed with the publisher before the benchmark is called complete."
+   },
+   "files": [
+    {
+     "name": "bouring.pdf",
+     "url": "https://www.city.neyagawa.osaka.jp/material/files/group/46/bouring.pdf",
+     "sha256": "1e569dd5eff38b4e3e23725bc5e3f02f5aeea41bc1b049fc2bcc9b431b2e5538",
+     "bytes": 887213,
+     "pages": 6
+    }
+   ],
+   "layout_family": "jp-cad-drawing-sheet",
+   "layout": [
+    "drawing_sheet",
+    "jacic_boring_log",
+    "site_plan"
+   ],
+   "scan_quality": "good_scan",
+   "related_group": "jp-neyagawa",
+   "split": "test",
+   "note": "A3 drawing sheets, each a log beside a location plan, as page images with no text layer; small print."
+  },
+  {
+   "id": "jp-hirosaki-schools-h26-miwa",
+   "title": "平成26年度 三和小学校地質調査業務 報告書 (Hirosaki, Miwa primary school site investigation report)",
+   "publisher": "弘前市 (Hirosaki City)",
+   "country": "JP",
+   "languages": [
+    "ja"
+   ],
+   "landing_url": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/od-chisitsu-sokuryo.html",
+   "licence": {
+    "id": "CC-BY-4.0",
+    "name": "Creative Commons Attribution 4.0 International",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "evidence": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/od-chisitsu-sokuryo.html (「オープンデータひろさき」で公開しているデータは クリエイティブ・コモンズ 表示 4.0 国際 ライセンスの下に提供されています)",
+    "checked_on": "2026-11-20",
+    "attribution": "弘前市「オープンデータひろさき 地質・測量」, CC BY 4.0",
+    "redistribution": "allowed with attribution",
+    "version_stated": true
+   },
+   "files": [
+    {
+     "name": "20170308_hirosaki_gakkoudukuri_miwashougakkou.pdf",
+     "url": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/files/20170308_hirosaki_gakkoudukuri_miwashougakkou.pdf",
+     "sha256": "8786535fe35c07bdd909eb84e2264fec02a4add3c3fd552e92c1524f7ab5df5b",
+     "bytes": 1335336,
+     "pages": 20
+    }
+   ],
+   "layout_family": "jp-scanned-report",
+   "layout": [
+    "full_report",
+    "jacic_boring_log",
+    "site_plan",
+    "cross_section",
+    "text"
+   ],
+   "scan_quality": "good_scan",
+   "related_group": "jp-hirosaki-schools-h26",
+   "split": "dev",
+   "note": "A complete report scanned to images: prose, maps, plan, section, test plots, logs."
+  },
+  {
+   "id": "jp-hirosaki-schools-h26-jitoku",
+   "title": "自得小学校地質調査業務 報告書 (Hirosaki, Jitoku primary school site investigation report)",
+   "publisher": "弘前市 (Hirosaki City)",
+   "country": "JP",
+   "languages": [
+    "ja"
+   ],
+   "landing_url": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/od-chisitsu-sokuryo.html",
+   "licence": {
+    "id": "CC-BY-4.0",
+    "name": "Creative Commons Attribution 4.0 International",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "evidence": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/od-chisitsu-sokuryo.html (「オープンデータひろさき」で公開しているデータは クリエイティブ・コモンズ 表示 4.0 国際 ライセンスの下に提供されています)",
+    "checked_on": "2026-11-20",
+    "attribution": "弘前市「オープンデータひろさき 地質・測量」, CC BY 4.0",
+    "redistribution": "allowed with attribution",
+    "version_stated": true
+   },
+   "files": [
+    {
+     "name": "20170308_hirosaki_gakkoudukuri_jitokushougakkou.pdf",
+     "url": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/files/20170308_hirosaki_gakkoudukuri_jitokushougakkou.pdf",
+     "sha256": "c847834760a672eb9a684da7bf320199f730bb351b2411f225024ac5466fc145",
+     "bytes": 1430634,
+     "pages": 22
+    }
+   ],
+   "layout_family": "jp-scanned-report",
+   "layout": [
+    "full_report",
+    "jacic_boring_log",
+    "site_plan",
+    "text"
+   ],
+   "scan_quality": "good_scan",
+   "related_group": "jp-hirosaki-schools-h26",
+   "split": "dev",
+   "note": "Same programme and year as the Miwa report: kept in the same split."
+  },
+  {
+   "id": "jp-hirosaki-yoshino-brick",
+   "title": "平成27年度 吉野町煉瓦倉庫耐震調査・耐震改修計画策定業務 報告書 (Hirosaki, brick warehouse seismic survey report)",
+   "publisher": "弘前市 (Hirosaki City)",
+   "country": "JP",
+   "languages": [
+    "ja"
+   ],
+   "landing_url": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/od-chisitsu-sokuryo.html",
+   "licence": {
+    "id": "CC-BY-4.0",
+    "name": "Creative Commons Attribution 4.0 International",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "evidence": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/od-chisitsu-sokuryo.html (「オープンデータひろさき」で公開しているデータは クリエイティブ・コモンズ 表示 4.0 国際 ライセンスの下に提供されています)",
+    "checked_on": "2026-11-20",
+    "attribution": "弘前市「オープンデータひろさき 地質・測量」, CC BY 4.0",
+    "redistribution": "allowed with attribution",
+    "version_stated": true
+   },
+   "files": [
+    {
+     "name": "20170308_hirosaki_yosinotyouryokuti_rengasoukotisitutyousa.pdf",
+     "url": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/files/20170308_hirosaki_yosinotyouryokuti_rengasoukotisitutyousa.pdf",
+     "sha256": "60681350381ac30f734f26a4efb47149420bacf977d213ac89781d30310ea395",
+     "bytes": 9223060,
+     "pages": 59
+    }
+   ],
+   "layout_family": "jp-mixed-report",
+   "layout": [
+    "full_report",
+    "jacic_boring_log",
+    "site_plan",
+    "cross_section",
+    "text"
+   ],
+   "scan_quality": "born_digital",
+   "related_group": "jp-hirosaki-yoshino",
+   "split": "validation",
+   "note": "Text pages are digital; plans, sections and some sheets are images."
+  },
+  {
+   "id": "jp-hirosaki-honmaru-wall",
+   "title": "平成27年度 弘前城本丸石垣地質調査業務 報告書 (Hirosaki Castle keep wall: soil tests and stability report)",
+   "publisher": "弘前市 (Hirosaki City)",
+   "country": "JP",
+   "languages": [
+    "ja"
+   ],
+   "landing_url": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/od-chisitsu-sokuryo.html",
+   "licence": {
+    "id": "CC-BY-4.0",
+    "name": "Creative Commons Attribution 4.0 International",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "evidence": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/od-chisitsu-sokuryo.html (「オープンデータひろさき」で公開しているデータは クリエイティブ・コモンズ 表示 4.0 国際 ライセンスの下に提供されています)",
+    "checked_on": "2026-11-20",
+    "attribution": "弘前市「オープンデータひろさき 地質・測量」, CC BY 4.0",
+    "redistribution": "allowed with attribution",
+    "version_stated": true
+   },
+   "files": [
+    {
+     "name": "20170308_hirosaki_kouenryokuti_honmaruisigakitisitutyousa.pdf",
+     "url": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/files/20170308_hirosaki_kouenryokuti_honmaruisigakitisitutyousa.pdf",
+     "sha256": "f6d4e40347fa16fbad7e3349baab576203061a60482491b6200eba62a93eda30",
+     "bytes": 2253146,
+     "pages": 100
+    }
+   ],
+   "layout_family": "jp-lab-report",
+   "layout": [
+    "full_report",
+    "lab_results",
+    "text"
+   ],
+   "scan_quality": "born_digital",
+   "related_group": "jp-hirosaki-honmaru",
+   "split": "test",
+   "note": "A geotechnical report of laboratory tests and stability calculations: an abstention case if it carries no borehole logs (to be confirmed in annotation)."
+  },
+  {
+   "id": "jp-hirosaki-ringo",
+   "title": "弘前市 りんご課 ボーリング柱状図・調査位置平面図・地層推定断面図 (Hirosaki, apple-centre site investigation set)",
+   "publisher": "弘前市 (Hirosaki City)",
+   "country": "JP",
+   "languages": [
+    "ja"
+   ],
+   "landing_url": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/od-chisitsu-sokuryo.html",
+   "licence": {
+    "id": "CC-BY-4.0",
+    "name": "Creative Commons Attribution 4.0 International",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "evidence": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/od-chisitsu-sokuryo.html (「オープンデータひろさき」で公開しているデータは クリエイティブ・コモンズ 表示 4.0 国際 ライセンスの下に提供されています)",
+    "checked_on": "2026-11-20",
+    "attribution": "弘前市「オープンデータひろさき 地質・測量」, CC BY 4.0",
+    "redistribution": "allowed with attribution",
+    "version_stated": true
+   },
+   "files": [
+    {
+     "name": "20170308_hirosaki_ringo_tyousatiannaizu.pdf",
+     "url": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/files/20170308_hirosaki_ringo_tyousatiannaizu.pdf",
+     "sha256": "55d859913ebc9fa2cc7c5d3f30d877f1f339897d3d1a7732b8d863e7858298df",
+     "bytes": 222439,
+     "pages": 1
+    },
+    {
+     "name": "20170308_hirosaki_ringo_tyousaitiheimenzu_risaikurutou.pdf",
+     "url": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/files/20170308_hirosaki_ringo_tyousaitiheimenzu_risaikurutou.pdf",
+     "sha256": "8b60ac70cea77f061b2bd84478243bb2778b9f4fcaf5bbb6cac054e7cea62ed1",
+     "bytes": 438989,
+     "pages": 1
+    },
+    {
+     "name": "20170308_hirosaki_ringo_tyousaitiheimenzu_kenshutou.pdf",
+     "url": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/files/20170308_hirosaki_ringo_tyousaitiheimenzu_kenshutou.pdf",
+     "sha256": "ca79a2cb6fc1a2c5811d340e2e9d004ed6e681d824b8840698dfb29dfce99c50",
+     "bytes": 316569,
+     "pages": 1
+    },
+    {
+     "name": "20170308_hirosaki_ringo_tisousuiteidanmenzu.pdf",
+     "url": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/files/20170308_hirosaki_ringo_tisousuiteidanmenzu.pdf",
+     "sha256": "582e6930f7b664b0ae709b8aaffb103a41e1ce2a8f8e5b62190ce53872a84c33",
+     "bytes": 203193,
+     "pages": 1
+    },
+    {
+     "name": "20170308_hirosaki_ringo_boringutyuujouzu1.pdf",
+     "url": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/files/20170308_hirosaki_ringo_boringutyuujouzu1.pdf",
+     "sha256": "e6364ee684bf6e4310a20e5a2d1451ed91684c254f163616b4f9b8d2540c5d63",
+     "bytes": 176461,
+     "pages": 1
+    },
+    {
+     "name": "20170308_hirosaki_ringo_boringutyuujouzu2.pdf",
+     "url": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/files/20170308_hirosaki_ringo_boringutyuujouzu2.pdf",
+     "sha256": "70d823d8e8677fddbf742b1a299e6f3058464e1d9087084e33606876a269f25a",
+     "bytes": 197824,
+     "pages": 1
+    },
+    {
+     "name": "20170308_hirosaki_ringo_boringutyuujouzu3.pdf",
+     "url": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/files/20170308_hirosaki_ringo_boringutyuujouzu3.pdf",
+     "sha256": "bcc2ed647504350c4e71e29ba952cf99bc8bfbfad063bc6ab09e2e751a7ba37a",
+     "bytes": 179424,
+     "pages": 1
+    },
+    {
+     "name": "20170308_hirosaki_ringo_boringutyuujouzu4.pdf",
+     "url": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/files/20170308_hirosaki_ringo_boringutyuujouzu4.pdf",
+     "sha256": "eb3db0f5f0c7d5f3033c669a257581893acb73c2db3bc063f94a10ab0c135b38",
+     "bytes": 181478,
+     "pages": 1
+    }
+   ],
+   "layout_family": "jp-scanned-sheets",
+   "layout": [
+    "report_set_of_files",
+    "jacic_boring_log",
+    "site_plan",
+    "cross_section"
+   ],
+   "scan_quality": "good_scan",
+   "related_group": "jp-hirosaki-ringo",
+   "split": "dev",
+   "note": "A3 log sheets as images, with plans and a section."
+  },
+  {
+   "id": "jp-hirosaki-cityhall-well",
+   "title": "平成26年度 市庁舎井戸ボーリング工事 地質柱状図 (Hirosaki City Hall well log)",
+   "publisher": "弘前市 (Hirosaki City)",
+   "country": "JP",
+   "languages": [
+    "ja"
+   ],
+   "landing_url": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/od-chisitsu-sokuryo.html",
+   "licence": {
+    "id": "CC-BY-4.0",
+    "name": "Creative Commons Attribution 4.0 International",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "evidence": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/od-chisitsu-sokuryo.html (「オープンデータひろさき」で公開しているデータは クリエイティブ・コモンズ 表示 4.0 国際 ライセンスの下に提供されています)",
+    "checked_on": "2026-11-20",
+    "attribution": "弘前市「オープンデータひろさき 地質・測量」, CC BY 4.0",
+    "redistribution": "allowed with attribution",
+    "version_stated": true
+   },
+   "files": [
+    {
+     "name": "20170308_hirosaki_zaisankanri_sityoushaidoboringu.pdf",
+     "url": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/files/20170308_hirosaki_zaisankanri_sityoushaidoboringu.pdf",
+     "sha256": "ffe2ba85237c0880638e4ff2e2bd7af110be6458f9c4376a8d22611f35412844",
+     "bytes": 280916,
+     "pages": 4
+    }
+   ],
+   "layout_family": "jp-well-log",
+   "layout": [
+    "well_log"
+   ],
+   "scan_quality": "good_scan",
+   "related_group": "jp-hirosaki-cityhall-well",
+   "split": "test",
+   "note": "A water-well log rather than a geotechnical boring."
+  },
+  {
+   "id": "jp-hirosaki-ryugataira",
+   "title": "平成27年度 竜ヶ平線地質調査柱状図 (Hirosaki, Ryugataira road logs)",
+   "publisher": "弘前市 (Hirosaki City)",
+   "country": "JP",
+   "languages": [
+    "ja"
+   ],
+   "landing_url": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/od-chisitsu-sokuryo.html",
+   "licence": {
+    "id": "CC-BY-4.0",
+    "name": "Creative Commons Attribution 4.0 International",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "evidence": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/od-chisitsu-sokuryo.html (「オープンデータひろさき」で公開しているデータは クリエイティブ・コモンズ 表示 4.0 国際 ライセンスの下に提供されています)",
+    "checked_on": "2026-11-20",
+    "attribution": "弘前市「オープンデータひろさき 地質・測量」, CC BY 4.0",
+    "redistribution": "allowed with attribution",
+    "version_stated": true
+   },
+   "files": [
+    {
+     "name": "20170308_hirosaki_kensetuseisaku_ryuugataira_tyuujouzu.pdf",
+     "url": "https://www.city.hirosaki.aomori.jp/gaiyou/opendata/files/20170308_hirosaki_kensetuseisaku_ryuugataira_tyuujouzu.pdf",
+     "sha256": "60dde2c21d710a02215dbf8b426c5b29dc214b2955e71d73f33d6cafd7984340",
+     "bytes": 1208005,
+     "pages": 6
+    }
+   ],
+   "layout_family": "jp-scanned-sheets",
+   "layout": [
+    "jacic_boring_log",
+    "site_plan"
+   ],
+   "scan_quality": "good_scan",
+   "related_group": "jp-hirosaki-ryugataira",
+   "split": "validation",
+   "note": "Location map and logs as page images."
+  },
+  {
+   "id": "jp-ehime-compilation",
+   "title": "愛媛県 ボーリング柱状図 (Ehime Prefecture compilation of borehole logs, 2016)",
+   "publisher": "愛媛県 (Ehime Prefecture)",
+   "country": "JP",
+   "languages": [
+    "ja"
+   ],
+   "landing_url": "https://www.pref.ehime.jp/opendata-catalog/dataset/pref-67.html",
+   "licence": {
+    "id": "CC-BY",
+    "name": "Creative Commons Attribution (version not stated by the publisher)",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "evidence": "https://www.pref.ehime.jp/opendata-catalog/dataset/pref-67.html (表示（CC BY）)",
+    "checked_on": "2026-11-20",
+    "attribution": "愛媛県「ボーリング柱状図」(愛媛県オープンデータカタログ), CC BY",
+    "redistribution": "allowed with attribution",
+    "version_stated": false,
+    "note": "The publisher marks the data 表示 (CC BY) without a version. Attribution is given as asked; the version should be confirmed with the publisher before the benchmark is called complete."
+   },
+   "files": [
+    {
+     "name": "Boring20160620.pdf",
+     "url": "https://www.pref.ehime.jp/opendata-catalog/dataset/pref-67/resource/73/Boring20160620.pdf",
+     "sha256": "2067d24c3314330bc26b382dd1ae129b7828fc01c9ed23773803036286c07699",
+     "bytes": 26794234,
+     "pages": 1201
+    }
+   ],
+   "layout_family": "jp-denshi-chujozu",
+   "layout": [
+    "compilation",
+    "jacic_boring_log"
+   ],
+   "scan_quality": "born_digital",
+   "related_group": "jp-ehime",
+   "split": "test",
+   "note": "1,201 pages of logs from many surveys in one file: boreholes are annotated on a sample (see the annotation's sample rule)."
+  },
+  {
+   "id": "us-usgs-ofr90-90",
+   "title": "Geotechnical drill-hole logs from the southern Seattle area, Washington (USGS Open-File Report 90-90)",
+   "publisher": "U.S. Geological Survey",
+   "country": "US",
+   "languages": [
+    "en"
+   ],
+   "landing_url": "https://pubs.usgs.gov/of/1990/0090/",
+   "licence": {
+    "id": "US-PD",
+    "name": "Public domain: U.S. Government work (17 U.S.C. §105)",
+    "url": "https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits",
+    "evidence": "USGS policy: information produced by the USGS is in the public domain unless otherwise noted; the report carries no other notice",
+    "checked_on": "2026-11-20",
+    "attribution": "U.S. Geological Survey (public domain); cite the report as given",
+    "redistribution": "allowed (public domain)",
+    "version_stated": true
+   },
+   "files": [
+    {
+     "name": "report.pdf",
+     "url": "https://pubs.usgs.gov/of/1990/0090/report.pdf",
+     "sha256": "5cf3ab96af0d07c3bc452ce7ab701bd2d640c23387949f86f2ad7402a17a0b45",
+     "bytes": 2824773,
+     "pages": 145
+    }
+   ],
+   "layout_family": "us-usgs-1990-drill-hole-logs",
+   "layout": [
+    "compilation",
+    "graphic_log_feet",
+    "text"
+   ],
+   "scan_quality": "good_scan",
+   "related_group": "us-usgs-ofr90-90",
+   "split": "dev",
+   "note": "Logs compiled by the USGS from earlier public-agency borings, scanned with a hidden OCR text layer; depths in feet; positions are on a separate plate, not in this file."
+  },
+  {
+   "id": "us-usgs-ofr94-706",
+   "title": "Seismic velocities and geologic logs from boreholes at three downhole arrays in San Francisco, California (USGS Open-File Report 94-706)",
+   "publisher": "U.S. Geological Survey",
+   "country": "US",
+   "languages": [
+    "en"
+   ],
+   "landing_url": "https://pubs.usgs.gov/of/1994/0706/",
+   "licence": {
+    "id": "US-PD",
+    "name": "Public domain: U.S. Government work (17 U.S.C. §105)",
+    "url": "https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits",
+    "evidence": "USGS policy: information produced by the USGS is in the public domain unless otherwise noted; the report carries no other notice",
+    "checked_on": "2026-11-20",
+    "attribution": "U.S. Geological Survey (public domain); cite the report as given",
+    "redistribution": "allowed (public domain)",
+    "version_stated": true
+   },
+   "files": [
+    {
+     "name": "of94-706.pdf",
+     "url": "https://pubs.usgs.gov/of/1994/0706/of94-706.pdf",
+     "sha256": "84c381aa562eae4f85b0cd902896d02e44efbb7293320de493852490cbc7648c",
+     "bytes": 13919923,
+     "pages": 42
+    }
+   ],
+   "layout_family": "us-usgs-1994-geologic-log",
+   "layout": [
+    "full_report",
+    "graphic_log_feet",
+    "text"
+   ],
+   "scan_quality": "poor_scan",
+   "related_group": "us-usgs-ofr94-706",
+   "split": "test",
+   "note": "A scanned report with three borehole logs giving latitude and longitude."
+  },
+  {
+   "id": "us-usgs-ofr2011-1281",
+   "title": "Cone penetration tests and soil borings at Mason Road, Green Valley, Solano County, California (USGS Open-File Report 2011-1281)",
+   "publisher": "U.S. Geological Survey",
+   "country": "US",
+   "languages": [
+    "en"
+   ],
+   "landing_url": "https://pubs.usgs.gov/of/2011/1281/",
+   "licence": {
+    "id": "US-PD",
+    "name": "Public domain: U.S. Government work (17 U.S.C. §105)",
+    "url": "https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits",
+    "evidence": "USGS policy: information produced by the USGS is in the public domain unless otherwise noted; the report carries no other notice",
+    "checked_on": "2026-11-20",
+    "attribution": "U.S. Geological Survey (public domain); cite the report as given",
+    "redistribution": "allowed (public domain)",
+    "version_stated": true
+   },
+   "files": [
+    {
+     "name": "of2011-1281_text.pdf",
+     "url": "https://pubs.usgs.gov/of/2011/1281/of2011-1281_text.pdf",
+     "sha256": "5bd2e013dd20c2b00c139ad24319d887205f2a7ccfe09d1c3ac91e891069f4d4",
+     "bytes": 10794611,
+     "pages": 57
+    }
+   ],
+   "layout_family": "us-usgs-2011-cpt-boring",
+   "layout": [
+    "full_report",
+    "insitu_test",
+    "borehole_log",
+    "text"
+   ],
+   "scan_quality": "born_digital",
+   "related_group": "us-usgs-ofr2011-1281",
+   "split": "test",
+   "note": "Mostly CPT soundings, with a few auger borings."
+  },
+  {
+   "id": "us-usgs-ds660",
+   "title": "Construction diagrams, geophysical logs, and lithologic descriptions for boreholes at the Idaho National Laboratory (USGS Data Series 660)",
+   "publisher": "U.S. Geological Survey",
+   "country": "US",
+   "languages": [
+    "en"
+   ],
+   "landing_url": "https://pubs.usgs.gov/ds/660/",
+   "licence": {
+    "id": "US-PD",
+    "name": "Public domain: U.S. Government work (17 U.S.C. §105)",
+    "url": "https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits",
+    "evidence": "USGS policy: information produced by the USGS is in the public domain unless otherwise noted; the report carries no other notice",
+    "checked_on": "2026-11-20",
+    "attribution": "U.S. Geological Survey (public domain); cite the report as given",
+    "redistribution": "allowed (public domain)",
+    "version_stated": true
+   },
+   "files": [
+    {
+     "name": "ds660.pdf",
+     "url": "https://pubs.usgs.gov/ds/660/pdf/ds660.pdf",
+     "sha256": "4e8dafc198e95a80cb83d4608f15d199dd52b32abd88280f5eb5cd5775b8e97c",
+     "bytes": 4396606,
+     "pages": 44
+    }
+   ],
+   "layout_family": "us-usgs-2011-lithologic-figure",
+   "layout": [
+    "full_report",
+    "graphic_log_feet",
+    "core_photo",
+    "text"
+   ],
+   "scan_quality": "born_digital",
+   "related_group": "us-usgs-ds660",
+   "split": "validation",
+   "note": "Deep basalt boreholes; simplified lithology drawn beside geophysical logs, depths in feet."
+  },
+  {
+   "id": "be-dov-1969-010172",
+   "title": "DOV Boorrapport, boring GEO-69/355-A (1969)",
+   "publisher": "Databank Ondergrond Vlaanderen (Flemish Government)",
+   "country": "BE",
+   "languages": [
+    "nl"
+   ],
+   "landing_url": "https://www.dov.vlaanderen.be/data/boring/1969-010172",
+   "licence": {
+    "id": "MGH-1.0",
+    "name": "Modellicentie Gratis Hergebruik v1.0 (Flemish government model licence for free reuse)",
+    "url": "https://overheid.vlaanderen.be/sites/default/files/documenten/ict-egov/licenties/hergebruik/modellicentie_gratis_hergebruik_v1_0.html",
+    "evidence": "https://www.dov.vlaanderen.be (DOV data may be reused free of charge, commercially or not, under the model licence; as already credited in docs/sites.md)",
+    "checked_on": "2026-11-20",
+    "attribution": "Databank Ondergrond Vlaanderen (DOV), Flemish Government; consulted on 20/11/2026, on https://www.dov.vlaanderen.be",
+    "redistribution": "allowed with attribution",
+    "version_stated": true
+   },
+   "files": [
+    {
+     "name": "boorrapport.pdf",
+     "url": "https://www.dov.vlaanderen.be/zoeken-ocdov/proxy-boring/boorstaat/1969-010172/rapport/rapportboringstandaard?titel=DOV+Boorrapport",
+     "sha256": "51c898bf300d879754b79da885448d369f5dd900f3239a2d1a58c4fa5c87d11f",
+     "bytes": 231509,
+     "pages": 2,
+     "volatile": "generated on request: the footer carries the date of the request",
+     "text_sha256": "6f1c498b10263a1341bac958d1bb820bd4fc86b86bf8ea12842eb32ee69c270e"
+    }
+   ],
+   "layout_family": "be-dov-boorrapport",
+   "layout": [
+    "from_to_table",
+    "single_borehole"
+   ],
+   "scan_quality": "born_digital",
+   "related_group": "be-dov-1969-010172",
+   "split": "dev",
+   "note": "The publisher's own PDF report of one geotechnical boring: From/To tables with descriptions and interpretations. The PDF is generated on request with the date in its footer: it is checked by the SHA-256 of its text without that date."
+  },
+  {
+   "id": "au-nsw-tahmoor-reactivity",
+   "title": "Assessment of soil reactivity: Tahmoor/Thirlmere region (2019)",
+   "publisher": "Department of Customer Service, New South Wales (Data.NSW); report for Subsidence Advisory NSW",
+   "country": "AU",
+   "languages": [
+    "en"
+   ],
+   "landing_url": "https://data.nsw.gov.au/data/dataset/nsw-soil-reactivity-report-in-tahmoor-thirlmere-region",
+   "licence": {
+    "id": "CC-BY-3.0-AU",
+    "name": "Creative Commons Attribution 3.0 Australia",
+    "url": "https://creativecommons.org/licenses/by/3.0/au/",
+    "evidence": "https://data.gov.au/data/api/3/action/package_show?id=nsw-soil-reactivity-report-in-tahmoor-thirlmere-region (license cc-by: Creative Commons Attribution 3.0 Australia; publisher Department of Customer Service, Data.NSW)",
+    "checked_on": "2026-11-20",
+    "attribution": "Soil Reactivity Report in Tahmoor/Thirlmere region, Department of Customer Service (Data.NSW), CC BY 3.0 AU",
+    "redistribution": "allowed with attribution",
+    "version_stated": true
+   },
+   "files": [
+    {
+     "name": "soil-reactivity-tahmoor-thirlmere.pdf",
+     "url": "https://data.nsw.gov.au/data/dataset/db0ed109-f062-4393-a77c-55feb31213cd/resource/9b253f40-74d7-479e-8a1c-8b44422557a1/download/5.-201903-soil-reactivity-assessment-report-tahmoor-thirlmere-region.pdf",
+     "sha256": "e82797eba83a5b2d679c98302872373c9cdaa6e51b1b5191ce637ec4715dd7d3",
+     "bytes": 3266406,
+     "pages": 20
+    }
+   ],
+   "layout_family": "au-report-no-logs",
+   "layout": [
+    "full_report",
+    "lab_results",
+    "text"
+   ],
+   "scan_quality": "born_digital",
+   "related_group": "au-nsw-tahmoor",
+   "split": "dev",
+   "note": "Sampling tables with depths, but the appendix of logs is a title page only: an abstention case (no borehole logs)."
+  }
+ ],
+ "excluded": [
+  {
+   "source": "DOV Boorrapport BGD049w0265 (be-dov-38269)",
+   "reason": "ambiguous_truth",
+   "detail": "Two different lithological descriptions of the same 206 m borehole (1999 and 2001): which layers a reader should give is not defined. Dropped after it was first listed."
+  },
+  {
+   "source": "国土地盤情報データベース (NGIC, publicweb.ngic.or.jp)",
+   "reason": "access_refused",
+   "detail": "Answers plain requests with an access-restriction page (HTTP 403). Not worked around."
+  },
+  {
+   "source": "静岡県地理情報システム ボーリング柱状図 (gis.pref.shizuoka.jp)",
+   "reason": "access_refused",
+   "detail": "CC BY, but the viewer answers plain requests with HTTP 403. Not worked around."
+  },
+  {
+   "source": "KuniJiban (www.kunijiban.pwri.go.jp)",
+   "reason": "no_documents",
+   "detail": "Logs are published as XML only; a PDF made from them here would be synthetic."
+  },
+  {
+   "source": "Urayasu City, Katori City boring-log PDFs",
+   "reason": "licence_not_stated",
+   "detail": "Public PDFs with no reuse licence stated."
+  },
+  {
+   "source": "Asahikawa City boring logs",
+   "reason": "not_public",
+   "detail": "Viewing in the office only."
+  },
+  {
+   "source": "USACE district geotechnical appendices (nae.usace.army.mil, saj.usace.army.mil)",
+   "reason": "access_refused",
+   "detail": "HTTP 403 to plain requests. Not worked around."
+  },
+  {
+   "source": "NRCS Appendix D-9 Geotechnical Evaluation Report",
+   "reason": "third_party_rights",
+   "detail": "Written by a private consultant for a local sponsor: not a U.S. Government work, and no licence stated."
+  },
+  {
+   "source": "FRA project appendices (railroads.dot.gov)",
+   "reason": "third_party_rights",
+   "detail": "Consultant reports for project sponsors; no licence stated."
+  },
+  {
+   "source": "Geological Survey Ireland, geotechnical site-investigation reports",
+   "reason": "third_party_rights",
+   "detail": "The index dataset is CC BY 4.0, but the linked reports are written by private firms and carry no licence of their own."
+  },
+  {
+   "source": "UK council and planning-portal ground investigation reports",
+   "reason": "licence_not_stated",
+   "detail": "Consultant reports published for planning; no reuse licence stated."
+  },
+  {
+   "source": "GOV.UK attachments of third-party ground investigation reports",
+   "reason": "third_party_rights",
+   "detail": "The Open Government Licence covers Crown copyright; these annexes are third-party reports."
+  },
+  {
+   "source": "Geological Survey of Queensland company reports",
+   "reason": "access_refused",
+   "detail": "CC BY 4.0, but the files answer plain requests with AccessDenied. Not worked around."
+  },
+  {
+   "source": "BGS borehole scans",
+   "reason": "third_party_rights",
+   "detail": "Scans of third-party records under BGS terms that restrict reuse."
+  },
+  {
+   "source": "New Zealand Geotechnical Database",
+   "reason": "terms_restrict",
+   "detail": "Registration required; terms restrict redistribution."
+  },
+  {
+   "source": "NADAG (Norway)",
+   "reason": "deferred",
+   "detail": "NLOD, but the reports' API was not reachable from here; to be examined later."
+  },
+  {
+   "source": "Private company reports",
+   "reason": "private",
+   "detail": "Never part of the public benchmark; kept outside the repository."
+  }
+ ]
+}

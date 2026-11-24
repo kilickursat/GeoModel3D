@@ -1,0 +1,603 @@
+{
+ "schema_version": "1.0.0",
+ "report_id": "jp-hirosaki-honmaru-wall",
+ "status": "draft",
+ "provenance": {
+  "annotated_on": "2026-11-20",
+  "annotator_kind": "assistant",
+  "method": "Page types by eye from contact sheets of all pages, checked on the page text. The report holds no borehole log."
+ },
+ "scope": {
+  "pages": "all",
+  "boreholes": "all",
+  "fields": [
+   "position",
+   "ground_elevation",
+   "final_depth",
+   "layers",
+   "spt",
+   "rqd",
+   "groundwater"
+  ]
+ },
+ "documents": [
+  {
+   "file": "20170308_hirosaki_kouenryokuti_honmaruisigakitisitutyousa.pdf",
+   "pages": 100,
+   "sha256": "f6d4e40347fa16fbad7e3349baab576203061a60482491b6200eba62a93eda30"
+  }
+ ],
+ "pages": [
+  {
+   "doc": 0,
+   "page": 1,
+   "type": "front_matter"
+  },
+  {
+   "doc": 0,
+   "page": 2,
+   "type": "front_matter",
+   "note": "contents"
+  },
+  {
+   "doc": 0,
+   "page": 3,
+   "type": "drawing_other",
+   "note": "figure of the wall and the sampling points"
+  },
+  {
+   "doc": 0,
+   "page": 4,
+   "type": "table_other",
+   "note": "list of samples with photographs"
+  },
+  {
+   "doc": 0,
+   "page": 5,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 6,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 7,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 8,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 9,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 10,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 11,
+   "type": "other",
+   "note": "section title page, soil test data sheets"
+  },
+  {
+   "doc": 0,
+   "page": 12,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 13,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 14,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 15,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 16,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 17,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 18,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 19,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 20,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 21,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 22,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 23,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 24,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 25,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 26,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 27,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 28,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 29,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 30,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 31,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 32,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 33,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 34,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 35,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 36,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 37,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 38,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 39,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 40,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 41,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 42,
+   "type": "other",
+   "note": "section title page, photographs"
+  },
+  {
+   "doc": 0,
+   "page": 43,
+   "type": "other",
+   "note": "photographs of samples and laboratory tests"
+  },
+  {
+   "doc": 0,
+   "page": 44,
+   "type": "other",
+   "note": "photographs of samples and laboratory tests"
+  },
+  {
+   "doc": 0,
+   "page": 45,
+   "type": "other",
+   "note": "photographs of samples and laboratory tests"
+  },
+  {
+   "doc": 0,
+   "page": 46,
+   "type": "other",
+   "note": "photographs of samples and laboratory tests"
+  },
+  {
+   "doc": 0,
+   "page": 47,
+   "type": "other",
+   "note": "photographs of samples and laboratory tests"
+  },
+  {
+   "doc": 0,
+   "page": 48,
+   "type": "other",
+   "note": "section title page, reference material"
+  },
+  {
+   "doc": 0,
+   "page": 49,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 50,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 51,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 52,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 53,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 54,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 55,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 56,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 57,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 58,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 59,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 60,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 61,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 62,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 63,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 64,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 65,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 66,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 67,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 68,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 69,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 70,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 71,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 72,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 73,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 74,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 75,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 76,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 77,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 78,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 79,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 80,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 81,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 82,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 83,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 84,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 85,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 86,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 87,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 88,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 89,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 90,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 91,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 92,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 93,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 94,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 95,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 96,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 97,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 98,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 99,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  },
+  {
+   "doc": 0,
+   "page": 100,
+   "type": "table_other",
+   "note": "slope stability calculation sheets"
+  }
+ ],
+ "boreholes": [],
+ "readiness": {
+  "expected": "abstain",
+  "reasons": [
+   "no_logs"
+  ],
+  "positioned_boreholes": 0,
+  "note": "A report of laboratory tests on samples from the castle wall and slope stability calculations: no borehole logs. No ground model can be built from it."
+ }
+}

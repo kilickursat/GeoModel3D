@@ -1,0 +1,1556 @@
+{
+ "schema_version": "1.0.0",
+ "report_id": "jp-hirosaki-yoshino-brick",
+ "status": "draft",
+ "provenance": {
+  "annotated_on": "2026-11-20",
+  "annotator_kind": "assistant",
+  "method": "Transcribed by eye from page images at 1.8x to 2.4x zoom (the logs are images; the report text is digital); checked against elevation = ground level - depth on every layer and against the N value printed beside each test. Names and telephone numbers are not transcribed."
+ },
+ "scope": {
+  "pages": "all",
+  "boreholes": "all",
+  "fields": [
+   "position",
+   "ground_elevation",
+   "final_depth",
+   "layers",
+   "spt",
+   "rqd",
+   "groundwater"
+  ]
+ },
+ "documents": [
+  {
+   "file": "20170308_hirosaki_yosinotyouryokuti_rengasoukotisitutyousa.pdf",
+   "pages": 59,
+   "sha256": "60681350381ac30f734f26a4efb47149420bacf977d213ac89781d30310ea395"
+  }
+ ],
+ "pages": [
+  {
+   "doc": 0,
+   "page": 1,
+   "type": "front_matter"
+  },
+  {
+   "doc": 0,
+   "page": 2,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 3,
+   "type": "front_matter"
+  },
+  {
+   "doc": 0,
+   "page": 4,
+   "type": "front_matter"
+  },
+  {
+   "doc": 0,
+   "page": 5,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 6,
+   "type": "borehole_summary",
+   "note": "Table 1-1, quantities per hole",
+   "boreholes": [
+    "No1",
+    "No2",
+    "No3"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 7,
+   "type": "site_plan",
+   "note": "location map"
+  },
+  {
+   "doc": 0,
+   "page": 8,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 9,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 10,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 11,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 12,
+   "type": "drawing_other",
+   "note": "geological map"
+  },
+  {
+   "doc": 0,
+   "page": 13,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 14,
+   "type": "drawing_other",
+   "note": "geological map"
+  },
+  {
+   "doc": 0,
+   "page": 15,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 16,
+   "type": "table_other",
+   "note": "table of strata"
+  },
+  {
+   "doc": 0,
+   "page": 17,
+   "type": "site_plan",
+   "note": "plan of the borehole positions"
+  },
+  {
+   "doc": 0,
+   "page": 18,
+   "type": "cross_section"
+  },
+  {
+   "doc": 0,
+   "page": 19,
+   "type": "cross_section"
+  },
+  {
+   "doc": 0,
+   "page": 20,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 21,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 22,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 23,
+   "type": "drawing_other",
+   "note": "N-value plots"
+  },
+  {
+   "doc": 0,
+   "page": 24,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 25,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 26,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 27,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 28,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 29,
+   "type": "table_other"
+  },
+  {
+   "doc": 0,
+   "page": 30,
+   "type": "table_other"
+  },
+  {
+   "doc": 0,
+   "page": 31,
+   "type": "table_other"
+  },
+  {
+   "doc": 0,
+   "page": 32,
+   "type": "table_other"
+  },
+  {
+   "doc": 0,
+   "page": 33,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 34,
+   "type": "other",
+   "note": "appendix contents"
+  },
+  {
+   "doc": 0,
+   "page": 35,
+   "type": "other",
+   "note": "section title page, boring logs"
+  },
+  {
+   "doc": 0,
+   "page": 36,
+   "type": "borehole_log",
+   "boreholes": [
+    "No1"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 37,
+   "type": "borehole_log",
+   "boreholes": [
+    "No2"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 38,
+   "type": "borehole_log",
+   "boreholes": [
+    "No3"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 39,
+   "type": "other",
+   "note": "section title page, laboratory data sheets"
+  },
+  {
+   "doc": 0,
+   "page": 40,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 41,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 42,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 43,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 44,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 45,
+   "type": "lab_results"
+  },
+  {
+   "doc": 0,
+   "page": 46,
+   "type": "other",
+   "note": "section title page, photographs"
+  },
+  {
+   "doc": 0,
+   "page": 47,
+   "type": "other",
+   "note": "site and laboratory photographs"
+  },
+  {
+   "doc": 0,
+   "page": 48,
+   "type": "other",
+   "note": "site and laboratory photographs"
+  },
+  {
+   "doc": 0,
+   "page": 49,
+   "type": "other",
+   "note": "site and laboratory photographs"
+  },
+  {
+   "doc": 0,
+   "page": 50,
+   "type": "other",
+   "note": "site and laboratory photographs"
+  },
+  {
+   "doc": 0,
+   "page": 51,
+   "type": "other",
+   "note": "site and laboratory photographs"
+  },
+  {
+   "doc": 0,
+   "page": 52,
+   "type": "other",
+   "note": "site and laboratory photographs"
+  },
+  {
+   "doc": 0,
+   "page": 53,
+   "type": "other",
+   "note": "site and laboratory photographs"
+  },
+  {
+   "doc": 0,
+   "page": 54,
+   "type": "other",
+   "note": "site and laboratory photographs"
+  },
+  {
+   "doc": 0,
+   "page": 55,
+   "type": "other",
+   "note": "site and laboratory photographs"
+  },
+  {
+   "doc": 0,
+   "page": 56,
+   "type": "other",
+   "note": "site and laboratory photographs"
+  },
+  {
+   "doc": 0,
+   "page": 57,
+   "type": "other",
+   "note": "site and laboratory photographs"
+  },
+  {
+   "doc": 0,
+   "page": 58,
+   "type": "other",
+   "note": "site and laboratory photographs"
+  },
+  {
+   "doc": 0,
+   "page": 59,
+   "type": "other",
+   "note": "site and laboratory photographs"
+  }
+ ],
+ "boreholes": [
+  {
+   "id": "No1",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 36
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 40.5976944,
+    "lon": 140.4730278,
+    "crs": "unstated",
+    "as_printed": "北緯 40°35'51.7\" 東経 140°28'22.9\"",
+    "source": {
+     "doc": 0,
+     "page": 36
+    }
+   },
+   "ground_elevation": {
+    "value": -0.47,
+    "datum": "KBM2 (local benchmark)",
+    "unit": "m",
+    "as_printed": "KBM2= -0.47m",
+    "source": {
+     "doc": 0,
+     "page": 36
+    }
+   },
+   "final_depth": {
+    "value": 20.4,
+    "source": {
+     "doc": 0,
+     "page": 36
+    }
+   },
+   "layers": [
+    {
+     "top": 0,
+     "base": 1.1,
+     "description": "表土・有機質シルト：草根を混入する",
+     "principal": "topsoil",
+     "source": {
+      "doc": 0,
+      "page": 36
+     }
+    },
+    {
+     "top": 1.1,
+     "base": 4.4,
+     "description": "砂礫：砂は粒径不均一な細砂主体、礫はφ2〜20mm位の円〜亜円礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 36
+     }
+    },
+    {
+     "top": 4.4,
+     "base": 5.6,
+     "description": "軽石混じり砂：砂は細砂で、φ1〜10mm位の軽石を混入する",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 36
+     }
+    },
+    {
+     "top": 5.6,
+     "base": 6.7,
+     "description": "シルト：比較的均質なシルト",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 36
+     }
+    },
+    {
+     "top": 6.7,
+     "base": 9.2,
+     "description": "砂礫：砂は細砂を主体、礫はφ5〜30mm位の亜円〜角礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 36
+     }
+    },
+    {
+     "top": 9.2,
+     "base": 20.4,
+     "description": "固結シルト：比較的均質なシルトで固結している",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 36
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 7,
+     "source": {
+      "doc": 0,
+      "page": 36
+     }
+    },
+    {
+     "depth": 2.15,
+     "n": 26,
+     "source": {
+      "doc": 0,
+      "page": 36
+     }
+    },
+    {
+     "depth": 3.15,
+     "n": 19,
+     "source": {
+      "doc": 0,
+      "page": 36
+     }
+    },
+    {
+     "depth": 4.15,
+     "n": 31,
+     "source": {
+      "doc": 0,
+      "page": 36
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 29,
+     "source": {
+      "doc": 0,
+      "page": 36
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 7,
+     "source": {
+      "doc": 0,
+      "page": 36
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 35,
+     "source": {
+      "doc": 0,
+      "page": 36
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 188,
+     "source": {
+      "doc": 0,
+      "page": 36
+     },
+     "penetration_cm": 8,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 9.15,
+     "n": 18,
+     "source": {
+      "doc": 0,
+      "page": 36
+     }
+    },
+    {
+     "depth": 10.15,
+     "n": 12,
+     "source": {
+      "doc": 0,
+      "page": 36
+     }
+    },
+    {
+     "depth": 11.15,
+     "n": 18,
+     "source": {
+      "doc": 0,
+      "page": 36
+     }
+    },
+    {
+     "depth": 12.15,
+     "n": 41,
+     "source": {
+      "doc": 0,
+      "page": 36
+     }
+    },
+    {
+     "depth": 13.15,
+     "n": 39,
+     "source": {
+      "doc": 0,
+      "page": 36
+     }
+    },
+    {
+     "depth": 14.15,
+     "n": 43,
+     "source": {
+      "doc": 0,
+      "page": 36
+     }
+    },
+    {
+     "depth": 15.15,
+     "n": 60,
+     "source": {
+      "doc": 0,
+      "page": 36
+     },
+     "penetration_cm": 25,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 16.15,
+     "n": 63,
+     "source": {
+      "doc": 0,
+      "page": 36
+     },
+     "penetration_cm": 24,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 17.15,
+     "n": 68,
+     "source": {
+      "doc": 0,
+      "page": 36
+     },
+     "penetration_cm": 22,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 18.15,
+     "n": 100,
+     "source": {
+      "doc": 0,
+      "page": 36
+     },
+     "penetration_cm": 15,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 19.15,
+     "n": 83,
+     "source": {
+      "doc": 0,
+      "page": 36
+     },
+     "penetration_cm": 18,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 20.15,
+     "n": 60,
+     "source": {
+      "doc": 0,
+      "page": 36
+     },
+     "penetration_cm": 25,
+     "refusal": true,
+     "blows": 50
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 1.4,
+      "kind": "unspecified",
+      "source": {
+       "doc": 0,
+       "page": 36
+      },
+      "date": "11/10"
+     }
+    ]
+   }
+  },
+  {
+   "id": "No2",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 37
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 40.5980833,
+    "lon": 140.4724444,
+    "crs": "unstated",
+    "as_printed": "北緯 40°35'53.1\" 東経 140°28'20.8\"",
+    "source": {
+     "doc": 0,
+     "page": 37
+    }
+   },
+   "ground_elevation": {
+    "value": -1.06,
+    "datum": "KBM2 (local benchmark)",
+    "unit": "m",
+    "as_printed": "KBM2= -1.06m",
+    "source": {
+     "doc": 0,
+     "page": 37
+    }
+   },
+   "final_depth": {
+    "value": 27.45,
+    "source": {
+     "doc": 0,
+     "page": 37
+    }
+   },
+   "layers": [
+    {
+     "top": 0,
+     "base": 1.9,
+     "description": "表土・粘土：GL-0.00〜1.10m間、有機質",
+     "principal": "topsoil",
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "top": 1.9,
+     "base": 2.7,
+     "description": "シルト混じり砂礫：砂は粗砂を主体、礫はφ5〜10mm位の亜角〜角礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "top": 2.7,
+     "base": 4.0,
+     "description": "砂混じりシルト",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "top": 4.0,
+     "base": 5.8,
+     "description": "シルト混じり砂：砂は粒子不均一な細砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "top": 5.8,
+     "base": 9.3,
+     "description": "シルト混じり砂礫：砂は細砂〜粗砂、礫はφ2〜20mm位の亜円〜角礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "top": 9.3,
+     "base": 14.3,
+     "description": "シルト質砂：砂は細砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "top": 14.3,
+     "base": 24.0,
+     "description": "礫混じり砂：砂は粒子均一な細〜中砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "top": 24.0,
+     "base": 25.0,
+     "description": "礫混じり砂質シルト",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "top": 25.0,
+     "base": 26.1,
+     "description": "火山灰質砂：砂は粒子均一な細砂を主体",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "top": 26.1,
+     "base": 27.45,
+     "description": "礫混じり砂質シルト",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 2,
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "depth": 2.15,
+     "n": 14,
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "depth": 3.15,
+     "n": 1,
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "depth": 4.15,
+     "n": 5,
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 7,
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 7,
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 19,
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 31,
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "depth": 9.15,
+     "n": 26,
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "depth": 10.15,
+     "n": 32,
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "depth": 11.15,
+     "n": 32,
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "depth": 12.15,
+     "n": 26,
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "depth": 13.15,
+     "n": 24,
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "depth": 14.15,
+     "n": 35,
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "depth": 15.15,
+     "n": 32,
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "depth": 16.15,
+     "n": 44,
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "depth": 17.15,
+     "n": 54,
+     "source": {
+      "doc": 0,
+      "page": 37
+     },
+     "penetration_cm": 28,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 18.15,
+     "n": 58,
+     "source": {
+      "doc": 0,
+      "page": 37
+     },
+     "penetration_cm": 26,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 19.15,
+     "n": 44,
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "depth": 20.15,
+     "n": 60,
+     "source": {
+      "doc": 0,
+      "page": 37
+     },
+     "penetration_cm": 25,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 21.15,
+     "n": 45,
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "depth": 22.15,
+     "n": 68,
+     "source": {
+      "doc": 0,
+      "page": 37
+     },
+     "penetration_cm": 22,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 23.15,
+     "n": 79,
+     "source": {
+      "doc": 0,
+      "page": 37
+     },
+     "penetration_cm": 19,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 24.15,
+     "n": 25,
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "depth": 25.15,
+     "n": 25,
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "depth": 26.15,
+     "n": 19,
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    },
+    {
+     "depth": 27.15,
+     "n": 30,
+     "source": {
+      "doc": 0,
+      "page": 37
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 2.21,
+      "kind": "unspecified",
+      "source": {
+       "doc": 0,
+       "page": 37
+      },
+      "date": "11/5"
+     }
+    ]
+   },
+   "note": "Names of thin layers are printed beside the column with leader lines; they are matched to the layers in order."
+  },
+  {
+   "id": "No3",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 38
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 40.5984722,
+    "lon": 140.4729444,
+    "crs": "unstated",
+    "as_printed": "北緯 40°35'54.5\" 東経 140°28'22.6\"",
+    "source": {
+     "doc": 0,
+     "page": 38
+    }
+   },
+   "ground_elevation": {
+    "value": -1.01,
+    "datum": "KBM2 (local benchmark)",
+    "unit": "m",
+    "as_printed": "KBM2= -1.01m",
+    "source": {
+     "doc": 0,
+     "page": 38
+    }
+   },
+   "final_depth": {
+    "value": 38.29,
+    "source": {
+     "doc": 0,
+     "page": 38
+    }
+   },
+   "layers": [
+    {
+     "top": 0,
+     "base": 1.3,
+     "description": "有機質シルト：草根を混入する",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "top": 1.3,
+     "base": 2.8,
+     "description": "シルト：やや火山灰質",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "top": 2.8,
+     "base": 5.8,
+     "description": "軽石混じり砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "top": 5.8,
+     "base": 7.3,
+     "description": "シルト：若干砂を含む",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "top": 7.3,
+     "base": 10.0,
+     "description": "砂礫：砂は粗砂を主体",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "top": 10.0,
+     "base": 22.0,
+     "description": "固結シルト",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "top": 22.0,
+     "base": 25.5,
+     "description": "礫混じりシルト",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "top": 25.5,
+     "base": 29.7,
+     "description": "シルト混じり砂：砂は細〜中砂を主体",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "top": 29.7,
+     "base": 35.9,
+     "description": "礫混じりシルト",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "top": 35.9,
+     "base": 37.1,
+     "description": "礫混じり砂：砂は粗砂を主体とし、礫はφ5〜20mm位の亜円礫を主体",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "top": 37.1,
+     "base": 37.6,
+     "description": "粘土：粘性強い粘土",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "top": 37.6,
+     "base": 38.29,
+     "description": "シルト混じり砂礫：砂は細〜粗砂",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 4,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 2.15,
+     "n": 2,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 3.15,
+     "n": 2,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 4.15,
+     "n": 10,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 14,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 8,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 26,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 50,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 9.15,
+     "n": 34,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 10.15,
+     "n": 22,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 11.15,
+     "n": 22,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 12.15,
+     "n": 21,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 13.15,
+     "n": 46,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 14.15,
+     "n": 49,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 15.15,
+     "n": 39,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 16.15,
+     "n": 34,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 17.15,
+     "n": 32,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 18.15,
+     "n": 34,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 19.15,
+     "n": 32,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 20.15,
+     "n": 33,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 21.15,
+     "n": 36,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 22.15,
+     "n": 39,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 23.15,
+     "n": 41,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 24.15,
+     "n": 23,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 25.15,
+     "n": 47,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 26.15,
+     "n": 36,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 27.15,
+     "n": 41,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 28.15,
+     "n": 40,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 29.15,
+     "n": 39,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 30.15,
+     "n": 60,
+     "source": {
+      "doc": 0,
+      "page": 38
+     },
+     "penetration_cm": 25,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 31.15,
+     "n": 34,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 32.15,
+     "n": 50,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 33.15,
+     "n": 58,
+     "source": {
+      "doc": 0,
+      "page": 38
+     },
+     "penetration_cm": 26,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 34.15,
+     "n": 38,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 35.15,
+     "n": 37,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 36.15,
+     "n": 167,
+     "source": {
+      "doc": 0,
+      "page": 38
+     },
+     "penetration_cm": 9,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 37.15,
+     "n": 13,
+     "source": {
+      "doc": 0,
+      "page": 38
+     }
+    },
+    {
+     "depth": 38.15,
+     "n": 107,
+     "source": {
+      "doc": 0,
+      "page": 38
+     },
+     "penetration_cm": 14,
+     "refusal": true,
+     "blows": 50
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 3.5,
+      "kind": "unspecified",
+      "source": {
+       "doc": 0,
+       "page": 38
+      },
+      "date": "10/26"
+     }
+    ]
+   }
+  }
+ ],
+ "readiness": {
+  "expected": "spatial_model",
+  "reasons": [],
+  "positioned_boreholes": 3,
+  "note": "Three boreholes with latitude and longitude; levels on a local benchmark (KBM2)."
+ }
+}
