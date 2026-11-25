@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.31.0 — 2026-11-25
 
 ### Added
 - Read the standard penetration tests (SPT) of a log: each test's depth, its blow count (N) and, where the test stopped short, its penetration ("50/12"). On Japanese log forms the count is read beside the test's depths (the total of its 10 cm counts, or the N column); on other logs from a blow-count column. The tests are listed under each borehole's layers in the review, where they can be corrected, linked to their place on the page.
