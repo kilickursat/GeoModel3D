@@ -299,14 +299,17 @@ describe("the sheets of a log and its rock core log",()=>{
 });
 
 // Invented values, laid out as a Japanese log form: a depth column of boundaries, the depths of the penetration tests
-// in a column of their own (start and end of each test), soil names in one column and remarks in another.
+// in a column of their own (start and end of each test) with the blows counted beside them, soil names in one column and
+// remarks in another.
+const COUNTS=[[1.15,"12","30","12"],[2.15,"9","30","9"],[3.15,"50","5",">50"],[4.15,"20","30","20"],[5.15,"6","30","6"]] as const;
 function japaneseForm(){
   return [L("ボーリング柱状図",400,20,120),L("土質区分",250,150,50),L("記事",400,150,40),...Array.from({length:7},(_,d)=>L(String(d),40,yAt(d),10)),
     L("0.80",100,yAt(0.8)-6,30),L("3.40",100,yAt(3.4)-6,30),L("6.00",100,yAt(6)-6,30),
     ...[1.15,1.45,2.15,2.45,3.15,3.45,4.15,4.45,5.15,5.45].map(v=>L(v.toFixed(2),700,yAt(v),30)),
     L("盛土",250,yAt(0.8)-18,30),L("(B)",250,yAt(0.8)-6,30),L("礫混じり",250,yAt(0.8)+12,40),L("粘性土",250,yAt(0.8)+24,40),L("(C-G)",250,yAt(0.8)+36,30),
     L("細砂",250,yAt(3.4)+12,30),L("(FS)",250,yAt(3.4)+24,30),
-    L("砕石を混入する。",400,yAt(0.2),120),L("含水は中位。粘性は強い。",400,yAt(1),150),L("均質な細砂。含水は高い。",400,yAt(3.6),150)];
+    L("砕石を混入する。",400,yAt(0.2),120),L("含水は中位。粘性は強い。",400,yAt(1),150),L("均質な細砂。含水は高い。",400,yAt(3.6),150),
+    ...COUNTS.flatMap(([d,b,p,n])=>[L(b,760,yAt(d)+4,20),L(p,760,yAt(d)+16,20),L(n,800,yAt(d)+8,24)])];
 }
 describe("reading a Japanese log form",()=>{
   it("takes the boundaries from the depth column, not from the depths of the penetration tests",()=>{
@@ -317,6 +320,39 @@ describe("reading a Japanese log form",()=>{
     expect(log.layers.map(l=>l.description)).toEqual(["盛土(B) 砕石を混入する。","礫混じり粘性土(C-G) 含水は中位。粘性は強い。","細砂(FS) 均質な細砂。含水は高い。"]);
     expect(draftHoles(0,"f.pdf",readDocument([{page:1,width:1000,height:800,lines:japaneseForm()}]).logs)[0].layers.map(l=>l.unit))
       .toEqual(["Fill and topsoil","Clay and silt","Sand"]);
+  });
+});
+
+describe("penetration tests, drawn boundaries, turned pages and Dutch tables",()=>{
+  it("reads each test's blows and penetration beside its start and end depths",()=>{
+    // The third test stopped at 50 blows over 5 cm (its end depth 3.20 instead of 3.45).
+    const [log]=readPage(japaneseForm().map(e=>e.text==="3.45"?{...e,text:"3.20"}:e),1000,800);
+    expect(log.spt?.map(t=>[t.depth,t.blows,t.penetration])).toEqual([[1.15,12,30],[2.15,9,30],[3.15,50,5],[4.15,20,30],[5.15,6,30]]);
+  });
+  it("takes boundaries from lines drawn across the descriptions where none is written",()=>{
+    const lines=drawnLog().filter(e=>!["1.20","4.50","9.80"].includes(e.text));
+    const rules=[1.2,4.5,9.8].map(d=>({x0:280,y0:yAt(d),x1:520,y1:yAt(d)}));
+    const [log]=readPage(lines,1000,800,rules);
+    expect(log.layers.map(l=>[l.from,l.to,l.description])).toEqual([[0,1.2,"FILL: sand and gravel"],[1.2,4.5,"CLAY: soft, grey"],[4.5,9.8,"SAND: dense"]]);
+    expect(log.flagged).toEqual([1.2,4.5,9.8]);
+  });
+  it("reads a log printed sideways, its lines shown where they are on the page",()=>{
+    // The drawn log turned a quarter clockwise on a page 800 wide and 1000 high: each line's box is tall.
+    const turned=drawnLog().map(e=>({...textLine(e.text,800-e.y1,e.x0,800-e.y0,e.x1),page:1}));
+    const {logs}=readDocument([{page:1,width:800,height:1000,lines:turned}]);
+    expect(logs[0].layers.map(l=>[l.from,l.to])).toEqual([[0,1.2],[1.2,4.5],[4.5,9.8]]);
+    const src=logs[0].layers[1].src.find(e=>e.text==="CLAY: soft, grey")!;
+    expect(src.shown).toEqual({x0:800-(yAt(2.5)+6),y0:300,x1:800-(yAt(2.5)-6),y1:300+8*16});
+  });
+  it("reads a Dutch table whose To heading is read with the next column's code, and the header's Lambert coordinates",()=>{
+    const lines=[L("X (mLambert):",40,40),L("151200.0 (XY_uit dossier)",200,40),L("Y (mLambert):",40,60),L("215100.0 (XY_uit dossier)",200,60),
+      L("Z (mTAW):",40,80),L("2.10 (Z_topografisch ingemeten)",200,80),L("Diepte (m):",500,40),L("0.00 - 6.00",650,40),
+      L("Van(m)",100,200),L("Tot(m) M",180,200),L("Beschrijving",300,200),
+      ...[[0,1.5,"bruine klei"],[1.5,4,"grijs zand"],[4,6,"groene klei"]].flatMap(([a,b,t],k)=>[L((a as number).toFixed(2),110,230+30*k),L((b as number).toFixed(2),190,230+30*k),L(t as string,300,230+30*k)])];
+    const [log]=readPage(lines,1000,800);
+    expect(log.kind).toBe("table");
+    expect(log.layers.map(l=>[l.from,l.to,l.description])).toEqual([[0,1.5,"bruine klei"],[1.5,4,"grijs zand"],[4,6,"groene klei"]]);
+    expect([log.x,log.y,log.ground,log.final]).toEqual([151200,215100,2.1,6]);
   });
 });
 

@@ -12,6 +12,7 @@ import {draftHoles,DraftHole} from "./draft";
 import {createReview,ReviewHost,Unread,OcrRead} from "./review";
 import {createOcr,Ocr} from "./ocrclient";
 import {agreement} from "./textlines";
+import {imageRules,joinRules,scaleRules} from "./ruling";
 import {newEvidenceId,EvidenceSource} from "../evidence";
 
 export const isImage=(f:File)=>/\.(png|jpe?g|webp)$/i.test(f.name)||/^image\/(png|jpeg|webp)$/.test(f.type);
@@ -53,9 +54,9 @@ export async function readPdfs(files:File[],host:ReviewHost){
     reader.status=`Reading ${s.file}${s.d.pages>1?`: page ${n} of ${s.d.pages}`:""} by OCR${reader.backend?` (${reader.backend})`:""}`;
     review.progress(reader.status+"…");
     const img=await s.d.image(n),lines=await ocr.read(img);
-    // The boxes on the review's page are in the pixels the page was read in.
+    // The boxes on the review's page are in the pixels the page was read in. The ruled lines are found on the same image.
     review.size(doc,n,img.width,img.height);
-    return {page:n,width:img.width,height:img.height,scanned:true,lines:lines.map(l=>textLine(l.text,l.x0,l.y0,l.x1,l.y1))};
+    return {page:n,width:img.width,height:img.height,scanned:true,lines:lines.map(l=>textLine(l.text,l.x0,l.y0,l.x1,l.y1)),rules:imageRules(img)};
   };
   const put=(s:DocState,t:PageText)=>{const at=s.pages.findIndex(p=>p.page===t.page);if(at>=0)s.pages.splice(at,1);s.pages.push(t)};
   // The logs of a document as read so far, for the review.
@@ -125,6 +126,17 @@ export async function readPdfs(files:File[],host:ReviewHost){
         if(!text)unread.push({doc,page:n,scanned:true,error:started?`the reading model failed (${(err as Error).message})`:failed});
         else if(doubt.includes(n))review.size(doc,n,text.width,text.height);
       }
+    }
+    // A log whose boundaries are drawn only, as lines across its descriptions (a scanned log with a text layer, depths
+    // every 2 ft), reads no layers from its text: its lines are found on the page's image, and the document read again.
+    const drawn=readDocument(s.pages).unread.filter(u=>u.log&&u.error==="no layers found"&&!s.read.has(u.page)).map(u=>u.page);
+    for(const n of [...new Set(drawn)]){
+      if(review.closed)return;
+      review.progress(`Reading the lines drawn on ${f.name}${s.d.pages>1?`, page ${n}`:""}…`);
+      try{
+        const img=await s.d.image(n),t=s.pages.find(p=>p.page===n);
+        if(t)t.rules=joinRules([...(t.rules??[]),...scaleRules(imageRules(img),t.width/img.width)]);
+      }catch{/* the page keeps its text alone */}
     }
     const r=result(doc,s);
     holes.push(...r.holes);

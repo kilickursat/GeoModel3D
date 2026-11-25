@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+- Read the standard penetration tests (SPT) of a log: each test's depth, its blow count (N) and, where the test stopped short, its penetration ("50/12"). On Japanese log forms the count is read beside the test's depths (the total of its 10 cm counts, or the N column); on other logs from a blow-count column. The tests are listed under each borehole's layers in the review, where they can be corrected, linked to their place on the page.
+- Read the lines a log is drawn with: from the PDF's own drawing, or from the page image of a scan. They keep apart the columns of a form, so a soil name and the colour printed next to it, or a description and the column beside it, are no longer read as one.
+
 ### Fixed
 - Read the header of Japanese borehole logs (柱状図), so they can be placed in the model. Their labels are often set out with spaces or one cell per character ("孔 口 標 高", "総 掘 進 長", "北" "緯"), which were not recognised. Now read:
   - latitude and longitude in degrees, minutes and seconds (北緯 / 東経, also as latitude / longitude);
@@ -11,6 +15,13 @@
 - Read the layers of Japanese log forms. The depths of the penetration tests (where each test starts and ends: 1.15, 1.45, 2.15, 2.45…) were taken for layer boundaries, which cut every log into three or four times too many layers. Such a column is now told apart, and the boundaries come from the column of depths.
 - Give each layer of a Japanese log form its soil name. The name (土質区分, "礫混じり粘性土(C-G)") stands in a column of its own, beside the remarks: it now leads the layer's description, and gives its unit. The Japanese rock rule also names chert (チャート) and hornfels (ホルンフェルス).
 - Recognise a Japanese log title with a subtitle in brackets ("土質ボーリング柱状図(標準貫入試験)").
+- Read the water level of a Japanese log form from its column (孔内水位), whose heading is set one character per line.
+- Read a log page printed sideways (turned a quarter turn) the right way up.
+- Where a log gives its boundaries only as lines drawn across its descriptions, with no depth written at them, read the boundaries from those lines, flagged for review. An even grid of lines (graph paper) is not taken for boundaries.
+- Read a log sheet that carries on from the page before without its own title or headings (a continuation sheet), and two logs printed on one page.
+- A geological section (断面図, cross section) is not read as a log.
+- Read logs set out as tables of layers with their depths from and to ("van / tot", "from / to") and Dutch and Belgian headers (X / Y in m Lambert, Z in m TAW or NAP, "diepte"), and a final depth written "T. D.".
+- Read a borehole's name followed by a note in brackets ("BH-3 (cont.)") or after "Hole number:", and only from a short title line.
 
 ## 0.30.0 — 2026-11-19
 
