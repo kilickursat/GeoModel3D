@@ -21,15 +21,18 @@ def principal(name):
         return "made_ground"
     if re.search(r"腐植|泥炭|有機質土$|ピート", n):
         return "peat_organic"
-    if re.search(r"ローム|火山灰|軽石|黒ボク", n):
-        return "volcanic_ash"
-    if any(r in n for r in ROCK) or re.search(r"岩$|岩盤", n):
+    if re.search(r"岩$|岩盤", n):
         return "rock"
-    # The principal soil is the last noun: 礫混じり粘性土 is clay, 粘土混じり砂 is sand, 砂礫 is gravel.
+    # The principal soil is the last noun: 礫混じり粘性土 is clay, 粘土混じり砂 is sand, 砂礫 is gravel. A word before
+    # it only qualifies it: 凝灰質粘土 (tuffaceous clay) and 火山灰質粘土 are clay, 軽石混じり砂 is sand.
     for pat, p in ((r"(粘性土|粘土|粘土質土)$", "clay"), (r"シルト$", "silt"), (r"(砂質土|砂)$", "sand"),
                    (r"(礫質土|砂礫|礫|角礫)$", "gravel"), (r"(玉石|転石|巨礫)$", "cobbles_boulders")):
         if re.search(pat, n):
             return p
+    if re.search(r"ローム|火山灰|軽石|黒ボク", n):
+        return "volcanic_ash"
+    if any(r in n for r in ROCK):
+        return "rock"
     return "other"
 
 

@@ -208,7 +208,7 @@
      "top": 4.95,
      "base": 5.75,
      "description": "凝灰質粘土：腐植物が混入。含水・粘性大。少量の砂が混入する。",
-     "principal": "rock",
+     "principal": "clay",
      "source": {
       "doc": 0,
       "page": 1
@@ -1110,7 +1110,7 @@
      "top": 4.0,
      "base": 4.6,
      "description": "凝灰質粘土：含水比・粘性　上位　細砂を混入",
-     "principal": "rock",
+     "principal": "clay",
      "source": {
       "doc": 5,
       "page": 1

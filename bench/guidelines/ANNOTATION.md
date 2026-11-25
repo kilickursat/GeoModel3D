@@ -105,12 +105,14 @@ labelled draft wherever they are reported.
   - `principal` is the material the description names first as the main constituent: `SANDY CLAY` is clay; `粘土混じり砂`
     is sand; `表土` is topsoil; `盛土` and fill are made_ground; `玉石混じり砂礫` is gravel; rock names (mudstone,
     granite, 泥岩, 凝灰岩) are rock; `火山灰` and loam (ローム) are volcanic_ash; core loss is no_recovery. A description
-    that names no material is `other`.
+    that names no material is `other`. A word before the soil noun only qualifies it: `凝灰質粘土` (tuffaceous clay) and
+    `火山灰質粘土` are clay, `軽石混じり砂` is sand.
 - `spt`: each Standard Penetration Test: `depth` at the top of the test, and `n` the N value the log prints for it.
   Where the log prints no number (">50", or nothing), `n` is the blows counted. A test stopped short (refusal) has
   `refusal: true`, `blows` the blows counted and `penetration_cm` the distance driven; a test driven further than the
   standard distance under its own weight has `penetration_cm` and no refusal. A test printed on two sheets is
-  transcribed once. Blows per 10 cm are not transcribed.
+  transcribed once. Blows per 10 cm are not transcribed. The scorer compares a refusal by its blows and penetration
+  (forms print its N as ">50" or scaled to 30 cm), and any other test by `n`.
 - `rqd`: each core run or interval with an RQD value, with total and solid core recovery (`tcr`, `scr`) where printed.
 - `groundwater`: `status` `recorded` with each depth printed (`strike` where met while drilling, `standing` or
   `stabilised` after a wait, else `unspecified`); `not_encountered` where the log says none was met;

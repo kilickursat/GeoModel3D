@@ -33,6 +33,10 @@ node .cache/bench-read.mjs read $RUN                  # predictions/<report>.jso
 python3 -I bench/scripts/score.py $RUN                # scores.json
 ```
 
+The runner calls the reader's own functions, so it goes with the app's code. From the second commit of this
+benchmark, it also reads the lines drawn on each page (`src/docread/ruling.ts`, from #50) and the penetration tests,
+and needs that code. The 0.30.0 baseline was run with the runner of the first commit.
+
 ## Rules
 
 - **Real reports only.** No synthetic documents or values. The answer keys are transcriptions of the pages.

@@ -157,7 +157,12 @@ def spt_scores(g, p, unit, failures):
             continue
         used.add(k)
         q = p["spt"][k]
-        ok = q.get("n") == s["n"] and bool(q.get("refusal")) == bool(s.get("refusal"))
+        if s.get("refusal"):
+            # A test stopped short is its blows over its penetration; forms print its N as ">50" or scaled to 30 cm.
+            pen_ok = s.get("penetration_cm") is None or q.get("penetration_cm") is None or abs(q["penetration_cm"] - s["penetration_cm"]) <= 1.5
+            ok = bool(q.get("refusal")) and q.get("blows") == s.get("blows", s["n"]) and pen_ok
+        else:
+            ok = q.get("n") == s["n"] and not q.get("refusal")
         t.add("correct" if ok else "wrong")
         if not ok:
             failures["spt_wrong"] += 1

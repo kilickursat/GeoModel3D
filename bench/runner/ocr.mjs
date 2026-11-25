@@ -19,10 +19,11 @@ for(const [id,docs] of Object.entries(plan.reports)){
   if(only.length&&!only.includes(id))continue;
   for(const d of docs){
     const out=`${runDir}/ocr/${id}/${d.doc}`,pages=d.pages.filter(n=>!existsSync(`${out}/p${n}.json`));
-    if(pages.length)jobs.push({id,doc:d.doc,file:d.file,out,pages});
+    const rules=(d.rules??[]).filter(n=>!existsSync(`${out}/p${n}.rules.json`));
+    if(pages.length||rules.length)jobs.push({id,doc:d.doc,file:d.file,out,pages,rules});
   }
 }
-const total=jobs.reduce((s,j)=>s+j.pages.length,0);
+const total=jobs.reduce((s,j)=>s+j.pages.length+j.rules.length,0);
 if(!total){console.log("all pages read");process.exit(0)}
 console.log(`${total} pages to read in ${jobs.length} documents`);
 const browser=await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE});
@@ -45,8 +46,9 @@ for(const job of jobs){
   mkdirSync(job.out,{recursive:true});
   current=readFileSync(job.file);
   const t0=Date.now();
-  const backend=await page.evaluate(async ({pages,worker,out})=>{
+  const backend=await page.evaluate(async ({pages,rules,worker,out})=>{
     const {openPdf}=await import("/src/docread/pdftext.ts");
+    const {imageRules}=await import("/src/docread/ruling.ts");
     const d=await openPdf("doc.pdf",new Uint8Array(await (await fetch("/__doc.pdf")).arrayBuffer()));
     window.__ocr??=await (async()=>{
       const w=new Worker(worker,{type:"module"}),waiting=new Map();let next=1;
@@ -61,14 +63,19 @@ for(const job of jobs){
       const read=img=>new Promise((res,rej)=>{const id=next++;waiting.set(id,{res,rej});w.postMessage({type:"read",id,width:img.width,height:img.height,data:img.data.buffer},[img.data.buffer])});
       return {on,read};
     })();
+    // The ruled lines of a page's image, as the app finds them (before the image goes to the worker).
+    for(const n of rules){
+      const img=await d.image(n);
+      await window.savePage(out,`${n}.rules`,JSON.stringify({page:n,width:img.width,height:img.height,rules:imageRules(img)}));
+    }
     for(const n of pages){
       const t0=performance.now(),img=await d.image(n),width=img.width,height=img.height,lines=await window.__ocr.read(img);
       await window.savePage(out,n,JSON.stringify({page:n,width,height,ms:Math.round(performance.now()-t0),backend:window.__ocr.on,lines}));
     }
     await d.close();
     return window.__ocr.on;
-  },{pages:job.pages,worker,out:job.out});
-  done+=job.pages.length;
+  },{pages:job.pages,rules:job.rules,worker,out:job.out});
+  done+=job.pages.length+job.rules.length;
   console.log(`${job.id} doc ${job.doc}: ${job.pages.length} pages in ${Math.round((Date.now()-t0)/1000)} s (${backend}); ${done}/${total}`);
 }
 await browser.close();
