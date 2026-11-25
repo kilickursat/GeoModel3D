@@ -306,6 +306,35 @@ export function header(lines:TextLine[]):LogHeader&{mark?:number}{
 
 // ---------- descriptions ----------
 
+// A column of Japanese soil names: short lines (a name is cut over two or three lines), most of them naming a soil or
+// rock, or the code of one in brackets.
+const SOIL_NAME=/砂|礫|粘土|粘性土|シルト|ローム|火山灰|岩|盛土|埋土|表土|腐植|泥炭|玉石|有機質|チャート|互層|[(（][A-Z][A-Za-z\-\/]*[)）]/;
+const SOIL_CODE=/^[(（][A-Z][A-Za-z\-\/]*[)）]$/;
+const median=(v:number[])=>{const s=[...v].sort((a,b)=>a-b);return s.length?s[s.length>>1]:0};
+function soilNames(c:{els:TextLine[]}){
+  const t=c.els.map(e=>e.text.replace(/\s/g,"")),cjk=t.join("").match(/[぀-ヿ㐀-鿿]/g)?.length??0;
+  return cjk>=2&&median(t.map(x=>x.length))<=6&&c.els.filter(e=>SOIL_NAME.test(e.text)).length>=Math.max(2,0.4*c.els.length);
+}
+// The lines of a name column as names: a name ends with its code in brackets ("礫混じり粘性土(C-G)"), or where the next
+// line starts below a boundary once the name is a whole word ("凝灰質粘土" before "粘土(CH)"). A code on a line of its
+// own, below a boundary, still ends the name above it. `lines`: the boundaries' places on the page.
+function groupNames(els:TextLine[],lines:number[]){
+  const band=(y:number)=>lines.filter(v=>v<=y).length;
+  const out:Array<{text:string;src:TextLine[]}>=[];
+  let cur:{text:string;src:TextLine[]}|undefined;
+  for(const e of els){
+    const t=kanji(e.text).replace(/\s/g,"");
+    if(!t)continue;
+    if(!cur&&out.length&&/^[(（]/.test(t)&&!/[)）]$/.test(out[out.length-1].text)){out[out.length-1].text+=t;out[out.length-1].src.push(e);continue}
+    if(cur&&band(e.cy)>band(cur.src[0].cy)&&/(?:土|砂|礫|ト|岩|層|石|ム|ク|炭)$/.test(cur.text)){out.push(cur);cur=undefined}
+    if(!cur)cur={text:"",src:[]};
+    cur.text+=t;cur.src.push(e);
+    if(/[)）]$/.test(t)){out.push(cur);cur=undefined}
+  }
+  if(cur)out.push(cur);
+  return out.filter(n=>/[぀-ヿ㐀-鿿]/.test(n.text));
+}
+
 // Digits OCR confuses, one at a time: "8.50" read for "0.50".
 const CONFUSED:Record<string,string>={"0":"869","8":"0369","6":"580","5":"63","1":"74","7":"1","3":"85","9":"084","4":"19","2":"73"};
 function variants(t:string){
@@ -516,13 +545,14 @@ function sampleLayers(samples:Sample[],final?:number):{layers:ReadLayer[];flagge
 // ---------- a drawn log ----------
 
 // A log is titled ("LOG OF BOREHOLE BH3", "BORE / DRILL LOG", ボーリング柱状図) or has a heading over its descriptions
-// ("SOIL DESCRIPTION", "Description of Strata", 土質区分). Headings and titles are short: a sentence of a report that
+// ("SOIL DESCRIPTION", "Description of Strata", 土質区分). Headings and titles are short (a Japanese title's subtitle in
+// brackets aside: "土質ボーリング柱状図(標準貫入試験)"): a sentence of a report that
 // mentions a borehole log or a description is neither, and nor is a numbered heading of a report ("2 Site
 // description"). The columns of tables of results (the number of a stratum, the strata a well is screened in) are no
 // description headings.
 const HEADING=/descri|soil profile|stratigraph|litholog|omschrijving|beschrijving|beschreibung|土質|記事|地層/i;
 const short=(t:string,words:number)=>!/^\s*\d+(?:\.\d+)*\.?\s/.test(t)&&
-  (/[぀-ヿ一-鿿]/.test(t)?t.trim().length<=12:t.trim().split(/\s+/).length<=words&&t.trim().length<=60);
+  (/[぀-ヿ一-鿿]/.test(t)?t.replace(/[(（][^)）]*[)）]/g,"").trim().length<=12:t.trim().split(/\s+/).length<=words&&t.trim().length<=60);
 const titled=(els:TextLine[])=>els.some(e=>LOG_TITLE.test(e.text)&&short(e.text,8));
 export const logEvidence=(els:TextLine[])=>titled(els)||els.some(e=>HEADING.test(e.text)&&short(e.text,5));
 
@@ -623,7 +653,16 @@ export function rebuild(els:TextLine[],width:number,height=Infinity):PageLog{
     if(at){head.final=num(at.text);head.src={...head.src,final:at}}
   }
   const core=coreTitled(els)?readCore(els,scale):undefined,extra={top:Math.max(0,+scale.depthAt(Math.min(...scale.labels.map(e=>e.cy))-0.5*scale.b).toFixed(2)),...(core?{core}:{})};
-  const bcol=columns(els.filter(isDecimal)).sort((p,q)=>q.els.filter(agree).length-p.els.filter(agree).length)[0];
+  // A column of test depths fits the scale too, often with more values than the boundaries: Standard Penetration Tests
+  // print where each test started and ended ("1.15" over "1.45", "4.00" over "4.05" for a test stopped short), pair
+  // after pair. A column where most values pair up so, at most 0.45 m apart, is no column of boundaries.
+  const testDepths=(c:Column)=>{
+    const v=c.els.filter(agree).map(e=>num(e.text)).sort((a,b)=>a-b);
+    let pairs=0;
+    for(let i=0;i+1<v.length;)if(v[i+1]-v[i]>0&&v[i+1]-v[i]<=0.45){pairs++;i+=2}else i++;
+    return pairs>=3&&2*pairs>=0.7*v.length;
+  };
+  const bcol=columns(els.filter(isDecimal)).filter(c=>!testDepths(c)).sort((p,q)=>q.els.filter(agree).length-p.els.filter(agree).length)[0];
   // A column where most values do not fit their places (laboratory results, sample numbers) is no column of
   // boundaries: a value that fits by chance there ("2.68" beside 2.7 m) is no boundary either. Only values that could
   // be depths on the page count against it: an elevation printed under each depth ("48.25" over "1.20") is no misread
@@ -642,13 +681,26 @@ export function rebuild(els:TextLine[],width:number,height=Infinity):PageLog{
   const above=heads.filter(e=>e.cy<topY),startY=heads.length?Math.max(...(above.length?above:heads).map(e=>e.y1)):scale.yAt(0);
   // Text of fewer than two letters is no description (a page code "A2-17" under the log, which would join its columns,
   // or a mark), unless it is a Japanese name ("砂").
+  // Japanese forms give each layer's soil name (土質区分: "礫混じり粘性土", "(C-G)") in a column of its own, beside the
+  // remarks (記事), which have the most letters. The names are read too, and lead each layer's description; where the
+  // names have more letters than the remarks (short remarks), the remarks are still the description column.
+  // A soil's code in brackets on a line of its own ("(B)") is part of its name on a Japanese form.
+  const japanese=els.some(e=>/[一-鿿]/.test(e.text));
   const describe=(bottom:number)=>{
-    const body=els.filter(e=>!Number.isFinite(num(e.text))&&!/^GWL/i.test(e.text)&&(letters(e.text)>=2||/[぀-ヿ一-鿿]/.test(e.text))&&
+    const body=els.filter(e=>!Number.isFinite(num(e.text))&&!/^GWL/i.test(e.text)&&(letters(e.text)>=2||/[぀-ヿ一-鿿]/.test(e.text)||japanese&&SOIL_CODE.test(e.text.trim()))&&
       e.cy>startY&&scale.depthAt(e.cy)>=0&&scale.depthAt(e.cy)<=bottom+0.5);
-    const main=columns(body).sort((p,q)=>q.els.reduce((s,e)=>s+letters(e.text),0)-p.els.reduce((s,e)=>s+letters(e.text),0))[0];
+    const lettersOf=(c:Column)=>c.els.reduce((s,e)=>s+letters(e.text),0);
+    const cols=columns(body).sort((p,q)=>lettersOf(q)-lettersOf(p));
+    let main:Column|undefined=cols[0],names:Column|undefined;
+    if(main&&soilNames(main)){
+      const remarks=cols.find(c=>c!==main&&!soilNames(c)&&median(c.els.map(e=>e.text.replace(/\s/g,"").length))>6&&lettersOf(c)>=0.25*lettersOf(main!));
+      // No remarks column at all: the names are the descriptions.
+      names=main;main=remarks;
+    }else names=cols.filter(c=>c!==main&&soilNames(c)).sort((p,q)=>q.els.filter(e=>SOIL_NAME.test(e.text)).length-p.els.filter(e=>SOIL_NAME.test(e.text)).length)[0];
     // Whether the column is Latin text, judged on the whole column: a lone kanji in it is a misread symbol.
     const joined=(main?.els??[]).map(e=>e.text).join("");
-    return {lines:[...(main?.els??[])].sort((p,q)=>p.cy-q.cy),latin:(joined.match(/[A-Za-z]/g)??[]).length>0.5*letters(joined)};
+    return {lines:[...(main?.els??[])].sort((p,q)=>p.cy-q.cy),latin:!!main&&(joined.match(/[A-Za-z]/g)??[]).length>0.5*letters(joined),
+      names:[...(names?.els??[])].sort((p,q)=>p.cy-q.cy)};
   };
   // No boundary depths beside the log: the descriptions may give their samples' depths instead. A lone decimal that fits
   // its place beside such a log is a laboratory result ("Gs = 2.68" at 2.7 m), not a boundary, so the samples win where
@@ -692,7 +744,7 @@ export function rebuild(els:TextLine[],width:number,height=Infinity):PageLog{
   const bounds=[...new Set(values)].filter(v=>v>0).sort((p,q)=>p-q);
   const layers:ReadLayer[]=bounds.map((to,k)=>({from:k?bounds[k-1]:0,to,description:"",src:[]}));
   // Each line of the description column goes to the layer at the depth of its centre.
-  const {lines,latin}=describe(bounds.at(-1)??Infinity);
+  const {lines,latin,names}=describe(bounds.at(-1)??Infinity);
   // A line that a boundary runs through is above or below it by a pixel or two, which says nothing. Where the
   // descriptions start with titles ("SILTY CLAY: firm…"), such a line is below the boundary if it is a title, and
   // otherwise ends the description above ("…brown, moist").
@@ -705,6 +757,15 @@ export function rebuild(els:TextLine[],width:number,height=Infinity):PageLog{
     const d=depthOf(e),l=layers.find(l=>d>=l.from&&d<l.to);
     if(l){const t=clean(kanji(e.text),latin);if(t){l.description=(l.description+" "+t).trim();used.add(e)}}
   }
+  // Soil names lead the descriptions of the layers they start in.
+  const named=latin?[]:groupNames(names,bounds.map(v=>scale.yAt(v)));
+  const nameAt=new Map<ReadLayer,string[]>();
+  for(const n of named){
+    const d=scale.depthAt(n.src[0].cy),l=layers.find(l=>d>=l.from&&d<l.to);
+    if(!l)continue;
+    nameAt.set(l,[...(nameAt.get(l)??[]),n.text]);n.src.forEach(e=>used.add(e));l.src.push(...n.src);
+  }
+  for(const [l,ns] of nameAt)l.description=[ns.join(""),l.description].filter(Boolean).join(" ");
   for(const v of thinStack(layers)){flagged.push(v);why.set(v,THIN)}
   fixTitles(layers);
   absorbRest(layers);
@@ -726,7 +787,9 @@ export function rebuild(els:TextLine[],width:number,height=Infinity):PageLog{
     head.waterFlag=`read as the elevation ${head.water}`;head.water=+(head.ground-head.water).toFixed(2);
   }
   // For logs over several pages: each description line with its depth.
-  const texts=lines.map(e=>({depth:depthOf(e),text:clean(kanji(e.text),latin),src:e})).filter(t=>t.text);
+  // Names first, so that a layer joined over several sheets keeps its name before its remarks.
+  const texts=[...named.map(n=>({depth:scale.depthAt(n.src[0].cy),text:n.text,src:n.src[0]})),
+    ...lines.map(e=>({depth:depthOf(e),text:clean(kanji(e.text),latin),src:e})).filter(t=>t.text)];
   return {...head,kind:"scale",layers,used,flagged,texts,bounds,evidence,...extra};
 }
 

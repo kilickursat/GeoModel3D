@@ -298,6 +298,28 @@ describe("the sheets of a log and its rock core log",()=>{
   });
 });
 
+// Invented values, laid out as a Japanese log form: a depth column of boundaries, the depths of the penetration tests
+// in a column of their own (start and end of each test), soil names in one column and remarks in another.
+function japaneseForm(){
+  return [L("ボーリング柱状図",400,20,120),L("土質区分",250,150,50),L("記事",400,150,40),...Array.from({length:7},(_,d)=>L(String(d),40,yAt(d),10)),
+    L("0.80",100,yAt(0.8)-6,30),L("3.40",100,yAt(3.4)-6,30),L("6.00",100,yAt(6)-6,30),
+    ...[1.15,1.45,2.15,2.45,3.15,3.45,4.15,4.45,5.15,5.45].map(v=>L(v.toFixed(2),700,yAt(v),30)),
+    L("盛土",250,yAt(0.8)-18,30),L("(B)",250,yAt(0.8)-6,30),L("礫混じり",250,yAt(0.8)+12,40),L("粘性土",250,yAt(0.8)+24,40),L("(C-G)",250,yAt(0.8)+36,30),
+    L("細砂",250,yAt(3.4)+12,30),L("(FS)",250,yAt(3.4)+24,30),
+    L("砕石を混入する。",400,yAt(0.2),120),L("含水は中位。粘性は強い。",400,yAt(1),150),L("均質な細砂。含水は高い。",400,yAt(3.6),150)];
+}
+describe("reading a Japanese log form",()=>{
+  it("takes the boundaries from the depth column, not from the depths of the penetration tests",()=>{
+    expect(readPage(japaneseForm(),1000,800)[0].layers.map(l=>[l.from,l.to])).toEqual([[0,0.8],[0.8,3.4],[3.4,6]]);
+  });
+  it("puts each layer's soil name before its remarks, and names its unit from the soil name",()=>{
+    const [log]=readPage(japaneseForm(),1000,800);
+    expect(log.layers.map(l=>l.description)).toEqual(["盛土(B) 砕石を混入する。","礫混じり粘性土(C-G) 含水は中位。粘性は強い。","細砂(FS) 均質な細砂。含水は高い。"]);
+    expect(draftHoles(0,"f.pdf",readDocument([{page:1,width:1000,height:800,lines:japaneseForm()}]).logs)[0].layers.map(l=>l.unit))
+      .toEqual(["Fill and topsoil","Clay and silt","Sand"]);
+  });
+});
+
 describe("header values",()=>{
   it("reads positions given by easting and northing, also with the labels swapped (UTM)",()=>{
     const line=L("E: 512345, N: 5401234 (UTM 33U)",40,40,300),h=header([L("Project: Main Street",40,20,200),line]);

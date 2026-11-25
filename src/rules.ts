@@ -78,7 +78,7 @@ export const japaneseLithologyRules:UnitRule[]=[
   {match:"盛土|埋土|表土|客土|コンクリート|アスファルト|舗装|砕石|廃棄物",unit:"Fill and topsoil"},
   {match:"腐植|泥炭|ピート|有機質",unit:"Organic soil"},
   {match:"ローム|火山灰|黒ボク|軽石",unit:"Volcanic ash soil"},
-  {match:"岩|固結",unit:"Rock and cemented soil"},
+  {match:"岩|固結|チャート|ホルンフェルス",unit:"Rock and cemented soil"},
   {match:"(礫|玉石|転石|礫質土)$",unit:"Gravel"},
   {match:"(砂|砂質土)$",unit:"Sand"},
   {match:"(シルト|粘土|粘性土)$",unit:"Clay and silt"}

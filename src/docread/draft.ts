@@ -36,11 +36,18 @@ const fmt=(v:number)=>String(+v.toFixed(3));
 
 // A unit for a description, by the app's first grouping of soil and rock names (Japanese names by their own rules).
 // A description no rule assigns stays its own unit, as in imports, and is reported.
+// A Japanese description read from a log form starts with the soil name, its code in brackets after it
+// ("礫混じり粘性土(C-G) 含水は低い…"): the name gives the unit, as the name of an imported log does.
 export function unitFor(description:string){
   const d=description.trim();
   if(!d)return "";
   const rules=CJK.test(d)?japaneseLithologyRules:lithologyRules;
-  return applyUnitRules([{id:"",x:0,y:0,z:0,intervals:[{from:0,to:1,unit:"",name:d}]}],rules).boreholes[0].intervals[0].unit;
+  const unit=(name:string)=>applyUnitRules([{id:"",x:0,y:0,z:0,intervals:[{from:0,to:1,unit:"",name}]}],rules).boreholes[0].intervals[0];
+  if(CJK.test(d)){
+    const name=d.split(/\s+/)[0].replace(/(?:[(（][^)）]*[)）])+$/,"");
+    if(name&&name!==d){const u=unit(name);if(u.unit!==name)return u.unit}
+  }
+  return unit(d).unit;
 }
 
 // The logs of one document as drafts. A log whose ID was not read is named after its first page, and flagged.

@@ -8,6 +8,9 @@
   - ground levels written with their datum ("KBM2= -0.47m", "GH= 121.17m", or "T.P." over "3.18m");
   - total depths in whole metres ("20 m");
   - borehole names with a note in brackets ("BR-2(6.25k+65m右岸)").
+- Read the layers of Japanese log forms. The depths of the penetration tests (where each test starts and ends: 1.15, 1.45, 2.15, 2.45…) were taken for layer boundaries, which cut every log into three or four times too many layers. Such a column is now told apart, and the boundaries come from the column of depths.
+- Give each layer of a Japanese log form its soil name. The name (土質区分, "礫混じり粘性土(C-G)") stands in a column of its own, beside the remarks: it now leads the layer's description, and gives its unit. The Japanese rock rule also names chert (チャート) and hornfels (ホルンフェルス).
+- Recognise a Japanese log title with a subtitle in brackets ("土質ボーリング柱状図(標準貫入試験)").
 
 ## 0.30.0 — 2026-11-19
 
