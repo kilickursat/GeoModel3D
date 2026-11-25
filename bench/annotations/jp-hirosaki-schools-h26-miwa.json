@@ -1,0 +1,748 @@
+{
+ "schema_version": "1.0.0",
+ "report_id": "jp-hirosaki-schools-h26-miwa",
+ "status": "draft",
+ "provenance": {
+  "annotated_on": "2026-11-20",
+  "annotator_kind": "assistant",
+  "method": "Transcribed by eye from page images at 2x to 8x zoom (the report is scanned, with no text layer); every depth, N value and water level read at least twice, and checked against the report's own tables (Table 1-1 lengths, Table 4-4 water levels) and against elevation = ground level - depth. Names and telephone numbers on the logs are not transcribed."
+ },
+ "scope": {
+  "pages": "all",
+  "boreholes": "all",
+  "fields": [
+   "position",
+   "ground_elevation",
+   "final_depth",
+   "layers",
+   "spt",
+   "rqd",
+   "groundwater"
+  ]
+ },
+ "documents": [
+  {
+   "file": "20170308_hirosaki_gakkoudukuri_miwashougakkou.pdf",
+   "pages": 20,
+   "sha256": "8786535fe35c07bdd909eb84e2264fec02a4add3c3fd552e92c1524f7ab5df5b"
+  }
+ ],
+ "pages": [
+  {
+   "doc": 0,
+   "page": 1,
+   "type": "front_matter"
+  },
+  {
+   "doc": 0,
+   "page": 2,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 3,
+   "type": "borehole_summary",
+   "boreholes": [
+    "No-1",
+    "No-2"
+   ],
+   "note": "Table 1-1, drilled lengths by soil and tests per hole"
+  },
+  {
+   "doc": 0,
+   "page": 4,
+   "type": "site_plan",
+   "note": "location map of the site, 1:50,000"
+  },
+  {
+   "doc": 0,
+   "page": 5,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 6,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 7,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 8,
+   "type": "drawing_other",
+   "note": "geological map"
+  },
+  {
+   "doc": 0,
+   "page": 9,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 10,
+   "type": "drawing_other",
+   "note": "land-condition map"
+  },
+  {
+   "doc": 0,
+   "page": 11,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 12,
+   "type": "table_other",
+   "note": "Table 4-3, strata with thickness and N range per hole"
+  },
+  {
+   "doc": 0,
+   "page": 13,
+   "type": "site_plan",
+   "note": "plan of the borehole positions"
+  },
+  {
+   "doc": 0,
+   "page": 14,
+   "type": "cross_section"
+  },
+  {
+   "doc": 0,
+   "page": 15,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 16,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 17,
+   "type": "drawing_other",
+   "note": "histograms of N values by stratum"
+  },
+  {
+   "doc": 0,
+   "page": 18,
+   "type": "text",
+   "note": "with Table 4-4, initial groundwater level per hole"
+  },
+  {
+   "doc": 0,
+   "page": 19,
+   "type": "borehole_log",
+   "boreholes": [
+    "No-1"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 20,
+   "type": "borehole_log",
+   "boreholes": [
+    "No-2"
+   ]
+  }
+ ],
+ "boreholes": [
+  {
+   "id": "No-1",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 19
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": null,
+   "ground_elevation": {
+    "value": -0.018,
+    "datum": "KBM (local benchmark)",
+    "unit": "m",
+    "as_printed": "KBM -0.018m",
+    "source": {
+     "doc": 0,
+     "page": 19
+    }
+   },
+   "final_depth": {
+    "value": 18.5,
+    "source": {
+     "doc": 0,
+     "page": 19
+    }
+   },
+   "layers": [
+    {
+     "top": 0,
+     "base": 1.6,
+     "description": "砂混じりシルト：上部は草根を混入、1m以浅、低含水、粘性含水中位、部分的に細砂を混入",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    },
+    {
+     "top": 1.6,
+     "base": 3.5,
+     "description": "砂質シルト",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    },
+    {
+     "top": 3.5,
+     "base": 6.0,
+     "description": "シルト：粘性弱い、含水は中位〜やや多い",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    },
+    {
+     "top": 6.0,
+     "base": 7.0,
+     "description": "砂質シルト",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    },
+    {
+     "top": 7.0,
+     "base": 8.0,
+     "description": "シルト混じり砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    },
+    {
+     "top": 8.0,
+     "base": 10.9,
+     "description": "礫混じり砂：中砂〜粗砂を主体、φ3〜20mmの亜円礫を少量混入",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    },
+    {
+     "top": 10.9,
+     "base": 12.9,
+     "description": "シルト：11m付近、固結状",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    },
+    {
+     "top": 12.9,
+     "base": 15.0,
+     "description": "シルト質砂：細砂〜微細砂を主体",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    },
+    {
+     "top": 15.0,
+     "base": 17.4,
+     "description": "中粗砂：中砂〜粗砂を主体、まれにφ3〜5mmの円礫を点在する",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    },
+    {
+     "top": 17.4,
+     "base": 18.5,
+     "description": "シルト：粘性弱い、含水中位、均一",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 2,
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    },
+    {
+     "depth": 2.15,
+     "n": 1,
+     "source": {
+      "doc": 0,
+      "page": 19
+     },
+     "penetration_cm": 35
+    },
+    {
+     "depth": 3.15,
+     "n": 2,
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    },
+    {
+     "depth": 4.15,
+     "n": 2,
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 5,
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 3,
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 7,
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 23,
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    },
+    {
+     "depth": 9.15,
+     "n": 20,
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    },
+    {
+     "depth": 10.15,
+     "n": 24,
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    },
+    {
+     "depth": 11.15,
+     "n": 12,
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    },
+    {
+     "depth": 12.15,
+     "n": 4,
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    },
+    {
+     "depth": 13.15,
+     "n": 3,
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    },
+    {
+     "depth": 14.15,
+     "n": 3,
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    },
+    {
+     "depth": 15.15,
+     "n": 12,
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    },
+    {
+     "depth": 16.15,
+     "n": 15,
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    },
+    {
+     "depth": 17.15,
+     "n": 22,
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    },
+    {
+     "depth": 18.15,
+     "n": 3,
+     "source": {
+      "doc": 0,
+      "page": 19
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 1.74,
+      "kind": "unspecified",
+      "source": {
+       "doc": 0,
+       "page": 19
+      },
+      "date": "9/5"
+     }
+    ]
+   },
+   "note": "The log gives no latitude or longitude. The test at 15.15 m prints 12 blows for 2+5+6 in 10 cm steps: kept as printed. The water level is 1.74 m (Table 4-4 on page 18 agrees)."
+  },
+  {
+   "id": "No-2",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 20
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": null,
+   "ground_elevation": {
+    "value": 0.013,
+    "datum": "KBM (local benchmark)",
+    "unit": "m",
+    "as_printed": "KBM +0.013m",
+    "source": {
+     "doc": 0,
+     "page": 20
+    }
+   },
+   "final_depth": {
+    "value": 18.5,
+    "source": {
+     "doc": 0,
+     "page": 20
+    }
+   },
+   "layers": [
+    {
+     "top": 0,
+     "base": 1.9,
+     "description": "シルト：全体に均一、1m以浅、含水やや低い",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    },
+    {
+     "top": 1.9,
+     "base": 2.9,
+     "description": "砂混じりシルト：1.90〜2.50m間、砂分を混入",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    },
+    {
+     "top": 2.9,
+     "base": 3.6,
+     "description": "シルト質砂：細砂を主体、均一",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    },
+    {
+     "top": 3.6,
+     "base": 6.0,
+     "description": "シルト：粘性弱い、含水中位〜やや少ない",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    },
+    {
+     "top": 6.0,
+     "base": 6.6,
+     "description": "シルト質砂：細〜微細砂を主体",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    },
+    {
+     "top": 6.6,
+     "base": 11.2,
+     "description": "礫混じり砂：中砂を主体、φ10〜20mmの亜円〜円礫を混入",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    },
+    {
+     "top": 11.2,
+     "base": 12.6,
+     "description": "砂混じりシルト：11.60m付近、細砂を混入、11.90m以深、有機質",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    },
+    {
+     "top": 12.6,
+     "base": 14.5,
+     "description": "火山灰質砂：微細砂を主体、φ1〜2mmの軽石粒を混入",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    },
+    {
+     "top": 14.5,
+     "base": 17.0,
+     "description": "砂質シルト：全体に微細砂を混入",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    },
+    {
+     "top": 17.0,
+     "base": 18.5,
+     "description": "シルト：均一、含水中位、粘性中位",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 3,
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    },
+    {
+     "depth": 2.15,
+     "n": 2,
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    },
+    {
+     "depth": 3.15,
+     "n": 1,
+     "source": {
+      "doc": 0,
+      "page": 20
+     },
+     "penetration_cm": 35
+    },
+    {
+     "depth": 4.15,
+     "n": 2,
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 4,
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 5,
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 16,
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 14,
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    },
+    {
+     "depth": 9.15,
+     "n": 23,
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    },
+    {
+     "depth": 10.15,
+     "n": 17,
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    },
+    {
+     "depth": 11.15,
+     "n": 9,
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    },
+    {
+     "depth": 12.15,
+     "n": 2,
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    },
+    {
+     "depth": 13.15,
+     "n": 16,
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    },
+    {
+     "depth": 14.15,
+     "n": 22,
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    },
+    {
+     "depth": 15.15,
+     "n": 14,
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    },
+    {
+     "depth": 16.15,
+     "n": 5,
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    },
+    {
+     "depth": 17.15,
+     "n": 3,
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    },
+    {
+     "depth": 18.15,
+     "n": 3,
+     "source": {
+      "doc": 0,
+      "page": 20
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 2.9,
+      "kind": "unspecified",
+      "source": {
+       "doc": 0,
+       "page": 20
+      },
+      "date": "9/11"
+     }
+    ]
+   },
+   "note": "The log gives no latitude or longitude."
+  }
+ ],
+ "readiness": {
+  "expected": "abstain",
+  "reasons": [
+   "no_positions"
+  ],
+  "positioned_boreholes": 0,
+  "note": "Two boreholes with levels on a local benchmark and no coordinates: they can be drawn as columns, but not placed on a map without positions from the plan."
+ }
+}

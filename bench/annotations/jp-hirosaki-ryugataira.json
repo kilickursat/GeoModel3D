@@ -1,0 +1,631 @@
+{
+ "schema_version": "1.0.0",
+ "report_id": "jp-hirosaki-ryugataira",
+ "status": "draft",
+ "provenance": {
+  "annotated_on": "2026-11-20",
+  "annotator_kind": "assistant",
+  "method": "Transcribed by eye from page images at 2x zoom (scanned A3 sheets, no text layer); checked against elevation = ground level - depth on every layer and the N value printed beside each test. Names and telephone numbers are not transcribed."
+ },
+ "scope": {
+  "pages": "all",
+  "boreholes": "all",
+  "fields": [
+   "position",
+   "ground_elevation",
+   "final_depth",
+   "layers",
+   "spt",
+   "rqd",
+   "groundwater"
+  ]
+ },
+ "documents": [
+  {
+   "file": "20170308_hirosaki_kensetuseisaku_ryuugataira_tyuujouzu.pdf",
+   "pages": 6,
+   "sha256": "60dde2c21d710a02215dbf8b426c5b29dc214b2955e71d73f33d6cafd7984340"
+  }
+ ],
+ "pages": [
+  {
+   "doc": 0,
+   "page": 1,
+   "type": "site_plan",
+   "note": "location map, 1:25,000"
+  },
+  {
+   "doc": 0,
+   "page": 2,
+   "type": "site_plan",
+   "note": "plan of section 1 with the borehole"
+  },
+  {
+   "doc": 0,
+   "page": 3,
+   "type": "site_plan",
+   "note": "plan of section 2 with the boreholes"
+  },
+  {
+   "doc": 0,
+   "page": 4,
+   "type": "borehole_log",
+   "boreholes": [
+    "1工区 B-1"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 5,
+   "type": "borehole_log",
+   "boreholes": [
+    "2工区 B-1"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 6,
+   "type": "borehole_log",
+   "boreholes": [
+    "2工区 B-2"
+   ]
+  }
+ ],
+ "boreholes": [
+  {
+   "id": "1工区 B-1",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 4
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 40.5611917,
+    "lon": 140.3637167,
+    "crs": "unstated",
+    "as_printed": "北緯 40°33'40.29\" 東経 140°21'49.38\"",
+    "source": {
+     "doc": 0,
+     "page": 4
+    }
+   },
+   "ground_elevation": {
+    "value": 121.17,
+    "datum": "unstated",
+    "unit": "m",
+    "as_printed": "GH= 121.17m",
+    "source": {
+     "doc": 0,
+     "page": 4
+    }
+   },
+   "final_depth": {
+    "value": 10.45,
+    "source": {
+     "doc": 0,
+     "page": 4
+    }
+   },
+   "layers": [
+    {
+     "top": 0,
+     "base": 2.0,
+     "description": "盛土(礫混じり粘性土)：深度0.80〜1.40mまで玉石混じり砂礫状",
+     "principal": "made_ground",
+     "source": {
+      "doc": 0,
+      "page": 4
+     }
+    },
+    {
+     "top": 2.0,
+     "base": 3.2,
+     "description": "砂質粘土：部分的に砂分が多く、所々にφ20mm前後の亜角礫が点在",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 4
+     }
+    },
+    {
+     "top": 3.2,
+     "base": 8.0,
+     "description": "礫混じりシルト：所々にφ2〜40mmの亜角礫を混入、7.70m以深、砂・礫の混入が多い",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 4
+     }
+    },
+    {
+     "top": 8.0,
+     "base": 10.45,
+     "description": "礫混じり砂：砂は火山灰質の細砂〜粗砂を主体",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 4
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 5,
+     "source": {
+      "doc": 0,
+      "page": 4
+     }
+    },
+    {
+     "depth": 2.15,
+     "n": 6,
+     "source": {
+      "doc": 0,
+      "page": 4
+     }
+    },
+    {
+     "depth": 3.15,
+     "n": 15,
+     "source": {
+      "doc": 0,
+      "page": 4
+     }
+    },
+    {
+     "depth": 4.15,
+     "n": 18,
+     "source": {
+      "doc": 0,
+      "page": 4
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 17,
+     "source": {
+      "doc": 0,
+      "page": 4
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 20,
+     "source": {
+      "doc": 0,
+      "page": 4
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 22,
+     "source": {
+      "doc": 0,
+      "page": 4
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 60,
+     "source": {
+      "doc": 0,
+      "page": 4
+     },
+     "penetration_cm": 25,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 9.15,
+     "n": 31,
+     "source": {
+      "doc": 0,
+      "page": 4
+     }
+    },
+    {
+     "depth": 10.15,
+     "n": 45,
+     "source": {
+      "doc": 0,
+      "page": 4
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 2.3,
+      "kind": "unspecified",
+      "source": {
+       "doc": 0,
+       "page": 4
+      },
+      "date": "8/31"
+     }
+    ]
+   }
+  },
+  {
+   "id": "2工区 B-1",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 5
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 40.5566583,
+    "lon": 140.3492222,
+    "crs": "unstated",
+    "as_printed": "北緯 40°33'23.97\" 東経 140°20'57.20\"",
+    "source": {
+     "doc": 0,
+     "page": 5
+    }
+   },
+   "ground_elevation": {
+    "value": 175.28,
+    "datum": "unstated",
+    "unit": "m",
+    "as_printed": "GH= 175.28m",
+    "source": {
+     "doc": 0,
+     "page": 5
+    }
+   },
+   "final_depth": {
+    "value": 10.0,
+    "source": {
+     "doc": 0,
+     "page": 5
+    }
+   },
+   "layers": [
+    {
+     "top": 0,
+     "base": 1.65,
+     "description": "盛土(礫混じり粘性土)：礫混じり砂質シルト状の盛土",
+     "principal": "made_ground",
+     "source": {
+      "doc": 0,
+      "page": 5
+     }
+    },
+    {
+     "top": 1.65,
+     "base": 4.1,
+     "description": "礫混じりシルト：所々にφ2〜40mm程度の風化角礫を多く混入",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 5
+     }
+    },
+    {
+     "top": 4.1,
+     "base": 10.0,
+     "description": "安山岩質凝灰角礫岩：送水掘りで硬質棒状コアで採取される",
+     "principal": "rock",
+     "source": {
+      "doc": 0,
+      "page": 5
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 5,
+     "source": {
+      "doc": 0,
+      "page": 5
+     }
+    },
+    {
+     "depth": 2.15,
+     "n": 3,
+     "source": {
+      "doc": 0,
+      "page": 5
+     }
+    },
+    {
+     "depth": 3.15,
+     "n": 4,
+     "source": {
+      "doc": 0,
+      "page": 5
+     }
+    },
+    {
+     "depth": 4.15,
+     "n": 58,
+     "source": {
+      "doc": 0,
+      "page": 5
+     },
+     "penetration_cm": 26,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 5.0,
+     "n": 250,
+     "source": {
+      "doc": 0,
+      "page": 5
+     },
+     "penetration_cm": 6,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 6.0,
+     "n": 500,
+     "source": {
+      "doc": 0,
+      "page": 5
+     },
+     "penetration_cm": 3,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 7.0,
+     "n": 750,
+     "source": {
+      "doc": 0,
+      "page": 5
+     },
+     "penetration_cm": 2,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 8.0,
+     "n": 750,
+     "source": {
+      "doc": 0,
+      "page": 5
+     },
+     "penetration_cm": 2,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 9.0,
+     "n": 1500,
+     "source": {
+      "doc": 0,
+      "page": 5
+     },
+     "penetration_cm": 1,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 10.0,
+     "n": 50,
+     "source": {
+      "doc": 0,
+      "page": 5
+     },
+     "penetration_cm": 0,
+     "refusal": true,
+     "blows": 50
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 3.7,
+      "kind": "unspecified",
+      "source": {
+       "doc": 0,
+       "page": 5
+      },
+      "date": "9/5"
+     }
+    ]
+   },
+   "note": "The test at 10.00 m: 50 blows, no penetration (貫入不能)."
+  },
+  {
+   "id": "2工区 B-2",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 6
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 40.5570111,
+    "lon": 140.3494,
+    "crs": "unstated",
+    "as_printed": "北緯 40°33'25.24\" 東経 140°20'57.84\"",
+    "source": {
+     "doc": 0,
+     "page": 6
+    }
+   },
+   "ground_elevation": {
+    "value": 178.21,
+    "datum": "unstated",
+    "unit": "m",
+    "as_printed": "GH= 178.21m",
+    "source": {
+     "doc": 0,
+     "page": 6
+    }
+   },
+   "final_depth": {
+    "value": 10.45,
+    "source": {
+     "doc": 0,
+     "page": 6
+    }
+   },
+   "layers": [
+    {
+     "top": 0,
+     "base": 1.5,
+     "description": "盛土(礫混じり粘性土)：0.00〜0.30mまで有機質シルト、以深は礫混じり砂質シルト状",
+     "principal": "made_ground",
+     "source": {
+      "doc": 0,
+      "page": 6
+     }
+    },
+    {
+     "top": 1.5,
+     "base": 4.0,
+     "description": "砂質シルト",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 6
+     }
+    },
+    {
+     "top": 4.0,
+     "base": 9.0,
+     "description": "礫混じりシルト：所々にφ2〜40mm程度の亜角礫混入",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 6
+     }
+    },
+    {
+     "top": 9.0,
+     "base": 10.45,
+     "description": "粘土質砂礫：礫はφ2〜40mm程度の風化角礫を主体",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 6
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 1,
+     "source": {
+      "doc": 0,
+      "page": 6
+     }
+    },
+    {
+     "depth": 2.15,
+     "n": 3,
+     "source": {
+      "doc": 0,
+      "page": 6
+     }
+    },
+    {
+     "depth": 3.15,
+     "n": 3,
+     "source": {
+      "doc": 0,
+      "page": 6
+     }
+    },
+    {
+     "depth": 4.15,
+     "n": 6,
+     "source": {
+      "doc": 0,
+      "page": 6
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 7,
+     "source": {
+      "doc": 0,
+      "page": 6
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 6,
+     "source": {
+      "doc": 0,
+      "page": 6
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 8,
+     "source": {
+      "doc": 0,
+      "page": 6
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 8,
+     "source": {
+      "doc": 0,
+      "page": 6
+     }
+    },
+    {
+     "depth": 9.15,
+     "n": 15,
+     "source": {
+      "doc": 0,
+      "page": 6
+     }
+    },
+    {
+     "depth": 10.15,
+     "n": 17,
+     "source": {
+      "doc": 0,
+      "page": 6
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 5.1,
+      "kind": "unspecified",
+      "source": {
+       "doc": 0,
+       "page": 6
+      },
+      "date": "9/3"
+     }
+    ]
+   }
+  }
+ ],
+ "readiness": {
+  "expected": "spatial_model",
+  "reasons": [],
+  "positioned_boreholes": 3,
+  "note": "Three boreholes with latitude and longitude, in two sections about 1 km apart."
+ }
+}

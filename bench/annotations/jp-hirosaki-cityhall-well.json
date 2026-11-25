@@ -1,0 +1,290 @@
+{
+ "schema_version": "1.0.0",
+ "report_id": "jp-hirosaki-cityhall-well",
+ "status": "draft",
+ "provenance": {
+  "annotated_on": "2026-11-20",
+  "annotator_kind": "assistant",
+  "method": "Transcribed by eye from page images turned upright at 2.2x to 2.5x zoom (scanned, no text layer). The name of the person in charge is not transcribed."
+ },
+ "scope": {
+  "pages": "all",
+  "boreholes": "all",
+  "fields": [
+   "position",
+   "ground_elevation",
+   "final_depth",
+   "layers",
+   "spt",
+   "rqd",
+   "groundwater"
+  ]
+ },
+ "documents": [
+  {
+   "file": "20170308_hirosaki_zaisankanri_sityoushaidoboringu.pdf",
+   "pages": 4,
+   "sha256": "ffe2ba85237c0880638e4ff2e2bd7af110be6458f9c4376a8d22611f35412844"
+  }
+ ],
+ "pages": [
+  {
+   "doc": 0,
+   "page": 1,
+   "type": "other",
+   "note": "title page, \"2) 地質柱状図\""
+  },
+  {
+   "doc": 0,
+   "page": 2,
+   "type": "borehole_log",
+   "boreholes": [
+    "市庁舎井戸"
+   ],
+   "note": "log with resistivity curve, drawn sideways"
+  },
+  {
+   "doc": 0,
+   "page": 3,
+   "type": "borehole_log",
+   "boreholes": [
+    "市庁舎井戸"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 4,
+   "type": "borehole_log",
+   "boreholes": [
+    "市庁舎井戸"
+   ]
+  }
+ ],
+ "boreholes": [
+  {
+   "id": "市庁舎井戸",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 2
+    },
+    {
+     "doc": 0,
+     "page": 3
+    },
+    {
+     "doc": 0,
+     "page": 4
+    }
+   ],
+   "kind": "well",
+   "depth_unit": "m",
+   "position": null,
+   "ground_elevation": null,
+   "final_depth": {
+    "value": 152.4,
+    "source": {
+     "doc": 0,
+     "page": 2
+    },
+    "as_printed": "掘さく深度 GL-152.4m"
+   },
+   "layers": [
+    {
+     "top": 0,
+     "base": 0.5,
+     "description": "(表土)",
+     "principal": "topsoil",
+     "source": {
+      "doc": 0,
+      "page": 2
+     }
+    },
+    {
+     "top": 0.5,
+     "base": 2.5,
+     "description": "砂利",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 2
+     }
+    },
+    {
+     "top": 2.5,
+     "base": 5.0,
+     "description": "粘土",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 2
+     }
+    },
+    {
+     "top": 5.0,
+     "base": 7.5,
+     "description": "砂質シルト",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 2
+     }
+    },
+    {
+     "top": 7.5,
+     "base": 15.0,
+     "description": "粘土",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 2
+     }
+    },
+    {
+     "top": 15.0,
+     "base": 32.0,
+     "description": "砂質シルト・粘土互層",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 2
+     }
+    },
+    {
+     "top": 32.0,
+     "base": 45.0,
+     "description": "砂礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 3
+     }
+    },
+    {
+     "top": 45.0,
+     "base": 55.0,
+     "description": "礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 3
+     }
+    },
+    {
+     "top": 55.0,
+     "base": 61.0,
+     "description": "砂質シルト",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 3
+     }
+    },
+    {
+     "top": 61.0,
+     "base": 64.0,
+     "description": "粘土",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 3
+     }
+    },
+    {
+     "top": 64.0,
+     "base": 82.0,
+     "description": "礫・粘土互層",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 3
+     }
+    },
+    {
+     "top": 82.0,
+     "base": 87.0,
+     "description": "砂質シルト・粘土互層",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 3
+     }
+    },
+    {
+     "top": 87.0,
+     "base": 97.0,
+     "description": "礫・粘土互層",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 3
+     }
+    },
+    {
+     "top": 97.0,
+     "base": 100.0,
+     "description": "礫・砂質シルト互層",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 4
+     }
+    },
+    {
+     "top": 100.0,
+     "base": 118.0,
+     "description": "石英",
+     "principal": "other",
+     "source": {
+      "doc": 0,
+      "page": 4
+     }
+    },
+    {
+     "top": 118.0,
+     "base": 124.0,
+     "description": "砂礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 4
+     }
+    },
+    {
+     "top": 124.0,
+     "base": 152.4,
+     "description": "砂礫・粘土互層",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 4
+     }
+    }
+   ],
+   "spt": [],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 38.87,
+      "kind": "standing",
+      "source": {
+       "doc": 0,
+       "page": 2
+      }
+     }
+    ]
+   },
+   "note": "A water well: no borehole name is printed (the title names the city hall well), no position and no ground level. The log is drawn sideways with depth along the sheet. The last layer prints thickness 28.0 for 124.0-152.4 m. \"石英\" (quartz) names no soil or rock type the guidelines map: other. Water: natural (static) level 38.87 m; the pumping level 50.12 m is not a groundwater level of the ground."
+  }
+ ],
+ "readiness": {
+  "expected": "column_only",
+  "reasons": [
+   "single_borehole"
+  ],
+  "positioned_boreholes": 0,
+  "note": "A single well log, with no position or level."
+ }
+}

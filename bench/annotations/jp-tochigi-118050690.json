@@ -1,0 +1,1418 @@
+{
+ "schema_version": "1.0.0",
+ "report_id": "jp-tochigi-118050690",
+ "status": "draft",
+ "provenance": {
+  "annotated_on": "2026-11-20",
+  "annotator_kind": "assistant",
+  "method": "Values copied from each sheet's PDF text layer with bench/tools/draft_jp_denshi.py (the columns of the JACIC form), checked on every sheet by internal consistency (elevation = ground level - depth, thickness = base - top, the N column against blows and penetration, last base = final depth), and against the page image for at least one log per survey and for every log that failed a check or had a layer name the helper could not place. RQD values are from the remarks column."
+ },
+ "scope": {
+  "pages": "all",
+  "boreholes": "all",
+  "fields": [
+   "position",
+   "ground_elevation",
+   "final_depth",
+   "layers",
+   "spt",
+   "rqd",
+   "groundwater"
+  ]
+ },
+ "documents": [
+  {
+   "file": "11805069001.pdf",
+   "pages": 1,
+   "sha256": "9f7763154588b32414385922d9f77e2cd96b6ad2d9b0d76410c5b16ac7629d9a"
+  },
+  {
+   "file": "11805069002.pdf",
+   "pages": 1,
+   "sha256": "d1bb8e56886c8690f7deb21275ffac2af7a85dd11fa8055f7a9291636975ef6b"
+  },
+  {
+   "file": "11805069003.pdf",
+   "pages": 1,
+   "sha256": "80abc7df4a469e711a386a826784ddd551cb9a7c2d0425d6b6853647de0a8beb"
+  },
+  {
+   "file": "11805069004.pdf",
+   "pages": 1,
+   "sha256": "6ac0edc24517d6145231dd085f9eef24f3650c92a9bf54e587d513c7e6ada6d6"
+  },
+  {
+   "file": "11805069005.pdf",
+   "pages": 1,
+   "sha256": "3353f021ae55c29527b439643ecb9a50b24c2d587976d4e6ecaad4a8426fc22b"
+  },
+  {
+   "file": "11805069006.pdf",
+   "pages": 1,
+   "sha256": "4d58ece7db039cb5e3022513b1e376442c31d9b71f718e57e98fa2636991c354"
+  },
+  {
+   "file": "11805069007.pdf",
+   "pages": 1,
+   "sha256": "e9e1e6813ba440ee81bcb2938c90f5137f91c2fc33e0244f039c449b2c2b5b9c"
+  }
+ ],
+ "pages": [
+  {
+   "doc": 0,
+   "page": 1,
+   "type": "borehole_log",
+   "boreholes": [
+    "B-2"
+   ]
+  },
+  {
+   "doc": 1,
+   "page": 1,
+   "type": "borehole_log",
+   "boreholes": [
+    "B-3"
+   ]
+  },
+  {
+   "doc": 2,
+   "page": 1,
+   "type": "borehole_log",
+   "boreholes": [
+    "B-4"
+   ]
+  },
+  {
+   "doc": 3,
+   "page": 1,
+   "type": "borehole_log",
+   "boreholes": [
+    "B-5"
+   ]
+  },
+  {
+   "doc": 4,
+   "page": 1,
+   "type": "borehole_log",
+   "boreholes": [
+    "B-6"
+   ]
+  },
+  {
+   "doc": 5,
+   "page": 1,
+   "type": "borehole_log",
+   "boreholes": [
+    "B-7"
+   ]
+  },
+  {
+   "doc": 6,
+   "page": 1,
+   "type": "borehole_log",
+   "boreholes": [
+    "B-1"
+   ]
+  }
+ ],
+ "boreholes": [
+  {
+   "id": "B-2",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 1
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 36.3316667,
+    "lon": 139.8230556,
+    "crs": "unstated",
+    "as_printed": "北緯 36° 19’ 54.0000” 東経 139° 49’ 23.0000”",
+    "source": {
+     "doc": 0,
+     "page": 1
+    }
+   },
+   "ground_elevation": {
+    "value": 42.4,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 0,
+     "page": 1
+    }
+   },
+   "final_depth": {
+    "value": 9.45,
+    "source": {
+     "doc": 0,
+     "page": 1
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 0.5,
+     "description": "盛土(BS)：径40～150mmの角礫が混入するシルト。木片や焼却灰が混入。",
+     "principal": "made_ground",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 0.5,
+     "base": 1.4,
+     "description": "ローム(Lm)：腐植物が混入する。含水量は中程度～多い。",
+     "principal": "volcanic_ash",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 1.4,
+     "base": 2.05,
+     "description": "軽石(Pm)：径2～5mmが主体。含水量は多い。",
+     "principal": "volcanic_ash",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 2.05,
+     "base": 3.6,
+     "description": "ローム(Lm)：腐植物が混入する。含水量は多く、粘性は強い。下部は粘土化している。",
+     "principal": "volcanic_ash",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 3.6,
+     "base": 4.95,
+     "description": "粘土混り砂(S-C)：細砂～中砂が主体。凝灰質粘土が多く混入している。含水量は中程度～多い。",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 4.95,
+     "base": 5.75,
+     "description": "凝灰質粘土：腐植物が混入。含水・粘性大。少量の砂が混入する。",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 5.75,
+     "base": 7.35,
+     "description": "粘土(CH)：所々、径20mm程度の風化亜円礫が点在する。腐植物が混入する。含水量は非常に多い。粘性中位。",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 7.35,
+     "base": 9.45,
+     "description": "礫混り砂(S-G)：上部は径3～5mmの細礫が主体。含水量は多い。GL-7.6m以深は細砂～中砂が主体で、径3～5mmの細礫が混入する。白黄色の軽石片が散在する。",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 4.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 2.15,
+     "n": 0.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 3.15,
+     "n": 2.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     },
+     "penetration_cm": 35.0
+    },
+    {
+     "depth": 4.15,
+     "n": 9.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 2.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     },
+     "penetration_cm": 35.0
+    },
+    {
+     "depth": 6.15,
+     "n": 4.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 3.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     },
+     "penetration_cm": 35.0
+    },
+    {
+     "depth": 8.15,
+     "n": 12.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 9.15,
+     "n": 19.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 2.55,
+      "kind": "unspecified",
+      "source": {
+       "doc": 0,
+       "page": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "B-3",
+   "pages": [
+    {
+     "doc": 1,
+     "page": 1
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 36.3308333,
+    "lon": 139.8277778,
+    "crs": "unstated",
+    "as_printed": "北緯 36° 19’ 51.0000” 東経 139° 49’ 40.0000”",
+    "source": {
+     "doc": 1,
+     "page": 1
+    }
+   },
+   "ground_elevation": {
+    "value": 40.99,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 1,
+     "page": 1
+    }
+   },
+   "final_depth": {
+    "value": 8.45,
+    "source": {
+     "doc": 1,
+     "page": 1
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 1.8,
+     "description": "シルト(M)：最上部30cmは耕作土。腐植物が混入する。含水量は多い。GL-0.7m以深は粘土質である。",
+     "principal": "silt",
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "top": 1.8,
+     "base": 2.35,
+     "description": "粘土質ローム(Lm)：層相不均質。腐植物が混入し、局部的に砂層が介在。含水・粘性大径1～3mmで強風化状。含水極大",
+     "principal": "volcanic_ash",
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "top": 2.35,
+     "base": 2.65,
+     "description": "軽石(Pm)",
+     "principal": "volcanic_ash",
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "top": 2.65,
+     "base": 4.8,
+     "description": "有機質粘土(CHO)：上部は腐植物の混入が多い。中部は微細砂が混入する凝灰質粘土状。下部は部分的に軽石片や、局部的に砂が多く混入する。含水量は多く、粘性は強い。",
+     "principal": "clay",
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "top": 4.8,
+     "base": 5.7,
+     "description": "砂質シルト(MS)：上部は細砂が混入する。以深、細砂の薄層が介在する。含水量は多く、粘性は強い。",
+     "principal": "silt",
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "top": 5.7,
+     "base": 8.45,
+     "description": "礫混り砂(S-G)：細砂～中砂が主体。径3～15mmの亜円礫,亜角礫が混入する。GL-6.5m以深、深度が増すに従い粒子が粗くなり、7m下部では粗砂が主体。GL-7.8m以深は礫の混入が多い。",
+     "principal": "sand",
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.0,
+     "n": 1.0,
+     "source": {
+      "doc": 1,
+      "page": 1
+     },
+     "penetration_cm": 45.0
+    },
+    {
+     "depth": 2.0,
+     "n": 1.0,
+     "source": {
+      "doc": 1,
+      "page": 1
+     },
+     "penetration_cm": 45.0
+    },
+    {
+     "depth": 3.0,
+     "n": 1.0,
+     "source": {
+      "doc": 1,
+      "page": 1
+     },
+     "penetration_cm": 50.0
+    },
+    {
+     "depth": 4.0,
+     "n": 0.0,
+     "source": {
+      "doc": 1,
+      "page": 1
+     },
+     "penetration_cm": 60.0
+    },
+    {
+     "depth": 5.15,
+     "n": 13.0,
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 25.0,
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 36.0,
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 26.0,
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 1.85,
+      "kind": "unspecified",
+      "source": {
+       "doc": 1,
+       "page": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "B-4",
+   "pages": [
+    {
+     "doc": 2,
+     "page": 1
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 36.3305556,
+    "lon": 139.8305556,
+    "crs": "unstated",
+    "as_printed": "北緯 36° 19’ 50.0000” 東経 139° 49’ 50.0000”",
+    "source": {
+     "doc": 2,
+     "page": 1
+    }
+   },
+   "ground_elevation": {
+    "value": 40.04,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 2,
+     "page": 1
+    }
+   },
+   "final_depth": {
+    "value": 8.45,
+    "source": {
+     "doc": 2,
+     "page": 1
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 1.55,
+     "description": "シルト(M)：最上部20cmは耕作土。植物根の混入が多い。腐植物が混入する。含水量は多い。深度が増すと含水量は更に多くなる。",
+     "principal": "silt",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "top": 1.55,
+     "base": 2.35,
+     "description": "ローム(Lm)：層相不均質。少量の砂が混入。中部以深は強風化しており、腐植物の混入が多い。含水・粘性大径1～3mmで強風化。含水極大",
+     "principal": "volcanic_ash",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "top": 2.35,
+     "base": 2.5,
+     "description": "軽石",
+     "principal": "volcanic_ash",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "top": 2.5,
+     "base": 3.75,
+     "description": "(Pm)有機質粘土(CHO)：上部・下部は腐植物の混入多い。中部は細砂が多く混入している。含水量は多く、粘性は強い。",
+     "principal": "clay",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "top": 3.75,
+     "base": 4.7,
+     "description": "砂質シルト(MS)：砂の薄層が介在し、概ね砂泥互層状を呈する。含水量は中程度。腐植物が混入。",
+     "principal": "silt",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "top": 4.7,
+     "base": 5.6,
+     "description": "礫混り砂(S-G)：中砂が主体。径3～10mmの亜円礫,角礫が混入。粘土の混入は無い。軽石片が散在し、下部では多い。",
+     "principal": "sand",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "top": 5.6,
+     "base": 8.45,
+     "description": "シルト混り細砂(FS-M)：微細砂～細砂が主体。シルト分の混入が多い。含水量は多い。",
+     "principal": "sand",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.0,
+     "n": 1.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     },
+     "penetration_cm": 50.0
+    },
+    {
+     "depth": 2.0,
+     "n": 0.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     },
+     "penetration_cm": 60.0
+    },
+    {
+     "depth": 3.15,
+     "n": 3.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 4.15,
+     "n": 15.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 23.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 6.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 31.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 33.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 1.5,
+      "kind": "unspecified",
+      "source": {
+       "doc": 2,
+       "page": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "B-5",
+   "pages": [
+    {
+     "doc": 3,
+     "page": 1
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 36.3261111,
+    "lon": 139.83,
+    "crs": "unstated",
+    "as_printed": "北緯 36° 19’ 34.0000” 東経 139° 49’ 48.0000”",
+    "source": {
+     "doc": 3,
+     "page": 1
+    }
+   },
+   "ground_elevation": {
+    "value": 37.86,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 3,
+     "page": 1
+    }
+   },
+   "final_depth": {
+    "value": 6.45,
+    "source": {
+     "doc": 3,
+     "page": 1
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 0.8,
+     "description": "盛土(BS)：上部30cmは砂混じりシルト。以深、シルト混じりローム。",
+     "principal": "made_ground",
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "top": 0.8,
+     "base": 2.2,
+     "description": "有機質シルト(MO)：最上部、径2～20mmの礫が混入。下部は有機物の混入が多い。含水量は多い。",
+     "principal": "silt",
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "top": 2.2,
+     "base": 2.8,
+     "description": "細砂(FS)：シルトがレンズ状に介在する。含水量は多い。",
+     "principal": "sand",
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "top": 2.8,
+     "base": 3.3,
+     "description": "砂質シルト(MS)：全体に砂の混入は多い。腐植物が混入。含水量は多い。",
+     "principal": "silt",
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "top": 3.3,
+     "base": 6.45,
+     "description": "礫混り砂(S-G)：上部～中部は細砂が主体。下部は中砂が主体。径2～20mmの礫が混入する。",
+     "principal": "sand",
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 2.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 2.15,
+     "n": 7.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 3.15,
+     "n": 2.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     },
+     "penetration_cm": 34.0
+    },
+    {
+     "depth": 4.15,
+     "n": 15.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 30.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 25.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 2.25,
+      "kind": "unspecified",
+      "source": {
+       "doc": 3,
+       "page": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "B-6",
+   "pages": [
+    {
+     "doc": 4,
+     "page": 1
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 36.3241667,
+    "lon": 139.8330556,
+    "crs": "unstated",
+    "as_printed": "北緯 36° 19’ 27.0000” 東経 139° 49’ 59.0000”",
+    "source": {
+     "doc": 4,
+     "page": 1
+    }
+   },
+   "ground_elevation": {
+    "value": 36.72,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 4,
+     "page": 1
+    }
+   },
+   "final_depth": {
+    "value": 8.45,
+    "source": {
+     "doc": 4,
+     "page": 1
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 1.1,
+     "description": "シルト(M)：含水量、粘性は共に中程度。",
+     "principal": "silt",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 1.1,
+     "base": 1.7,
+     "description": "粘土混り砂礫(GS-C)：径20～40mmの礫が主体。粘土が混入している。",
+     "principal": "gravel",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 1.7,
+     "base": 5.6,
+     "description": "礫混り砂(S-G)：粗砂が主体。径5～20mm程度の亜円礫が混入している。含水量は多い。",
+     "principal": "sand",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 5.6,
+     "base": 6.9,
+     "description": "砂混りシルト(M-S)：細砂が混入している。含水量は多く、粘性は強い。",
+     "principal": "silt",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 6.9,
+     "base": 8.45,
+     "description": "礫混り砂(S-G)：粗砂が主体。径5～20mm程度の亜円礫が混入する。含水量が多い。",
+     "principal": "sand",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 16.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 2.15,
+     "n": 14.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 3.15,
+     "n": 18.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 4.15,
+     "n": 15.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 17.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 3.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 13.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 12.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 1.28,
+      "kind": "unspecified",
+      "source": {
+       "doc": 4,
+       "page": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "B-7",
+   "pages": [
+    {
+     "doc": 5,
+     "page": 1
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 36.3313889,
+    "lon": 139.8241667,
+    "crs": "unstated",
+    "as_printed": "北緯 36° 19’ 53.0000” 東経 139° 49’ 27.0000”",
+    "source": {
+     "doc": 5,
+     "page": 1
+    }
+   },
+   "ground_elevation": {
+    "value": 41.94,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 5,
+     "page": 1
+    }
+   },
+   "final_depth": {
+    "value": 7.45,
+    "source": {
+     "doc": 5,
+     "page": 1
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 1.0,
+     "description": "シルト(M)：0-40砕石　全体的にシルト混る旧表土　含水比上位少量の腐植物を混入",
+     "principal": "silt",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 1.0,
+     "base": 1.95,
+     "description": "ローム(Lm)：含水比・粘性　中～上位1.30m付近より茶褐色を呈す",
+     "principal": "volcanic_ash",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 1.95,
+     "base": 3.25,
+     "description": "軽石(Pm)：含水比上位　φ1～3mm程度の粒径主体　下部約25cmは風化激しく若干白色を帯びる",
+     "principal": "volcanic_ash",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 3.25,
+     "base": 4.0,
+     "description": "ローム(Lm)：含水比・粘性　上位　局部的に変色し暗茶褐色を呈す　腐植物を少量混入",
+     "principal": "volcanic_ash",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 4.0,
+     "base": 4.6,
+     "description": "凝灰質粘土：含水比・粘性　上位　細砂を混入",
+     "principal": "clay",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 4.6,
+     "base": 5.3,
+     "description": "有機質粘土(CHO)：含水比上位　腐植物混入多い非常に軟らかい状態で孔壁せり出しあり　粘性　中～上位",
+     "principal": "clay",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 5.3,
+     "base": 6.95,
+     "description": "粘土(CH)：含水比・粘性　上位　腐植物の混入やや多い下位に従い徐々にシルト分の混入多くなる",
+     "principal": "clay",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 6.95,
+     "base": 7.45,
+     "description": "粘土混り砂(S-C)：含水比上位　細～中砂主体　粘土分多く自立　φ2～5mmの円礫混入",
+     "principal": "sand",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 5.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 2.15,
+     "n": 1.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     },
+     "penetration_cm": 40.0
+    },
+    {
+     "depth": 3.0,
+     "n": 0.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     },
+     "penetration_cm": 55.0
+    },
+    {
+     "depth": 4.0,
+     "n": 0.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     },
+     "penetration_cm": 65.0
+    },
+    {
+     "depth": 6.2,
+     "n": 2.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 6.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 1.0,
+      "kind": "unspecified",
+      "source": {
+       "doc": 5,
+       "page": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "B-1",
+   "pages": [
+    {
+     "doc": 6,
+     "page": 1
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 36.3380556,
+    "lon": 139.8258333,
+    "crs": "unstated",
+    "as_printed": "北緯 36° 20’ 17.0000” 東経 139° 49’ 33.0000”",
+    "source": {
+     "doc": 6,
+     "page": 1
+    }
+   },
+   "ground_elevation": {
+    "value": 43.25,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 6,
+     "page": 1
+    }
+   },
+   "final_depth": {
+    "value": 8.45,
+    "source": {
+     "doc": 6,
+     "page": 1
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 1.05,
+     "description": "盛土(BS)：最上部15cmは砕石。60cmまで径20～100mmの岩砕が混入するズリ砕石。以深はシルトとロームの混合土。木片が混入。含水大。",
+     "principal": "made_ground",
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "top": 1.05,
+     "base": 1.85,
+     "description": "ローム(Lm)：腐植物が混入。下部、軽石散在。含水量は多く、粘性が強い。",
+     "principal": "volcanic_ash",
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "top": 1.85,
+     "base": 2.6,
+     "description": "軽石(Pm)：最下部は砂が多く混入し半固結状含水量が非常に多い。",
+     "principal": "volcanic_ash",
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "top": 2.6,
+     "base": 3.5,
+     "description": "ローム(Lm)：腐植物が混入する。含水量は多く、粘性は中程度。",
+     "principal": "volcanic_ash",
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "top": 3.5,
+     "base": 4.7,
+     "description": "砂質シルト(MS)：上部は微細砂の混入が多く、下部は有機質土状。腐植物が混入し、軽石片が散在する。含水量は多く、粘性は強い。",
+     "principal": "silt",
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "top": 4.7,
+     "base": 5.5,
+     "description": "砂混りシルト(M-S)：少量の細砂や腐植物を混入。含水量は多い。",
+     "principal": "silt",
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "top": 5.5,
+     "base": 8.45,
+     "description": "礫混り砂(S-G)：層相は不均質である。細砂～中砂が主体。全体に粒径は不均一である。最上部はシルトが混入する。径5～20mmの亜円礫や亜角礫が散在する。局部的に礫の密集部がある。",
+     "principal": "sand",
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 3.0,
+     "source": {
+      "doc": 6,
+      "page": 1
+     },
+     "penetration_cm": 35.0
+    },
+    {
+     "depth": 2.15,
+     "n": 0.0,
+     "source": {
+      "doc": 6,
+      "page": 1
+     },
+     "penetration_cm": 60.0
+    },
+    {
+     "depth": 3.0,
+     "n": 0.0,
+     "source": {
+      "doc": 6,
+      "page": 1
+     },
+     "penetration_cm": 60.0
+    },
+    {
+     "depth": 4.15,
+     "n": 0.0,
+     "source": {
+      "doc": 6,
+      "page": 1
+     },
+     "penetration_cm": 60.0
+    },
+    {
+     "depth": 5.15,
+     "n": 8.0,
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 31.0,
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 24.0,
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 32.0,
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 1.95,
+      "kind": "unspecified",
+      "source": {
+       "doc": 6,
+       "page": 1
+      }
+     }
+    ]
+   }
+  }
+ ],
+ "readiness": {
+  "expected": "spatial_model",
+  "reasons": [],
+  "positioned_boreholes": 7
+ }
+}

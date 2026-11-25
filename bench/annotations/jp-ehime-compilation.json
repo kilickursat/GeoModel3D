@@ -1,0 +1,12954 @@
+{
+ "schema_version": "1.0.0",
+ "report_id": "jp-ehime-compilation",
+ "status": "draft",
+ "provenance": {
+  "annotated_on": "2026-11-20",
+  "annotator_kind": "assistant",
+  "method": "Page types from each sheet's header line (every sheet of the compilation is a log sheet, headed by the delivery file name and depth range). Sampled boreholes: values copied from the PDF text layer with bench/tools/draft_jp_denshi.py, checked by internal consistency on every sheet (elevation = ground level - depth, thickness = base - top, N column against blows and penetration) and against the page image where a check failed or a test ran across a sheet break."
+ },
+ "scope": {
+  "pages": "all",
+  "boreholes": "sample",
+  "sample_rule": "The log on every 100th page: the boreholes whose sheets include pages 1, 101, 201, ..., 1201 (13 of the 833 logs).",
+  "fields": [
+   "position",
+   "ground_elevation",
+   "final_depth",
+   "layers",
+   "spt",
+   "rqd",
+   "groundwater"
+  ]
+ },
+ "documents": [
+  {
+   "file": "Boring20160620.pdf",
+   "pages": 1201,
+   "sha256": "2067d24c3314330bc26b382dd1ae129b7828fc01c9ed23773803036286c07699"
+  }
+ ],
+ "pages": [
+  {
+   "doc": 0,
+   "page": 1,
+   "type": "borehole_log",
+   "boreholes": [
+    "A934D649"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 2,
+   "type": "borehole_log",
+   "boreholes": [
+    "A934D650"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 3,
+   "type": "borehole_log",
+   "boreholes": [
+    "A935D651"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 4,
+   "type": "borehole_log",
+   "boreholes": [
+    "A935D652"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 5,
+   "type": "borehole_log",
+   "boreholes": [
+    "A935D653"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 6,
+   "type": "borehole_log",
+   "boreholes": [
+    "A935D653"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 7,
+   "type": "borehole_log",
+   "boreholes": [
+    "A935D654"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 8,
+   "type": "borehole_log",
+   "boreholes": [
+    "A935D655"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 9,
+   "type": "borehole_log",
+   "boreholes": [
+    "A935D656"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 10,
+   "type": "borehole_log",
+   "boreholes": [
+    "A936D657"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 11,
+   "type": "borehole_log",
+   "boreholes": [
+    "A936D658"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 12,
+   "type": "borehole_log",
+   "boreholes": [
+    "A936D659"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 13,
+   "type": "borehole_log",
+   "boreholes": [
+    "A937D660"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 14,
+   "type": "borehole_log",
+   "boreholes": [
+    "A937D662"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 15,
+   "type": "borehole_log",
+   "boreholes": [
+    "A937D664"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 16,
+   "type": "borehole_log",
+   "boreholes": [
+    "A937D668"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 17,
+   "type": "borehole_log",
+   "boreholes": [
+    "A938D670"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 18,
+   "type": "borehole_log",
+   "boreholes": [
+    "A938D671"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 19,
+   "type": "borehole_log",
+   "boreholes": [
+    "A938D671"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 20,
+   "type": "borehole_log",
+   "boreholes": [
+    "A938D672"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 21,
+   "type": "borehole_log",
+   "boreholes": [
+    "A939D673"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 22,
+   "type": "borehole_log",
+   "boreholes": [
+    "A939D674"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 23,
+   "type": "borehole_log",
+   "boreholes": [
+    "A939D675"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 24,
+   "type": "borehole_log",
+   "boreholes": [
+    "A939D676"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 25,
+   "type": "borehole_log",
+   "boreholes": [
+    "A939D677"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 26,
+   "type": "borehole_log",
+   "boreholes": [
+    "A939D678"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 27,
+   "type": "borehole_log",
+   "boreholes": [
+    "A939D679"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 28,
+   "type": "borehole_log",
+   "boreholes": [
+    "A939D680"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 29,
+   "type": "borehole_log",
+   "boreholes": [
+    "A939D681"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 30,
+   "type": "borehole_log",
+   "boreholes": [
+    "A939D682"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 31,
+   "type": "borehole_log",
+   "boreholes": [
+    "A939D683"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 32,
+   "type": "borehole_log",
+   "boreholes": [
+    "A939D683"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 33,
+   "type": "borehole_log",
+   "boreholes": [
+    "A939D684"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 34,
+   "type": "borehole_log",
+   "boreholes": [
+    "A939D685"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 35,
+   "type": "borehole_log",
+   "boreholes": [
+    "A939D686"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 36,
+   "type": "borehole_log",
+   "boreholes": [
+    "A939D687"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 37,
+   "type": "borehole_log",
+   "boreholes": [
+    "A940D688"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 38,
+   "type": "borehole_log",
+   "boreholes": [
+    "A940D689"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 39,
+   "type": "borehole_log",
+   "boreholes": [
+    "A940D690"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 40,
+   "type": "borehole_log",
+   "boreholes": [
+    "A940D691"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 41,
+   "type": "borehole_log",
+   "boreholes": [
+    "A940D692"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 42,
+   "type": "borehole_log",
+   "boreholes": [
+    "A940D693"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 43,
+   "type": "borehole_log",
+   "boreholes": [
+    "A940D694"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 44,
+   "type": "borehole_log",
+   "boreholes": [
+    "A940D694"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 45,
+   "type": "borehole_log",
+   "boreholes": [
+    "A940D695"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 46,
+   "type": "borehole_log",
+   "boreholes": [
+    "A940D695"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 47,
+   "type": "borehole_log",
+   "boreholes": [
+    "A940D696"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 48,
+   "type": "borehole_log",
+   "boreholes": [
+    "A940D696"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 49,
+   "type": "borehole_log",
+   "boreholes": [
+    "A940D697"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 50,
+   "type": "borehole_log",
+   "boreholes": [
+    "A940D698"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 51,
+   "type": "borehole_log",
+   "boreholes": [
+    "A940D699"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 52,
+   "type": "borehole_log",
+   "boreholes": [
+    "A941D700"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 53,
+   "type": "borehole_log",
+   "boreholes": [
+    "A941D701"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 54,
+   "type": "borehole_log",
+   "boreholes": [
+    "A941D701"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 55,
+   "type": "borehole_log",
+   "boreholes": [
+    "A941D702"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 56,
+   "type": "borehole_log",
+   "boreholes": [
+    "A941D703"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 57,
+   "type": "borehole_log",
+   "boreholes": [
+    "A941D703"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 58,
+   "type": "borehole_log",
+   "boreholes": [
+    "A941D704"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 59,
+   "type": "borehole_log",
+   "boreholes": [
+    "A941D705"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 60,
+   "type": "borehole_log",
+   "boreholes": [
+    "A942D707"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 61,
+   "type": "borehole_log",
+   "boreholes": [
+    "A943D708"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 62,
+   "type": "borehole_log",
+   "boreholes": [
+    "A943D709"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 63,
+   "type": "borehole_log",
+   "boreholes": [
+    "A944D710"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 64,
+   "type": "borehole_log",
+   "boreholes": [
+    "A944D710"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 65,
+   "type": "borehole_log",
+   "boreholes": [
+    "A945D711"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 66,
+   "type": "borehole_log",
+   "boreholes": [
+    "A945D711"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 67,
+   "type": "borehole_log",
+   "boreholes": [
+    "A946D712"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 68,
+   "type": "borehole_log",
+   "boreholes": [
+    "A946D713"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 69,
+   "type": "borehole_log",
+   "boreholes": [
+    "A946D714"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 70,
+   "type": "borehole_log",
+   "boreholes": [
+    "A946D715"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 71,
+   "type": "borehole_log",
+   "boreholes": [
+    "A947D716"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 72,
+   "type": "borehole_log",
+   "boreholes": [
+    "A947D717"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 73,
+   "type": "borehole_log",
+   "boreholes": [
+    "A948D718"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 74,
+   "type": "borehole_log",
+   "boreholes": [
+    "A948D718"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 75,
+   "type": "borehole_log",
+   "boreholes": [
+    "A948D719"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 76,
+   "type": "borehole_log",
+   "boreholes": [
+    "A948D719"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 77,
+   "type": "borehole_log",
+   "boreholes": [
+    "A949D720"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 78,
+   "type": "borehole_log",
+   "boreholes": [
+    "A949D720"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 79,
+   "type": "borehole_log",
+   "boreholes": [
+    "A950D721"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 80,
+   "type": "borehole_log",
+   "boreholes": [
+    "A950D722"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 81,
+   "type": "borehole_log",
+   "boreholes": [
+    "A950D723"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 82,
+   "type": "borehole_log",
+   "boreholes": [
+    "A951D724"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 83,
+   "type": "borehole_log",
+   "boreholes": [
+    "A951D725"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 84,
+   "type": "borehole_log",
+   "boreholes": [
+    "A951D726"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 85,
+   "type": "borehole_log",
+   "boreholes": [
+    "A951D727"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 86,
+   "type": "borehole_log",
+   "boreholes": [
+    "A951D727"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 87,
+   "type": "borehole_log",
+   "boreholes": [
+    "A952D728"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 88,
+   "type": "borehole_log",
+   "boreholes": [
+    "A953D729"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 89,
+   "type": "borehole_log",
+   "boreholes": [
+    "A953D729"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 90,
+   "type": "borehole_log",
+   "boreholes": [
+    "A954D730"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 91,
+   "type": "borehole_log",
+   "boreholes": [
+    "A955D731"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 92,
+   "type": "borehole_log",
+   "boreholes": [
+    "A955D732"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 93,
+   "type": "borehole_log",
+   "boreholes": [
+    "A955D733"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 94,
+   "type": "borehole_log",
+   "boreholes": [
+    "A955D733"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 95,
+   "type": "borehole_log",
+   "boreholes": [
+    "A956D734"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 96,
+   "type": "borehole_log",
+   "boreholes": [
+    "A956D735"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 97,
+   "type": "borehole_log",
+   "boreholes": [
+    "A956D736"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 98,
+   "type": "borehole_log",
+   "boreholes": [
+    "A956D737"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 99,
+   "type": "borehole_log",
+   "boreholes": [
+    "A957D738"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 100,
+   "type": "borehole_log",
+   "boreholes": [
+    "A957D738"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 101,
+   "type": "borehole_log",
+   "boreholes": [
+    "A957D739"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 102,
+   "type": "borehole_log",
+   "boreholes": [
+    "A957D739"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 103,
+   "type": "borehole_log",
+   "boreholes": [
+    "A957D740"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 104,
+   "type": "borehole_log",
+   "boreholes": [
+    "A957D740"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 105,
+   "type": "borehole_log",
+   "boreholes": [
+    "A957D741"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 106,
+   "type": "borehole_log",
+   "boreholes": [
+    "A957D741"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 107,
+   "type": "borehole_log",
+   "boreholes": [
+    "A957D742"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 108,
+   "type": "borehole_log",
+   "boreholes": [
+    "A957D742"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 109,
+   "type": "borehole_log",
+   "boreholes": [
+    "A957D743"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 110,
+   "type": "borehole_log",
+   "boreholes": [
+    "A957D743"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 111,
+   "type": "borehole_log",
+   "boreholes": [
+    "A958D744"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 112,
+   "type": "borehole_log",
+   "boreholes": [
+    "A958D744"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 113,
+   "type": "borehole_log",
+   "boreholes": [
+    "A958D745"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 114,
+   "type": "borehole_log",
+   "boreholes": [
+    "A958D745"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 115,
+   "type": "borehole_log",
+   "boreholes": [
+    "A959D746"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 116,
+   "type": "borehole_log",
+   "boreholes": [
+    "A959D746"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 117,
+   "type": "borehole_log",
+   "boreholes": [
+    "A959D747"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 118,
+   "type": "borehole_log",
+   "boreholes": [
+    "A959D747"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 119,
+   "type": "borehole_log",
+   "boreholes": [
+    "A960D748"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 120,
+   "type": "borehole_log",
+   "boreholes": [
+    "A960D748"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 121,
+   "type": "borehole_log",
+   "boreholes": [
+    "A960D749"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 122,
+   "type": "borehole_log",
+   "boreholes": [
+    "A960D749"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 123,
+   "type": "borehole_log",
+   "boreholes": [
+    "A960D750"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 124,
+   "type": "borehole_log",
+   "boreholes": [
+    "A960D750"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 125,
+   "type": "borehole_log",
+   "boreholes": [
+    "A961D751"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 126,
+   "type": "borehole_log",
+   "boreholes": [
+    "A961D751"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 127,
+   "type": "borehole_log",
+   "boreholes": [
+    "A961D752"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 128,
+   "type": "borehole_log",
+   "boreholes": [
+    "A961D752"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 129,
+   "type": "borehole_log",
+   "boreholes": [
+    "A961D753"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 130,
+   "type": "borehole_log",
+   "boreholes": [
+    "A961D753"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 131,
+   "type": "borehole_log",
+   "boreholes": [
+    "A962D754"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 132,
+   "type": "borehole_log",
+   "boreholes": [
+    "A962D755"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 133,
+   "type": "borehole_log",
+   "boreholes": [
+    "A963D756"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 134,
+   "type": "borehole_log",
+   "boreholes": [
+    "A963D756"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 135,
+   "type": "borehole_log",
+   "boreholes": [
+    "A963D757"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 136,
+   "type": "borehole_log",
+   "boreholes": [
+    "A963D757"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 137,
+   "type": "borehole_log",
+   "boreholes": [
+    "A964D758"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 138,
+   "type": "borehole_log",
+   "boreholes": [
+    "A964D759"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 139,
+   "type": "borehole_log",
+   "boreholes": [
+    "A964D760"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 140,
+   "type": "borehole_log",
+   "boreholes": [
+    "A964D761"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 141,
+   "type": "borehole_log",
+   "boreholes": [
+    "A965D762"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 142,
+   "type": "borehole_log",
+   "boreholes": [
+    "A965D763"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 143,
+   "type": "borehole_log",
+   "boreholes": [
+    "A965D764"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 144,
+   "type": "borehole_log",
+   "boreholes": [
+    "A965D765"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 145,
+   "type": "borehole_log",
+   "boreholes": [
+    "A965D766"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 146,
+   "type": "borehole_log",
+   "boreholes": [
+    "A965D767"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 147,
+   "type": "borehole_log",
+   "boreholes": [
+    "A965D768"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 148,
+   "type": "borehole_log",
+   "boreholes": [
+    "A965D769"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 149,
+   "type": "borehole_log",
+   "boreholes": [
+    "A966D770"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 150,
+   "type": "borehole_log",
+   "boreholes": [
+    "A966D770"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 151,
+   "type": "borehole_log",
+   "boreholes": [
+    "A967D771"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 152,
+   "type": "borehole_log",
+   "boreholes": [
+    "A968D772"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 153,
+   "type": "borehole_log",
+   "boreholes": [
+    "A968D773"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 154,
+   "type": "borehole_log",
+   "boreholes": [
+    "A969D774"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 155,
+   "type": "borehole_log",
+   "boreholes": [
+    "A969D774"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 156,
+   "type": "borehole_log",
+   "boreholes": [
+    "A969D775"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 157,
+   "type": "borehole_log",
+   "boreholes": [
+    "A970D776"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 158,
+   "type": "borehole_log",
+   "boreholes": [
+    "A970D777"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 159,
+   "type": "borehole_log",
+   "boreholes": [
+    "A970D778"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 160,
+   "type": "borehole_log",
+   "boreholes": [
+    "A971D779"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 161,
+   "type": "borehole_log",
+   "boreholes": [
+    "A971D780"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 162,
+   "type": "borehole_log",
+   "boreholes": [
+    "A971D781"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 163,
+   "type": "borehole_log",
+   "boreholes": [
+    "A972D782"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 164,
+   "type": "borehole_log",
+   "boreholes": [
+    "A972D782"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 165,
+   "type": "borehole_log",
+   "boreholes": [
+    "A973D783"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 166,
+   "type": "borehole_log",
+   "boreholes": [
+    "A973D784"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 167,
+   "type": "borehole_log",
+   "boreholes": [
+    "A974D785"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 168,
+   "type": "borehole_log",
+   "boreholes": [
+    "A974D785"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 169,
+   "type": "borehole_log",
+   "boreholes": [
+    "A975D788"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 170,
+   "type": "borehole_log",
+   "boreholes": [
+    "A975D788"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 171,
+   "type": "borehole_log",
+   "boreholes": [
+    "A976D789"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 172,
+   "type": "borehole_log",
+   "boreholes": [
+    "A976D790"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 173,
+   "type": "borehole_log",
+   "boreholes": [
+    "A977D791"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 174,
+   "type": "borehole_log",
+   "boreholes": [
+    "A977D791"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 175,
+   "type": "borehole_log",
+   "boreholes": [
+    "A978D793"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 176,
+   "type": "borehole_log",
+   "boreholes": [
+    "A978D793"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 177,
+   "type": "borehole_log",
+   "boreholes": [
+    "A979D794"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 178,
+   "type": "borehole_log",
+   "boreholes": [
+    "A979D795"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 179,
+   "type": "borehole_log",
+   "boreholes": [
+    "A979D795"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 180,
+   "type": "borehole_log",
+   "boreholes": [
+    "A979D796"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 181,
+   "type": "borehole_log",
+   "boreholes": [
+    "A979D797"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 182,
+   "type": "borehole_log",
+   "boreholes": [
+    "A979D798"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 183,
+   "type": "borehole_log",
+   "boreholes": [
+    "A979D799"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 184,
+   "type": "borehole_log",
+   "boreholes": [
+    "A980D800"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 185,
+   "type": "borehole_log",
+   "boreholes": [
+    "A980D801"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 186,
+   "type": "borehole_log",
+   "boreholes": [
+    "A980D802"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 187,
+   "type": "borehole_log",
+   "boreholes": [
+    "A980D803"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 188,
+   "type": "borehole_log",
+   "boreholes": [
+    "A980D804"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 189,
+   "type": "borehole_log",
+   "boreholes": [
+    "A981D805"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 190,
+   "type": "borehole_log",
+   "boreholes": [
+    "A981D806"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 191,
+   "type": "borehole_log",
+   "boreholes": [
+    "A981D806"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 192,
+   "type": "borehole_log",
+   "boreholes": [
+    "A981D807"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 193,
+   "type": "borehole_log",
+   "boreholes": [
+    "A982D808"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 194,
+   "type": "borehole_log",
+   "boreholes": [
+    "A982D808"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 195,
+   "type": "borehole_log",
+   "boreholes": [
+    "A982D809"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 196,
+   "type": "borehole_log",
+   "boreholes": [
+    "A982D809"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 197,
+   "type": "borehole_log",
+   "boreholes": [
+    "A982D810"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 198,
+   "type": "borehole_log",
+   "boreholes": [
+    "A982D810"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 199,
+   "type": "borehole_log",
+   "boreholes": [
+    "A982D811"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 200,
+   "type": "borehole_log",
+   "boreholes": [
+    "A982D811"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 201,
+   "type": "borehole_log",
+   "boreholes": [
+    "A982D812"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 202,
+   "type": "borehole_log",
+   "boreholes": [
+    "A983D813"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 203,
+   "type": "borehole_log",
+   "boreholes": [
+    "A983D813"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 204,
+   "type": "borehole_log",
+   "boreholes": [
+    "A983D815"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 205,
+   "type": "borehole_log",
+   "boreholes": [
+    "A983D815"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 206,
+   "type": "borehole_log",
+   "boreholes": [
+    "A983D817"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 207,
+   "type": "borehole_log",
+   "boreholes": [
+    "A983D817"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 208,
+   "type": "borehole_log",
+   "boreholes": [
+    "A984D818"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 209,
+   "type": "borehole_log",
+   "boreholes": [
+    "A984D818"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 210,
+   "type": "borehole_log",
+   "boreholes": [
+    "A984D819"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 211,
+   "type": "borehole_log",
+   "boreholes": [
+    "A984D819"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 212,
+   "type": "borehole_log",
+   "boreholes": [
+    "A984D820"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 213,
+   "type": "borehole_log",
+   "boreholes": [
+    "A984D820"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 214,
+   "type": "borehole_log",
+   "boreholes": [
+    "A984D821"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 215,
+   "type": "borehole_log",
+   "boreholes": [
+    "A984D821"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 216,
+   "type": "borehole_log",
+   "boreholes": [
+    "A985D822"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 217,
+   "type": "borehole_log",
+   "boreholes": [
+    "A985D823"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 218,
+   "type": "borehole_log",
+   "boreholes": [
+    "A986D824"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 219,
+   "type": "borehole_log",
+   "boreholes": [
+    "A986D824"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 220,
+   "type": "borehole_log",
+   "boreholes": [
+    "A987D825"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 221,
+   "type": "borehole_log",
+   "boreholes": [
+    "A988D827"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 222,
+   "type": "borehole_log",
+   "boreholes": [
+    "A988D828"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 223,
+   "type": "borehole_log",
+   "boreholes": [
+    "A988D829"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 224,
+   "type": "borehole_log",
+   "boreholes": [
+    "A988D830"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 225,
+   "type": "borehole_log",
+   "boreholes": [
+    "A988D831"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 226,
+   "type": "borehole_log",
+   "boreholes": [
+    "A988D832"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 227,
+   "type": "borehole_log",
+   "boreholes": [
+    "A988D832"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 228,
+   "type": "borehole_log",
+   "boreholes": [
+    "A988D833"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 229,
+   "type": "borehole_log",
+   "boreholes": [
+    "A988D833"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 230,
+   "type": "borehole_log",
+   "boreholes": [
+    "A989D834"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 231,
+   "type": "borehole_log",
+   "boreholes": [
+    "A989D835"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 232,
+   "type": "borehole_log",
+   "boreholes": [
+    "A990D836"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 233,
+   "type": "borehole_log",
+   "boreholes": [
+    "A990D836"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 234,
+   "type": "borehole_log",
+   "boreholes": [
+    "A990D837"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 235,
+   "type": "borehole_log",
+   "boreholes": [
+    "A990D837"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 236,
+   "type": "borehole_log",
+   "boreholes": [
+    "A990D838"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 237,
+   "type": "borehole_log",
+   "boreholes": [
+    "A990D838"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 238,
+   "type": "borehole_log",
+   "boreholes": [
+    "A990D839"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 239,
+   "type": "borehole_log",
+   "boreholes": [
+    "A990D839"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 240,
+   "type": "borehole_log",
+   "boreholes": [
+    "A990D840"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 241,
+   "type": "borehole_log",
+   "boreholes": [
+    "A990D840"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 242,
+   "type": "borehole_log",
+   "boreholes": [
+    "A990D841"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 243,
+   "type": "borehole_log",
+   "boreholes": [
+    "A990D841"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 244,
+   "type": "borehole_log",
+   "boreholes": [
+    "A990D842"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 245,
+   "type": "borehole_log",
+   "boreholes": [
+    "A990D842"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 246,
+   "type": "borehole_log",
+   "boreholes": [
+    "A990D843"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 247,
+   "type": "borehole_log",
+   "boreholes": [
+    "A990D844"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 248,
+   "type": "borehole_log",
+   "boreholes": [
+    "A990D845"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 249,
+   "type": "borehole_log",
+   "boreholes": [
+    "A990D846"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 250,
+   "type": "borehole_log",
+   "boreholes": [
+    "A991D847"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 251,
+   "type": "borehole_log",
+   "boreholes": [
+    "A991D848"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 252,
+   "type": "borehole_log",
+   "boreholes": [
+    "A991D849"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 253,
+   "type": "borehole_log",
+   "boreholes": [
+    "A991D849"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 254,
+   "type": "borehole_log",
+   "boreholes": [
+    "A991D850"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 255,
+   "type": "borehole_log",
+   "boreholes": [
+    "A991D851"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 256,
+   "type": "borehole_log",
+   "boreholes": [
+    "A991D852"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 257,
+   "type": "borehole_log",
+   "boreholes": [
+    "A991D853"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 258,
+   "type": "borehole_log",
+   "boreholes": [
+    "A991D854"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 259,
+   "type": "borehole_log",
+   "boreholes": [
+    "A991D854"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 260,
+   "type": "borehole_log",
+   "boreholes": [
+    "A992D855"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 261,
+   "type": "borehole_log",
+   "boreholes": [
+    "A992D855"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 262,
+   "type": "borehole_log",
+   "boreholes": [
+    "A993D856"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 263,
+   "type": "borehole_log",
+   "boreholes": [
+    "A994D857"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 264,
+   "type": "borehole_log",
+   "boreholes": [
+    "A994D857"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 265,
+   "type": "borehole_log",
+   "boreholes": [
+    "A994D858"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 266,
+   "type": "borehole_log",
+   "boreholes": [
+    "A994D858"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 267,
+   "type": "borehole_log",
+   "boreholes": [
+    "A995D859"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 268,
+   "type": "borehole_log",
+   "boreholes": [
+    "A995D859"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 269,
+   "type": "borehole_log",
+   "boreholes": [
+    "A995D860"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 270,
+   "type": "borehole_log",
+   "boreholes": [
+    "A995D860"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 271,
+   "type": "borehole_log",
+   "boreholes": [
+    "A996D861"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 272,
+   "type": "borehole_log",
+   "boreholes": [
+    "A996D861"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 273,
+   "type": "borehole_log",
+   "boreholes": [
+    "A997D862"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 274,
+   "type": "borehole_log",
+   "boreholes": [
+    "A998D863"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 275,
+   "type": "borehole_log",
+   "boreholes": [
+    "A998D863"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 276,
+   "type": "borehole_log",
+   "boreholes": [
+    "A998D864"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 277,
+   "type": "borehole_log",
+   "boreholes": [
+    "A998D864"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 278,
+   "type": "borehole_log",
+   "boreholes": [
+    "A998D865"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 279,
+   "type": "borehole_log",
+   "boreholes": [
+    "A998D866"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 280,
+   "type": "borehole_log",
+   "boreholes": [
+    "A998D867"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 281,
+   "type": "borehole_log",
+   "boreholes": [
+    "A998D868"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 282,
+   "type": "borehole_log",
+   "boreholes": [
+    "A998D869"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 283,
+   "type": "borehole_log",
+   "boreholes": [
+    "A999D870"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 284,
+   "type": "borehole_log",
+   "boreholes": [
+    "A999D871"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 285,
+   "type": "borehole_log",
+   "boreholes": [
+    "B000D872"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 286,
+   "type": "borehole_log",
+   "boreholes": [
+    "B000D872"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 287,
+   "type": "borehole_log",
+   "boreholes": [
+    "B000D873"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 288,
+   "type": "borehole_log",
+   "boreholes": [
+    "B000D873"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 289,
+   "type": "borehole_log",
+   "boreholes": [
+    "B001D874"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 290,
+   "type": "borehole_log",
+   "boreholes": [
+    "B001D875"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 291,
+   "type": "borehole_log",
+   "boreholes": [
+    "B001D876"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 292,
+   "type": "borehole_log",
+   "boreholes": [
+    "B002D877"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 293,
+   "type": "borehole_log",
+   "boreholes": [
+    "B002D877"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 294,
+   "type": "borehole_log",
+   "boreholes": [
+    "B003D878"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 295,
+   "type": "borehole_log",
+   "boreholes": [
+    "B003D878"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 296,
+   "type": "borehole_log",
+   "boreholes": [
+    "B003D879"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 297,
+   "type": "borehole_log",
+   "boreholes": [
+    "B003D879"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 298,
+   "type": "borehole_log",
+   "boreholes": [
+    "B003D880"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 299,
+   "type": "borehole_log",
+   "boreholes": [
+    "B003D880"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 300,
+   "type": "borehole_log",
+   "boreholes": [
+    "B003D881"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 301,
+   "type": "borehole_log",
+   "boreholes": [
+    "B003D881"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 302,
+   "type": "borehole_log",
+   "boreholes": [
+    "B004D882"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 303,
+   "type": "borehole_log",
+   "boreholes": [
+    "B004D882"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 304,
+   "type": "borehole_log",
+   "boreholes": [
+    "B004D883"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 305,
+   "type": "borehole_log",
+   "boreholes": [
+    "B004D883"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 306,
+   "type": "borehole_log",
+   "boreholes": [
+    "B005D884"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 307,
+   "type": "borehole_log",
+   "boreholes": [
+    "B005D884"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 308,
+   "type": "borehole_log",
+   "boreholes": [
+    "B005D885"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 309,
+   "type": "borehole_log",
+   "boreholes": [
+    "B005D885"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 310,
+   "type": "borehole_log",
+   "boreholes": [
+    "B006D886"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 311,
+   "type": "borehole_log",
+   "boreholes": [
+    "B006D886"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 312,
+   "type": "borehole_log",
+   "boreholes": [
+    "B007D887"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 313,
+   "type": "borehole_log",
+   "boreholes": [
+    "B007D887"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 314,
+   "type": "borehole_log",
+   "boreholes": [
+    "B007D888"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 315,
+   "type": "borehole_log",
+   "boreholes": [
+    "B007D888"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 316,
+   "type": "borehole_log",
+   "boreholes": [
+    "B007D889"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 317,
+   "type": "borehole_log",
+   "boreholes": [
+    "B007D889"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 318,
+   "type": "borehole_log",
+   "boreholes": [
+    "B008D890"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 319,
+   "type": "borehole_log",
+   "boreholes": [
+    "B009D891"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 320,
+   "type": "borehole_log",
+   "boreholes": [
+    "B009D891"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 321,
+   "type": "borehole_log",
+   "boreholes": [
+    "B010D892"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 322,
+   "type": "borehole_log",
+   "boreholes": [
+    "B010D893"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 323,
+   "type": "borehole_log",
+   "boreholes": [
+    "B011D894"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 324,
+   "type": "borehole_log",
+   "boreholes": [
+    "B011D895"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 325,
+   "type": "borehole_log",
+   "boreholes": [
+    "B011D896"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 326,
+   "type": "borehole_log",
+   "boreholes": [
+    "B011D897"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 327,
+   "type": "borehole_log",
+   "boreholes": [
+    "B011D898"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 328,
+   "type": "borehole_log",
+   "boreholes": [
+    "B011D899"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 329,
+   "type": "borehole_log",
+   "boreholes": [
+    "B012D900"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 330,
+   "type": "borehole_log",
+   "boreholes": [
+    "B012D901"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 331,
+   "type": "borehole_log",
+   "boreholes": [
+    "B013D902"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 332,
+   "type": "borehole_log",
+   "boreholes": [
+    "B014D903"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 333,
+   "type": "borehole_log",
+   "boreholes": [
+    "B015D904"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 334,
+   "type": "borehole_log",
+   "boreholes": [
+    "B015D905"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 335,
+   "type": "borehole_log",
+   "boreholes": [
+    "B015D906"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 336,
+   "type": "borehole_log",
+   "boreholes": [
+    "B016D907"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 337,
+   "type": "borehole_log",
+   "boreholes": [
+    "B016D908"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 338,
+   "type": "borehole_log",
+   "boreholes": [
+    "B017D909"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 339,
+   "type": "borehole_log",
+   "boreholes": [
+    "B017D909"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 340,
+   "type": "borehole_log",
+   "boreholes": [
+    "B018D910"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 341,
+   "type": "borehole_log",
+   "boreholes": [
+    "B019D911"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 342,
+   "type": "borehole_log",
+   "boreholes": [
+    "B019D911"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 343,
+   "type": "borehole_log",
+   "boreholes": [
+    "B019D912"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 344,
+   "type": "borehole_log",
+   "boreholes": [
+    "B019D912"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 345,
+   "type": "borehole_log",
+   "boreholes": [
+    "B020D913"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 346,
+   "type": "borehole_log",
+   "boreholes": [
+    "B020D913"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 347,
+   "type": "borehole_log",
+   "boreholes": [
+    "B020D914"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 348,
+   "type": "borehole_log",
+   "boreholes": [
+    "B020D914"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 349,
+   "type": "borehole_log",
+   "boreholes": [
+    "B020D915"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 350,
+   "type": "borehole_log",
+   "boreholes": [
+    "B020D915"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 351,
+   "type": "borehole_log",
+   "boreholes": [
+    "B021D916"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 352,
+   "type": "borehole_log",
+   "boreholes": [
+    "B021D917"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 353,
+   "type": "borehole_log",
+   "boreholes": [
+    "B021D918"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 354,
+   "type": "borehole_log",
+   "boreholes": [
+    "B021D919"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 355,
+   "type": "borehole_log",
+   "boreholes": [
+    "B021D920"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 356,
+   "type": "borehole_log",
+   "boreholes": [
+    "B021D921"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 357,
+   "type": "borehole_log",
+   "boreholes": [
+    "B021D921"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 358,
+   "type": "borehole_log",
+   "boreholes": [
+    "B021D922"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 359,
+   "type": "borehole_log",
+   "boreholes": [
+    "B021D923"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 360,
+   "type": "borehole_log",
+   "boreholes": [
+    "B021D924"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 361,
+   "type": "borehole_log",
+   "boreholes": [
+    "B021D924"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 362,
+   "type": "borehole_log",
+   "boreholes": [
+    "B022D925"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 363,
+   "type": "borehole_log",
+   "boreholes": [
+    "B022D926"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 364,
+   "type": "borehole_log",
+   "boreholes": [
+    "B022D927"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 365,
+   "type": "borehole_log",
+   "boreholes": [
+    "B022D928"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 366,
+   "type": "borehole_log",
+   "boreholes": [
+    "B022D929"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 367,
+   "type": "borehole_log",
+   "boreholes": [
+    "B023D930"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 368,
+   "type": "borehole_log",
+   "boreholes": [
+    "B023D930"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 369,
+   "type": "borehole_log",
+   "boreholes": [
+    "B023D931"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 370,
+   "type": "borehole_log",
+   "boreholes": [
+    "B024D932"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 371,
+   "type": "borehole_log",
+   "boreholes": [
+    "B025D933"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 372,
+   "type": "borehole_log",
+   "boreholes": [
+    "B025D933"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 373,
+   "type": "borehole_log",
+   "boreholes": [
+    "B025D934"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 374,
+   "type": "borehole_log",
+   "boreholes": [
+    "B025D934"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 375,
+   "type": "borehole_log",
+   "boreholes": [
+    "B025D935"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 376,
+   "type": "borehole_log",
+   "boreholes": [
+    "B025D935"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 377,
+   "type": "borehole_log",
+   "boreholes": [
+    "B025D936"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 378,
+   "type": "borehole_log",
+   "boreholes": [
+    "B025D936"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 379,
+   "type": "borehole_log",
+   "boreholes": [
+    "B025D937"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 380,
+   "type": "borehole_log",
+   "boreholes": [
+    "B025D937"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 381,
+   "type": "borehole_log",
+   "boreholes": [
+    "B026D938"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 382,
+   "type": "borehole_log",
+   "boreholes": [
+    "B026D938"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 383,
+   "type": "borehole_log",
+   "boreholes": [
+    "B026D939"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 384,
+   "type": "borehole_log",
+   "boreholes": [
+    "B026D939"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 385,
+   "type": "borehole_log",
+   "boreholes": [
+    "B026D940"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 386,
+   "type": "borehole_log",
+   "boreholes": [
+    "B026D940"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 387,
+   "type": "borehole_log",
+   "boreholes": [
+    "B027D941"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 388,
+   "type": "borehole_log",
+   "boreholes": [
+    "B027D941"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 389,
+   "type": "borehole_log",
+   "boreholes": [
+    "B027D941"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 390,
+   "type": "borehole_log",
+   "boreholes": [
+    "B027D942"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 391,
+   "type": "borehole_log",
+   "boreholes": [
+    "B027D942"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 392,
+   "type": "borehole_log",
+   "boreholes": [
+    "B027D942"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 393,
+   "type": "borehole_log",
+   "boreholes": [
+    "B028D943"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 394,
+   "type": "borehole_log",
+   "boreholes": [
+    "B028D944"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 395,
+   "type": "borehole_log",
+   "boreholes": [
+    "B028D945"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 396,
+   "type": "borehole_log",
+   "boreholes": [
+    "B029D946"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 397,
+   "type": "borehole_log",
+   "boreholes": [
+    "B029D946"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 398,
+   "type": "borehole_log",
+   "boreholes": [
+    "B029D947"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 399,
+   "type": "borehole_log",
+   "boreholes": [
+    "B029D948"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 400,
+   "type": "borehole_log",
+   "boreholes": [
+    "B030D949"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 401,
+   "type": "borehole_log",
+   "boreholes": [
+    "B030D950"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 402,
+   "type": "borehole_log",
+   "boreholes": [
+    "B030D951"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 403,
+   "type": "borehole_log",
+   "boreholes": [
+    "B030D952"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 404,
+   "type": "borehole_log",
+   "boreholes": [
+    "B031D953"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 405,
+   "type": "borehole_log",
+   "boreholes": [
+    "B031D954"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 406,
+   "type": "borehole_log",
+   "boreholes": [
+    "B031D954"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 407,
+   "type": "borehole_log",
+   "boreholes": [
+    "B031D955"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 408,
+   "type": "borehole_log",
+   "boreholes": [
+    "B031D956"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 409,
+   "type": "borehole_log",
+   "boreholes": [
+    "B031D957"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 410,
+   "type": "borehole_log",
+   "boreholes": [
+    "B031D958"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 411,
+   "type": "borehole_log",
+   "boreholes": [
+    "B031D958"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 412,
+   "type": "borehole_log",
+   "boreholes": [
+    "B032D959"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 413,
+   "type": "borehole_log",
+   "boreholes": [
+    "B032D960"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 414,
+   "type": "borehole_log",
+   "boreholes": [
+    "B032D961"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 415,
+   "type": "borehole_log",
+   "boreholes": [
+    "B032D962"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 416,
+   "type": "borehole_log",
+   "boreholes": [
+    "B032D963"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 417,
+   "type": "borehole_log",
+   "boreholes": [
+    "B032D964"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 418,
+   "type": "borehole_log",
+   "boreholes": [
+    "B032D965"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 419,
+   "type": "borehole_log",
+   "boreholes": [
+    "B032D966"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 420,
+   "type": "borehole_log",
+   "boreholes": [
+    "B032D967"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 421,
+   "type": "borehole_log",
+   "boreholes": [
+    "B032D968"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 422,
+   "type": "borehole_log",
+   "boreholes": [
+    "B032D969"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 423,
+   "type": "borehole_log",
+   "boreholes": [
+    "B032D970"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 424,
+   "type": "borehole_log",
+   "boreholes": [
+    "B033D971"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 425,
+   "type": "borehole_log",
+   "boreholes": [
+    "B033D972"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 426,
+   "type": "borehole_log",
+   "boreholes": [
+    "B033D972"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 427,
+   "type": "borehole_log",
+   "boreholes": [
+    "B033D973"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 428,
+   "type": "borehole_log",
+   "boreholes": [
+    "B033D974"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 429,
+   "type": "borehole_log",
+   "boreholes": [
+    "B033D974"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 430,
+   "type": "borehole_log",
+   "boreholes": [
+    "B033D975"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 431,
+   "type": "borehole_log",
+   "boreholes": [
+    "B033D976"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 432,
+   "type": "borehole_log",
+   "boreholes": [
+    "B033D977"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 433,
+   "type": "borehole_log",
+   "boreholes": [
+    "B033D978"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 434,
+   "type": "borehole_log",
+   "boreholes": [
+    "B033D979"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 435,
+   "type": "borehole_log",
+   "boreholes": [
+    "B033D979"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 436,
+   "type": "borehole_log",
+   "boreholes": [
+    "B033D980"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 437,
+   "type": "borehole_log",
+   "boreholes": [
+    "B033D981"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 438,
+   "type": "borehole_log",
+   "boreholes": [
+    "B033D982"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 439,
+   "type": "borehole_log",
+   "boreholes": [
+    "B034D983"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 440,
+   "type": "borehole_log",
+   "boreholes": [
+    "B034D984"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 441,
+   "type": "borehole_log",
+   "boreholes": [
+    "B034D985"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 442,
+   "type": "borehole_log",
+   "boreholes": [
+    "B034D986"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 443,
+   "type": "borehole_log",
+   "boreholes": [
+    "B034D987"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 444,
+   "type": "borehole_log",
+   "boreholes": [
+    "B034D988"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 445,
+   "type": "borehole_log",
+   "boreholes": [
+    "B034D989"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 446,
+   "type": "borehole_log",
+   "boreholes": [
+    "B034D990"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 447,
+   "type": "borehole_log",
+   "boreholes": [
+    "B034D991"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 448,
+   "type": "borehole_log",
+   "boreholes": [
+    "B034D992"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 449,
+   "type": "borehole_log",
+   "boreholes": [
+    "B034D993"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 450,
+   "type": "borehole_log",
+   "boreholes": [
+    "B034D994"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 451,
+   "type": "borehole_log",
+   "boreholes": [
+    "B034D995"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 452,
+   "type": "borehole_log",
+   "boreholes": [
+    "B034D996"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 453,
+   "type": "borehole_log",
+   "boreholes": [
+    "B034D996"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 454,
+   "type": "borehole_log",
+   "boreholes": [
+    "B034D997"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 455,
+   "type": "borehole_log",
+   "boreholes": [
+    "B034D998"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 456,
+   "type": "borehole_log",
+   "boreholes": [
+    "B034D999"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 457,
+   "type": "borehole_log",
+   "boreholes": [
+    "B034E000"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 458,
+   "type": "borehole_log",
+   "boreholes": [
+    "B034E001"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 459,
+   "type": "borehole_log",
+   "boreholes": [
+    "B034E005"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 460,
+   "type": "borehole_log",
+   "boreholes": [
+    "B035E006"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 461,
+   "type": "borehole_log",
+   "boreholes": [
+    "B035E007"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 462,
+   "type": "borehole_log",
+   "boreholes": [
+    "B035E008"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 463,
+   "type": "borehole_log",
+   "boreholes": [
+    "B035E009"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 464,
+   "type": "borehole_log",
+   "boreholes": [
+    "B035E010"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 465,
+   "type": "borehole_log",
+   "boreholes": [
+    "B035E011"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 466,
+   "type": "borehole_log",
+   "boreholes": [
+    "B035E011"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 467,
+   "type": "borehole_log",
+   "boreholes": [
+    "B035E012"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 468,
+   "type": "borehole_log",
+   "boreholes": [
+    "B035E012"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 469,
+   "type": "borehole_log",
+   "boreholes": [
+    "B035E013"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 470,
+   "type": "borehole_log",
+   "boreholes": [
+    "B035E013"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 471,
+   "type": "borehole_log",
+   "boreholes": [
+    "B035E014"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 472,
+   "type": "borehole_log",
+   "boreholes": [
+    "B035E015"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 473,
+   "type": "borehole_log",
+   "boreholes": [
+    "B036E016"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 474,
+   "type": "borehole_log",
+   "boreholes": [
+    "B036E016"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 475,
+   "type": "borehole_log",
+   "boreholes": [
+    "B036E016"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 476,
+   "type": "borehole_log",
+   "boreholes": [
+    "B036E017"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 477,
+   "type": "borehole_log",
+   "boreholes": [
+    "B036E017"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 478,
+   "type": "borehole_log",
+   "boreholes": [
+    "B036E018"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 479,
+   "type": "borehole_log",
+   "boreholes": [
+    "B036E018"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 480,
+   "type": "borehole_log",
+   "boreholes": [
+    "B036E019"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 481,
+   "type": "borehole_log",
+   "boreholes": [
+    "B037E020"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 482,
+   "type": "borehole_log",
+   "boreholes": [
+    "B037E020"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 483,
+   "type": "borehole_log",
+   "boreholes": [
+    "B037E021"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 484,
+   "type": "borehole_log",
+   "boreholes": [
+    "B037E022"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 485,
+   "type": "borehole_log",
+   "boreholes": [
+    "B037E023"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 486,
+   "type": "borehole_log",
+   "boreholes": [
+    "B037E024"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 487,
+   "type": "borehole_log",
+   "boreholes": [
+    "B037E025"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 488,
+   "type": "borehole_log",
+   "boreholes": [
+    "B037E026"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 489,
+   "type": "borehole_log",
+   "boreholes": [
+    "B037E027"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 490,
+   "type": "borehole_log",
+   "boreholes": [
+    "B037E028"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 491,
+   "type": "borehole_log",
+   "boreholes": [
+    "B037E029"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 492,
+   "type": "borehole_log",
+   "boreholes": [
+    "B037E029"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 493,
+   "type": "borehole_log",
+   "boreholes": [
+    "B037E030"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 494,
+   "type": "borehole_log",
+   "boreholes": [
+    "B037E030"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 495,
+   "type": "borehole_log",
+   "boreholes": [
+    "B037E031"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 496,
+   "type": "borehole_log",
+   "boreholes": [
+    "B037E031"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 497,
+   "type": "borehole_log",
+   "boreholes": [
+    "B037E032"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 498,
+   "type": "borehole_log",
+   "boreholes": [
+    "B037E032"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 499,
+   "type": "borehole_log",
+   "boreholes": [
+    "B037E033"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 500,
+   "type": "borehole_log",
+   "boreholes": [
+    "B037E033"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 501,
+   "type": "borehole_log",
+   "boreholes": [
+    "B037E034"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 502,
+   "type": "borehole_log",
+   "boreholes": [
+    "B037E034"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 503,
+   "type": "borehole_log",
+   "boreholes": [
+    "B053E181"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 504,
+   "type": "borehole_log",
+   "boreholes": [
+    "B054E187"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 505,
+   "type": "borehole_log",
+   "boreholes": [
+    "B054E188"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 506,
+   "type": "borehole_log",
+   "boreholes": [
+    "B054E189"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 507,
+   "type": "borehole_log",
+   "boreholes": [
+    "B054E190"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 508,
+   "type": "borehole_log",
+   "boreholes": [
+    "B054E191"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 509,
+   "type": "borehole_log",
+   "boreholes": [
+    "B054E192"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 510,
+   "type": "borehole_log",
+   "boreholes": [
+    "B055E194"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 511,
+   "type": "borehole_log",
+   "boreholes": [
+    "B055E195"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 512,
+   "type": "borehole_log",
+   "boreholes": [
+    "B055E196"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 513,
+   "type": "borehole_log",
+   "boreholes": [
+    "B055E197"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 514,
+   "type": "borehole_log",
+   "boreholes": [
+    "B055E198"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 515,
+   "type": "borehole_log",
+   "boreholes": [
+    "B055E199"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 516,
+   "type": "borehole_log",
+   "boreholes": [
+    "B056E201"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 517,
+   "type": "borehole_log",
+   "boreholes": [
+    "B056E202"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 518,
+   "type": "borehole_log",
+   "boreholes": [
+    "B056E204"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 519,
+   "type": "borehole_log",
+   "boreholes": [
+    "B056E208"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 520,
+   "type": "borehole_log",
+   "boreholes": [
+    "B057E209"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 521,
+   "type": "borehole_log",
+   "boreholes": [
+    "B057E209"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 522,
+   "type": "borehole_log",
+   "boreholes": [
+    "B057E210"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 523,
+   "type": "borehole_log",
+   "boreholes": [
+    "B057E210"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 524,
+   "type": "borehole_log",
+   "boreholes": [
+    "B058E213"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 525,
+   "type": "borehole_log",
+   "boreholes": [
+    "B058E213"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 526,
+   "type": "borehole_log",
+   "boreholes": [
+    "B059E219"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 527,
+   "type": "borehole_log",
+   "boreholes": [
+    "B059E220"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 528,
+   "type": "borehole_log",
+   "boreholes": [
+    "B059E221"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 529,
+   "type": "borehole_log",
+   "boreholes": [
+    "B059E222"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 530,
+   "type": "borehole_log",
+   "boreholes": [
+    "B059E222"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 531,
+   "type": "borehole_log",
+   "boreholes": [
+    "B059E223"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 532,
+   "type": "borehole_log",
+   "boreholes": [
+    "B059E224"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 533,
+   "type": "borehole_log",
+   "boreholes": [
+    "B059E225"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 534,
+   "type": "borehole_log",
+   "boreholes": [
+    "B059E226"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 535,
+   "type": "borehole_log",
+   "boreholes": [
+    "B059E227"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 536,
+   "type": "borehole_log",
+   "boreholes": [
+    "B059E228"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 537,
+   "type": "borehole_log",
+   "boreholes": [
+    "B060E230"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 538,
+   "type": "borehole_log",
+   "boreholes": [
+    "B060E232"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 539,
+   "type": "borehole_log",
+   "boreholes": [
+    "B060E234"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 540,
+   "type": "borehole_log",
+   "boreholes": [
+    "B060E236"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 541,
+   "type": "borehole_log",
+   "boreholes": [
+    "B060E238"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 542,
+   "type": "borehole_log",
+   "boreholes": [
+    "B061E239"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 543,
+   "type": "borehole_log",
+   "boreholes": [
+    "B061E239"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 544,
+   "type": "borehole_log",
+   "boreholes": [
+    "B062E241"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 545,
+   "type": "borehole_log",
+   "boreholes": [
+    "B062E242"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 546,
+   "type": "borehole_log",
+   "boreholes": [
+    "B062E244"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 547,
+   "type": "borehole_log",
+   "boreholes": [
+    "B062E245"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 548,
+   "type": "borehole_log",
+   "boreholes": [
+    "B064E249"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 549,
+   "type": "borehole_log",
+   "boreholes": [
+    "B064E249"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 550,
+   "type": "borehole_log",
+   "boreholes": [
+    "B065E250"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 551,
+   "type": "borehole_log",
+   "boreholes": [
+    "B065E250"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 552,
+   "type": "borehole_log",
+   "boreholes": [
+    "B065E252"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 553,
+   "type": "borehole_log",
+   "boreholes": [
+    "B065E252"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 554,
+   "type": "borehole_log",
+   "boreholes": [
+    "B065E254"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 555,
+   "type": "borehole_log",
+   "boreholes": [
+    "B065E254"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 556,
+   "type": "borehole_log",
+   "boreholes": [
+    "B066E260"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 557,
+   "type": "borehole_log",
+   "boreholes": [
+    "B066E261"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 558,
+   "type": "borehole_log",
+   "boreholes": [
+    "B066E261"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 559,
+   "type": "borehole_log",
+   "boreholes": [
+    "B066E265"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 560,
+   "type": "borehole_log",
+   "boreholes": [
+    "B066E266"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 561,
+   "type": "borehole_log",
+   "boreholes": [
+    "B067E268"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 562,
+   "type": "borehole_log",
+   "boreholes": [
+    "B067E269"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 563,
+   "type": "borehole_log",
+   "boreholes": [
+    "B067E270"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 564,
+   "type": "borehole_log",
+   "boreholes": [
+    "B067E271"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 565,
+   "type": "borehole_log",
+   "boreholes": [
+    "B067E272"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 566,
+   "type": "borehole_log",
+   "boreholes": [
+    "B067E273"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 567,
+   "type": "borehole_log",
+   "boreholes": [
+    "B067E274"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 568,
+   "type": "borehole_log",
+   "boreholes": [
+    "B067E275"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 569,
+   "type": "borehole_log",
+   "boreholes": [
+    "B067E277"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 570,
+   "type": "borehole_log",
+   "boreholes": [
+    "B067E278"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 571,
+   "type": "borehole_log",
+   "boreholes": [
+    "B067E279"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 572,
+   "type": "borehole_log",
+   "boreholes": [
+    "B067E280"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 573,
+   "type": "borehole_log",
+   "boreholes": [
+    "B068E281"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 574,
+   "type": "borehole_log",
+   "boreholes": [
+    "B068E282"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 575,
+   "type": "borehole_log",
+   "boreholes": [
+    "B069E285"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 576,
+   "type": "borehole_log",
+   "boreholes": [
+    "B069E286"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 577,
+   "type": "borehole_log",
+   "boreholes": [
+    "B069E287"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 578,
+   "type": "borehole_log",
+   "boreholes": [
+    "B069E288"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 579,
+   "type": "borehole_log",
+   "boreholes": [
+    "B069E289"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 580,
+   "type": "borehole_log",
+   "boreholes": [
+    "B069E290"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 581,
+   "type": "borehole_log",
+   "boreholes": [
+    "B069E291"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 582,
+   "type": "borehole_log",
+   "boreholes": [
+    "B069E292"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 583,
+   "type": "borehole_log",
+   "boreholes": [
+    "B069E293"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 584,
+   "type": "borehole_log",
+   "boreholes": [
+    "B071E297"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 585,
+   "type": "borehole_log",
+   "boreholes": [
+    "B072E301"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 586,
+   "type": "borehole_log",
+   "boreholes": [
+    "B072E302"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 587,
+   "type": "borehole_log",
+   "boreholes": [
+    "B073E304"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 588,
+   "type": "borehole_log",
+   "boreholes": [
+    "B073E306"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 589,
+   "type": "borehole_log",
+   "boreholes": [
+    "B075E309"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 590,
+   "type": "borehole_log",
+   "boreholes": [
+    "B075E309"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 591,
+   "type": "borehole_log",
+   "boreholes": [
+    "B075E310"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 592,
+   "type": "borehole_log",
+   "boreholes": [
+    "B075E313"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 593,
+   "type": "borehole_log",
+   "boreholes": [
+    "B075E313"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 594,
+   "type": "borehole_log",
+   "boreholes": [
+    "B076E317"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 595,
+   "type": "borehole_log",
+   "boreholes": [
+    "B076E317"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 596,
+   "type": "borehole_log",
+   "boreholes": [
+    "B077E319"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 597,
+   "type": "borehole_log",
+   "boreholes": [
+    "B077E319"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 598,
+   "type": "borehole_log",
+   "boreholes": [
+    "B077E321"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 599,
+   "type": "borehole_log",
+   "boreholes": [
+    "B077E325"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 600,
+   "type": "borehole_log",
+   "boreholes": [
+    "B077E325"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 601,
+   "type": "borehole_log",
+   "boreholes": [
+    "B077E326"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 602,
+   "type": "borehole_log",
+   "boreholes": [
+    "B077E326"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 603,
+   "type": "borehole_log",
+   "boreholes": [
+    "B078E327"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 604,
+   "type": "borehole_log",
+   "boreholes": [
+    "B078E327"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 605,
+   "type": "borehole_log",
+   "boreholes": [
+    "B078E328"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 606,
+   "type": "borehole_log",
+   "boreholes": [
+    "B078E329"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 607,
+   "type": "borehole_log",
+   "boreholes": [
+    "B078E330"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 608,
+   "type": "borehole_log",
+   "boreholes": [
+    "B078E330"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 609,
+   "type": "borehole_log",
+   "boreholes": [
+    "B078E331"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 610,
+   "type": "borehole_log",
+   "boreholes": [
+    "B078E331"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 611,
+   "type": "borehole_log",
+   "boreholes": [
+    "B078E332"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 612,
+   "type": "borehole_log",
+   "boreholes": [
+    "B078E332"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 613,
+   "type": "borehole_log",
+   "boreholes": [
+    "B078E333"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 614,
+   "type": "borehole_log",
+   "boreholes": [
+    "B078E333"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 615,
+   "type": "borehole_log",
+   "boreholes": [
+    "B079E335"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 616,
+   "type": "borehole_log",
+   "boreholes": [
+    "B081E337"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 617,
+   "type": "borehole_log",
+   "boreholes": [
+    "B081E337"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 618,
+   "type": "borehole_log",
+   "boreholes": [
+    "B081E339"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 619,
+   "type": "borehole_log",
+   "boreholes": [
+    "B081E339"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 620,
+   "type": "borehole_log",
+   "boreholes": [
+    "B083E342"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 621,
+   "type": "borehole_log",
+   "boreholes": [
+    "B085E347"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 622,
+   "type": "borehole_log",
+   "boreholes": [
+    "B085E347"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 623,
+   "type": "borehole_log",
+   "boreholes": [
+    "B085E348"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 624,
+   "type": "borehole_log",
+   "boreholes": [
+    "B086E350"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 625,
+   "type": "borehole_log",
+   "boreholes": [
+    "B086E354"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 626,
+   "type": "borehole_log",
+   "boreholes": [
+    "B087E355"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 627,
+   "type": "borehole_log",
+   "boreholes": [
+    "B087E355"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 628,
+   "type": "borehole_log",
+   "boreholes": [
+    "B089E358"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 629,
+   "type": "borehole_log",
+   "boreholes": [
+    "B089E359"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 630,
+   "type": "borehole_log",
+   "boreholes": [
+    "B089E359"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 631,
+   "type": "borehole_log",
+   "boreholes": [
+    "B089E360"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 632,
+   "type": "borehole_log",
+   "boreholes": [
+    "B089E360"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 633,
+   "type": "borehole_log",
+   "boreholes": [
+    "B089E362"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 634,
+   "type": "borehole_log",
+   "boreholes": [
+    "B089E362"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 635,
+   "type": "borehole_log",
+   "boreholes": [
+    "B089E363"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 636,
+   "type": "borehole_log",
+   "boreholes": [
+    "B089E363"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 637,
+   "type": "borehole_log",
+   "boreholes": [
+    "B089E364"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 638,
+   "type": "borehole_log",
+   "boreholes": [
+    "B089E364"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 639,
+   "type": "borehole_log",
+   "boreholes": [
+    "B089E365"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 640,
+   "type": "borehole_log",
+   "boreholes": [
+    "B089E365"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 641,
+   "type": "borehole_log",
+   "boreholes": [
+    "B090E369"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 642,
+   "type": "borehole_log",
+   "boreholes": [
+    "B091E371"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 643,
+   "type": "borehole_log",
+   "boreholes": [
+    "B091E372"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 644,
+   "type": "borehole_log",
+   "boreholes": [
+    "B092E373"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 645,
+   "type": "borehole_log",
+   "boreholes": [
+    "B092E373"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 646,
+   "type": "borehole_log",
+   "boreholes": [
+    "B094E379"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 647,
+   "type": "borehole_log",
+   "boreholes": [
+    "B094E379"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 648,
+   "type": "borehole_log",
+   "boreholes": [
+    "B094E380"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 649,
+   "type": "borehole_log",
+   "boreholes": [
+    "B094E381"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 650,
+   "type": "borehole_log",
+   "boreholes": [
+    "B094E382"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 651,
+   "type": "borehole_log",
+   "boreholes": [
+    "B094E386"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 652,
+   "type": "borehole_log",
+   "boreholes": [
+    "B094E387"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 653,
+   "type": "borehole_log",
+   "boreholes": [
+    "B094E387"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 654,
+   "type": "borehole_log",
+   "boreholes": [
+    "B095E388"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 655,
+   "type": "borehole_log",
+   "boreholes": [
+    "B095E389"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 656,
+   "type": "borehole_log",
+   "boreholes": [
+    "B095E390"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 657,
+   "type": "borehole_log",
+   "boreholes": [
+    "B095E391"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 658,
+   "type": "borehole_log",
+   "boreholes": [
+    "B095E392"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 659,
+   "type": "borehole_log",
+   "boreholes": [
+    "B095E393"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 660,
+   "type": "borehole_log",
+   "boreholes": [
+    "B095E393"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 661,
+   "type": "borehole_log",
+   "boreholes": [
+    "B095E395"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 662,
+   "type": "borehole_log",
+   "boreholes": [
+    "B095E395"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 663,
+   "type": "borehole_log",
+   "boreholes": [
+    "B095E396"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 664,
+   "type": "borehole_log",
+   "boreholes": [
+    "B095E397"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 665,
+   "type": "borehole_log",
+   "boreholes": [
+    "B095E398"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 666,
+   "type": "borehole_log",
+   "boreholes": [
+    "B095E399"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 667,
+   "type": "borehole_log",
+   "boreholes": [
+    "B095E401"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 668,
+   "type": "borehole_log",
+   "boreholes": [
+    "B096E402"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 669,
+   "type": "borehole_log",
+   "boreholes": [
+    "B096E402"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 670,
+   "type": "borehole_log",
+   "boreholes": [
+    "B096E403"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 671,
+   "type": "borehole_log",
+   "boreholes": [
+    "B096E403"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 672,
+   "type": "borehole_log",
+   "boreholes": [
+    "B096E404"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 673,
+   "type": "borehole_log",
+   "boreholes": [
+    "B096E405"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 674,
+   "type": "borehole_log",
+   "boreholes": [
+    "B096E406"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 675,
+   "type": "borehole_log",
+   "boreholes": [
+    "B096E407"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 676,
+   "type": "borehole_log",
+   "boreholes": [
+    "B096E408"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 677,
+   "type": "borehole_log",
+   "boreholes": [
+    "B096E409"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 678,
+   "type": "borehole_log",
+   "boreholes": [
+    "B096E409"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 679,
+   "type": "borehole_log",
+   "boreholes": [
+    "B096E410"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 680,
+   "type": "borehole_log",
+   "boreholes": [
+    "B096E411"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 681,
+   "type": "borehole_log",
+   "boreholes": [
+    "B096E412"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 682,
+   "type": "borehole_log",
+   "boreholes": [
+    "B096E413"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 683,
+   "type": "borehole_log",
+   "boreholes": [
+    "B096E413"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 684,
+   "type": "borehole_log",
+   "boreholes": [
+    "B096E414"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 685,
+   "type": "borehole_log",
+   "boreholes": [
+    "B096E415"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 686,
+   "type": "borehole_log",
+   "boreholes": [
+    "B096E416"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 687,
+   "type": "borehole_log",
+   "boreholes": [
+    "B096E418"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 688,
+   "type": "borehole_log",
+   "boreholes": [
+    "B096E419"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 689,
+   "type": "borehole_log",
+   "boreholes": [
+    "B096E420"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 690,
+   "type": "borehole_log",
+   "boreholes": [
+    "B096E421"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 691,
+   "type": "borehole_log",
+   "boreholes": [
+    "B096E422"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 692,
+   "type": "borehole_log",
+   "boreholes": [
+    "B096E423"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 693,
+   "type": "borehole_log",
+   "boreholes": [
+    "B097E424"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 694,
+   "type": "borehole_log",
+   "boreholes": [
+    "B097E426"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 695,
+   "type": "borehole_log",
+   "boreholes": [
+    "B098E428"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 696,
+   "type": "borehole_log",
+   "boreholes": [
+    "B099E432"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 697,
+   "type": "borehole_log",
+   "boreholes": [
+    "B100E434"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 698,
+   "type": "borehole_log",
+   "boreholes": [
+    "B100E434"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 699,
+   "type": "borehole_log",
+   "boreholes": [
+    "B101E435"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 700,
+   "type": "borehole_log",
+   "boreholes": [
+    "B101E437"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 701,
+   "type": "borehole_log",
+   "boreholes": [
+    "B101E439"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 702,
+   "type": "borehole_log",
+   "boreholes": [
+    "B101E441"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 703,
+   "type": "borehole_log",
+   "boreholes": [
+    "B101E443"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 704,
+   "type": "borehole_log",
+   "boreholes": [
+    "B101E444"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 705,
+   "type": "borehole_log",
+   "boreholes": [
+    "B101E445"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 706,
+   "type": "borehole_log",
+   "boreholes": [
+    "B101E446"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 707,
+   "type": "borehole_log",
+   "boreholes": [
+    "B102E449"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 708,
+   "type": "borehole_log",
+   "boreholes": [
+    "B102E449"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 709,
+   "type": "borehole_log",
+   "boreholes": [
+    "B102E450"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 710,
+   "type": "borehole_log",
+   "boreholes": [
+    "B102E450"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 711,
+   "type": "borehole_log",
+   "boreholes": [
+    "B106E457"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 712,
+   "type": "borehole_log",
+   "boreholes": [
+    "B106E457"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 713,
+   "type": "borehole_log",
+   "boreholes": [
+    "B107E460"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 714,
+   "type": "borehole_log",
+   "boreholes": [
+    "B108E462"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 715,
+   "type": "borehole_log",
+   "boreholes": [
+    "B108E462"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 716,
+   "type": "borehole_log",
+   "boreholes": [
+    "B108E463"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 717,
+   "type": "borehole_log",
+   "boreholes": [
+    "B108E463"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 718,
+   "type": "borehole_log",
+   "boreholes": [
+    "B109E464"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 719,
+   "type": "borehole_log",
+   "boreholes": [
+    "B109E473"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 720,
+   "type": "borehole_log",
+   "boreholes": [
+    "B109E473"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 721,
+   "type": "borehole_log",
+   "boreholes": [
+    "B109E474"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 722,
+   "type": "borehole_log",
+   "boreholes": [
+    "B114E482"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 723,
+   "type": "borehole_log",
+   "boreholes": [
+    "B115E484"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 724,
+   "type": "borehole_log",
+   "boreholes": [
+    "B115E484"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 725,
+   "type": "borehole_log",
+   "boreholes": [
+    "B115E484"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 726,
+   "type": "borehole_log",
+   "boreholes": [
+    "B115E488"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 727,
+   "type": "borehole_log",
+   "boreholes": [
+    "B116E492"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 728,
+   "type": "borehole_log",
+   "boreholes": [
+    "B116E492"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 729,
+   "type": "borehole_log",
+   "boreholes": [
+    "B117E494"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 730,
+   "type": "borehole_log",
+   "boreholes": [
+    "B117E495"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 731,
+   "type": "borehole_log",
+   "boreholes": [
+    "B117E496"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 732,
+   "type": "borehole_log",
+   "boreholes": [
+    "B117E498"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 733,
+   "type": "borehole_log",
+   "boreholes": [
+    "B118E500"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 734,
+   "type": "borehole_log",
+   "boreholes": [
+    "B120E503"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 735,
+   "type": "borehole_log",
+   "boreholes": [
+    "B120E504"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 736,
+   "type": "borehole_log",
+   "boreholes": [
+    "B120E506"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 737,
+   "type": "borehole_log",
+   "boreholes": [
+    "B120E506"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 738,
+   "type": "borehole_log",
+   "boreholes": [
+    "B120E507"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 739,
+   "type": "borehole_log",
+   "boreholes": [
+    "B120E508"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 740,
+   "type": "borehole_log",
+   "boreholes": [
+    "B120E508"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 741,
+   "type": "borehole_log",
+   "boreholes": [
+    "B124E514"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 742,
+   "type": "borehole_log",
+   "boreholes": [
+    "B124E515"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 743,
+   "type": "borehole_log",
+   "boreholes": [
+    "B124E516"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 744,
+   "type": "borehole_log",
+   "boreholes": [
+    "B124E517"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 745,
+   "type": "borehole_log",
+   "boreholes": [
+    "B124E519"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 746,
+   "type": "borehole_log",
+   "boreholes": [
+    "B124E520"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 747,
+   "type": "borehole_log",
+   "boreholes": [
+    "B124E521"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 748,
+   "type": "borehole_log",
+   "boreholes": [
+    "B124E522"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 749,
+   "type": "borehole_log",
+   "boreholes": [
+    "B124E524"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 750,
+   "type": "borehole_log",
+   "boreholes": [
+    "B124E524"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 751,
+   "type": "borehole_log",
+   "boreholes": [
+    "B124E525"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 752,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E526"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 753,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E526"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 754,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E527"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 755,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E527"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 756,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E528"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 757,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E528"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 758,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E529"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 759,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E529"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 760,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E530"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 761,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E530"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 762,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E531"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 763,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E531"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 764,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E531"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 765,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E532"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 766,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E532"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 767,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E533"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 768,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E533"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 769,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E533"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 770,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E534"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 771,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E534"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 772,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E535"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 773,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E535"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 774,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E535"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 775,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E536"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 776,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E536"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 777,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E537"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 778,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E537"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 779,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E537"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 780,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E538"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 781,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E538"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 782,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E539"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 783,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E539"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 784,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E539"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 785,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E540"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 786,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E540"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 787,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E541"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 788,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E541"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 789,
+   "type": "borehole_log",
+   "boreholes": [
+    "B125E541"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 790,
+   "type": "borehole_log",
+   "boreholes": [
+    "B126E544"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 791,
+   "type": "borehole_log",
+   "boreholes": [
+    "B126E544"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 792,
+   "type": "borehole_log",
+   "boreholes": [
+    "B126E546"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 793,
+   "type": "borehole_log",
+   "boreholes": [
+    "B126E546"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 794,
+   "type": "borehole_log",
+   "boreholes": [
+    "B126E547"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 795,
+   "type": "borehole_log",
+   "boreholes": [
+    "B126E547"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 796,
+   "type": "borehole_log",
+   "boreholes": [
+    "B126E548"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 797,
+   "type": "borehole_log",
+   "boreholes": [
+    "B126E548"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 798,
+   "type": "borehole_log",
+   "boreholes": [
+    "B128E551"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 799,
+   "type": "borehole_log",
+   "boreholes": [
+    "B132E559"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 800,
+   "type": "borehole_log",
+   "boreholes": [
+    "B132E559"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 801,
+   "type": "borehole_log",
+   "boreholes": [
+    "B132E560"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 802,
+   "type": "borehole_log",
+   "boreholes": [
+    "B132E560"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 803,
+   "type": "borehole_log",
+   "boreholes": [
+    "B132E561"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 804,
+   "type": "borehole_log",
+   "boreholes": [
+    "B132E561"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 805,
+   "type": "borehole_log",
+   "boreholes": [
+    "B132E562"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 806,
+   "type": "borehole_log",
+   "boreholes": [
+    "B132E562"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 807,
+   "type": "borehole_log",
+   "boreholes": [
+    "B132E563"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 808,
+   "type": "borehole_log",
+   "boreholes": [
+    "B132E563"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 809,
+   "type": "borehole_log",
+   "boreholes": [
+    "B132E564"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 810,
+   "type": "borehole_log",
+   "boreholes": [
+    "B132E564"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 811,
+   "type": "borehole_log",
+   "boreholes": [
+    "B137E574"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 812,
+   "type": "borehole_log",
+   "boreholes": [
+    "B138E576"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 813,
+   "type": "borehole_log",
+   "boreholes": [
+    "B140E579"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 814,
+   "type": "borehole_log",
+   "boreholes": [
+    "B141E581"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 815,
+   "type": "borehole_log",
+   "boreholes": [
+    "B142E582"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 816,
+   "type": "borehole_log",
+   "boreholes": [
+    "B142E582"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 817,
+   "type": "borehole_log",
+   "boreholes": [
+    "B142E584"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 818,
+   "type": "borehole_log",
+   "boreholes": [
+    "B142E584"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 819,
+   "type": "borehole_log",
+   "boreholes": [
+    "B143E586"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 820,
+   "type": "borehole_log",
+   "boreholes": [
+    "B143E586"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 821,
+   "type": "borehole_log",
+   "boreholes": [
+    "B144E588"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 822,
+   "type": "borehole_log",
+   "boreholes": [
+    "B145E590"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 823,
+   "type": "borehole_log",
+   "boreholes": [
+    "B145E592"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 824,
+   "type": "borehole_log",
+   "boreholes": [
+    "B146E594"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 825,
+   "type": "borehole_log",
+   "boreholes": [
+    "B146E594"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 826,
+   "type": "borehole_log",
+   "boreholes": [
+    "B146E596"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 827,
+   "type": "borehole_log",
+   "boreholes": [
+    "B146E596"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 828,
+   "type": "borehole_log",
+   "boreholes": [
+    "B147E597"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 829,
+   "type": "borehole_log",
+   "boreholes": [
+    "B147E597"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 830,
+   "type": "borehole_log",
+   "boreholes": [
+    "B147E598"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 831,
+   "type": "borehole_log",
+   "boreholes": [
+    "B147E598"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 832,
+   "type": "borehole_log",
+   "boreholes": [
+    "B147E600"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 833,
+   "type": "borehole_log",
+   "boreholes": [
+    "B147E600"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 834,
+   "type": "borehole_log",
+   "boreholes": [
+    "B147E601"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 835,
+   "type": "borehole_log",
+   "boreholes": [
+    "B147E602"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 836,
+   "type": "borehole_log",
+   "boreholes": [
+    "B148E603"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 837,
+   "type": "borehole_log",
+   "boreholes": [
+    "B149E606"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 838,
+   "type": "borehole_log",
+   "boreholes": [
+    "B160E670"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 839,
+   "type": "borehole_log",
+   "boreholes": [
+    "B161E671"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 840,
+   "type": "borehole_log",
+   "boreholes": [
+    "B161E671"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 841,
+   "type": "borehole_log",
+   "boreholes": [
+    "B161E672"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 842,
+   "type": "borehole_log",
+   "boreholes": [
+    "B161E672"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 843,
+   "type": "borehole_log",
+   "boreholes": [
+    "B161E673"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 844,
+   "type": "borehole_log",
+   "boreholes": [
+    "B161E673"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 845,
+   "type": "borehole_log",
+   "boreholes": [
+    "B161E674"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 846,
+   "type": "borehole_log",
+   "boreholes": [
+    "B161E674"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 847,
+   "type": "borehole_log",
+   "boreholes": [
+    "B162E675"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 848,
+   "type": "borehole_log",
+   "boreholes": [
+    "B162E675"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 849,
+   "type": "borehole_log",
+   "boreholes": [
+    "B162E676"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 850,
+   "type": "borehole_log",
+   "boreholes": [
+    "B162E676"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 851,
+   "type": "borehole_log",
+   "boreholes": [
+    "B163E677"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 852,
+   "type": "borehole_log",
+   "boreholes": [
+    "B163E678"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 853,
+   "type": "borehole_log",
+   "boreholes": [
+    "B164E679"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 854,
+   "type": "borehole_log",
+   "boreholes": [
+    "B164E679"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 855,
+   "type": "borehole_log",
+   "boreholes": [
+    "B164E680"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 856,
+   "type": "borehole_log",
+   "boreholes": [
+    "B164E680"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 857,
+   "type": "borehole_log",
+   "boreholes": [
+    "B165E681"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 858,
+   "type": "borehole_log",
+   "boreholes": [
+    "B165E681"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 859,
+   "type": "borehole_log",
+   "boreholes": [
+    "B165E682"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 860,
+   "type": "borehole_log",
+   "boreholes": [
+    "B165E682"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 861,
+   "type": "borehole_log",
+   "boreholes": [
+    "B165E683"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 862,
+   "type": "borehole_log",
+   "boreholes": [
+    "B165E683"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 863,
+   "type": "borehole_log",
+   "boreholes": [
+    "B165E684"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 864,
+   "type": "borehole_log",
+   "boreholes": [
+    "B165E684"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 865,
+   "type": "borehole_log",
+   "boreholes": [
+    "B166E685"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 866,
+   "type": "borehole_log",
+   "boreholes": [
+    "B166E685"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 867,
+   "type": "borehole_log",
+   "boreholes": [
+    "B166E686"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 868,
+   "type": "borehole_log",
+   "boreholes": [
+    "B166E686"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 869,
+   "type": "borehole_log",
+   "boreholes": [
+    "B166E687"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 870,
+   "type": "borehole_log",
+   "boreholes": [
+    "B166E687"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 871,
+   "type": "borehole_log",
+   "boreholes": [
+    "B166E688"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 872,
+   "type": "borehole_log",
+   "boreholes": [
+    "B166E688"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 873,
+   "type": "borehole_log",
+   "boreholes": [
+    "B167E689"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 874,
+   "type": "borehole_log",
+   "boreholes": [
+    "B167E689"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 875,
+   "type": "borehole_log",
+   "boreholes": [
+    "B167E690"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 876,
+   "type": "borehole_log",
+   "boreholes": [
+    "B167E691"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 877,
+   "type": "borehole_log",
+   "boreholes": [
+    "B167E691"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 878,
+   "type": "borehole_log",
+   "boreholes": [
+    "B167E692"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 879,
+   "type": "borehole_log",
+   "boreholes": [
+    "B167E693"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 880,
+   "type": "borehole_log",
+   "boreholes": [
+    "B167E693"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 881,
+   "type": "borehole_log",
+   "boreholes": [
+    "B167E694"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 882,
+   "type": "borehole_log",
+   "boreholes": [
+    "B167E695"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 883,
+   "type": "borehole_log",
+   "boreholes": [
+    "B168E696"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 884,
+   "type": "borehole_log",
+   "boreholes": [
+    "B168E696"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 885,
+   "type": "borehole_log",
+   "boreholes": [
+    "B168E697"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 886,
+   "type": "borehole_log",
+   "boreholes": [
+    "B168E697"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 887,
+   "type": "borehole_log",
+   "boreholes": [
+    "B168E698"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 888,
+   "type": "borehole_log",
+   "boreholes": [
+    "B168E698"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 889,
+   "type": "borehole_log",
+   "boreholes": [
+    "B168E699"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 890,
+   "type": "borehole_log",
+   "boreholes": [
+    "B168E699"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 891,
+   "type": "borehole_log",
+   "boreholes": [
+    "B169E700"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 892,
+   "type": "borehole_log",
+   "boreholes": [
+    "B169E700"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 893,
+   "type": "borehole_log",
+   "boreholes": [
+    "B169E701"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 894,
+   "type": "borehole_log",
+   "boreholes": [
+    "B169E702"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 895,
+   "type": "borehole_log",
+   "boreholes": [
+    "B169E702"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 896,
+   "type": "borehole_log",
+   "boreholes": [
+    "B169E703"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 897,
+   "type": "borehole_log",
+   "boreholes": [
+    "B170E704"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 898,
+   "type": "borehole_log",
+   "boreholes": [
+    "B170E705"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 899,
+   "type": "borehole_log",
+   "boreholes": [
+    "B170E706"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 900,
+   "type": "borehole_log",
+   "boreholes": [
+    "B170E706"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 901,
+   "type": "borehole_log",
+   "boreholes": [
+    "B170E707"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 902,
+   "type": "borehole_log",
+   "boreholes": [
+    "B170E707"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 903,
+   "type": "borehole_log",
+   "boreholes": [
+    "B170E708"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 904,
+   "type": "borehole_log",
+   "boreholes": [
+    "B170E708"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 905,
+   "type": "borehole_log",
+   "boreholes": [
+    "B170E709"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 906,
+   "type": "borehole_log",
+   "boreholes": [
+    "B170E709"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 907,
+   "type": "borehole_log",
+   "boreholes": [
+    "B171E743"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 908,
+   "type": "borehole_log",
+   "boreholes": [
+    "B171E744"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 909,
+   "type": "borehole_log",
+   "boreholes": [
+    "B171E744"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 910,
+   "type": "borehole_log",
+   "boreholes": [
+    "B171E745"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 911,
+   "type": "borehole_log",
+   "boreholes": [
+    "B171E745"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 912,
+   "type": "borehole_log",
+   "boreholes": [
+    "B171E746"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 913,
+   "type": "borehole_log",
+   "boreholes": [
+    "B171E746"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 914,
+   "type": "borehole_log",
+   "boreholes": [
+    "B171E747"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 915,
+   "type": "borehole_log",
+   "boreholes": [
+    "B171E747"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 916,
+   "type": "borehole_log",
+   "boreholes": [
+    "B171E748"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 917,
+   "type": "borehole_log",
+   "boreholes": [
+    "B171E749"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 918,
+   "type": "borehole_log",
+   "boreholes": [
+    "B171E750"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 919,
+   "type": "borehole_log",
+   "boreholes": [
+    "B171E751"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 920,
+   "type": "borehole_log",
+   "boreholes": [
+    "B171E751"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 921,
+   "type": "borehole_log",
+   "boreholes": [
+    "B171E752"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 922,
+   "type": "borehole_log",
+   "boreholes": [
+    "B171E752"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 923,
+   "type": "borehole_log",
+   "boreholes": [
+    "B172E753"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 924,
+   "type": "borehole_log",
+   "boreholes": [
+    "B172E754"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 925,
+   "type": "borehole_log",
+   "boreholes": [
+    "B172E754"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 926,
+   "type": "borehole_log",
+   "boreholes": [
+    "B173E755"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 927,
+   "type": "borehole_log",
+   "boreholes": [
+    "B173E755"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 928,
+   "type": "borehole_log",
+   "boreholes": [
+    "B173E756"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 929,
+   "type": "borehole_log",
+   "boreholes": [
+    "B173E756"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 930,
+   "type": "borehole_log",
+   "boreholes": [
+    "B174E710"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 931,
+   "type": "borehole_log",
+   "boreholes": [
+    "B174E711"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 932,
+   "type": "borehole_log",
+   "boreholes": [
+    "B175E712"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 933,
+   "type": "borehole_log",
+   "boreholes": [
+    "B175E712"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 934,
+   "type": "borehole_log",
+   "boreholes": [
+    "B175E713"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 935,
+   "type": "borehole_log",
+   "boreholes": [
+    "B175E713"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 936,
+   "type": "borehole_log",
+   "boreholes": [
+    "B175E714"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 937,
+   "type": "borehole_log",
+   "boreholes": [
+    "B175E714"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 938,
+   "type": "borehole_log",
+   "boreholes": [
+    "B175E715"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 939,
+   "type": "borehole_log",
+   "boreholes": [
+    "B175E715"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 940,
+   "type": "borehole_log",
+   "boreholes": [
+    "B175E716"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 941,
+   "type": "borehole_log",
+   "boreholes": [
+    "B175E716"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 942,
+   "type": "borehole_log",
+   "boreholes": [
+    "B175E717"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 943,
+   "type": "borehole_log",
+   "boreholes": [
+    "B175E717"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 944,
+   "type": "borehole_log",
+   "boreholes": [
+    "B175E718"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 945,
+   "type": "borehole_log",
+   "boreholes": [
+    "B175E718"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 946,
+   "type": "borehole_log",
+   "boreholes": [
+    "B175E719"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 947,
+   "type": "borehole_log",
+   "boreholes": [
+    "B175E719"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 948,
+   "type": "borehole_log",
+   "boreholes": [
+    "B175E720"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 949,
+   "type": "borehole_log",
+   "boreholes": [
+    "B175E720"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 950,
+   "type": "borehole_log",
+   "boreholes": [
+    "B175E721"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 951,
+   "type": "borehole_log",
+   "boreholes": [
+    "B175E721"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 952,
+   "type": "borehole_log",
+   "boreholes": [
+    "B176E722"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 953,
+   "type": "borehole_log",
+   "boreholes": [
+    "B176E723"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 954,
+   "type": "borehole_log",
+   "boreholes": [
+    "B176E724"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 955,
+   "type": "borehole_log",
+   "boreholes": [
+    "B177E725"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 956,
+   "type": "borehole_log",
+   "boreholes": [
+    "B177E726"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 957,
+   "type": "borehole_log",
+   "boreholes": [
+    "B177E727"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 958,
+   "type": "borehole_log",
+   "boreholes": [
+    "B177E728"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 959,
+   "type": "borehole_log",
+   "boreholes": [
+    "B178E729"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 960,
+   "type": "borehole_log",
+   "boreholes": [
+    "B178E729"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 961,
+   "type": "borehole_log",
+   "boreholes": [
+    "B178E730"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 962,
+   "type": "borehole_log",
+   "boreholes": [
+    "B179E731"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 963,
+   "type": "borehole_log",
+   "boreholes": [
+    "B179E731"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 964,
+   "type": "borehole_log",
+   "boreholes": [
+    "B179E732"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 965,
+   "type": "borehole_log",
+   "boreholes": [
+    "B179E732"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 966,
+   "type": "borehole_log",
+   "boreholes": [
+    "B180E733"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 967,
+   "type": "borehole_log",
+   "boreholes": [
+    "B180E734"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 968,
+   "type": "borehole_log",
+   "boreholes": [
+    "B180E735"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 969,
+   "type": "borehole_log",
+   "boreholes": [
+    "B180E736"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 970,
+   "type": "borehole_log",
+   "boreholes": [
+    "B180E736"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 971,
+   "type": "borehole_log",
+   "boreholes": [
+    "B180E737"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 972,
+   "type": "borehole_log",
+   "boreholes": [
+    "B181E738"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 973,
+   "type": "borehole_log",
+   "boreholes": [
+    "B181E738"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 974,
+   "type": "borehole_log",
+   "boreholes": [
+    "B182E739"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 975,
+   "type": "borehole_log",
+   "boreholes": [
+    "B183E740"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 976,
+   "type": "borehole_log",
+   "boreholes": [
+    "B183E741"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 977,
+   "type": "borehole_log",
+   "boreholes": [
+    "B183E742"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 978,
+   "type": "borehole_log",
+   "boreholes": [
+    "B184E757"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 979,
+   "type": "borehole_log",
+   "boreholes": [
+    "B184E757"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 980,
+   "type": "borehole_log",
+   "boreholes": [
+    "B184E758"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 981,
+   "type": "borehole_log",
+   "boreholes": [
+    "B184E758"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 982,
+   "type": "borehole_log",
+   "boreholes": [
+    "B185E759"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 983,
+   "type": "borehole_log",
+   "boreholes": [
+    "B185E760"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 984,
+   "type": "borehole_log",
+   "boreholes": [
+    "B185E761"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 985,
+   "type": "borehole_log",
+   "boreholes": [
+    "B185E761"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 986,
+   "type": "borehole_log",
+   "boreholes": [
+    "B185E762"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 987,
+   "type": "borehole_log",
+   "boreholes": [
+    "B185E763"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 988,
+   "type": "borehole_log",
+   "boreholes": [
+    "B185E764"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 989,
+   "type": "borehole_log",
+   "boreholes": [
+    "B185E765"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 990,
+   "type": "borehole_log",
+   "boreholes": [
+    "B185E765"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 991,
+   "type": "borehole_log",
+   "boreholes": [
+    "B186E766"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 992,
+   "type": "borehole_log",
+   "boreholes": [
+    "B186E766"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 993,
+   "type": "borehole_log",
+   "boreholes": [
+    "B186E767"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 994,
+   "type": "borehole_log",
+   "boreholes": [
+    "B186E767"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 995,
+   "type": "borehole_log",
+   "boreholes": [
+    "B186E768"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 996,
+   "type": "borehole_log",
+   "boreholes": [
+    "B186E768"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 997,
+   "type": "borehole_log",
+   "boreholes": [
+    "B186E769"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 998,
+   "type": "borehole_log",
+   "boreholes": [
+    "B186E770"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 999,
+   "type": "borehole_log",
+   "boreholes": [
+    "B186E770"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1000,
+   "type": "borehole_log",
+   "boreholes": [
+    "B186E771"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1001,
+   "type": "borehole_log",
+   "boreholes": [
+    "B186E772"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1002,
+   "type": "borehole_log",
+   "boreholes": [
+    "B186E772"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1003,
+   "type": "borehole_log",
+   "boreholes": [
+    "B186E773"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1004,
+   "type": "borehole_log",
+   "boreholes": [
+    "B186E773"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1005,
+   "type": "borehole_log",
+   "boreholes": [
+    "B187E774"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1006,
+   "type": "borehole_log",
+   "boreholes": [
+    "B187E774"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1007,
+   "type": "borehole_log",
+   "boreholes": [
+    "B187E775"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1008,
+   "type": "borehole_log",
+   "boreholes": [
+    "B187E775"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1009,
+   "type": "borehole_log",
+   "boreholes": [
+    "B187E776"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1010,
+   "type": "borehole_log",
+   "boreholes": [
+    "B187E776"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1011,
+   "type": "borehole_log",
+   "boreholes": [
+    "B187E777"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1012,
+   "type": "borehole_log",
+   "boreholes": [
+    "B187E777"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1013,
+   "type": "borehole_log",
+   "boreholes": [
+    "B187E778"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1014,
+   "type": "borehole_log",
+   "boreholes": [
+    "B187E778"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1015,
+   "type": "borehole_log",
+   "boreholes": [
+    "B187E779"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1016,
+   "type": "borehole_log",
+   "boreholes": [
+    "B187E779"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1017,
+   "type": "borehole_log",
+   "boreholes": [
+    "B187E780"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1018,
+   "type": "borehole_log",
+   "boreholes": [
+    "B187E780"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1019,
+   "type": "borehole_log",
+   "boreholes": [
+    "B187E781"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1020,
+   "type": "borehole_log",
+   "boreholes": [
+    "B187E781"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1021,
+   "type": "borehole_log",
+   "boreholes": [
+    "B187E782"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1022,
+   "type": "borehole_log",
+   "boreholes": [
+    "B187E782"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1023,
+   "type": "borehole_log",
+   "boreholes": [
+    "B187E783"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1024,
+   "type": "borehole_log",
+   "boreholes": [
+    "B187E783"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1025,
+   "type": "borehole_log",
+   "boreholes": [
+    "B188E784"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1026,
+   "type": "borehole_log",
+   "boreholes": [
+    "B188E784"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1027,
+   "type": "borehole_log",
+   "boreholes": [
+    "B188E785"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1028,
+   "type": "borehole_log",
+   "boreholes": [
+    "B188E785"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1029,
+   "type": "borehole_log",
+   "boreholes": [
+    "B188E786"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1030,
+   "type": "borehole_log",
+   "boreholes": [
+    "B188E786"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1031,
+   "type": "borehole_log",
+   "boreholes": [
+    "B189E787"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1032,
+   "type": "borehole_log",
+   "boreholes": [
+    "B189E787"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1033,
+   "type": "borehole_log",
+   "boreholes": [
+    "B189E788"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1034,
+   "type": "borehole_log",
+   "boreholes": [
+    "B189E788"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1035,
+   "type": "borehole_log",
+   "boreholes": [
+    "B189E789"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1036,
+   "type": "borehole_log",
+   "boreholes": [
+    "B189E789"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1037,
+   "type": "borehole_log",
+   "boreholes": [
+    "B190E790"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1038,
+   "type": "borehole_log",
+   "boreholes": [
+    "B190E791"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1039,
+   "type": "borehole_log",
+   "boreholes": [
+    "B190E792"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1040,
+   "type": "borehole_log",
+   "boreholes": [
+    "B190E793"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1041,
+   "type": "borehole_log",
+   "boreholes": [
+    "B190E794"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1042,
+   "type": "borehole_log",
+   "boreholes": [
+    "B190E795"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1043,
+   "type": "borehole_log",
+   "boreholes": [
+    "B191E796"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1044,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E797"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1045,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E797"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1046,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E798"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1047,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E798"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1048,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E799"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1049,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E799"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1050,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E800"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1051,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E800"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1052,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E801"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1053,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E801"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1054,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E802"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1055,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E802"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1056,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E803"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1057,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E803"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1058,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E804"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1059,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E804"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1060,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E805"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1061,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E805"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1062,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E806"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1063,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E806"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1064,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E806"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1065,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E807"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1066,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E807"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1067,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E807"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1068,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E808"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1069,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E808"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1070,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E808"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1071,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E809"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1072,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E809"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1073,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E810"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1074,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E810"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1075,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E810"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1076,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E811"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1077,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E811"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1078,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E812"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1079,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E812"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1080,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E812"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1081,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E813"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1082,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E813"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1083,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E814"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1084,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E814"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1085,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E815"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1086,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E815"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1087,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E816"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1088,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E817"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1089,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E817"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1090,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E818"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1091,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E818"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1092,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E819"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1093,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E820"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1094,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E820"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1095,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E821"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1096,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E821"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1097,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E822"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1098,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E823"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1099,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E823"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1100,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E824"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1101,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E824"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1102,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E825"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1103,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E825"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1104,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E826"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1105,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E826"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1106,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E827"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1107,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E827"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1108,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E828"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1109,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E828"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1110,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E829"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1111,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E829"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1112,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E830"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1113,
+   "type": "borehole_log",
+   "boreholes": [
+    "B192E830"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1114,
+   "type": "borehole_log",
+   "boreholes": [
+    "B193E831"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1115,
+   "type": "borehole_log",
+   "boreholes": [
+    "B193E832"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1116,
+   "type": "borehole_log",
+   "boreholes": [
+    "B193E833"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1117,
+   "type": "borehole_log",
+   "boreholes": [
+    "B193E834"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1118,
+   "type": "borehole_log",
+   "boreholes": [
+    "B194E835"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1119,
+   "type": "borehole_log",
+   "boreholes": [
+    "B194E836"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1120,
+   "type": "borehole_log",
+   "boreholes": [
+    "B194E837"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1121,
+   "type": "borehole_log",
+   "boreholes": [
+    "B194E837"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1122,
+   "type": "borehole_log",
+   "boreholes": [
+    "B194E838"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1123,
+   "type": "borehole_log",
+   "boreholes": [
+    "B194E838"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1124,
+   "type": "borehole_log",
+   "boreholes": [
+    "B194E839"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1125,
+   "type": "borehole_log",
+   "boreholes": [
+    "B194E839"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1126,
+   "type": "borehole_log",
+   "boreholes": [
+    "B194E840"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1127,
+   "type": "borehole_log",
+   "boreholes": [
+    "B194E840"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1128,
+   "type": "borehole_log",
+   "boreholes": [
+    "B194E841"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1129,
+   "type": "borehole_log",
+   "boreholes": [
+    "B194E841"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1130,
+   "type": "borehole_log",
+   "boreholes": [
+    "B194E842"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1131,
+   "type": "borehole_log",
+   "boreholes": [
+    "B194E842"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1132,
+   "type": "borehole_log",
+   "boreholes": [
+    "B194E843"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1133,
+   "type": "borehole_log",
+   "boreholes": [
+    "B194E843"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1134,
+   "type": "borehole_log",
+   "boreholes": [
+    "B194E844"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1135,
+   "type": "borehole_log",
+   "boreholes": [
+    "B194E844"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1136,
+   "type": "borehole_log",
+   "boreholes": [
+    "B194E845"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1137,
+   "type": "borehole_log",
+   "boreholes": [
+    "B194E845"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1138,
+   "type": "borehole_log",
+   "boreholes": [
+    "B194E846"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1139,
+   "type": "borehole_log",
+   "boreholes": [
+    "B195E847"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1140,
+   "type": "borehole_log",
+   "boreholes": [
+    "B195E847"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1141,
+   "type": "borehole_log",
+   "boreholes": [
+    "B196E848"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1142,
+   "type": "borehole_log",
+   "boreholes": [
+    "B196E848"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1143,
+   "type": "borehole_log",
+   "boreholes": [
+    "B196E849"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1144,
+   "type": "borehole_log",
+   "boreholes": [
+    "B196E849"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1145,
+   "type": "borehole_log",
+   "boreholes": [
+    "B197E850"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1146,
+   "type": "borehole_log",
+   "boreholes": [
+    "B197E850"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1147,
+   "type": "borehole_log",
+   "boreholes": [
+    "B197E851"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1148,
+   "type": "borehole_log",
+   "boreholes": [
+    "B197E851"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1149,
+   "type": "borehole_log",
+   "boreholes": [
+    "B198E852"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1150,
+   "type": "borehole_log",
+   "boreholes": [
+    "B198E853"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1151,
+   "type": "borehole_log",
+   "boreholes": [
+    "B198E854"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1152,
+   "type": "borehole_log",
+   "boreholes": [
+    "B198E855"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1153,
+   "type": "borehole_log",
+   "boreholes": [
+    "B198E855"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1154,
+   "type": "borehole_log",
+   "boreholes": [
+    "B198E856"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1155,
+   "type": "borehole_log",
+   "boreholes": [
+    "B198E856"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1156,
+   "type": "borehole_log",
+   "boreholes": [
+    "B198E857"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1157,
+   "type": "borehole_log",
+   "boreholes": [
+    "B198E857"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1158,
+   "type": "borehole_log",
+   "boreholes": [
+    "B198E858"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1159,
+   "type": "borehole_log",
+   "boreholes": [
+    "B198E858"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1160,
+   "type": "borehole_log",
+   "boreholes": [
+    "B199E860"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1161,
+   "type": "borehole_log",
+   "boreholes": [
+    "B199E860"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1162,
+   "type": "borehole_log",
+   "boreholes": [
+    "B199E861"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1163,
+   "type": "borehole_log",
+   "boreholes": [
+    "B200E862"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1164,
+   "type": "borehole_log",
+   "boreholes": [
+    "B200E863"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1165,
+   "type": "borehole_log",
+   "boreholes": [
+    "B201E864"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1166,
+   "type": "borehole_log",
+   "boreholes": [
+    "B201E864"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1167,
+   "type": "borehole_log",
+   "boreholes": [
+    "B201E865"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1168,
+   "type": "borehole_log",
+   "boreholes": [
+    "B201E865"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1169,
+   "type": "borehole_log",
+   "boreholes": [
+    "B201E866"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1170,
+   "type": "borehole_log",
+   "boreholes": [
+    "B201E866"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1171,
+   "type": "borehole_log",
+   "boreholes": [
+    "B201E867"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1172,
+   "type": "borehole_log",
+   "boreholes": [
+    "B201E868"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1173,
+   "type": "borehole_log",
+   "boreholes": [
+    "B201E868"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1174,
+   "type": "borehole_log",
+   "boreholes": [
+    "J108L189"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1175,
+   "type": "borehole_log",
+   "boreholes": [
+    "J108L190"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1176,
+   "type": "borehole_log",
+   "boreholes": [
+    "J108L191"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1177,
+   "type": "borehole_log",
+   "boreholes": [
+    "J109L192"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1178,
+   "type": "borehole_log",
+   "boreholes": [
+    "J110L193"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1179,
+   "type": "borehole_log",
+   "boreholes": [
+    "J111L194"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1180,
+   "type": "borehole_log",
+   "boreholes": [
+    "J111L195"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1181,
+   "type": "borehole_log",
+   "boreholes": [
+    "J111L196"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1182,
+   "type": "borehole_log",
+   "boreholes": [
+    "J112L197"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1183,
+   "type": "borehole_log",
+   "boreholes": [
+    "J112L198"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1184,
+   "type": "borehole_log",
+   "boreholes": [
+    "J112L199"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1185,
+   "type": "borehole_log",
+   "boreholes": [
+    "J113L200"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1186,
+   "type": "borehole_log",
+   "boreholes": [
+    "J114L201"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1187,
+   "type": "borehole_log",
+   "boreholes": [
+    "J114L202"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1188,
+   "type": "borehole_log",
+   "boreholes": [
+    "J116L205"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1189,
+   "type": "borehole_log",
+   "boreholes": [
+    "J116L205"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1190,
+   "type": "borehole_log",
+   "boreholes": [
+    "J116L206"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1191,
+   "type": "borehole_log",
+   "boreholes": [
+    "J116L207"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1192,
+   "type": "borehole_log",
+   "boreholes": [
+    "J116L207"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1193,
+   "type": "borehole_log",
+   "boreholes": [
+    "J116L208"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1194,
+   "type": "borehole_log",
+   "boreholes": [
+    "J116L209"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1195,
+   "type": "borehole_log",
+   "boreholes": [
+    "J116L209"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1196,
+   "type": "borehole_log",
+   "boreholes": [
+    "J116L210"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1197,
+   "type": "borehole_log",
+   "boreholes": [
+    "J116L210"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1198,
+   "type": "borehole_log",
+   "boreholes": [
+    "J116L211"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1199,
+   "type": "borehole_log",
+   "boreholes": [
+    "J116L211"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1200,
+   "type": "borehole_log",
+   "boreholes": [
+    "J117L212"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 1201,
+   "type": "borehole_log",
+   "boreholes": [
+    "J119L216"
+   ]
+  }
+ ],
+ "boreholes": [
+  {
+   "id": "A934D649",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 1
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 33.8224167,
+    "lon": 132.7400722,
+    "crs": "unstated",
+    "as_printed": "北緯 33° 49’ 20.70” 東経 132° 44’ 24.26”",
+    "source": {
+     "doc": 0,
+     "page": 1
+    }
+   },
+   "ground_elevation": {
+    "value": 11.0,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 0,
+     "page": 1
+    }
+   },
+   "final_depth": {
+    "value": 11.5,
+    "source": {
+     "doc": 0,
+     "page": 1
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 0.2,
+     "description": "砂混じり粘土",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 0.2,
+     "base": 0.9,
+     "description": "粘土混じり砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 0.9,
+     "base": 1.3,
+     "description": "礫混じり砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 1.3,
+     "base": 1.5,
+     "description": "礫混じり砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 1.5,
+     "base": 2.4,
+     "description": "砂混じり粘土",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 2.4,
+     "base": 2.9,
+     "description": "シルト混じり砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 2.9,
+     "base": 6.1,
+     "description": "砂混じり粘土",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 6.1,
+     "base": 11.5,
+     "description": "礫混じり砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.0,
+     "n": 2.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 2.0,
+     "n": 2.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 3.0,
+     "n": 1.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 4.0,
+     "n": 3.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 5.0,
+     "n": 2.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 6.0,
+     "n": 33.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 7.0,
+     "n": 36.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 8.0,
+     "n": 32.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 9.0,
+     "n": 34.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 10.0,
+     "n": 32.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "not_recorded",
+    "readings": []
+   }
+  },
+  {
+   "id": "A957D739",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 101
+    },
+    {
+     "doc": 0,
+     "page": 102
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 33.8224417,
+    "lon": 132.70425,
+    "crs": "unstated",
+    "as_printed": "北緯 33° 49’ 20.79” 東経 132° 42’ 15.30”",
+    "source": {
+     "doc": 0,
+     "page": 101
+    }
+   },
+   "ground_elevation": {
+    "value": 3.86,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 0,
+     "page": 101
+    }
+   },
+   "final_depth": {
+    "value": 20.0,
+    "source": {
+     "doc": 0,
+     "page": 101
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 2.1,
+     "description": "礫混じり砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 101
+     }
+    },
+    {
+     "top": 2.1,
+     "base": 2.7,
+     "description": "砂質ローム",
+     "principal": "volcanic_ash",
+     "source": {
+      "doc": 0,
+      "page": 101
+     }
+    },
+    {
+     "top": 2.7,
+     "base": 3.6,
+     "description": "礫混じり砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 101
+     }
+    },
+    {
+     "top": 3.6,
+     "base": 4.3,
+     "description": "礫混じりローム",
+     "principal": "volcanic_ash",
+     "source": {
+      "doc": 0,
+      "page": 101
+     }
+    },
+    {
+     "top": 4.3,
+     "base": 5.15,
+     "description": "砂礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 101
+     }
+    },
+    {
+     "top": 5.15,
+     "base": 5.8,
+     "description": "礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 101
+     }
+    },
+    {
+     "top": 5.8,
+     "base": 8.5,
+     "description": "礫混じり砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 101
+     }
+    },
+    {
+     "top": 8.5,
+     "base": 9.0,
+     "description": "礫混じり砂質ローム",
+     "principal": "volcanic_ash",
+     "source": {
+      "doc": 0,
+      "page": 101
+     }
+    },
+    {
+     "top": 9.0,
+     "base": 15.0,
+     "description": "砂質ローム",
+     "principal": "volcanic_ash",
+     "source": {
+      "doc": 0,
+      "page": 101
+     }
+    },
+    {
+     "top": 15.0,
+     "base": 17.0,
+     "description": "ローム",
+     "principal": "volcanic_ash",
+     "source": {
+      "doc": 0,
+      "page": 101
+     }
+    },
+    {
+     "top": 17.0,
+     "base": 18.0,
+     "description": "砂質ローム",
+     "principal": "volcanic_ash",
+     "source": {
+      "doc": 0,
+      "page": 102
+     }
+    },
+    {
+     "top": 18.0,
+     "base": 19.0,
+     "description": "ローム",
+     "principal": "volcanic_ash",
+     "source": {
+      "doc": 0,
+      "page": 102
+     }
+    },
+    {
+     "top": 19.0,
+     "base": 20.0,
+     "description": "礫混じりローム",
+     "principal": "volcanic_ash",
+     "source": {
+      "doc": 0,
+      "page": 102
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.45,
+     "n": 8.0,
+     "source": {
+      "doc": 0,
+      "page": 101
+     }
+    },
+    {
+     "depth": 2.54,
+     "n": 1.0,
+     "source": {
+      "doc": 0,
+      "page": 101
+     }
+    },
+    {
+     "depth": 3.45,
+     "n": 15.0,
+     "source": {
+      "doc": 0,
+      "page": 101
+     }
+    },
+    {
+     "depth": 4.45,
+     "n": 29.0,
+     "source": {
+      "doc": 0,
+      "page": 101
+     }
+    },
+    {
+     "depth": 5.45,
+     "n": 30.0,
+     "source": {
+      "doc": 0,
+      "page": 101
+     }
+    },
+    {
+     "depth": 6.46,
+     "n": 30.0,
+     "source": {
+      "doc": 0,
+      "page": 101
+     }
+    },
+    {
+     "depth": 7.45,
+     "n": 20.0,
+     "source": {
+      "doc": 0,
+      "page": 101
+     }
+    },
+    {
+     "depth": 8.46,
+     "n": 9.0,
+     "source": {
+      "doc": 0,
+      "page": 101
+     }
+    },
+    {
+     "depth": 9.45,
+     "n": 6.0,
+     "source": {
+      "doc": 0,
+      "page": 101
+     }
+    },
+    {
+     "depth": 10.47,
+     "n": 5.0,
+     "source": {
+      "doc": 0,
+      "page": 101
+     }
+    },
+    {
+     "depth": 11.45,
+     "n": 8.0,
+     "source": {
+      "doc": 0,
+      "page": 101
+     }
+    },
+    {
+     "depth": 12.45,
+     "n": 12.0,
+     "source": {
+      "doc": 0,
+      "page": 101
+     }
+    },
+    {
+     "depth": 13.45,
+     "n": 15.0,
+     "source": {
+      "doc": 0,
+      "page": 101
+     }
+    },
+    {
+     "depth": 14.46,
+     "n": 17.0,
+     "source": {
+      "doc": 0,
+      "page": 101
+     }
+    },
+    {
+     "depth": 15.45,
+     "n": 20.0,
+     "source": {
+      "doc": 0,
+      "page": 101
+     }
+    },
+    {
+     "depth": 16.46,
+     "n": 21.0,
+     "source": {
+      "doc": 0,
+      "page": 102
+     }
+    },
+    {
+     "depth": 17.45,
+     "n": 20.0,
+     "source": {
+      "doc": 0,
+      "page": 102
+     }
+    },
+    {
+     "depth": 19.46,
+     "n": 20.0,
+     "source": {
+      "doc": 0,
+      "page": 102
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 1.3,
+      "kind": "unspecified",
+      "source": {
+       "doc": 0,
+       "page": 101
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "A982D812",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 201
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 33.9239139,
+    "lon": 132.7599917,
+    "crs": "unstated",
+    "as_printed": "北緯 33° 55’ 26.09” 東経 132° 45’ 35.97”",
+    "source": {
+     "doc": 0,
+     "page": 201
+    }
+   },
+   "ground_elevation": {
+    "value": 2.24,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 0,
+     "page": 201
+    }
+   },
+   "final_depth": {
+    "value": 15.4,
+    "source": {
+     "doc": 0,
+     "page": 201
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 0.75,
+     "description": "砂混じりシルト(盛土)",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 201
+     }
+    },
+    {
+     "top": 0.75,
+     "base": 4.65,
+     "description": "砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 201
+     }
+    },
+    {
+     "top": 4.65,
+     "base": 6.6,
+     "description": "シルト質砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 201
+     }
+    },
+    {
+     "top": 6.6,
+     "base": 7.65,
+     "description": "砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 201
+     }
+    },
+    {
+     "top": 7.65,
+     "base": 8.5,
+     "description": "礫混じり砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 201
+     }
+    },
+    {
+     "top": 8.5,
+     "base": 8.9,
+     "description": "砂質粘土",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 201
+     }
+    },
+    {
+     "top": 8.9,
+     "base": 15.4,
+     "description": "まさ土",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 201
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.3,
+     "n": 9.0,
+     "source": {
+      "doc": 0,
+      "page": 201
+     }
+    },
+    {
+     "depth": 2.3,
+     "n": 16.0,
+     "source": {
+      "doc": 0,
+      "page": 201
+     }
+    },
+    {
+     "depth": 3.3,
+     "n": 8.0,
+     "source": {
+      "doc": 0,
+      "page": 201
+     }
+    },
+    {
+     "depth": 4.3,
+     "n": 11.0,
+     "source": {
+      "doc": 0,
+      "page": 201
+     }
+    },
+    {
+     "depth": 5.3,
+     "n": 4.0,
+     "source": {
+      "doc": 0,
+      "page": 201
+     }
+    },
+    {
+     "depth": 6.3,
+     "n": 3.0,
+     "source": {
+      "doc": 0,
+      "page": 201
+     }
+    },
+    {
+     "depth": 7.3,
+     "n": 18.0,
+     "source": {
+      "doc": 0,
+      "page": 201
+     }
+    },
+    {
+     "depth": 8.3,
+     "n": 32.0,
+     "source": {
+      "doc": 0,
+      "page": 201
+     }
+    },
+    {
+     "depth": 9.3,
+     "n": 17.0,
+     "source": {
+      "doc": 0,
+      "page": 201
+     }
+    },
+    {
+     "depth": 10.3,
+     "n": 20.0,
+     "source": {
+      "doc": 0,
+      "page": 201
+     }
+    },
+    {
+     "depth": 11.3,
+     "n": 30.0,
+     "source": {
+      "doc": 0,
+      "page": 201
+     }
+    },
+    {
+     "depth": 12.3,
+     "n": 32.0,
+     "source": {
+      "doc": 0,
+      "page": 201
+     }
+    },
+    {
+     "depth": 13.3,
+     "n": 39.0,
+     "source": {
+      "doc": 0,
+      "page": 201
+     }
+    },
+    {
+     "depth": 14.27,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 201
+     }
+    },
+    {
+     "depth": 15.28,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 201
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 0.2,
+      "kind": "unspecified",
+      "source": {
+       "doc": 0,
+       "page": 201
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "B003D881",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 300
+    },
+    {
+     "doc": 0,
+     "page": 301
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 33.88425,
+    "lon": 132.7183917,
+    "crs": "unstated",
+    "as_printed": "北緯 33° 53’ 3.30” 東経 132° 43’ 6.21”",
+    "source": {
+     "doc": 0,
+     "page": 300
+    }
+   },
+   "ground_elevation": {
+    "value": 31.0,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 0,
+     "page": 300
+    }
+   },
+   "final_depth": {
+    "value": 25.0,
+    "source": {
+     "doc": 0,
+     "page": 300
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 0.4,
+     "description": "砂質土(盛土)",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 300
+     }
+    },
+    {
+     "top": 0.4,
+     "base": 8.0,
+     "description": "風化花崗岩",
+     "principal": "rock",
+     "source": {
+      "doc": 0,
+      "page": 300
+     }
+    },
+    {
+     "top": 8.0,
+     "base": 14.0,
+     "description": "風化花崗岩",
+     "principal": "rock",
+     "source": {
+      "doc": 0,
+      "page": 300
+     }
+    },
+    {
+     "top": 14.0,
+     "base": 25.0,
+     "description": "風化花崗岩",
+     "principal": "rock",
+     "source": {
+      "doc": 0,
+      "page": 300
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.3,
+     "n": 14.0,
+     "source": {
+      "doc": 0,
+      "page": 300
+     }
+    },
+    {
+     "depth": 2.3,
+     "n": 28.0,
+     "source": {
+      "doc": 0,
+      "page": 300
+     }
+    },
+    {
+     "depth": 3.28,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 300
+     }
+    },
+    {
+     "depth": 4.26,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 300
+     }
+    },
+    {
+     "depth": 5.18,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 300
+     }
+    },
+    {
+     "depth": 6.07,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 300
+     }
+    },
+    {
+     "depth": 7.06,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 300
+     }
+    },
+    {
+     "depth": 8.07,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 300
+     }
+    },
+    {
+     "depth": 9.07,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 300
+     }
+    },
+    {
+     "depth": 10.07,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 300
+     }
+    },
+    {
+     "depth": 11.07,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 300
+     }
+    },
+    {
+     "depth": 12.06,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 300
+     }
+    },
+    {
+     "depth": 13.04,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 300
+     }
+    },
+    {
+     "depth": 14.03,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 300
+     }
+    },
+    {
+     "depth": 15.03,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 300
+     }
+    },
+    {
+     "depth": 16.03,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 301
+     }
+    },
+    {
+     "depth": 17.02,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 301
+     }
+    },
+    {
+     "depth": 18.02,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 301
+     }
+    },
+    {
+     "depth": 19.01,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 301
+     }
+    },
+    {
+     "depth": 20.02,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 301
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "not_recorded",
+    "readings": []
+   }
+  },
+  {
+   "id": "B030D950",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 401
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 33.7958528,
+    "lon": 132.9057028,
+    "crs": "unstated",
+    "as_printed": "北緯 33° 47’ 45.07” 東経 132° 54’ 20.53”",
+    "source": {
+     "doc": 0,
+     "page": 401
+    }
+   },
+   "ground_elevation": {
+    "value": 122.43,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 0,
+     "page": 401
+    }
+   },
+   "final_depth": {
+    "value": 10.5,
+    "source": {
+     "doc": 0,
+     "page": 401
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 0.6,
+     "description": "粘土混じり礫質砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 401
+     }
+    },
+    {
+     "top": 0.6,
+     "base": 2.4,
+     "description": "粘土混じり砂質礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 401
+     }
+    },
+    {
+     "top": 2.4,
+     "base": 7.9,
+     "description": "粘土混じり砂質礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 401
+     }
+    },
+    {
+     "top": 7.9,
+     "base": 10.5,
+     "description": "粘土混じり砂質礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 401
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.3,
+     "n": 20.0,
+     "source": {
+      "doc": 0,
+      "page": 401
+     }
+    },
+    {
+     "depth": 2.3,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 401
+     }
+    },
+    {
+     "depth": 3.3,
+     "n": 33.0,
+     "source": {
+      "doc": 0,
+      "page": 401
+     }
+    },
+    {
+     "depth": 4.3,
+     "n": 39.0,
+     "source": {
+      "doc": 0,
+      "page": 401
+     }
+    },
+    {
+     "depth": 5.3,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 401
+     }
+    },
+    {
+     "depth": 6.3,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 401
+     }
+    },
+    {
+     "depth": 7.3,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 401
+     }
+    },
+    {
+     "depth": 8.3,
+     "n": 25.0,
+     "source": {
+      "doc": 0,
+      "page": 401
+     }
+    },
+    {
+     "depth": 9.3,
+     "n": 23.0,
+     "source": {
+      "doc": 0,
+      "page": 401
+     }
+    },
+    {
+     "depth": 10.3,
+     "n": 20.0,
+     "source": {
+      "doc": 0,
+      "page": 401
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 3.1,
+      "kind": "unspecified",
+      "source": {
+       "doc": 0,
+       "page": 401
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "B037E034",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 501
+    },
+    {
+     "doc": 0,
+     "page": 502
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 33.7605361,
+    "lon": 132.7417694,
+    "crs": "unstated",
+    "as_printed": "北緯 33° 45’ 37.93” 東経 132° 44’ 30.37”",
+    "source": {
+     "doc": 0,
+     "page": 501
+    }
+   },
+   "ground_elevation": {
+    "value": 77.03,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 0,
+     "page": 501
+    }
+   },
+   "final_depth": {
+    "value": 19.4,
+    "source": {
+     "doc": 0,
+     "page": 501
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 2.0,
+     "description": "砂質粘土(盛土)",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 501
+     }
+    },
+    {
+     "top": 2.0,
+     "base": 5.5,
+     "description": "泥(頁)岩",
+     "principal": "rock",
+     "source": {
+      "doc": 0,
+      "page": 501
+     }
+    },
+    {
+     "top": 5.5,
+     "base": 11.0,
+     "description": "泥(頁)岩",
+     "principal": "rock",
+     "source": {
+      "doc": 0,
+      "page": 501
+     }
+    },
+    {
+     "top": 11.0,
+     "base": 16.0,
+     "description": "泥(頁)岩",
+     "principal": "rock",
+     "source": {
+      "doc": 0,
+      "page": 501
+     }
+    },
+    {
+     "top": 16.0,
+     "base": 19.4,
+     "description": "泥(頁)岩",
+     "principal": "rock",
+     "source": {
+      "doc": 0,
+      "page": 502
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 0.3,
+     "n": 7.0,
+     "source": {
+      "doc": 0,
+      "page": 501
+     }
+    },
+    {
+     "depth": 1.3,
+     "n": 12.0,
+     "source": {
+      "doc": 0,
+      "page": 501
+     }
+    },
+    {
+     "depth": 2.3,
+     "n": 19.0,
+     "source": {
+      "doc": 0,
+      "page": 501
+     }
+    },
+    {
+     "depth": 3.3,
+     "n": 20.0,
+     "source": {
+      "doc": 0,
+      "page": 501
+     }
+    },
+    {
+     "depth": 4.3,
+     "n": 22.0,
+     "source": {
+      "doc": 0,
+      "page": 501
+     }
+    },
+    {
+     "depth": 5.3,
+     "n": 27.0,
+     "source": {
+      "doc": 0,
+      "page": 501
+     }
+    },
+    {
+     "depth": 6.3,
+     "n": 24.0,
+     "source": {
+      "doc": 0,
+      "page": 501
+     }
+    },
+    {
+     "depth": 7.3,
+     "n": 25.0,
+     "source": {
+      "doc": 0,
+      "page": 501
+     }
+    },
+    {
+     "depth": 8.3,
+     "n": 16.0,
+     "source": {
+      "doc": 0,
+      "page": 501
+     }
+    },
+    {
+     "depth": 9.3,
+     "n": 20.0,
+     "source": {
+      "doc": 0,
+      "page": 501
+     }
+    },
+    {
+     "depth": 10.3,
+     "n": 21.0,
+     "source": {
+      "doc": 0,
+      "page": 501
+     }
+    },
+    {
+     "depth": 11.3,
+     "n": 42.0,
+     "source": {
+      "doc": 0,
+      "page": 501
+     }
+    },
+    {
+     "depth": 12.3,
+     "n": 41.0,
+     "source": {
+      "doc": 0,
+      "page": 501
+     }
+    },
+    {
+     "depth": 13.3,
+     "n": 31.0,
+     "source": {
+      "doc": 0,
+      "page": 501
+     }
+    },
+    {
+     "depth": 14.3,
+     "n": 47.0,
+     "source": {
+      "doc": 0,
+      "page": 501
+     }
+    },
+    {
+     "depth": 15.3,
+     "n": 40.0,
+     "source": {
+      "doc": 0,
+      "page": 501
+     }
+    },
+    {
+     "depth": 16.25,
+     "n": 70.0,
+     "source": {
+      "doc": 0,
+      "page": 502
+     }
+    },
+    {
+     "depth": 17.28,
+     "n": 70.0,
+     "source": {
+      "doc": 0,
+      "page": 502
+     }
+    },
+    {
+     "depth": 18.3,
+     "n": 53.0,
+     "source": {
+      "doc": 0,
+      "page": 502
+     }
+    },
+    {
+     "depth": 19.28,
+     "n": 76.0,
+     "source": {
+      "doc": 0,
+      "page": 502
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 6.42,
+      "kind": "unspecified",
+      "source": {
+       "doc": 0,
+       "page": 501
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "B077E326",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 601
+    },
+    {
+     "doc": 0,
+     "page": 602
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 33.8320889,
+    "lon": 132.6975833,
+    "crs": "unstated",
+    "as_printed": "北緯 33° 49’ 55.52” 東経 132° 41’ 51.30”",
+    "source": {
+     "doc": 0,
+     "page": 601
+    }
+   },
+   "ground_elevation": {
+    "value": -1.25,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 0,
+     "page": 601
+    }
+   },
+   "final_depth": {
+    "value": 18.8,
+    "source": {
+     "doc": 0,
+     "page": 601
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 0.7,
+     "description": "砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 601
+     }
+    },
+    {
+     "top": 0.7,
+     "base": 3.1,
+     "description": "礫混じり砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 601
+     }
+    },
+    {
+     "top": 3.1,
+     "base": 7.0,
+     "description": "砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 601
+     }
+    },
+    {
+     "top": 7.0,
+     "base": 8.8,
+     "description": "シルト質砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 601
+     }
+    },
+    {
+     "top": 8.8,
+     "base": 13.2,
+     "description": "シルト質砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 601
+     }
+    },
+    {
+     "top": 13.2,
+     "base": 16.6,
+     "description": "シルト質砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 601
+     }
+    },
+    {
+     "top": 16.6,
+     "base": 17.95,
+     "description": "シルト質砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 602
+     }
+    },
+    {
+     "top": 17.95,
+     "base": 18.8,
+     "description": "砂礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 602
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 2.19,
+     "n": 5.0,
+     "source": {
+      "doc": 0,
+      "page": 601
+     }
+    },
+    {
+     "depth": 4.17,
+     "n": 24.0,
+     "source": {
+      "doc": 0,
+      "page": 601
+     }
+    },
+    {
+     "depth": 6.16,
+     "n": 14.0,
+     "source": {
+      "doc": 0,
+      "page": 601
+     }
+    },
+    {
+     "depth": 10.16,
+     "n": 9.0,
+     "source": {
+      "doc": 0,
+      "page": 601
+     }
+    },
+    {
+     "depth": 12.16,
+     "n": 16.0,
+     "source": {
+      "doc": 0,
+      "page": 601
+     }
+    },
+    {
+     "depth": 18.36,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 602
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "not_recorded",
+    "readings": []
+   }
+  },
+  {
+   "id": "B101E439",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 701
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 33.7969889,
+    "lon": 132.9053944,
+    "crs": "unstated",
+    "as_printed": "北緯 33° 47’ 49.16” 東経 132° 54’ 19.42”",
+    "source": {
+     "doc": 0,
+     "page": 701
+    }
+   },
+   "ground_elevation": {
+    "value": 128.74,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 0,
+     "page": 701
+    }
+   },
+   "final_depth": {
+    "value": 12.4,
+    "source": {
+     "doc": 0,
+     "page": 701
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 1.0,
+     "description": "玉石混じり砂質礫(盛土)",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 701
+     }
+    },
+    {
+     "top": 1.0,
+     "base": 1.5,
+     "description": "粘土(盛土)",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 701
+     }
+    },
+    {
+     "top": 1.5,
+     "base": 3.0,
+     "description": "砂礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 701
+     }
+    },
+    {
+     "top": 3.0,
+     "base": 6.0,
+     "description": "砂礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 701
+     }
+    },
+    {
+     "top": 6.0,
+     "base": 8.6,
+     "description": "玉石混じり砂質礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 701
+     }
+    },
+    {
+     "top": 8.6,
+     "base": 12.4,
+     "description": "粘土混じり砂質礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 701
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.3,
+     "n": 7.0,
+     "source": {
+      "doc": 0,
+      "page": 701
+     }
+    },
+    {
+     "depth": 2.3,
+     "n": 28.0,
+     "source": {
+      "doc": 0,
+      "page": 701
+     }
+    },
+    {
+     "depth": 3.3,
+     "n": 27.0,
+     "source": {
+      "doc": 0,
+      "page": 701
+     }
+    },
+    {
+     "depth": 4.3,
+     "n": 28.0,
+     "source": {
+      "doc": 0,
+      "page": 701
+     }
+    },
+    {
+     "depth": 5.3,
+     "n": 18.0,
+     "source": {
+      "doc": 0,
+      "page": 701
+     }
+    },
+    {
+     "depth": 6.45,
+     "n": 24.0,
+     "source": {
+      "doc": 0,
+      "page": 701
+     }
+    },
+    {
+     "depth": 7.24,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 701
+     }
+    },
+    {
+     "depth": 8.22,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 701
+     }
+    },
+    {
+     "depth": 9.21,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 701
+     }
+    },
+    {
+     "depth": 10.3,
+     "n": 59.0,
+     "source": {
+      "doc": 0,
+      "page": 701
+     }
+    },
+    {
+     "depth": 11.3,
+     "n": 58.0,
+     "source": {
+      "doc": 0,
+      "page": 701
+     }
+    },
+    {
+     "depth": 12.28,
+     "n": 54.0,
+     "source": {
+      "doc": 0,
+      "page": 701
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 3.4,
+      "kind": "unspecified",
+      "source": {
+       "doc": 0,
+       "page": 701
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "B132E560",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 801
+    },
+    {
+     "doc": 0,
+     "page": 802
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 33.8093444,
+    "lon": 132.7373833,
+    "crs": "unstated",
+    "as_printed": "北緯 33° 48’ 33.64” 東経 132° 44’ 14.58”",
+    "source": {
+     "doc": 0,
+     "page": 801
+    }
+   },
+   "ground_elevation": {
+    "value": 11.65,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 0,
+     "page": 801
+    }
+   },
+   "final_depth": {
+    "value": 23.42,
+    "source": {
+     "doc": 0,
+     "page": 801
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 3.5,
+     "description": "まさ土(盛土)",
+     "principal": "made_ground",
+     "source": {
+      "doc": 0,
+      "page": 801
+     }
+    },
+    {
+     "top": 3.5,
+     "base": 4.5,
+     "description": "礫混じりシルト質砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 801
+     }
+    },
+    {
+     "top": 4.5,
+     "base": 7.2,
+     "description": "砂礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 801
+     }
+    },
+    {
+     "top": 7.2,
+     "base": 8.1,
+     "description": "砂質シルト",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 801
+     }
+    },
+    {
+     "top": 8.1,
+     "base": 11.7,
+     "description": "砂礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 801
+     }
+    },
+    {
+     "top": 11.7,
+     "base": 14.2,
+     "description": "砂質シルト",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 801
+     }
+    },
+    {
+     "top": 14.2,
+     "base": 16.35,
+     "description": "礫混じり砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 801
+     }
+    },
+    {
+     "top": 16.35,
+     "base": 23.42,
+     "description": "シルト混じり砂質礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 802
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.31,
+     "n": 11.0,
+     "source": {
+      "doc": 0,
+      "page": 801
+     }
+    },
+    {
+     "depth": 3.31,
+     "n": 15.0,
+     "source": {
+      "doc": 0,
+      "page": 801
+     }
+    },
+    {
+     "depth": 4.31,
+     "n": 20.0,
+     "source": {
+      "doc": 0,
+      "page": 801
+     }
+    },
+    {
+     "depth": 5.3,
+     "n": 29.0,
+     "source": {
+      "doc": 0,
+      "page": 801
+     }
+    },
+    {
+     "depth": 6.3,
+     "n": 35.0,
+     "source": {
+      "doc": 0,
+      "page": 801
+     }
+    },
+    {
+     "depth": 7.33,
+     "n": 18.0,
+     "source": {
+      "doc": 0,
+      "page": 801
+     }
+    },
+    {
+     "depth": 8.3,
+     "n": 15.0,
+     "source": {
+      "doc": 0,
+      "page": 801
+     }
+    },
+    {
+     "depth": 9.3,
+     "n": 33.0,
+     "source": {
+      "doc": 0,
+      "page": 801
+     }
+    },
+    {
+     "depth": 10.3,
+     "n": 29.0,
+     "source": {
+      "doc": 0,
+      "page": 801
+     }
+    },
+    {
+     "depth": 11.31,
+     "n": 7.0,
+     "source": {
+      "doc": 0,
+      "page": 801
+     }
+    },
+    {
+     "depth": 12.31,
+     "n": 5.0,
+     "source": {
+      "doc": 0,
+      "page": 801
+     }
+    },
+    {
+     "depth": 13.3,
+     "n": 5.0,
+     "source": {
+      "doc": 0,
+      "page": 801
+     }
+    },
+    {
+     "depth": 14.3,
+     "n": 35.0,
+     "source": {
+      "doc": 0,
+      "page": 801
+     }
+    },
+    {
+     "depth": 15.3,
+     "n": 22.0,
+     "source": {
+      "doc": 0,
+      "page": 801
+     }
+    },
+    {
+     "depth": 16.3,
+     "n": 37.0,
+     "source": {
+      "doc": 0,
+      "page": 802
+     }
+    },
+    {
+     "depth": 17.29,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 802
+     }
+    },
+    {
+     "depth": 18.25,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 802
+     }
+    },
+    {
+     "depth": 19.27,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 802
+     }
+    },
+    {
+     "depth": 20.29,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 802
+     }
+    },
+    {
+     "depth": 21.3,
+     "n": 37.0,
+     "source": {
+      "doc": 0,
+      "page": 802
+     }
+    },
+    {
+     "depth": 22.28,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 802
+     }
+    },
+    {
+     "depth": 23.29,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 802
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 2.4,
+      "kind": "unspecified",
+      "source": {
+       "doc": 0,
+       "page": 801
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "B170E707",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 901
+    },
+    {
+     "doc": 0,
+     "page": 902
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 34.0474333,
+    "lon": 132.9850806,
+    "crs": "unstated",
+    "as_printed": "北緯 34° 2’ 50.76” 東経 132° 59’ 6.29”",
+    "source": {
+     "doc": 0,
+     "page": 901
+    }
+   },
+   "ground_elevation": {
+    "value": 12.73,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 0,
+     "page": 901
+    }
+   },
+   "final_depth": {
+    "value": 22.18,
+    "source": {
+     "doc": 0,
+     "page": 901
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 1.8,
+     "description": "まさ土(盛土)",
+     "principal": "made_ground",
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "top": 1.8,
+     "base": 2.1,
+     "description": "砂礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "top": 2.1,
+     "base": 3.55,
+     "description": "礫混じり砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "top": 3.55,
+     "base": 4.0,
+     "description": "砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "top": 4.0,
+     "base": 5.3,
+     "description": "礫混じり砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "top": 5.3,
+     "base": 7.0,
+     "description": "砂礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "top": 7.0,
+     "base": 7.1,
+     "description": "砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "top": 7.1,
+     "base": 9.0,
+     "description": "礫混じり砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "top": 9.0,
+     "base": 9.45,
+     "description": "腐植土",
+     "principal": "peat_organic",
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "top": 9.45,
+     "base": 10.1,
+     "description": "礫混じり砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "top": 10.1,
+     "base": 12.8,
+     "description": "砂礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "top": 12.8,
+     "base": 13.25,
+     "description": "礫混じり砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "top": 13.25,
+     "base": 22.18,
+     "description": "シルト混じり礫質砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 4.0,
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "depth": 2.15,
+     "n": 11.0,
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "depth": 3.35,
+     "n": 18.0,
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "depth": 4.45,
+     "n": 12.0,
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 34.0,
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 21.0,
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "depth": 7.25,
+     "n": 16.0,
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 23.0,
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "depth": 9.15,
+     "n": 4.0,
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "depth": 10.31,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "depth": 11.15,
+     "n": 28.0,
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "depth": 12.25,
+     "n": 34.0,
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "depth": 13.15,
+     "n": 33.0,
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "depth": 14.14,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "depth": 15.15,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 901
+     }
+    },
+    {
+     "depth": 16.11,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 902
+     }
+    },
+    {
+     "depth": 17.12,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 902
+     }
+    },
+    {
+     "depth": 18.09,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 902
+     }
+    },
+    {
+     "depth": 19.07,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 902
+     }
+    },
+    {
+     "depth": 20.07,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 902
+     }
+    },
+    {
+     "depth": 21.08,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 902
+     }
+    },
+    {
+     "depth": 22.09,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 902
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 2.2,
+      "kind": "unspecified",
+      "source": {
+       "doc": 0,
+       "page": 901
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "B186E772",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 1001
+    },
+    {
+     "doc": 0,
+     "page": 1002
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 33.9061444,
+    "lon": 133.0747389,
+    "crs": "unstated",
+    "as_printed": "北緯 33° 54’ 22.12” 東経 133° 4’ 29.06”",
+    "source": {
+     "doc": 0,
+     "page": 1001
+    }
+   },
+   "ground_elevation": {
+    "value": 12.88,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 0,
+     "page": 1001
+    }
+   },
+   "final_depth": {
+    "value": 17.41,
+    "source": {
+     "doc": 0,
+     "page": 1001
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 0.2,
+     "description": "砂質シルト(盛土)",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 1001
+     }
+    },
+    {
+     "top": 0.2,
+     "base": 1.0,
+     "description": "砂質シルト",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 1001
+     }
+    },
+    {
+     "top": 1.0,
+     "base": 1.7,
+     "description": "砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 1001
+     }
+    },
+    {
+     "top": 1.7,
+     "base": 17.41,
+     "description": "砂礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 1001
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.3,
+     "n": 3.0,
+     "source": {
+      "doc": 0,
+      "page": 1001
+     }
+    },
+    {
+     "depth": 2.3,
+     "n": 13.0,
+     "source": {
+      "doc": 0,
+      "page": 1001
+     }
+    },
+    {
+     "depth": 3.3,
+     "n": 17.0,
+     "source": {
+      "doc": 0,
+      "page": 1001
+     }
+    },
+    {
+     "depth": 4.3,
+     "n": 33.0,
+     "source": {
+      "doc": 0,
+      "page": 1001
+     }
+    },
+    {
+     "depth": 5.28,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 1001
+     }
+    },
+    {
+     "depth": 6.3,
+     "n": 37.0,
+     "source": {
+      "doc": 0,
+      "page": 1001
+     }
+    },
+    {
+     "depth": 7.3,
+     "n": 32.0,
+     "source": {
+      "doc": 0,
+      "page": 1001
+     }
+    },
+    {
+     "depth": 8.3,
+     "n": 30.0,
+     "source": {
+      "doc": 0,
+      "page": 1001
+     }
+    },
+    {
+     "depth": 9.3,
+     "n": 32.0,
+     "source": {
+      "doc": 0,
+      "page": 1001
+     }
+    },
+    {
+     "depth": 10.3,
+     "n": 28.0,
+     "source": {
+      "doc": 0,
+      "page": 1001
+     }
+    },
+    {
+     "depth": 11.3,
+     "n": 28.0,
+     "source": {
+      "doc": 0,
+      "page": 1001
+     }
+    },
+    {
+     "depth": 12.3,
+     "n": 58.0,
+     "source": {
+      "doc": 0,
+      "page": 1001
+     }
+    },
+    {
+     "depth": 13.3,
+     "n": 40.0,
+     "source": {
+      "doc": 0,
+      "page": 1001
+     }
+    },
+    {
+     "depth": 14.28,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 1001
+     }
+    },
+    {
+     "depth": 15.3,
+     "n": 52.0,
+     "source": {
+      "doc": 0,
+      "page": 1001
+     }
+    },
+    {
+     "depth": 16.25,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 1002
+     }
+    },
+    {
+     "depth": 17.28,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 1002
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 2.5,
+      "kind": "unspecified",
+      "source": {
+       "doc": 0,
+       "page": 1001
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "B192E824",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 1100
+    },
+    {
+     "doc": 0,
+     "page": 1101
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 33.9175,
+    "lon": 133.0730833,
+    "crs": "unstated",
+    "as_printed": "北緯 33° 55’ 3.00” 東経 133° 4’ 23.10”",
+    "source": {
+     "doc": 0,
+     "page": 1100
+    }
+   },
+   "ground_elevation": {
+    "value": 7.5,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 0,
+     "page": 1100
+    }
+   },
+   "final_depth": {
+    "value": 17.45,
+    "source": {
+     "doc": 0,
+     "page": 1100
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 0.4,
+     "description": "シルト質砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 1100
+     }
+    },
+    {
+     "top": 0.4,
+     "base": 1.0,
+     "description": "礫混じり砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 1100
+     }
+    },
+    {
+     "top": 1.0,
+     "base": 1.5,
+     "description": "礫混じり粘土",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 1100
+     }
+    },
+    {
+     "top": 1.5,
+     "base": 3.25,
+     "description": "玉石混じり砂質礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 1100
+     }
+    },
+    {
+     "top": 3.25,
+     "base": 3.9,
+     "description": "礫混じりシルト",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 1100
+     }
+    },
+    {
+     "top": 3.9,
+     "base": 5.5,
+     "description": "シルト",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 1100
+     }
+    },
+    {
+     "top": 5.5,
+     "base": 5.9,
+     "description": "シルト混じり砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 1100
+     }
+    },
+    {
+     "top": 5.9,
+     "base": 6.8,
+     "description": "シルト質粘土",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 1100
+     }
+    },
+    {
+     "top": 6.8,
+     "base": 7.8,
+     "description": "シルト",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 1100
+     }
+    },
+    {
+     "top": 7.8,
+     "base": 17.45,
+     "description": "粘土混じり砂質礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 1100
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.3,
+     "n": 14.0,
+     "source": {
+      "doc": 0,
+      "page": 1100
+     }
+    },
+    {
+     "depth": 2.3,
+     "n": 24.0,
+     "source": {
+      "doc": 0,
+      "page": 1100
+     }
+    },
+    {
+     "depth": 3.3,
+     "n": 12.0,
+     "source": {
+      "doc": 0,
+      "page": 1100
+     }
+    },
+    {
+     "depth": 4.3,
+     "n": 5.0,
+     "source": {
+      "doc": 0,
+      "page": 1100
+     }
+    },
+    {
+     "depth": 5.3,
+     "n": 7.0,
+     "source": {
+      "doc": 0,
+      "page": 1100
+     }
+    },
+    {
+     "depth": 6.3,
+     "n": 5.0,
+     "source": {
+      "doc": 0,
+      "page": 1100
+     }
+    },
+    {
+     "depth": 7.3,
+     "n": 12.0,
+     "source": {
+      "doc": 0,
+      "page": 1100
+     }
+    },
+    {
+     "depth": 8.3,
+     "n": 37.0,
+     "source": {
+      "doc": 0,
+      "page": 1100
+     }
+    },
+    {
+     "depth": 9.3,
+     "n": 26.0,
+     "source": {
+      "doc": 0,
+      "page": 1100
+     }
+    },
+    {
+     "depth": 10.3,
+     "n": 29.0,
+     "source": {
+      "doc": 0,
+      "page": 1100
+     }
+    },
+    {
+     "depth": 11.3,
+     "n": 26.0,
+     "source": {
+      "doc": 0,
+      "page": 1100
+     }
+    },
+    {
+     "depth": 12.27,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 1100
+     }
+    },
+    {
+     "depth": 13.3,
+     "n": 38.0,
+     "source": {
+      "doc": 0,
+      "page": 1100
+     }
+    },
+    {
+     "depth": 14.3,
+     "n": 32.0,
+     "source": {
+      "doc": 0,
+      "page": 1100
+     }
+    },
+    {
+     "depth": 15.3,
+     "n": 48.0,
+     "source": {
+      "doc": 0,
+      "page": 1100
+     }
+    },
+    {
+     "depth": 16.3,
+     "n": 30.0,
+     "source": {
+      "doc": 0,
+      "page": 1101
+     }
+    },
+    {
+     "depth": 17.3,
+     "n": 37.0,
+     "source": {
+      "doc": 0,
+      "page": 1101
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "not_recorded",
+    "readings": []
+   }
+  },
+  {
+   "id": "J119L216",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 1201
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 33.9742611,
+    "lon": 132.5410694,
+    "crs": "unstated",
+    "as_printed": "北緯 33° 58’ 27.34” 東経 132° 32’ 27.85”",
+    "source": {
+     "doc": 0,
+     "page": 1201
+    }
+   },
+   "ground_elevation": {
+    "value": -0.62,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 0,
+     "page": 1201
+    }
+   },
+   "final_depth": {
+    "value": 15.19,
+    "source": {
+     "doc": 0,
+     "page": 1201
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 3.0,
+     "description": "礫混じり砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 1201
+     }
+    },
+    {
+     "top": 3.0,
+     "base": 4.0,
+     "description": "シルト混じり砂",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 1201
+     }
+    },
+    {
+     "top": 4.0,
+     "base": 9.5,
+     "description": "砂礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 1201
+     }
+    },
+    {
+     "top": 9.5,
+     "base": 13.2,
+     "description": "粘土混じり砂質礫",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 1201
+     }
+    },
+    {
+     "top": 13.2,
+     "base": 15.19,
+     "description": "花崗岩",
+     "principal": "rock",
+     "source": {
+      "doc": 0,
+      "page": 1201
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 0.08,
+     "n": 10.0,
+     "source": {
+      "doc": 0,
+      "page": 1201
+     }
+    },
+    {
+     "depth": 0.65,
+     "n": 18.0,
+     "source": {
+      "doc": 0,
+      "page": 1201
+     }
+    },
+    {
+     "depth": 1.65,
+     "n": 19.0,
+     "source": {
+      "doc": 0,
+      "page": 1201
+     }
+    },
+    {
+     "depth": 2.65,
+     "n": 4.0,
+     "source": {
+      "doc": 0,
+      "page": 1201
+     }
+    },
+    {
+     "depth": 3.65,
+     "n": 36.0,
+     "source": {
+      "doc": 0,
+      "page": 1201
+     }
+    },
+    {
+     "depth": 4.65,
+     "n": 20.0,
+     "source": {
+      "doc": 0,
+      "page": 1201
+     }
+    },
+    {
+     "depth": 5.65,
+     "n": 30.0,
+     "source": {
+      "doc": 0,
+      "page": 1201
+     }
+    },
+    {
+     "depth": 6.65,
+     "n": 20.0,
+     "source": {
+      "doc": 0,
+      "page": 1201
+     }
+    },
+    {
+     "depth": 7.65,
+     "n": 18.0,
+     "source": {
+      "doc": 0,
+      "page": 1201
+     }
+    },
+    {
+     "depth": 8.65,
+     "n": 27.0,
+     "source": {
+      "doc": 0,
+      "page": 1201
+     }
+    },
+    {
+     "depth": 9.65,
+     "n": 29.0,
+     "source": {
+      "doc": 0,
+      "page": 1201
+     }
+    },
+    {
+     "depth": 10.65,
+     "n": 35.0,
+     "source": {
+      "doc": 0,
+      "page": 1201
+     }
+    },
+    {
+     "depth": 11.65,
+     "n": 29.0,
+     "source": {
+      "doc": 0,
+      "page": 1201
+     }
+    },
+    {
+     "depth": 12.65,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 1201
+     }
+    },
+    {
+     "depth": 13.65,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 1201
+     }
+    },
+    {
+     "depth": 14.65,
+     "n": 99.0,
+     "source": {
+      "doc": 0,
+      "page": 1201
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "not_recorded",
+    "readings": []
+   }
+  }
+ ],
+ "readiness": {
+  "expected": "spatial_model",
+  "reasons": [],
+  "positioned_boreholes": 13,
+  "note": "Every sampled log gives latitude and longitude; the compilation spans many sites across the prefecture, so a model is a regional one."
+ }
+}

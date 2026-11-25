@@ -1,0 +1,2895 @@
+{
+ "schema_version": "1.0.0",
+ "report_id": "us-usgs-ofr90-90",
+ "status": "draft",
+ "provenance": {
+  "annotated_on": "2026-11-20",
+  "annotator_kind": "assistant",
+  "method": "Transcribed by eye from page images at 1.5x to 3x zoom (scanned, with a hidden OCR text layer that was not used). Layer boundaries and test depths are drawn against a depth scale labelled every 2 ft and read to the nearest foot (depth_resolution 1 ft)."
+ },
+ "scope": {
+  "pages": "all",
+  "boreholes": "sample",
+  "fields": [
+   "position",
+   "ground_elevation",
+   "final_depth",
+   "layers",
+   "spt",
+   "rqd",
+   "groundwater"
+  ],
+  "sample_rule": "The boreholes whose logs are on pages 11, 31, 51, 71, 91, 111 and 131 (every 20th page from the first log page), with all their sheets: 9 of the 164 logs."
+ },
+ "documents": [
+  {
+   "file": "report.pdf",
+   "pages": 145,
+   "sha256": "5cf3ab96af0d07c3bc452ce7ab701bd2d640c23387949f86f2ad7402a17a0b45"
+  }
+ ],
+ "pages": [
+  {
+   "doc": 0,
+   "page": 1,
+   "type": "front_matter"
+  },
+  {
+   "doc": 0,
+   "page": 2,
+   "type": "front_matter"
+  },
+  {
+   "doc": 0,
+   "page": 3,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 4,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 5,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 6,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 7,
+   "type": "text"
+  },
+  {
+   "doc": 0,
+   "page": 8,
+   "type": "other",
+   "note": "appendix title page"
+  },
+  {
+   "doc": 0,
+   "page": 9,
+   "type": "legend",
+   "note": "generalized stratigraphic section of the area"
+  },
+  {
+   "doc": 0,
+   "page": 10,
+   "type": "legend"
+  },
+  {
+   "doc": 0,
+   "page": 11,
+   "type": "borehole_log",
+   "boreholes": [
+    "79001"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 12,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 13,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 14,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 15,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 16,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 17,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 18,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 19,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 20,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 21,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 22,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 23,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 24,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 25,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 26,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 27,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 28,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 29,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 30,
+   "type": "borehole_log",
+   "boreholes": [
+    "79016"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 31,
+   "type": "borehole_log",
+   "boreholes": [
+    "79016"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 32,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 33,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 34,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 35,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 36,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 37,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 38,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 39,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 40,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 41,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 42,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 43,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 44,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 45,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 46,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 47,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 48,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 49,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 50,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 51,
+   "type": "borehole_log",
+   "boreholes": [
+    "79031"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 52,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 53,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 54,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 55,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 56,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 57,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 58,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 59,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 60,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 61,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 62,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 63,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 64,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 65,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 66,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 67,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 68,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 69,
+   "type": "borehole_log",
+   "boreholes": [
+    "79040"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 70,
+   "type": "borehole_log",
+   "boreholes": [
+    "79040"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 71,
+   "type": "borehole_log",
+   "boreholes": [
+    "79040"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 72,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 73,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 74,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 75,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 76,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 77,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 78,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 79,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 80,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 81,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 82,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 83,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 84,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 85,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 86,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 87,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 88,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 89,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 90,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 91,
+   "type": "borehole_log",
+   "boreholes": [
+    "80019",
+    "80020"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 92,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 93,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 94,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 95,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 96,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 97,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 98,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 99,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 100,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 101,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 102,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 103,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 104,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 105,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 106,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 107,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 108,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 109,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 110,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 111,
+   "type": "borehole_log",
+   "boreholes": [
+    "81038",
+    "81039"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 112,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 113,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 114,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 115,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 116,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 117,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 118,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 119,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 120,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 121,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 122,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 123,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 124,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 125,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 126,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 127,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 128,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 129,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 130,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 131,
+   "type": "borehole_log",
+   "boreholes": [
+    "82017"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 132,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 133,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 134,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 135,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 136,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 137,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 138,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 139,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 140,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 141,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 142,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 143,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 144,
+   "type": "borehole_log"
+  },
+  {
+   "doc": 0,
+   "page": 145,
+   "type": "borehole_log"
+  }
+ ],
+ "boreholes": [
+  {
+   "id": "79001",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 11
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "ft",
+   "position": null,
+   "ground_elevation": {
+    "value": 4.9,
+    "datum": "unstated (feet)",
+    "unit": "ft",
+    "as_printed": "GROUND ELEVATION: 4.9'",
+    "source": {
+     "doc": 0,
+     "page": 11
+    }
+   },
+   "final_depth": {
+    "value": 82,
+    "source": {
+     "doc": 0,
+     "page": 11
+    },
+    "as_printed": "T.D. 82'"
+   },
+   "layers": [
+    {
+     "top": 0,
+     "base": 7,
+     "description": "Sandy silt with organic material. [Qal]",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 11
+     }
+    },
+    {
+     "top": 7,
+     "base": 25.5,
+     "description": "Fine- to medium-grained sand; pocket of very loose, fine- to medium-grained sand. [Qal]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 11
+     }
+    },
+    {
+     "top": 25.5,
+     "base": 51,
+     "description": "Fine- to medium-grained silty sand; occasional silt layers and decomposed wood. [Qal]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 11
+     }
+    },
+    {
+     "top": 51,
+     "base": 55.5,
+     "description": "Fine- to medium-grained sand; trace of silt [Qal]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 11
+     }
+    },
+    {
+     "top": 55.5,
+     "base": 63,
+     "description": "Sandy silt with occasional marine shells. [Qal]",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 11
+     }
+    },
+    {
+     "top": 63,
+     "base": 65,
+     "description": "Clayey silt. [Qal]",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 11
+     }
+    },
+    {
+     "top": 65,
+     "base": 77,
+     "description": "Fine- to medium-grained sand. [Qal]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 11
+     }
+    },
+    {
+     "top": 77,
+     "base": 82,
+     "description": "Very dense, sandy gravel; some gravel clasts decomposing. [Qal]",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 11
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 10,
+     "n": 8,
+     "source": {
+      "doc": 0,
+      "page": 11
+     }
+    },
+    {
+     "depth": 14,
+     "n": 24,
+     "source": {
+      "doc": 0,
+      "page": 11
+     }
+    },
+    {
+     "depth": 20,
+     "n": 18,
+     "source": {
+      "doc": 0,
+      "page": 11
+     }
+    },
+    {
+     "depth": 30,
+     "n": 12,
+     "source": {
+      "doc": 0,
+      "page": 11
+     }
+    },
+    {
+     "depth": 34,
+     "n": 11,
+     "source": {
+      "doc": 0,
+      "page": 11
+     }
+    },
+    {
+     "depth": 38,
+     "n": 15,
+     "source": {
+      "doc": 0,
+      "page": 11
+     }
+    },
+    {
+     "depth": 42,
+     "n": 14,
+     "source": {
+      "doc": 0,
+      "page": 11
+     }
+    },
+    {
+     "depth": 48,
+     "n": 18,
+     "source": {
+      "doc": 0,
+      "page": 11
+     }
+    },
+    {
+     "depth": 54,
+     "n": 20,
+     "source": {
+      "doc": 0,
+      "page": 11
+     }
+    },
+    {
+     "depth": 60,
+     "n": 4,
+     "source": {
+      "doc": 0,
+      "page": 11
+     }
+    },
+    {
+     "depth": 66,
+     "n": 100,
+     "source": {
+      "doc": 0,
+      "page": 11
+     }
+    },
+    {
+     "depth": 74,
+     "n": 58,
+     "source": {
+      "doc": 0,
+      "page": 11
+     }
+    },
+    {
+     "depth": 82,
+     "n": 69,
+     "source": {
+      "doc": 0,
+      "page": 11
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "not_recorded",
+    "readings": []
+   },
+   "depth_resolution": 1.0
+  },
+  {
+   "id": "79016",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 30
+    },
+    {
+     "doc": 0,
+     "page": 31
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "ft",
+   "position": null,
+   "ground_elevation": {
+    "value": 6.4,
+    "datum": "unstated (feet)",
+    "unit": "ft",
+    "as_printed": "GROUND ELEVATION: 6.4'",
+    "source": {
+     "doc": 0,
+     "page": 30
+    }
+   },
+   "final_depth": {
+    "value": 131.5,
+    "source": {
+     "doc": 0,
+     "page": 30
+    },
+    "as_printed": "T.D. 131.5'"
+   },
+   "layers": [
+    {
+     "top": 0,
+     "base": 10,
+     "description": "Sand; small amounts of fine-grained gravel. [af]",
+     "principal": "made_ground",
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "top": 10,
+     "base": 20,
+     "description": "Silt; some very fine grained sand. [af]",
+     "principal": "made_ground",
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "top": 20,
+     "base": 32.5,
+     "description": "Fine-grained sand. [af]",
+     "principal": "made_ground",
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "top": 32.5,
+     "base": 35,
+     "description": "Silt. [Qal]",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "top": 35,
+     "base": 49.5,
+     "description": "Silty very fine grained sand; some clam shells. [Qal]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "top": 49.5,
+     "base": 55,
+     "description": "Silty very fine grained sand. [Qal]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "top": 55,
+     "base": 65,
+     "description": "Interbedded, thin layers of silty very fine grained sand and silt; some organic material. [Qal]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "top": 65,
+     "base": 69,
+     "description": "Silty very fine grained sand; thin silt layers and some clam shells. [Qal]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "top": 69,
+     "base": 92.5,
+     "description": "Silty very fine grained sand; thin silt layers. [Qal]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "top": 92.5,
+     "base": 105,
+     "description": "Silt. [Qal]",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "top": 105,
+     "base": 113,
+     "description": "Silty very fine grained sand with some organic matter. [Qal]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "top": 113,
+     "base": 125,
+     "description": "Silt. [Qal]",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "top": 125,
+     "base": 131.5,
+     "description": "Interbedded, thin layers of silty fine-grained sand and silt. [Qal]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 10,
+     "n": 3,
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "depth": 20,
+     "n": 18,
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "depth": 30,
+     "n": 23,
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "depth": 36,
+     "n": 19,
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "depth": 42,
+     "n": 49,
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "depth": 50,
+     "n": 14,
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "depth": 54,
+     "n": 16,
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "depth": 60,
+     "n": 21,
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "depth": 66,
+     "n": 23,
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "depth": 70,
+     "n": 14,
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "depth": 74,
+     "n": 11,
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "depth": 78,
+     "n": 25,
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "depth": 82,
+     "n": 23,
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "depth": 88,
+     "n": 12,
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "depth": 94,
+     "n": 3,
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "depth": 106,
+     "n": 23,
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "depth": 112,
+     "n": 36,
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "depth": 116,
+     "n": 8,
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "depth": 120,
+     "n": 12,
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "depth": 124,
+     "n": 22,
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    },
+    {
+     "depth": 130,
+     "n": 75,
+     "source": {
+      "doc": 0,
+      "page": 30
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "not_recorded",
+    "readings": []
+   },
+   "note": "The test at 10 ft prints 3/18\" (3 blows over 18 inches): n is 3. Layers marked [af] (artificial fill) are made ground.",
+   "depth_resolution": 1.0
+  },
+  {
+   "id": "79031",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 51
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "ft",
+   "position": null,
+   "ground_elevation": {
+    "value": 115,
+    "datum": "unstated (feet)",
+    "unit": "ft",
+    "as_printed": "GROUND ELEVATION: 115'",
+    "source": {
+     "doc": 0,
+     "page": 51
+    }
+   },
+   "final_depth": {
+    "value": 93,
+    "source": {
+     "doc": 0,
+     "page": 51
+    },
+    "as_printed": "T.D. 93'"
+   },
+   "layers": [
+    {
+     "top": 0,
+     "base": 7,
+     "description": "Dense to loose, damp, silty, gravelly sand with silt pockets: brick and wood debris. [af]",
+     "principal": "made_ground",
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "top": 7,
+     "base": 21,
+     "description": "Damp, slightly silty, fine-grained sand. [Qva]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "top": 21,
+     "base": 27,
+     "description": "Dense, damp, slightly silty, very fine and fine-grained sand. [Qva]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "top": 27,
+     "base": 30,
+     "description": "Dense, damp, slightly gravelly, fine- to medium-grained sandy silt. [Qva]",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "top": 30,
+     "base": 40,
+     "description": "Very stiff, damp, clayey silt and silty clay; occasional fine-grained sand seams and slickensides. [Qva]",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "top": 40,
+     "base": 43,
+     "description": "Hard, moist, gravelly, fine-to coarse-grained sandy, clayey silt. [Qva]",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "top": 43,
+     "base": 56,
+     "description": "Very stiff to hard, moist, clayey silt and silty clay; lenses of damp to wet, silty, very fine-grained sand; ... Hard, damp, clayey silt and silty clay. [Qva]",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "top": 56,
+     "base": 60,
+     "description": "Dense, damp, slightly silty, fine-grained sand. [Qg]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "top": 60,
+     "base": 65,
+     "description": "Very dense, damp to moist, gravelly, silt to fine- to medium-grained sand. [Qg]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "top": 65,
+     "base": 85,
+     "description": "Very dense, damp to saturated, slightly silty fine-grained sand. [Qg]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "top": 85,
+     "base": 93,
+     "description": "Very dense, wet, silty, gravelly, fine- to coarse-grained sand. [Qg]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 4,
+     "n": 12,
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "depth": 8,
+     "n": 3,
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "depth": 14,
+     "n": 7,
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "depth": 18,
+     "n": 16,
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "depth": 24,
+     "n": 20,
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "depth": 28,
+     "n": 33,
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "depth": 32,
+     "n": 27,
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "depth": 34,
+     "n": 18,
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "depth": 36,
+     "n": 19,
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "depth": 38,
+     "n": 20,
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "depth": 42,
+     "n": 55,
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "depth": 44,
+     "n": 36,
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "depth": 46,
+     "n": 30,
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "depth": 48,
+     "n": 55,
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "depth": 54,
+     "n": 35,
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "depth": 58,
+     "n": 90,
+     "source": {
+      "doc": 0,
+      "page": 51
+     }
+    },
+    {
+     "depth": 62,
+     "n": 50,
+     "source": {
+      "doc": 0,
+      "page": 51
+     },
+     "penetration_cm": 5.1,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 64,
+     "n": 50,
+     "source": {
+      "doc": 0,
+      "page": 51
+     },
+     "penetration_cm": 12.7,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 68,
+     "n": 50,
+     "source": {
+      "doc": 0,
+      "page": 51
+     },
+     "penetration_cm": 12.7,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 72,
+     "n": 90,
+     "source": {
+      "doc": 0,
+      "page": 51
+     },
+     "penetration_cm": 22.9,
+     "refusal": true,
+     "blows": 90
+    },
+    {
+     "depth": 74,
+     "n": 82,
+     "source": {
+      "doc": 0,
+      "page": 51
+     },
+     "penetration_cm": 27.9,
+     "refusal": true,
+     "blows": 82
+    },
+    {
+     "depth": 78,
+     "n": 50,
+     "source": {
+      "doc": 0,
+      "page": 51
+     },
+     "penetration_cm": 12.7,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 84,
+     "n": 50,
+     "source": {
+      "doc": 0,
+      "page": 51
+     },
+     "penetration_cm": 12.7,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 88,
+     "n": 50,
+     "source": {
+      "doc": 0,
+      "page": 51
+     },
+     "penetration_cm": 12.7,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 92,
+     "n": 50,
+     "source": {
+      "doc": 0,
+      "page": 51
+     },
+     "penetration_cm": 12.7,
+     "refusal": true,
+     "blows": 50
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "not_recorded",
+    "readings": []
+   },
+   "note": "Blow counts printed as blows over inches (50/5\") are refusals: n and blows are the blows, penetration converted to cm.",
+   "depth_resolution": 1.0
+  },
+  {
+   "id": "79040",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 69
+    },
+    {
+     "doc": 0,
+     "page": 70
+    },
+    {
+     "doc": 0,
+     "page": 71
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "ft",
+   "position": null,
+   "ground_elevation": {
+    "value": 8,
+    "datum": "unstated (feet)",
+    "unit": "ft",
+    "as_printed": "GROUND ELEVATION: 8'",
+    "source": {
+     "doc": 0,
+     "page": 69
+    }
+   },
+   "final_depth": {
+    "value": 230.5,
+    "source": {
+     "doc": 0,
+     "page": 69
+    },
+    "as_printed": "T.D. 230.5'"
+   },
+   "layers": [
+    {
+     "top": 0,
+     "base": 7,
+     "description": "Soft, fine- to medium-grained sandy, silty clay; scattered gravel, organic material and debris. [af]",
+     "principal": "made_ground",
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "top": 7,
+     "base": 31,
+     "description": "Medium dense, slightly silty, fine- to medium-grained sand; scattered gravel and organic material. [af]",
+     "principal": "made_ground",
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "top": 31,
+     "base": 63,
+     "description": "Similar to above except dense; scattered thin clayey silt and sandy silt layers. [Qal]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "top": 63,
+     "base": 127,
+     "description": "Interbedded, medium dense, silty, fine-grained sand and stiff to very stiff, slightly clayey, fine-grained sandy silt; scattered organic material. [Qal]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "top": 127,
+     "base": 143,
+     "description": "Stiff to hard, slightly clayey to clayey, fine-grained sandy silt; scattered very thin silty sand layers, organic material and wood fragments. [Qal]",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "top": 143,
+     "base": 183,
+     "description": "Dense to very dense, silty fine-grained sand; numerous hard, clayey, fine-grained sandy silty layers below 170', and scattered organic material and shell fragments. [Qal]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "top": 183,
+     "base": 189,
+     "description": "Stiff, fine-grained sandy, clayey silt. [Qal]",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "top": 189,
+     "base": 194,
+     "description": "Very dense, gravelly, clayey, silty, fine- to medium-grained sand. [Qvr]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "top": 194,
+     "base": 230.5,
+     "description": "Hard, fine- to medium-grained, sandy, silty clay, trace of gravel. [Qvr]",
+     "principal": "clay",
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 4,
+     "n": 4,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 6,
+     "n": 3,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 8,
+     "n": 17,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 12,
+     "n": 33,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 14,
+     "n": 17,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 16,
+     "n": 22,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 18,
+     "n": 8,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 24,
+     "n": 26,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 26,
+     "n": 15,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 28,
+     "n": 13,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 32,
+     "n": 12,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 34,
+     "n": 34,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 36,
+     "n": 30,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 38,
+     "n": 34,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 42,
+     "n": 27,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 46,
+     "n": 30,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 56,
+     "n": 37,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 62,
+     "n": 33,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 66,
+     "n": 16,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 72,
+     "n": 10,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 82,
+     "n": 13,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 86,
+     "n": 25,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 92,
+     "n": 27,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 96,
+     "n": 24,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 102,
+     "n": 32,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 106,
+     "n": 28,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 112,
+     "n": 48,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 122,
+     "n": 14,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 126,
+     "n": 23,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 132,
+     "n": 12,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 136,
+     "n": 35,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 142,
+     "n": 19,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 152,
+     "n": 59,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 156,
+     "n": 65,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 162,
+     "n": 47,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 164,
+     "n": 45,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 166,
+     "n": 47,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 172,
+     "n": 79,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 176,
+     "n": 49,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 182,
+     "n": 53,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 186,
+     "n": 15,
+     "source": {
+      "doc": 0,
+      "page": 69
+     }
+    },
+    {
+     "depth": 190,
+     "n": 31,
+     "source": {
+      "doc": 0,
+      "page": 69
+     },
+     "penetration_cm": 5.1,
+     "refusal": true,
+     "blows": 31
+    },
+    {
+     "depth": 200,
+     "n": 51,
+     "source": {
+      "doc": 0,
+      "page": 69
+     },
+     "penetration_cm": 12.7,
+     "refusal": true,
+     "blows": 51
+    },
+    {
+     "depth": 204,
+     "n": 53,
+     "source": {
+      "doc": 0,
+      "page": 69
+     },
+     "penetration_cm": 12.7,
+     "refusal": true,
+     "blows": 53
+    },
+    {
+     "depth": 210,
+     "n": 52,
+     "source": {
+      "doc": 0,
+      "page": 69
+     },
+     "penetration_cm": 7.6,
+     "refusal": true,
+     "blows": 52
+    },
+    {
+     "depth": 214,
+     "n": 52,
+     "source": {
+      "doc": 0,
+      "page": 69
+     },
+     "penetration_cm": 15.2,
+     "refusal": true,
+     "blows": 52
+    },
+    {
+     "depth": 220,
+     "n": 51,
+     "source": {
+      "doc": 0,
+      "page": 69
+     },
+     "penetration_cm": 7.6,
+     "refusal": true,
+     "blows": 51
+    },
+    {
+     "depth": 230,
+     "n": 53,
+     "source": {
+      "doc": 0,
+      "page": 69
+     },
+     "penetration_cm": 15.2,
+     "refusal": true,
+     "blows": 53
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 11,
+      "kind": "unspecified",
+      "source": {
+       "doc": 0,
+       "page": 69
+      },
+      "date": "3/26/80, 4/24/80"
+     }
+    ]
+   },
+   "note": "Water level drawn at about 11 ft (read off the scale).",
+   "depth_resolution": 1.0
+  },
+  {
+   "id": "80019",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 91
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "ft",
+   "position": null,
+   "ground_elevation": {
+    "value": 300,
+    "datum": "unstated (feet)",
+    "unit": "ft",
+    "as_printed": "GROUND ELEVATION: 300'",
+    "source": {
+     "doc": 0,
+     "page": 91
+    }
+   },
+   "final_depth": {
+    "value": 15,
+    "source": {
+     "doc": 0,
+     "page": 91
+    },
+    "as_printed": "T.D. 15'"
+   },
+   "layers": [
+    {
+     "top": 0,
+     "base": 5,
+     "description": "Loose, well-graded sand with gravel and silt. [Qva]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 91
+     }
+    },
+    {
+     "top": 5,
+     "base": 10,
+     "description": "Loose sand; traces of gravel and silt. [Qva]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 91
+     }
+    },
+    {
+     "top": 10,
+     "base": 15,
+     "description": "Firm sand; traces of gravel and silt. [Qva]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 91
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 4,
+     "n": 6,
+     "source": {
+      "doc": 0,
+      "page": 91
+     }
+    },
+    {
+     "depth": 8,
+     "n": 2,
+     "source": {
+      "doc": 0,
+      "page": 91
+     }
+    },
+    {
+     "depth": 14,
+     "n": 29,
+     "source": {
+      "doc": 0,
+      "page": 91
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "not_recorded",
+    "readings": []
+   },
+   "depth_resolution": 1.0
+  },
+  {
+   "id": "80020",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 91
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "ft",
+   "position": null,
+   "ground_elevation": {
+    "value": 25,
+    "datum": "unstated (feet)",
+    "unit": "ft",
+    "as_printed": "GROUND ELEVATION: 25'",
+    "source": {
+     "doc": 0,
+     "page": 91
+    }
+   },
+   "final_depth": {
+    "value": 28.5,
+    "source": {
+     "doc": 0,
+     "page": 91
+    },
+    "as_printed": "T.D. 28.5'"
+   },
+   "layers": [
+    {
+     "top": 0,
+     "base": 5,
+     "description": "Firm, medium-grained sand with gravel to 3/4\". [Qg]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 91
+     }
+    },
+    {
+     "top": 5,
+     "base": 10,
+     "description": "Firm, medium-grained sand with gravel to 3/4\". [Qg]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 91
+     }
+    },
+    {
+     "top": 10,
+     "base": 15,
+     "description": "Firm, medium- to coarse-grained sand with gravel to 3/4\". [Qg]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 91
+     }
+    },
+    {
+     "top": 15,
+     "base": 20,
+     "description": "Firm, medium- to coarse-grained sand with gravel to 3/4\". [Qg]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 91
+     }
+    },
+    {
+     "top": 20,
+     "base": 25,
+     "description": "Medium dense, silty sand; traces of fine-grained gravel, fine sand, and clay. [Qn]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 91
+     }
+    },
+    {
+     "top": 25,
+     "base": 28.5,
+     "description": "Firm, fine-grained sand and silt; traces of stratified clay. [Bedrock]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 91
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 6,
+     "n": 21,
+     "source": {
+      "doc": 0,
+      "page": 91
+     }
+    },
+    {
+     "depth": 12,
+     "n": 24,
+     "source": {
+      "doc": 0,
+      "page": 91
+     }
+    },
+    {
+     "depth": 18,
+     "n": 20,
+     "source": {
+      "doc": 0,
+      "page": 91
+     }
+    },
+    {
+     "depth": 22,
+     "n": 11,
+     "source": {
+      "doc": 0,
+      "page": 91
+     }
+    },
+    {
+     "depth": 26,
+     "n": 52,
+     "source": {
+      "doc": 0,
+      "page": 91
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 16,
+      "kind": "unspecified",
+      "source": {
+       "doc": 0,
+       "page": 91
+      },
+      "date": "7/18/62"
+     }
+    ]
+   },
+   "note": "Second log on its page. Water level drawn at about 16 ft.",
+   "depth_resolution": 1.0
+  },
+  {
+   "id": "81038",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 111
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "ft",
+   "position": null,
+   "ground_elevation": {
+    "value": 375,
+    "datum": "unstated (feet)",
+    "unit": "ft",
+    "as_printed": "GROUND ELEVATION: 375'",
+    "source": {
+     "doc": 0,
+     "page": 111
+    }
+   },
+   "final_depth": {
+    "value": 15,
+    "source": {
+     "doc": 0,
+     "page": 111
+    },
+    "as_printed": "T.D. 15'"
+   },
+   "layers": [
+    {
+     "top": 0,
+     "base": 5,
+     "description": "Loose sandy silt; gravel and wood fragments. [Qal]",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 111
+     }
+    },
+    {
+     "top": 5,
+     "base": 10,
+     "description": "Very compact sand and silt with gravel. [Qvt]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 111
+     }
+    },
+    {
+     "top": 10,
+     "base": 15,
+     "description": "Very compact silty sand with gravel. [Qvt]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 111
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 4,
+     "n": 1,
+     "source": {
+      "doc": 0,
+      "page": 111
+     }
+    },
+    {
+     "depth": 8,
+     "n": 50,
+     "source": {
+      "doc": 0,
+      "page": 111
+     },
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 14,
+     "n": 50,
+     "source": {
+      "doc": 0,
+      "page": 111
+     },
+     "refusal": true,
+     "blows": 50
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "not_recorded",
+    "readings": []
+   },
+   "note": "Blow counts printed 50+: refusals with no penetration given.",
+   "depth_resolution": 1.0
+  },
+  {
+   "id": "81039",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 111
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "ft",
+   "position": null,
+   "ground_elevation": {
+    "value": 50,
+    "datum": "unstated (feet)",
+    "unit": "ft",
+    "as_printed": "GROUND ELEVATION: 50'",
+    "source": {
+     "doc": 0,
+     "page": 111
+    }
+   },
+   "final_depth": {
+    "value": 15,
+    "source": {
+     "doc": 0,
+     "page": 111
+    },
+    "as_printed": "T.D. 15'"
+   },
+   "layers": [
+    {
+     "top": 0,
+     "base": 5,
+     "description": "Soft sandy silt with clay and gravel. [af]",
+     "principal": "made_ground",
+     "source": {
+      "doc": 0,
+      "page": 111
+     }
+    },
+    {
+     "top": 5,
+     "base": 10,
+     "description": "Medium dense clayey silt with silt partings. [Qn]",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 111
+     }
+    },
+    {
+     "top": 10,
+     "base": 15,
+     "description": "Stif clayey silt with thin silt layers. [Qn]",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 111
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 2,
+     "n": 4,
+     "source": {
+      "doc": 0,
+      "page": 111
+     }
+    },
+    {
+     "depth": 6,
+     "n": 10,
+     "source": {
+      "doc": 0,
+      "page": 111
+     }
+    },
+    {
+     "depth": 10,
+     "n": 14,
+     "source": {
+      "doc": 0,
+      "page": 111
+     }
+    },
+    {
+     "depth": 14,
+     "n": 18,
+     "source": {
+      "doc": 0,
+      "page": 111
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "not_recorded",
+    "readings": []
+   },
+   "note": "Second log on its page.",
+   "depth_resolution": 1.0
+  },
+  {
+   "id": "82017",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 131
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "ft",
+   "position": null,
+   "ground_elevation": {
+    "value": 125,
+    "datum": "unstated (feet)",
+    "unit": "ft",
+    "as_printed": "GROUND ELEVATION: 125'",
+    "source": {
+     "doc": 0,
+     "page": 131
+    }
+   },
+   "final_depth": {
+    "value": 35,
+    "source": {
+     "doc": 0,
+     "page": 131
+    },
+    "as_printed": "T.D. 35'"
+   },
+   "layers": [
+    {
+     "top": 0,
+     "base": 5,
+     "description": "Moist, very stiff; slightly clayey sandy silt. [Qvr]",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 131
+     }
+    },
+    {
+     "top": 5,
+     "base": 15,
+     "description": "Moist, compact; coarse-grained sand with trace of gravel, some clay and very fine-grained sand layers. [Qvt]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 131
+     }
+    },
+    {
+     "top": 15,
+     "base": 20,
+     "description": "Moist, compact; silty fine-grained sand. [Qva]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 131
+     }
+    },
+    {
+     "top": 20,
+     "base": 35,
+     "description": "Moist to wet, very compact; sand. [Qva]",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 131
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 4,
+     "n": 38,
+     "source": {
+      "doc": 0,
+      "page": 131
+     }
+    },
+    {
+     "depth": 8,
+     "n": 51,
+     "source": {
+      "doc": 0,
+      "page": 131
+     }
+    },
+    {
+     "depth": 14,
+     "n": 35,
+     "source": {
+      "doc": 0,
+      "page": 131
+     }
+    },
+    {
+     "depth": 18,
+     "n": 39,
+     "source": {
+      "doc": 0,
+      "page": 131
+     }
+    },
+    {
+     "depth": 24,
+     "n": 62,
+     "source": {
+      "doc": 0,
+      "page": 131
+     }
+    },
+    {
+     "depth": 28,
+     "n": 62,
+     "source": {
+      "doc": 0,
+      "page": 131
+     }
+    },
+    {
+     "depth": 34,
+     "n": 59,
+     "source": {
+      "doc": 0,
+      "page": 131
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 28,
+      "kind": "unspecified",
+      "source": {
+       "doc": 0,
+       "page": 131
+      },
+      "date": "3-31-69"
+     }
+    ]
+   },
+   "note": "Water level drawn at about 28 ft.",
+   "depth_resolution": 1.0
+  }
+ ],
+ "readiness": {
+  "expected": "abstain",
+  "reasons": [
+   "no_positions"
+  ],
+  "positioned_boreholes": 0,
+  "note": "The logs give site descriptions (streets, stations) and ground elevations, but no coordinates: the positions are on a separate plate that is not part of this file."
+ }
+}

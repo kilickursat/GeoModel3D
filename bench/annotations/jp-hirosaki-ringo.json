@@ -1,0 +1,1188 @@
+{
+ "schema_version": "1.0.0",
+ "report_id": "jp-hirosaki-ringo",
+ "status": "draft",
+ "provenance": {
+  "annotated_on": "2026-11-20",
+  "annotator_kind": "assistant",
+  "method": "Transcribed by eye from page images turned upright, at 2x and 5x zoom (scanned, no text layer); checked against elevation = ground level - depth on every layer and the N-value printed beside each test. Names and telephone numbers on the logs are not transcribed."
+ },
+ "scope": {
+  "pages": "all",
+  "boreholes": "all",
+  "fields": [
+   "position",
+   "ground_elevation",
+   "final_depth",
+   "layers",
+   "spt",
+   "rqd",
+   "groundwater"
+  ]
+ },
+ "documents": [
+  {
+   "file": "20170308_hirosaki_ringo_tyousatiannaizu.pdf",
+   "pages": 1,
+   "sha256": "55d859913ebc9fa2cc7c5d3f30d877f1f339897d3d1a7732b8d863e7858298df"
+  },
+  {
+   "file": "20170308_hirosaki_ringo_tyousaitiheimenzu_risaikurutou.pdf",
+   "pages": 1,
+   "sha256": "8b60ac70cea77f061b2bd84478243bb2778b9f4fcaf5bbb6cac054e7cea62ed1"
+  },
+  {
+   "file": "20170308_hirosaki_ringo_tyousaitiheimenzu_kenshutou.pdf",
+   "pages": 1,
+   "sha256": "ca79a2cb6fc1a2c5811d340e2e9d004ed6e681d824b8840698dfb29dfce99c50"
+  },
+  {
+   "file": "20170308_hirosaki_ringo_tisousuiteidanmenzu.pdf",
+   "pages": 1,
+   "sha256": "582e6930f7b664b0ae709b8aaffb103a41e1ce2a8f8e5b62190ce53872a84c33"
+  },
+  {
+   "file": "20170308_hirosaki_ringo_boringutyuujouzu1.pdf",
+   "pages": 1,
+   "sha256": "e6364ee684bf6e4310a20e5a2d1451ed91684c254f163616b4f9b8d2540c5d63"
+  },
+  {
+   "file": "20170308_hirosaki_ringo_boringutyuujouzu2.pdf",
+   "pages": 1,
+   "sha256": "70d823d8e8677fddbf742b1a299e6f3058464e1d9087084e33606876a269f25a"
+  },
+  {
+   "file": "20170308_hirosaki_ringo_boringutyuujouzu3.pdf",
+   "pages": 1,
+   "sha256": "bcc2ed647504350c4e71e29ba952cf99bc8bfbfad063bc6ab09e2e751a7ba37a"
+  },
+  {
+   "file": "20170308_hirosaki_ringo_boringutyuujouzu4.pdf",
+   "pages": 1,
+   "sha256": "eb3db0f5f0c7d5f3033c669a257581893acb73c2db3bc063f94a10ab0c135b38"
+  }
+ ],
+ "pages": [
+  {
+   "doc": 0,
+   "page": 1,
+   "type": "site_plan",
+   "note": "location guide map",
+   "scan_quality": "good_scan"
+  },
+  {
+   "doc": 1,
+   "page": 1,
+   "type": "site_plan",
+   "note": "plan of the borehole positions (recycling building)"
+  },
+  {
+   "doc": 2,
+   "page": 1,
+   "type": "site_plan",
+   "note": "plan of the borehole positions (training building)"
+  },
+  {
+   "doc": 3,
+   "page": 1,
+   "type": "cross_section",
+   "note": "estimated geological section"
+  },
+  {
+   "doc": 4,
+   "page": 1,
+   "type": "borehole_log",
+   "boreholes": [
+    "No.1"
+   ],
+   "note": "A3 sheet with the log printed sideways (rotated 90 degrees)"
+  },
+  {
+   "doc": 5,
+   "page": 1,
+   "type": "borehole_log",
+   "boreholes": [
+    "No.2"
+   ],
+   "note": "A3 sheet with the log printed sideways (rotated 90 degrees)"
+  },
+  {
+   "doc": 6,
+   "page": 1,
+   "type": "borehole_log",
+   "boreholes": [
+    "No.3"
+   ],
+   "note": "A3 sheet with the log printed sideways (rotated 90 degrees)"
+  },
+  {
+   "doc": 7,
+   "page": 1,
+   "type": "borehole_log",
+   "boreholes": [
+    "No.4"
+   ],
+   "note": "A3 sheet with the log printed sideways (rotated 90 degrees)"
+  }
+ ],
+ "boreholes": [
+  {
+   "id": "No.1",
+   "pages": [
+    {
+     "doc": 4,
+     "page": 1
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": null,
+   "ground_elevation": {
+    "value": -0.862,
+    "datum": "KBM (local benchmark)",
+    "unit": "m",
+    "as_printed": "KBM -0.862m",
+    "source": {
+     "doc": 4,
+     "page": 1
+    }
+   },
+   "final_depth": {
+    "value": 15.05,
+    "source": {
+     "doc": 4,
+     "page": 1
+    }
+   },
+   "layers": [
+    {
+     "top": 0,
+     "base": 0.2,
+     "description": "表土：砂混じりシルト主体、草根を混入",
+     "principal": "topsoil",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 0.2,
+     "base": 2.6,
+     "description": "砂混じりシルト：全体に微細砂を混入",
+     "principal": "silt",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 2.6,
+     "base": 5.6,
+     "description": "火山灰質粘土：3.70、4.50m付近、φ30〜50mmの角礫を点在",
+     "principal": "clay",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 5.6,
+     "base": 7.9,
+     "description": "礫混じり粘土：所々、φ20〜40mmの亜円〜亜角礫及び軽石を混入",
+     "principal": "clay",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 7.9,
+     "base": 8.5,
+     "description": "粘土：φ10〜20mmの亜角礫を点在",
+     "principal": "clay",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 8.5,
+     "base": 15.05,
+     "description": "玉石混じり砂礫：φ10〜30mmの角礫を主体、13.80〜15.00m間は玉石",
+     "principal": "gravel",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 12,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 2.15,
+     "n": 15,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 3.15,
+     "n": 5,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 4.15,
+     "n": 5,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 5,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 16,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 16,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 9,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 9.15,
+     "n": 17,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 10.15,
+     "n": 26,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 11.15,
+     "n": 50,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 12.15,
+     "n": 100,
+     "source": {
+      "doc": 4,
+      "page": 1
+     },
+     "penetration_cm": 15,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 13.0,
+     "n": 50,
+     "source": {
+      "doc": 4,
+      "page": 1
+     },
+     "penetration_cm": 0,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 14.0,
+     "n": 50,
+     "source": {
+      "doc": 4,
+      "page": 1
+     },
+     "penetration_cm": 0,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 15.0,
+     "n": 300,
+     "source": {
+      "doc": 4,
+      "page": 1
+     },
+     "penetration_cm": 5,
+     "refusal": true,
+     "blows": 50
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 0.2,
+      "kind": "unspecified",
+      "source": {
+       "doc": 4,
+       "page": 1
+      },
+      "date": "9/1"
+     }
+    ]
+   },
+   "note": "No latitude or longitude. The water level is printed over the column head and is hard to read (0.20). Tests at 13.00 and 14.00 m: 50 blows, no penetration (貫入不能)."
+  },
+  {
+   "id": "No.2",
+   "pages": [
+    {
+     "doc": 5,
+     "page": 1
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": null,
+   "ground_elevation": {
+    "value": -0.992,
+    "datum": "KBM (local benchmark)",
+    "unit": "m",
+    "as_printed": "KBM -0.992m",
+    "source": {
+     "doc": 5,
+     "page": 1
+    }
+   },
+   "final_depth": {
+    "value": 20.0,
+    "source": {
+     "doc": 5,
+     "page": 1
+    }
+   },
+   "layers": [
+    {
+     "top": 0,
+     "base": 0.5,
+     "description": "表土：黒ボク主体",
+     "principal": "topsoil",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 0.5,
+     "base": 1.6,
+     "description": "砂混じりシルト：粗砂を混入、火山灰質",
+     "principal": "silt",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 1.6,
+     "base": 6.5,
+     "description": "火山灰質粘土：部分的に角礫を点在",
+     "principal": "clay",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 6.5,
+     "base": 7.5,
+     "description": "礫混じり砂質粘土",
+     "principal": "clay",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 7.5,
+     "base": 10.5,
+     "description": "礫混じり火山灰質粘土：7.80〜8.80m間、φ10mm以下の角礫・粗砂を多く混入",
+     "principal": "clay",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 10.5,
+     "base": 12.8,
+     "description": "粘土混じり砂礫：φ10〜30mmの角礫を主体",
+     "principal": "gravel",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 12.8,
+     "base": 14.5,
+     "description": "礫混じり粘土：所々にφ10〜30mmの亜角礫を混入",
+     "principal": "clay",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 14.5,
+     "base": 20.0,
+     "description": "玉石混じり砂礫：φ20〜40mmの角礫を主体、14.50〜15.70m間は玉石",
+     "principal": "gravel",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 19,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 2.15,
+     "n": 5,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 3.15,
+     "n": 5,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 4.15,
+     "n": 5,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 5,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 3,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 11,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 4,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 9.15,
+     "n": 6,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 10.15,
+     "n": 6,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 11.15,
+     "n": 14,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 12.15,
+     "n": 39,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 13.15,
+     "n": 7,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 14.15,
+     "n": 9,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 15.0,
+     "n": 50,
+     "source": {
+      "doc": 5,
+      "page": 1
+     },
+     "penetration_cm": 0,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 16.0,
+     "n": 150,
+     "source": {
+      "doc": 5,
+      "page": 1
+     },
+     "penetration_cm": 10,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 17.0,
+     "n": 50,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 18.15,
+     "n": 50,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 19.0,
+     "n": 50,
+     "source": {
+      "doc": 5,
+      "page": 1
+     },
+     "penetration_cm": 0,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 20.0,
+     "n": 50,
+     "source": {
+      "doc": 5,
+      "page": 1
+     },
+     "penetration_cm": 0,
+     "refusal": true,
+     "blows": 50
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 1.8,
+      "kind": "unspecified",
+      "source": {
+       "doc": 5,
+       "page": 1
+      },
+      "date": "9/8"
+     }
+    ]
+   },
+   "note": "No latitude or longitude."
+  },
+  {
+   "id": "No.3",
+   "pages": [
+    {
+     "doc": 6,
+     "page": 1
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": null,
+   "ground_elevation": {
+    "value": 2.108,
+    "datum": "KBM (local benchmark)",
+    "unit": "m",
+    "as_printed": "KBM +2.108m",
+    "source": {
+     "doc": 6,
+     "page": 1
+    }
+   },
+   "final_depth": {
+    "value": 16.45,
+    "source": {
+     "doc": 6,
+     "page": 1
+    }
+   },
+   "layers": [
+    {
+     "top": 0,
+     "base": 0.5,
+     "description": "表土：砂混じりシルト主体、草根を混入",
+     "principal": "topsoil",
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "top": 0.5,
+     "base": 3.0,
+     "description": "火山灰質粘土",
+     "principal": "clay",
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "top": 3.0,
+     "base": 3.7,
+     "description": "火山灰質砂：細中砂を主体",
+     "principal": "sand",
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "top": 3.7,
+     "base": 8.8,
+     "description": "粘土混り砂礫：φ20〜50mmの亜角〜角礫を主体、マトリクスは粗砂",
+     "principal": "gravel",
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "top": 8.8,
+     "base": 10.5,
+     "description": "火山灰質砂：中〜粗砂を主体、全体に軽石粒を混入",
+     "principal": "sand",
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "top": 10.5,
+     "base": 16.45,
+     "description": "粘土混じり砂礫：φ10〜40mmの亜角〜角礫主体、13.70〜15.00m間はコア長50〜100mmの玉石を主体とする",
+     "principal": "gravel",
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 13,
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "depth": 2.15,
+     "n": 5,
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "depth": 3.15,
+     "n": 11,
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "depth": 4.15,
+     "n": 21,
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 28,
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 17,
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 40,
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 38,
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "depth": 9.15,
+     "n": 15,
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "depth": 10.15,
+     "n": 11,
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "depth": 11.15,
+     "n": 33,
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "depth": 12.15,
+     "n": 45,
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "depth": 13.15,
+     "n": 46,
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    },
+    {
+     "depth": 14.15,
+     "n": 150,
+     "source": {
+      "doc": 6,
+      "page": 1
+     },
+     "penetration_cm": 10,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 15.15,
+     "n": 75,
+     "source": {
+      "doc": 6,
+      "page": 1
+     },
+     "penetration_cm": 20,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 16.15,
+     "n": 50,
+     "source": {
+      "doc": 6,
+      "page": 1
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 1.25,
+      "kind": "unspecified",
+      "source": {
+       "doc": 6,
+       "page": 1
+      },
+      "date": "9/16"
+     }
+    ]
+   },
+   "note": "No latitude or longitude."
+  },
+  {
+   "id": "No.4",
+   "pages": [
+    {
+     "doc": 7,
+     "page": 1
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": null,
+   "ground_elevation": {
+    "value": 0.999,
+    "datum": "KBM (local benchmark)",
+    "unit": "m",
+    "as_printed": "KBM +0.999m",
+    "source": {
+     "doc": 7,
+     "page": 1
+    }
+   },
+   "final_depth": {
+    "value": 16.0,
+    "source": {
+     "doc": 7,
+     "page": 1
+    }
+   },
+   "layers": [
+    {
+     "top": 0,
+     "base": 1.0,
+     "description": "盛土：礫混じり砂質粘土主体、砕石を混入",
+     "principal": "made_ground",
+     "source": {
+      "doc": 7,
+      "page": 1
+     }
+    },
+    {
+     "top": 1.0,
+     "base": 3.6,
+     "description": "火山灰質粘土：所々に角礫を点在",
+     "principal": "clay",
+     "source": {
+      "doc": 7,
+      "page": 1
+     }
+    },
+    {
+     "top": 3.6,
+     "base": 5.0,
+     "description": "砂混じり粘土：中粗砂を混入",
+     "principal": "clay",
+     "source": {
+      "doc": 7,
+      "page": 1
+     }
+    },
+    {
+     "top": 5.0,
+     "base": 5.6,
+     "description": "粘土質砂：中〜粗砂を主体、軟質な軽石粒を多く混入",
+     "principal": "sand",
+     "source": {
+      "doc": 7,
+      "page": 1
+     }
+    },
+    {
+     "top": 5.6,
+     "base": 7.2,
+     "description": "粘土質砂礫：φ20〜40mmの角礫を主体",
+     "principal": "gravel",
+     "source": {
+      "doc": 7,
+      "page": 1
+     }
+    },
+    {
+     "top": 7.2,
+     "base": 11.0,
+     "description": "火山灰質粘土質砂：中〜粗砂を主体",
+     "principal": "sand",
+     "source": {
+      "doc": 7,
+      "page": 1
+     }
+    },
+    {
+     "top": 11.0,
+     "base": 16.0,
+     "description": "粘土混じり砂礫：φ10〜30mmの角礫を主体",
+     "principal": "gravel",
+     "source": {
+      "doc": 7,
+      "page": 1
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 13,
+     "source": {
+      "doc": 7,
+      "page": 1
+     }
+    },
+    {
+     "depth": 2.15,
+     "n": 5,
+     "source": {
+      "doc": 7,
+      "page": 1
+     }
+    },
+    {
+     "depth": 3.15,
+     "n": 3,
+     "source": {
+      "doc": 7,
+      "page": 1
+     }
+    },
+    {
+     "depth": 4.15,
+     "n": 3,
+     "source": {
+      "doc": 7,
+      "page": 1
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 19,
+     "source": {
+      "doc": 7,
+      "page": 1
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 50,
+     "source": {
+      "doc": 7,
+      "page": 1
+     }
+    },
+    {
+     "depth": 7.0,
+     "n": 50,
+     "source": {
+      "doc": 7,
+      "page": 1
+     },
+     "penetration_cm": 0,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 8.15,
+     "n": 22,
+     "source": {
+      "doc": 7,
+      "page": 1
+     }
+    },
+    {
+     "depth": 9.15,
+     "n": 23,
+     "source": {
+      "doc": 7,
+      "page": 1
+     }
+    },
+    {
+     "depth": 10.15,
+     "n": 20,
+     "source": {
+      "doc": 7,
+      "page": 1
+     }
+    },
+    {
+     "depth": 11.15,
+     "n": 30,
+     "source": {
+      "doc": 7,
+      "page": 1
+     }
+    },
+    {
+     "depth": 12.15,
+     "n": 71,
+     "source": {
+      "doc": 7,
+      "page": 1
+     },
+     "penetration_cm": 21,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 13.15,
+     "n": 54,
+     "source": {
+      "doc": 7,
+      "page": 1
+     },
+     "penetration_cm": 28,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 14.15,
+     "n": 115,
+     "source": {
+      "doc": 7,
+      "page": 1
+     },
+     "penetration_cm": 13,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 15.15,
+     "n": 100,
+     "source": {
+      "doc": 7,
+      "page": 1
+     },
+     "penetration_cm": 15,
+     "refusal": true,
+     "blows": 50
+    },
+    {
+     "depth": 16.0,
+     "n": 50,
+     "source": {
+      "doc": 7,
+      "page": 1
+     },
+     "penetration_cm": 0,
+     "refusal": true,
+     "blows": 50
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 2.3,
+      "kind": "unspecified",
+      "source": {
+       "doc": 7,
+       "page": 1
+      },
+      "date": "9/30"
+     }
+    ]
+   },
+   "note": "No latitude or longitude."
+  }
+ ],
+ "readiness": {
+  "expected": "abstain",
+  "reasons": [
+   "no_positions"
+  ],
+  "positioned_boreholes": 0,
+  "note": "Four boreholes with levels on a local benchmark and no coordinates; their positions are drawn on the plans only."
+ }
+}

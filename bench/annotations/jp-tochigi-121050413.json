@@ -1,0 +1,2087 @@
+{
+ "schema_version": "1.0.0",
+ "report_id": "jp-tochigi-121050413",
+ "status": "draft",
+ "provenance": {
+  "annotated_on": "2026-11-20",
+  "annotator_kind": "assistant",
+  "method": "Values copied from each sheet's PDF text layer with bench/tools/draft_jp_denshi.py (the columns of the JACIC form), checked on every sheet by internal consistency (elevation = ground level - depth, thickness = base - top, the N column against blows and penetration, last base = final depth), and against the page image for at least one log per survey and for every log that failed a check or had a layer name the helper could not place. RQD values are from the remarks column."
+ },
+ "scope": {
+  "pages": "all",
+  "boreholes": "all",
+  "fields": [
+   "position",
+   "ground_elevation",
+   "final_depth",
+   "layers",
+   "spt",
+   "rqd",
+   "groundwater"
+  ]
+ },
+ "documents": [
+  {
+   "file": "12105041301.pdf",
+   "pages": 2,
+   "sha256": "7ecc7077e31f524f73248d70f055f40fe6be1d51bd3c24cf45a85783acd478b7"
+  },
+  {
+   "file": "12105041302.pdf",
+   "pages": 1,
+   "sha256": "d47bcdacebd1722f58064e082bef85bca0f8b1df68a77f9eb4ee75134cba2a5b"
+  },
+  {
+   "file": "12105041303.pdf",
+   "pages": 1,
+   "sha256": "16d5d9358566d0666819bddf699ba52118250b1f05f661d1e7e8609afa08b4b1"
+  },
+  {
+   "file": "12105041304.pdf",
+   "pages": 1,
+   "sha256": "c27581f340a9d53fd1b638ad35edefd124d385e057b1fe6ae4ab5b5b5ac3896d"
+  },
+  {
+   "file": "12105041305.pdf",
+   "pages": 1,
+   "sha256": "f9f329c713820c7a5cb93650b23b73ee927599cf21774f9b9e010aa7ab78f036"
+  },
+  {
+   "file": "12105041306.pdf",
+   "pages": 1,
+   "sha256": "3eabb6fb0a760c33a38baf98092c8217810d98f122e454286d7a75c19edbffee"
+  }
+ ],
+ "pages": [
+  {
+   "doc": 0,
+   "page": 1,
+   "type": "borehole_log",
+   "boreholes": [
+    "BR-2(6.25k+65m右岸)"
+   ]
+  },
+  {
+   "doc": 0,
+   "page": 2,
+   "type": "borehole_log",
+   "boreholes": [
+    "BR-2(6.25k+65m右岸)"
+   ]
+  },
+  {
+   "doc": 1,
+   "page": 1,
+   "type": "borehole_log",
+   "boreholes": [
+    "BR-3(6.25k+65m右岸)"
+   ]
+  },
+  {
+   "doc": 2,
+   "page": 1,
+   "type": "borehole_log",
+   "boreholes": [
+    "BR-4(8.75k-33m右岸)"
+   ]
+  },
+  {
+   "doc": 3,
+   "page": 1,
+   "type": "borehole_log",
+   "boreholes": [
+    "BR-5(8.75k-33m右岸)"
+   ]
+  },
+  {
+   "doc": 4,
+   "page": 1,
+   "type": "borehole_log",
+   "boreholes": [
+    "BR-6(8.75k-33m右岸)"
+   ]
+  },
+  {
+   "doc": 5,
+   "page": 1,
+   "type": "borehole_log",
+   "boreholes": [
+    "BR-1(6.25k+65m右岸)"
+   ]
+  }
+ ],
+ "boreholes": [
+  {
+   "id": "BR-2(6.25k+65m右岸)",
+   "pages": [
+    {
+     "doc": 0,
+     "page": 1
+    },
+    {
+     "doc": 0,
+     "page": 2
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 36.3083333,
+    "lon": 139.7777778,
+    "crs": "unstated",
+    "as_printed": "北緯 36° 18’ 30.0000” 東経 139° 46’ 40.0000”",
+    "source": {
+     "doc": 0,
+     "page": 1
+    }
+   },
+   "ground_elevation": {
+    "value": 26.5,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 0,
+     "page": 1
+    }
+   },
+   "final_depth": {
+    "value": 18.45,
+    "source": {
+     "doc": 0,
+     "page": 1
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 0.35,
+     "description": "盛土・砂混りシルト互層：植物根を混入する",
+     "principal": "made_ground",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 0.35,
+     "base": 2.05,
+     "description": "(/M-S)盛土・砂礫互層(/GS)：粘土分を少量混じる",
+     "principal": "made_ground",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 2.05,
+     "base": 3.1,
+     "description": "盛土・砂混じりシルト互層(/M-S)：所々に黒色のシルトを混じる",
+     "principal": "made_ground",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 3.1,
+     "base": 4.5,
+     "description": "盛土・シルト質細砂互層(/FSM)：含水少ない細砂主体で均一にシルトを混じる",
+     "principal": "made_ground",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 4.5,
+     "base": 5.1,
+     "description": "砂質シルト(MS)：含水中位で腐植物を点在する4.85m以深は腐植物を多く混じる",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 5.1,
+     "base": 5.85,
+     "description": "砂礫(GS)：φ30mm以下の円礫主体で礫間は中～粗砂で充填される崩壊性高い",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 5.85,
+     "base": 6.2,
+     "description": "細砂(FS)：6.0m付近まで少量のシルト分を含む",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 6.2,
+     "base": 6.65,
+     "description": "礫混じり中砂：中～細砂主体でφ15mm以下の円礫を点在する",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 6.65,
+     "base": 7.75,
+     "description": "(MS-G)砂礫(GS)：φ30mm以下の円礫主体で礫間は中～粗砂で充填されるごく微量の細粒分混じる7.75m付近より暗灰色に変わり礫径50mm程度と全体にシルト分を含み、一部シル",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 7.75,
+     "base": 11.15,
+     "description": "粘土混じり砂礫(GS-C)：ト質砂礫となるφ50mm以下の円礫主体で礫間は中～粗砂及びシルト分で充填される8.50m付近から良く締まる10.25～10.60m付近で若干の逸水が見られる",
+     "principal": "gravel",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 11.15,
+     "base": 11.5,
+     "description": "砂混じりシルト：粘性中位で所々に薄層状に細砂を挟む",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 11.5,
+     "base": 12.3,
+     "description": "(M-S)シルト質粗砂(CSM)：11.40mより粗砂を混じる中～粗砂が主体で均一に少量のシルト分を含む11.80mよりシルト分多く",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 12.3,
+     "base": 13.6,
+     "description": "シルト質細砂(FSM)：12.00～12.30m間は縞状にシルトを挟む微細砂主体で均一にシルト分を含む13.00～13.55m間は薄層状にシルトを挟む",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 13.6,
+     "base": 14.1,
+     "description": "シルト(M)：含水、粘性ともに中位やや固結している",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 14.1,
+     "base": 15.0,
+     "description": "砂混じりシルト(M-S)：凝灰質でやや固結している",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 15.0,
+     "base": 15.9,
+     "description": "シルト(M)：やや固結したシルト",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 15.9,
+     "base": 16.8,
+     "description": "砂質シルト(MS)：均一に微細砂を多く混じり、所々シルト質細砂状均一に微細砂を多く混じり、所々シルト質細砂状",
+     "principal": "silt",
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "top": 16.8,
+     "base": 17.1,
+     "description": "細砂(FS)：均一な細砂主体",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 2
+     }
+    },
+    {
+     "top": 17.1,
+     "base": 17.8,
+     "description": "礫混じり粗砂(CS-G)：中～粗砂主体でφ5mm以下の細礫を混じる",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 2
+     }
+    },
+    {
+     "top": 17.8,
+     "base": 18.1,
+     "description": "シルト質細砂：細砂主体で均一にシルト分を含む",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 2
+     }
+    },
+    {
+     "top": 18.1,
+     "base": 18.45,
+     "description": "(FSM)シルト質粗砂：粗砂主体でシルト分を多く含む",
+     "principal": "sand",
+     "source": {
+      "doc": 0,
+      "page": 2
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 22.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 2.15,
+     "n": 4.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     },
+     "penetration_cm": 34.0
+    },
+    {
+     "depth": 3.15,
+     "n": 3.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     },
+     "penetration_cm": 32.0
+    },
+    {
+     "depth": 4.15,
+     "n": 3.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     },
+     "penetration_cm": 34.0
+    },
+    {
+     "depth": 5.15,
+     "n": 10.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 8.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 11.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 15.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 9.15,
+     "n": 39.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 10.15,
+     "n": 49.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 11.15,
+     "n": 6.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 12.15,
+     "n": 26.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 13.15,
+     "n": 17.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 14.15,
+     "n": 20.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 15.15,
+     "n": 8.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 16.15,
+     "n": 13.0,
+     "source": {
+      "doc": 0,
+      "page": 1
+     }
+    },
+    {
+     "depth": 17.15,
+     "n": 50.0,
+     "source": {
+      "doc": 0,
+      "page": 2
+     },
+     "penetration_cm": 27.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 18.15,
+     "n": 17.0,
+     "source": {
+      "doc": 0,
+      "page": 2
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 4.84,
+      "kind": "unspecified",
+      "source": {
+       "doc": 0,
+       "page": 1
+      }
+     },
+     {
+      "depth": 5.19,
+      "kind": "unspecified",
+      "source": {
+       "doc": 0,
+       "page": 1
+      }
+     },
+     {
+      "depth": 5.26,
+      "kind": "unspecified",
+      "source": {
+       "doc": 0,
+       "page": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "BR-3(6.25k+65m右岸)",
+   "pages": [
+    {
+     "doc": 1,
+     "page": 1
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 36.3083333,
+    "lon": 139.7777778,
+    "crs": "unstated",
+    "as_printed": "北緯 36° 18’ 30.0000” 東経 139° 46’ 40.0000”",
+    "source": {
+     "doc": 1,
+     "page": 1
+    }
+   },
+   "ground_elevation": {
+    "value": 24.61,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 1,
+     "page": 1
+    }
+   },
+   "final_depth": {
+    "value": 15.45,
+    "source": {
+     "doc": 1,
+     "page": 1
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 0.45,
+     "description": "盛土・砂混りシルト互層：砂混じりの粘土シルトで植物根混入",
+     "principal": "made_ground",
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "top": 0.45,
+     "base": 2.1,
+     "description": "(/M-S)盛土・粘土混じり砂礫互層(/GS-C)：φ40mm以下の礫主体",
+     "principal": "made_ground",
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "top": 2.1,
+     "base": 2.9,
+     "description": "礫混じり砂質シルト(MS-G)：均一に細砂を多く混じるφ30mm以下の円礫を少量混じる2.35m付近まで微量の有機物を混じる",
+     "principal": "silt",
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "top": 2.9,
+     "base": 3.8,
+     "description": "砂混じりシルト(M-S)：少量の微細砂を混じり、有機物を点在する",
+     "principal": "silt",
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "top": 3.8,
+     "base": 4.6,
+     "description": "シルト質細砂(FSM)：細砂、微細砂主体で含水多く緩い",
+     "principal": "sand",
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "top": 4.6,
+     "base": 4.8,
+     "description": "砂混じりシルト：少量の微細砂混じる",
+     "principal": "silt",
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "top": 4.8,
+     "base": 6.7,
+     "description": "(M-S)砂礫(GS)：4.80～5.50mはφ25mm以下の円礫主体5.50m以深はφ40mm程度となる礫間は中～粗砂で緩く充填される",
+     "principal": "gravel",
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "top": 6.7,
+     "base": 9.4,
+     "description": "粘土混じり砂礫(GS-C)：8.30mまでは暗灰でφ40mm程度以下の円礫主体礫間は中～粗砂及びシルト質粘土で充填される8.30m以深は暗緑灰となり礫径はφ65mm程度以下となる部分的に粗砂や粘土分を多く混じる",
+     "principal": "gravel",
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "top": 9.4,
+     "base": 11.4,
+     "description": "シルト混じり細砂(FS-M)：細砂が主体で不規則にシルトを混じる細砂は黒灰を帯び、シルト部は暗褐",
+     "principal": "sand",
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "top": 11.4,
+     "base": 14.6,
+     "description": "シルト(M)：全体に暗緑灰を強く帯びる微細砂を少量混じる所々で固結状",
+     "principal": "silt",
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "top": 14.6,
+     "base": 15.0,
+     "description": "砂質シルト：所々に細砂を多く混じる",
+     "principal": "silt",
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "top": 15.0,
+     "base": 15.45,
+     "description": "(MS)中砂(MS)：中砂主体で微量のシルト分を含む",
+     "principal": "sand",
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 23.0,
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "depth": 2.15,
+     "n": 6.0,
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "depth": 3.15,
+     "n": 5.0,
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "depth": 4.15,
+     "n": 2.0,
+     "source": {
+      "doc": 1,
+      "page": 1
+     },
+     "penetration_cm": 34.0
+    },
+    {
+     "depth": 5.15,
+     "n": 9.0,
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 26.0,
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 19.0,
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 37.0,
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "depth": 9.15,
+     "n": 50.0,
+     "source": {
+      "doc": 1,
+      "page": 1
+     },
+     "penetration_cm": 9.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 10.15,
+     "n": 20.0,
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "depth": 11.15,
+     "n": 19.0,
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "depth": 12.15,
+     "n": 8.0,
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "depth": 13.15,
+     "n": 5.0,
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "depth": 14.15,
+     "n": 11.0,
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    },
+    {
+     "depth": 15.15,
+     "n": 18.0,
+     "source": {
+      "doc": 1,
+      "page": 1
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 3.23,
+      "kind": "unspecified",
+      "source": {
+       "doc": 1,
+       "page": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "BR-4(8.75k-33m右岸)",
+   "pages": [
+    {
+     "doc": 2,
+     "page": 1
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 36.3216667,
+    "lon": 139.7963889,
+    "crs": "unstated",
+    "as_printed": "北緯 36° 19’ 18.0000” 東経 139° 47’ 47.0000”",
+    "source": {
+     "doc": 2,
+     "page": 1
+    }
+   },
+   "ground_elevation": {
+    "value": 28.27,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 2,
+     "page": 1
+    }
+   },
+   "final_depth": {
+    "value": 13.45,
+    "source": {
+     "doc": 2,
+     "page": 1
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 0.5,
+     "description": "盛土・砂混りシルト互層：植物根を多量混じる",
+     "principal": "made_ground",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "top": 0.5,
+     "base": 1.9,
+     "description": "(/M-S)盛土・礫混じりシルト互層(/M-G)：φ40mm以下の円礫をやや多く混じる",
+     "principal": "made_ground",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "top": 1.9,
+     "base": 2.7,
+     "description": "盛土・シルト質細砂互層(/FSM)：φ20mm以下の円礫を少量混じる",
+     "principal": "made_ground",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "top": 2.7,
+     "base": 4.0,
+     "description": "盛土・砂礫混じりシルト互層(/M-G)：φ35mm以下の円礫をやや多く混じる3.75～4.00mはコンクリート",
+     "principal": "made_ground",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "top": 4.0,
+     "base": 5.0,
+     "description": "砂礫(GS)：φ60mm以下の円礫主体で礫間は細～中砂で充填される含水多い",
+     "principal": "gravel",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "top": 5.0,
+     "base": 5.6,
+     "description": "粘土混じり砂礫(GS-C)：φ35mm以下の円礫主体で礫間は粘土混じり細～中砂で充填5.10～5.20m間はシルト分を多く",
+     "principal": "gravel",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "top": 5.6,
+     "base": 6.9,
+     "description": "砂混じりシルト(M-S)：混じる含水多い少量の有機物を混入する6.65～6.85m間にシルト質細砂を挟む",
+     "principal": "silt",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "top": 6.9,
+     "base": 8.4,
+     "description": "固結シルト(M)：全体に少量の微細砂混じりで固結度高い含水少ない",
+     "principal": "silt",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "top": 8.4,
+     "base": 8.9,
+     "description": "礫混じりシルト質粗砂：均一にシルト分混じるφ20mm以下の細礫を混入する含水多い",
+     "principal": "sand",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "top": 8.9,
+     "base": 9.8,
+     "description": "(CSM-G)礫混じり中砂(MS-G)：中砂主体でφ20mm以下の円礫を点在する",
+     "principal": "sand",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "top": 9.8,
+     "base": 11.8,
+     "description": "シルト質細砂(FSM)：細砂主体で均一にシルトを混じる",
+     "principal": "sand",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "top": 11.8,
+     "base": 12.8,
+     "description": "砂質シルト(MS)：所々にシルト質細砂を互層状に挟む12.75m付近は暗緑を帯びる",
+     "principal": "silt",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "top": 12.8,
+     "base": 13.45,
+     "description": "シルト(M)：少量の微細砂を混じる",
+     "principal": "silt",
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 3.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     },
+     "penetration_cm": 31.0
+    },
+    {
+     "depth": 2.15,
+     "n": 5.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     },
+     "penetration_cm": 33.0
+    },
+    {
+     "depth": 3.15,
+     "n": 3.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     },
+     "penetration_cm": 35.0
+    },
+    {
+     "depth": 4.15,
+     "n": 30.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 14.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 15.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 39.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 40.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 9.15,
+     "n": 45.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 10.15,
+     "n": 31.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 11.15,
+     "n": 13.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 12.15,
+     "n": 20.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    },
+    {
+     "depth": 13.15,
+     "n": 10.0,
+     "source": {
+      "doc": 2,
+      "page": 1
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 4.83,
+      "kind": "unspecified",
+      "source": {
+       "doc": 2,
+       "page": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "BR-5(8.75k-33m右岸)",
+   "pages": [
+    {
+     "doc": 3,
+     "page": 1
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 36.3216667,
+    "lon": 139.7963889,
+    "crs": "unstated",
+    "as_printed": "北緯 36° 19’ 18.0000” 東経 139° 47’ 47.0000”",
+    "source": {
+     "doc": 3,
+     "page": 1
+    }
+   },
+   "ground_elevation": {
+    "value": 29.99,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 3,
+     "page": 1
+    }
+   },
+   "final_depth": {
+    "value": 15.45,
+    "source": {
+     "doc": 3,
+     "page": 1
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 0.75,
+     "description": "盛土・礫混りシルト互層(/M-G)：φ40mm以下の円礫及び細砂を混じる",
+     "principal": "made_ground",
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "top": 0.75,
+     "base": 3.2,
+     "description": "盛土・シルト質細砂互層(/FSM)：全体にφ15mm以下の礫を少量礫混じる",
+     "principal": "made_ground",
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "top": 3.2,
+     "base": 4.3,
+     "description": "盛土・粘土混じり砂礫互層(/GS-C)：φ60mm以下の円礫主体で礫間は粘土混じりの細～中砂",
+     "principal": "made_ground",
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "top": 4.3,
+     "base": 5.1,
+     "description": "シルト(M)：少量の有機物点在する",
+     "principal": "silt",
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "top": 5.1,
+     "base": 7.6,
+     "description": "砂礫(GS)：φ45mm以下の円～亜円礫が主体で礫間は細～中砂で充填される7.00～7.60m葉粘土混じりである",
+     "principal": "gravel",
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "top": 7.6,
+     "base": 7.9,
+     "description": "砂混じりシルト：φ15mm以下の円礫及び有機物を点在する",
+     "principal": "silt",
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "top": 7.9,
+     "base": 8.5,
+     "description": "(M-S)シルト混じり細砂：不均一にシルトを筋状に混じる",
+     "principal": "sand",
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "top": 8.5,
+     "base": 9.9,
+     "description": "(FS-M)砂混じり固結シルト(M-S)：8.65m付近まで有機物混じり8.65～9.35m間は暗緑灰で固結する9.35m以深は暗褐で有機物混じり",
+     "principal": "silt",
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "top": 9.9,
+     "base": 11.6,
+     "description": "シルト質粗砂(CSM)：全体にφ10mm以下の細礫を混入する10.75mまでは礫の混入多い",
+     "principal": "sand",
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "top": 11.6,
+     "base": 12.1,
+     "description": "礫混じり砂質シルト：砂質シルトとシルト質細砂の互層状",
+     "principal": "silt",
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "top": 12.1,
+     "base": 12.8,
+     "description": "(MS-G)礫混じり粗砂(CS-G)：φ20mm以下の亜円礫を全体に混じる所々細砂主体となる含水多い",
+     "principal": "sand",
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "top": 12.8,
+     "base": 14.55,
+     "description": "砂質シルト砂互層(SMS)：全体に砂質シルト主体所々に10～20cm厚で細～粗砂を互層状に挟む",
+     "principal": "silt",
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "top": 14.55,
+     "base": 15.45,
+     "description": "シルト(M)：含水少なく全体に少量の有機物混入する所々で砂混じりシルト状となる",
+     "principal": "silt",
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 14.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 2.15,
+     "n": 3.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     },
+     "penetration_cm": 35.0
+    },
+    {
+     "depth": 3.15,
+     "n": 5.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     },
+     "penetration_cm": 31.0
+    },
+    {
+     "depth": 4.15,
+     "n": 8.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 24.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 23.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 15.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 29.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 9.15,
+     "n": 50.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     },
+     "penetration_cm": 5.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 10.15,
+     "n": 50.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     },
+     "penetration_cm": 28.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 11.15,
+     "n": 49.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 12.15,
+     "n": 50.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     },
+     "penetration_cm": 18.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 13.15,
+     "n": 19.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 14.15,
+     "n": 32.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    },
+    {
+     "depth": 15.15,
+     "n": 8.0,
+     "source": {
+      "doc": 3,
+      "page": 1
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 6.76,
+      "kind": "unspecified",
+      "source": {
+       "doc": 3,
+       "page": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "BR-6(8.75k-33m右岸)",
+   "pages": [
+    {
+     "doc": 4,
+     "page": 1
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 36.3216667,
+    "lon": 139.7966667,
+    "crs": "unstated",
+    "as_printed": "北緯 36° 19’ 18.0000” 東経 139° 47’ 48.0000”",
+    "source": {
+     "doc": 4,
+     "page": 1
+    }
+   },
+   "ground_elevation": {
+    "value": 27.95,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 4,
+     "page": 1
+    }
+   },
+   "final_depth": {
+    "value": 13.45,
+    "source": {
+     "doc": 4,
+     "page": 1
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 0.3,
+     "description": "盛土・コンクリート互層：護岸ブロック",
+     "principal": "made_ground",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 0.3,
+     "base": 3.0,
+     "description": "盛土・砂礫互層(/GS)：φ60mm以下の円礫主体で礫間は中～粗砂で充填される",
+     "principal": "made_ground",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 3.0,
+     "base": 3.7,
+     "description": "砂混じりシルト(M-S)：やや有機質である全体に少量の微細砂混じる",
+     "principal": "silt",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 3.7,
+     "base": 5.7,
+     "description": "砂礫(GS)：φ50mm以下の円礫主体で礫間は細～中砂で充填される5.10mまで含水少ない",
+     "principal": "gravel",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 5.7,
+     "base": 6.7,
+     "description": "砂混じりシルト(M-S)：全体に細砂を多く混じり所々でシルト質細砂状含水中位",
+     "principal": "silt",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 6.7,
+     "base": 7.7,
+     "description": "固結シルト(M)：6.85mまで少量の有機物混じり全体に固結度の高いシルト",
+     "principal": "silt",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 7.7,
+     "base": 8.8,
+     "description": "礫混じり粗砂(CS-G)：全体にφ20mm以下の円礫を混入する含水多い",
+     "principal": "sand",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 8.8,
+     "base": 11.9,
+     "description": "シルト質細砂(FSM)：細砂主体で全体に少量の固結シルトを混じる10.50～10.70m間は少量の細礫を混じる含水多い",
+     "principal": "sand",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 11.9,
+     "base": 12.6,
+     "description": "砂質シルト(MS)：12.35m付近より微細砂多く暗緑灰に変わる",
+     "principal": "silt",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "top": 12.6,
+     "base": 13.45,
+     "description": "シルト(M)：不均一に少量の微細砂混じる有機物点在する含水少ない",
+     "principal": "silt",
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 11.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 2.15,
+     "n": 8.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 3.15,
+     "n": 2.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     },
+     "penetration_cm": 39.0
+    },
+    {
+     "depth": 4.15,
+     "n": 32.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 26.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 6.15,
+     "n": 20.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 50.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     },
+     "penetration_cm": 20.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 8.15,
+     "n": 50.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     },
+     "penetration_cm": 18.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 9.15,
+     "n": 50.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     },
+     "penetration_cm": 27.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 10.15,
+     "n": 49.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 11.15,
+     "n": 50.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     },
+     "penetration_cm": 22.0,
+     "refusal": true,
+     "blows": 50.0
+    },
+    {
+     "depth": 12.15,
+     "n": 15.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    },
+    {
+     "depth": 13.15,
+     "n": 7.0,
+     "source": {
+      "doc": 4,
+      "page": 1
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 5.14,
+      "kind": "unspecified",
+      "source": {
+       "doc": 4,
+       "page": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "BR-1(6.25k+65m右岸)",
+   "pages": [
+    {
+     "doc": 5,
+     "page": 1
+    }
+   ],
+   "kind": "borehole",
+   "depth_unit": "m",
+   "position": {
+    "kind": "latlon",
+    "lat": 36.3083333,
+    "lon": 139.7777778,
+    "crs": "unstated",
+    "as_printed": "北緯 36° 18’ 30.0000” 東経 139° 46’ 40.0000”",
+    "source": {
+     "doc": 5,
+     "page": 1
+    }
+   },
+   "ground_elevation": {
+    "value": 25.4,
+    "datum": "unstated",
+    "unit": "m",
+    "source": {
+     "doc": 5,
+     "page": 1
+    }
+   },
+   "final_depth": {
+    "value": 16.45,
+    "source": {
+     "doc": 5,
+     "page": 1
+    }
+   },
+   "layers": [
+    {
+     "top": 0.0,
+     "base": 0.8,
+     "description": "盛土・砂混じりシルト互層(/M-S)：細礫を点在する",
+     "principal": "made_ground",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 0.8,
+     "base": 1.9,
+     "description": "盛土・礫混じりシルト互層(/M-G)：φ40mm以下の円礫を少量混じる",
+     "principal": "made_ground",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 1.9,
+     "base": 3.0,
+     "description": "盛土・シルト質細砂互層(/FSM)：細砂主体で均一にシルト分を少量混じるφ20mm以下の円礫を点在する",
+     "principal": "made_ground",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 3.0,
+     "base": 3.7,
+     "description": "砂質シルト(MS)：全体に微細砂を多く混じる",
+     "principal": "silt",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 3.7,
+     "base": 4.4,
+     "description": "粘土混じり砂礫(GS-C)：φ65mm以下の円礫主体で礫間は粘土混じりの細～中砂で充填される",
+     "principal": "gravel",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 4.4,
+     "base": 4.8,
+     "description": "細砂(FS)：微細砂主体",
+     "principal": "sand",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 4.8,
+     "base": 5.3,
+     "description": "礫混じり粗砂(CS-G)：粗砂主体でφ15mm以下の円礫を少量混じる",
+     "principal": "sand",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 5.3,
+     "base": 5.6,
+     "description": "有機質シルト：全体に有機物を混じる",
+     "principal": "silt",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 5.6,
+     "base": 6.5,
+     "description": "(MO)細砂(FS)：含水多い細砂が主体5.95m以深は細礫を点在する",
+     "principal": "sand",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 6.5,
+     "base": 6.9,
+     "description": "砂礫(GS)：φ35mm以下の円礫主体で礫間は細～中砂",
+     "principal": "gravel",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 6.9,
+     "base": 10.0,
+     "description": "粘土混じり砂礫(GS-C)：含水多く緩いφ60mm以下の円礫主体で礫間は粘土混じりの細～中砂で充填される最大径φ100mm程度の玉石を点在する全体に堆積状況は不規則である",
+     "principal": "gravel",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 10.0,
+     "base": 10.4,
+     "description": "シルト(M)：含水少なく粘性中位",
+     "principal": "silt",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 10.4,
+     "base": 12.4,
+     "description": "シルト混じり粗砂(CS-M)：中～粗砂が主体均一に少量のシルト分を含み所々に5～10mm厚のシルトを挟む",
+     "principal": "sand",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 12.4,
+     "base": 15.5,
+     "description": "シルト(M)：含水少なく粘性中位全体にやや固結したシルトで少量の微細砂混じる",
+     "principal": "silt",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 15.5,
+     "base": 15.8,
+     "description": "砂質シルト：均一に微細砂を混じる",
+     "principal": "silt",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "top": 15.8,
+     "base": 16.45,
+     "description": "(MS)粗砂(CS)：含水多い粗砂で不規則にシルトを混じる",
+     "principal": "sand",
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    }
+   ],
+   "spt": [
+    {
+     "depth": 1.15,
+     "n": 2.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     },
+     "penetration_cm": 33.0
+    },
+    {
+     "depth": 2.15,
+     "n": 2.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     },
+     "penetration_cm": 38.0
+    },
+    {
+     "depth": 3.15,
+     "n": 3.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     },
+     "penetration_cm": 33.0
+    },
+    {
+     "depth": 4.15,
+     "n": 9.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 5.15,
+     "n": 1.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     },
+     "penetration_cm": 41.0
+    },
+    {
+     "depth": 6.15,
+     "n": 9.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 7.15,
+     "n": 25.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 8.15,
+     "n": 35.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 9.15,
+     "n": 48.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 10.15,
+     "n": 16.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 11.15,
+     "n": 34.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 12.15,
+     "n": 36.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 13.15,
+     "n": 15.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 14.15,
+     "n": 10.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 15.15,
+     "n": 12.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    },
+    {
+     "depth": 16.15,
+     "n": 34.0,
+     "source": {
+      "doc": 5,
+      "page": 1
+     }
+    }
+   ],
+   "rqd": [],
+   "groundwater": {
+    "status": "recorded",
+    "readings": [
+     {
+      "depth": 4.21,
+      "kind": "unspecified",
+      "source": {
+       "doc": 5,
+       "page": 1
+      }
+     }
+    ]
+   }
+  }
+ ],
+ "readiness": {
+  "expected": "spatial_model",
+  "reasons": [],
+  "positioned_boreholes": 6
+ }
+}
