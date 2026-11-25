@@ -3,6 +3,7 @@
 // vertically (a depth written up a table column) stays one line with its true box. The result is what OCR gives for a
 // page image, so both go through the same reconstruction.
 import {TextLine,textLine} from "./reconstruct";
+import {Rule,isVertical,xAt} from "./ruling";
 
 // A text item as PDF.js gives it: `transform` maps the glyph space of a font of size 1 to user space; `width` is the
 // run's advance in user space and `height` its font size.
@@ -25,8 +26,9 @@ function stretch(it:PdfTextItem,view:Matrix,s0:number,s1:number){
 }
 
 type Box={x0:number;y0:number;x1:number;y1:number};
-// `view` maps user space to page pixels (PDF.js viewport.transform).
-export function linesFromItems(items:PdfTextItem[],view:number[]):TextLine[]{
+// `view` maps user space to page pixels (PDF.js viewport.transform). `rules`: the page's ruled lines (ruling.ts); words
+// either side of a line drawn down between them are never one line (a soil name and its colour in the next column).
+export function linesFromItems(items:PdfTextItem[],view:number[],rules:Rule[]=[]):TextLine[]{
   const m=view as Matrix,words:Word[]=[],out:TextLine[]=[];
   // Text printed twice over itself a fraction of a point aside (bold imitated by overprinting: "BOREHOLE NO.: BH-12"
   // would read "BOREHOLEBOREHOLE NO.: NO.: BH-12BH-12") is read once: the same text in nearly the same box.
@@ -66,9 +68,11 @@ export function linesFromItems(items:PdfTextItem[],view:number[]):TextLine[]{
     if(row)row.push(w);else rows.push([w]);
   }
   for(const row of rows)row.sort((p,q)=>p.x0-q.x0);
+  const walls=rules.filter(isVertical);
+  const walled=(cur:Word,w:Word)=>walls.some(r=>{const y=(w.y0+w.y1)/2,x=xAt(r,y);return r.y0<=y&&r.y1>=y&&x>cur.x1-1&&x<w.x0+1});
   const join=(cur:Word,w:Word)=>{
     const gap=w.x0-cur.x1,h=Math.max(w.h,cur.h),last=cur.text.split(" ").pop()??"";
-    return gap<0.8*h&&!(isNumber(last)&&isNumber(w.text)&&gap>0.05*h);
+    return gap<0.8*h&&!(isNumber(last)&&isNumber(w.text)&&gap>0.05*h)&&!walled(cur,w);
   };
   // Where lines start: a column's left edge has lines starting on three rows or more. A run of text that starts there
   // begins a line of its own, however close the text before it, so a description that reaches the next column of a

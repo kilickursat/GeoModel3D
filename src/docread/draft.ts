@@ -22,11 +22,13 @@ export interface DraftLayer { from:string; to:string; unit:string; description:s
 // `ocr`: read by the reading model, not from the document's own text, and `ocrWhy` why (a scanned page, unusable PDF
 // text). `samples`: the layers were read from the sample depths that start the descriptions.
 // `core`: the runs of the borehole's rock core logs, kept for the review and not used in the model.
+// `spt`: its Standard Penetration Tests, as the SPT table of Input data takes them: depth (m), blows and penetration (mm).
+export interface DraftSpt { depth:string; blows:string; penetration:string; src:TextLine[] }
 export interface DraftHole {
   use:boolean; doc:number; file:string; pages:number[]; kind:"scale"|"table"; ocr:boolean; ocrWhy?:string; samples?:boolean;
   core?:CoreSheet&{pages:number[]};
   values:Record<Field,string>; flags:Partial<Record<Field,string>>; src:Partial<Record<Field,TextLine>>;
-  layers:DraftLayer[]; evidence?:EvidenceRecord; waterEvidence?:EvidenceRecord; ocrPages?:number[];
+  layers:DraftLayer[]; evidence?:EvidenceRecord; waterEvidence?:EvidenceRecord; ocrPages?:number[]; spt?:DraftSpt[];
 }
 
 const text=(v:number|undefined)=>v===undefined||!Number.isFinite(v)?"":String(v);
@@ -36,11 +38,18 @@ const fmt=(v:number)=>String(+v.toFixed(3));
 
 // A unit for a description, by the app's first grouping of soil and rock names (Japanese names by their own rules).
 // A description no rule assigns stays its own unit, as in imports, and is reported.
+// A Japanese description read from a log form starts with the soil name, its code in brackets after it
+// ("礫混じり粘性土(C-G) 含水は低い…"): the name gives the unit, as the name of an imported log does.
 export function unitFor(description:string){
   const d=description.trim();
   if(!d)return "";
   const rules=CJK.test(d)?japaneseLithologyRules:lithologyRules;
-  return applyUnitRules([{id:"",x:0,y:0,z:0,intervals:[{from:0,to:1,unit:"",name:d}]}],rules).boreholes[0].intervals[0].unit;
+  const unit=(name:string)=>applyUnitRules([{id:"",x:0,y:0,z:0,intervals:[{from:0,to:1,unit:"",name}]}],rules).boreholes[0].intervals[0];
+  if(CJK.test(d)){
+    const name=d.split(/\s+/)[0].replace(/(?:[(（][^)）]*[)）])+$/,"");
+    if(name&&name!==d){const u=unit(name);if(u.unit!==name)return u.unit}
+  }
+  return unit(d).unit;
 }
 
 // The logs of one document as drafts. A log whose ID was not read is named after its first page, and flagged.
@@ -59,7 +68,9 @@ export function draftHoles(doc:number,file:string,logs:ReadLog[],scanned:Readonl
         ground:text(log.ground),final:text(log.final),water:text(log.water)},
       flags,src:{...log.src},
       layers:log.layers.map(l=>({from:text(l.from),to:text(l.to),unit:unitFor(l.description),description:l.description,
-        ...(l.flagged?{flag:l.why??"check this depth against the page"}:{}),...(l.gap?{gap:l.gap}:{}),autoUnit:true,src:l.src}))};
+        ...(l.flagged?{flag:l.why??"check this depth against the page"}:{}),...(l.gap?{gap:l.gap}:{}),autoUnit:true,src:l.src})),
+      // Penetration in mm, as the SPT table takes it; left empty where the log does not give it ("50+").
+      ...(log.spt?.length?{spt:log.spt.map(t=>({depth:text(t.depth),blows:text(t.blows),penetration:t.penetration===undefined?"":text(Math.round(t.penetration*10)),src:t.src}))}:{})};
   });
 }
 
@@ -68,7 +79,9 @@ export function draftHoles(doc:number,file:string,logs:ReadLog[],scanned:Readonl
 export const evidenceField=(field:Field)=>field==="ground"?"z":field==="final"?"depth":field;
 export type PageSize={width:number;height:number};
 export function captureDraftEvidence(holes:DraftHole[],sources:EvidenceSource[],size:(doc:number,page:number)=>PageSize|undefined){
-  const boxes=(h:DraftHole,lines:TextLine[]):EvidenceBox[]=>lines.flatMap(line=>{
+  const boxes=(h:DraftHole,read:TextLine[]):EvidenceBox[]=>read.flatMap(l=>{
+    // A line of a page read turned keeps its place on the page as shown.
+    const line={...l,...(l.shown??{})};
     const page=line.page??h.pages[0],s=size(h.doc,page);
     if(!s||!(s.width>0&&s.height>0)||![line.x0,line.y0,line.x1,line.y1].every(Number.isFinite))return [];
     const clamp=(n:number)=>Math.max(0,Math.min(1,n));
@@ -187,6 +200,7 @@ export function draftTables(holes:DraftHole[],files:string[],sources?:EvidenceSo
   t.rows.boreholes=used.map(h=>[h.values.id.trim(),...(["x","y","lat","lon","ground","final"] as Field[]).map(k=>cell(h.values[k]))]);
   t.rows.logs=used.flatMap(h=>h.layers.map(l=>[h.values.id.trim(),cell(l.from),cell(l.to),l.unit.trim(),l.description.trim()]));
   t.rows.water=used.filter(h=>h.values.water.trim()).map(h=>[h.values.id.trim(),cell(h.values.water),""]);
+  t.rows.spt=used.flatMap(h=>(h.spt??[]).filter(x=>x.depth.trim()&&x.blows.trim()).map(x=>[h.values.id.trim(),cell(x.depth),cell(x.blows),cell(x.penetration)]));
   const boreholes:Borehole[]=used.map(h=>({id:h.values.id.trim(),x:0,y:0,z:0,intervals:h.layers
     .map(l=>({from:num(l.from)??NaN,to:num(l.to)??NaN,unit:l.unit.trim()}))
     .filter(i=>i.unit&&Number.isFinite(i.from)&&Number.isFinite(i.to)&&i.to>i.from)}));

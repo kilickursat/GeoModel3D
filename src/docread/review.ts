@@ -96,9 +96,18 @@ export function createReview(host:ReviewHost){
     panel.innerHTML=`<div class="dr-fields">${FIELDS.map(field).join("")}</div>
 <div class="dr-layers-head"><b>Layers</b><span>${h.kind==="table"?"read from the From and To columns of a table":h.samples?"read from the sample depths that start the descriptions, by the depth scale on the page":"read by the depth scale on the page"}${h.ocr?`, by OCR (${esc(h.ocrWhy??"a scanned page")})`:""}</span><button class="dr-add">Add layer</button></div>
 <div class="dr-table-wrap"><table class="dr-layers"><thead><tr><th></th><th>From (m)</th><th>To (m)</th><th>Unit</th><th>Description</th><th></th></tr></thead><tbody>${h.layers.map(layer).join("")}</tbody></table>${
-      h.layers.length?"":'<p class="dr-empty">No layers: add them, or leave this borehole out.</p>'}</div>${core(h)}`;
+      h.layers.length?"":'<p class="dr-empty">No layers: add them, or leave this borehole out.</p>'}</div>${spt(h)}${core(h)}`;
     $("#dr-units").innerHTML=[...new Set([...holes.flatMap(h=>h.layers.map(l=>l.unit.trim())),...RULE_UNITS])].filter(Boolean).map(u=>`<option value="${esc(u)}">`).join("");
     panel.querySelectorAll("textarea").forEach(fit);
+  }
+  // The borehole's penetration tests, as the SPT table of Input data takes them.
+  function spt(h:DraftHole){
+    if(!h.spt?.length)return "";
+    const name={depth:"Depth (m)",blows:"Blows",penetration:"Penetration (mm)"};
+    const cellOf=(k:number,c:"depth"|"blows"|"penetration")=>`<td data-label="${name[c]}"><input data-spt="${k}" data-c="${c}" value="${esc(h.spt![k][c])}" inputmode="decimal" aria-label="Test ${k+1}, ${name[c]}" spellcheck="false"></td>`;
+    const rows=h.spt.map((t,k)=>`<tr class="dr-row" data-key="s:${k}"><td class="dr-n">${k+1}</td>${cellOf(k,"depth")}${cellOf(k,"blows")}${cellOf(k,"penetration")}<td class="dr-acts"><button class="dr-sdel" data-spt="${k}" title="Delete this test" aria-label="Delete test ${k+1}">×</button></td></tr>`).join("");
+    return `<div class="dr-core"><div class="dr-layers-head"><b>Penetration tests (SPT)</b><span>read beside the log: blows over the penetration; 300 mm for a complete test</span></div>
+<div class="dr-table-wrap"><table class="dr-layers dr-spt"><thead><tr><th></th><th>Depth (m)</th><th>Blows</th><th>Penetration (mm)</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
   }
   // The runs of the borehole's rock core logs: records to compare with the page, not layers, and not used in the model.
   function core(h:DraftHole){
@@ -157,6 +166,7 @@ export function createReview(host:ReviewHost){
     if(k.startsWith("f:")){const s=h.src[k.slice(2) as Field];return s?[s]:[]}
     if(k.startsWith("l:"))return h.layers[Number(k.slice(2))]?.src??[];
     if(k.startsWith("c:"))return h.core?.runs[Number(k.slice(2))]?.src??[];
+    if(k.startsWith("s:"))return h.spt?.[Number(k.slice(2))]?.src??[];
     return [];
   }
   function showPage(){
@@ -190,13 +200,16 @@ export function createReview(host:ReviewHost){
     pageNote.textContent="";
     if(!h||!size||h.doc!==view.doc){boxes.innerHTML="";return}
     const out:string[]=[];
-    const box=(l:TextLine,k:string,flag:boolean,title:string)=>{
-      if(l.page!==view.page)return;
+    const box=(read:TextLine,k:string,flag:boolean,title:string)=>{
+      if(read.page!==view.page)return;
+      // A line of a page read turned is shown where it is on the page.
+      const l=read.shown??read;
       out.push(`<div class="dr-box${flag?" flag":""}${k===active?" on":""}" data-key="${k}" title="${esc(title)}" style="left:${(l.x0/size.width*100).toFixed(3)}%;top:${(l.y0/size.height*100).toFixed(3)}%;width:${((l.x1-l.x0)/size.width*100).toFixed(3)}%;height:${((l.y1-l.y0)/size.height*100).toFixed(3)}%"></div>`);
     };
     for(const f of FIELDS){const s=h.src[f.key];if(s)box(s,`f:${f.key}`,!!h.flags[f.key],`${f.label}: ${h.values[f.key]}`)}
     h.layers.forEach((l,k)=>l.src.forEach(s=>box(s,`l:${k}`,!!l.flag,`Layer ${k+1}: ${l.from}–${l.to} m${l.unit?`, ${l.unit}`:""}`)));
     h.core?.runs.forEach((r,k)=>r.src.forEach(s=>box(s,`c:${k}`,false,`Core run ${r.run}: ${r.from??"?"}–${r.to??"?"} m`)));
+    h.spt?.forEach((t,k)=>t.src.forEach(s=>box(s,`s:${k}`,false,`SPT at ${t.depth} m: ${t.blows} blows${t.penetration?` over ${t.penetration} mm`:""}`)));
     boxes.innerHTML=out.join("");
     if(!out.length)pageNote.textContent=h.pages.includes(view.page)?"":`Nothing of ${label(h)} was read on this page.`;
   }
@@ -275,6 +288,7 @@ export function createReview(host:ReviewHost){
     if(b.classList.contains("dr-add")){insertLayer(holes[current].layers.length);return}
     if(b.classList.contains("dr-ins")){insertLayer(Number(b.dataset.layer)+1);return}
     if(b.classList.contains("dr-del")){holes[current].layers.splice(Number(b.dataset.layer),1);edited=true;active="";renderAll();drawBoxes();return}
+    if(b.classList.contains("dr-sdel")){holes[current].spt?.splice(Number(b.dataset.spt),1);edited=true;active="";renderAll();drawBoxes();return}
   });
   el.addEventListener("change",e=>{
     const t=e.target as HTMLInputElement;
@@ -301,6 +315,10 @@ export function createReview(host:ReviewHost){
       if(c==="description"&&l.autoUnit){l.unit=unitFor(t.value);if(l.evidence)changeEvidenceField(l.evidence,"unit",l.unit,"Unit rules applied to the edited description");const u=panel.querySelector<HTMLInputElement>(`input[data-layer="${k}"][data-c="unit"]`);if(u)u.value=l.unit}
       if(t instanceof HTMLTextAreaElement)fit(t);
       if(c==="to"&&l.flag)unflag(`l:${k}`);
+    }else if(t.dataset.spt!==undefined){
+      const test=h.spt?.[Number(t.dataset.spt)];
+      if(!test)return;
+      test[t.dataset.c as "depth"|"blows"|"penetration"]=t.value;
     }else return;
     edited=true;
     recheck();
