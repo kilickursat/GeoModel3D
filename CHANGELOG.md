@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Fixed
+- Read the header of Japanese borehole logs (柱状図), so they can be placed in the model. Their labels are often set out with spaces or one cell per character ("孔 口 標 高", "総 掘 進 長", "北" "緯"), which were not recognised. Now read:
+  - latitude and longitude in degrees, minutes and seconds (北緯 / 東経, also as latitude / longitude);
+  - ground levels written with their datum ("KBM2= -0.47m", "GH= 121.17m", or "T.P." over "3.18m");
+  - total depths in whole metres ("20 m");
+  - borehole names with a note in brackets ("BR-2(6.25k+65m右岸)").
+
 ## 0.30.0 — 2026-11-19
 
 ### Added

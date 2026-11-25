@@ -151,18 +151,58 @@ function fieldAt(els:TextLine[],label:RegExp,ok:(t:string)=>boolean=()=>true):{t
     if(cands[0])return {text:cands[0].text,src:cands[0]};
     const next=els.filter(e=>e!==l&&line(e)&&e.x0>=l.x1-2).sort((p,q)=>p.x0-q.x0)[0];
     if(next&&ok(next.text))return {text:next.text,src:next};
+    // A cell of two lines beside the label, its datum over its value ("T.P." over "3.18m"): the value just right of
+    // the label, up to a line above or below it.
+    const stacked=els.filter(e=>e!==l&&ok(e.text)&&e.x0>=l.x1-2&&e.x0-l.x1<3*h&&Math.abs(e.cy-l.cy)<1.2*h)
+      .sort((p,q)=>Math.hypot(p.cx-l.cx,p.cy-l.cy)-Math.hypot(q.cx-l.cx,q.cy-l.cy))[0];
+    if(stacked)return {text:stacked.text,src:stacked};
   }
   return undefined;
 }
 // Values: an ID ("1", "BH3", "BH-01", "401"); a number first ("3.64 m NAP", "GL-9.80m"), but not a date; a decimal
 // number, so a sample number "1" beside a heading is not taken for a water depth.
 const DATE=/\d{1,2}[./-]\d{1,2}[./-]\d{2,4}/;
+// A note in brackets after an ID ("BR-2(6.25k+65m右岸)", "No.2(測点No.67 R5.0)") is part of the name as printed.
+const ID_NOTE=/\s*[(（][^)）]*[)）]?\s*$/;
 const isId=(t:string)=>/^[A-Za-z.#\-]{0,6}\s?\d[\w.\-/]{0,12}$/.test(t.trim());
 const isNum=(t:string)=>/^\D{0,3}\d/.test(t)&&!DATE.test(t);
 const isDec=(t:string)=>/^\D{0,3}\d+[.,]\d/.test(t)&&!DATE.test(t);
 const REMARK=/^\s*\d+(?:[.,]\d+)?\s*m\s*:\s*\p{L}/u;
+// A level is often given with its datum before it: "KBM2= -0.47m", "GH= 121.17m", "T.P.+3.18m", "KBM -0.862m". The
+// datum's name (and a number in it, "KBM2") is no part of the value.
+const DATUM=/^\s*(?:(?:T\.?\s*P\.?|K\.?\s*B\.?\s*M\.?|B\.?\s*M\.?|G\.?\s*H\.?|D\.?\s*L\.?|A\.?\s*P\.?|N\.?\s*A\.?\s*P\.?|H)\s*\d{0,2}\s*[=＝:：]?\s*)/i;
+const stripDatum=(t:string)=>{const eq=/[=＝]\s*([+\-−]?\s*\d)/.exec(t);return eq?t.slice(eq.index+1).trim():t.replace(DATUM,"")};
+const levelNum=(t:string|undefined)=>t===undefined?undefined:firstNum(stripDatum(t).replace(/^\+\s*/,""));
 // A thickness ("80mm ASPHALT", under "GROUND SURFACE") is no level.
-const isLevel=(t:string)=>isNum(t)&&!/^\D{0,3}\d+(?:[.,]\d+)?\s?(?:mm|cm)\b/i.test(t);
+const isLevel=(t:string)=>{const s=stripDatum(t);return isNum(s)&&!/^\D{0,3}\d+(?:[.,]\d+)?\s?(?:mm|cm)\b/i.test(s)};
+// Latitude or longitude in degrees, minutes and seconds ("36° 20’ 27.6574”", "40°12′52.9″", "140度21分49.38秒"); the
+// degree sign may be read as "゚" or "゜". Minutes and seconds under 60.
+const DMS=String.raw`(\d{1,3})\s*[°゚゜º度]\s*(\d{1,2})\s*['’′‘分]\s*(\d{1,2}(?:[.,]\d+)?)\s*(?:["”″“]|''|′′|’’|秒)?`;
+const dms=(m:RegExpExecArray|null|undefined,at:number)=>{
+  if(!m)return undefined;
+  const d=+m[at],mi=+m[at+1],s=+m[at+2].replace(",",".");
+  return mi<60&&s<60?+(d+mi/60+s/3600).toFixed(7):undefined;
+};
+// Japanese labels set out with a space between their characters ("孔 口 標 高", "総 掘 進 長", "北 緯"), as table cells
+// often are, are matched as written without the spaces.
+// A dash drawn as "―" or "‐" in katakana ("ボ―リング") is the long-vowel mark.
+const CJK_GAP=/([぀-ヿ㐀-鿿])[ \t　]+(?=[぀-ヿ㐀-鿿])/g;
+const squeeze=(t:string)=>t.replace(/([ァ-ヿ])[―‐－−](?=[ァ-ヿ])/g,"$1ー").replace(CJK_GAP,"$1");
+// Labels whose characters are cells of their own ("孔", "口", "標", "高" side by side) are closed up into one, as are
+// "北" and "緯": short runs of kanji or kana only, close together on one line.
+const KANA_KANJI=/^[぀-ヿ㐀-鿿ー]{1,6}$/;
+function closeUp(els:TextLine[]){
+  const out:TextLine[]=[],first=new Map<TextLine,TextLine>();
+  for(const e of els){
+    const p=out.at(-1),h=Math.max(e.y1-e.y0,1);
+    if(p&&KANA_KANJI.test(p.text)&&KANA_KANJI.test(e.text)&&Math.abs(p.cy-e.cy)<0.6*h&&e.x0>=p.x1-2&&e.x0-p.x1<2.5*h){
+      const m={...p,text:p.text+e.text,x1:Math.max(p.x1,e.x1),y0:Math.min(p.y0,e.y0),y1:Math.max(p.y1,e.y1)};
+      m.cx=(m.x0+m.x1)/2;m.cy=(m.y0+m.y1)/2;
+      first.set(m,first.get(p)??p);out[out.length-1]=m;
+    }else out.push(e);
+  }
+  return {els:out,first};
+}
 
 // Page order: lines top to bottom, each left to right. Text within half a line height of a line's first item is on
 // that line, so two headings side by side keep their order whatever their boxes' heights. (A PDF's own text comes in
@@ -176,7 +216,12 @@ function pageOrder(els:TextLine[]){
 // The header of a log: ID, sheet of a log over several pages, ground level, final depth, water level and position.
 // Labels in English, Dutch, French, German and Japanese.
 export function header(lines:TextLine[]):LogHeader&{mark?:number}{
-  const els=pageOrder(lines),all=els.map(e=>e.text).join("\n");
+  // Labels are matched on the text with spaced-out kanji closed up; each value keeps the line it was read from.
+  const original=new Map<TextLine,TextLine>();
+  const squeezed=pageOrder(lines).map(e=>{const t=squeeze(e.text);if(t===e.text)return e;const c={...e,text:t};original.set(c,e);return c});
+  const closed=closeUp(squeezed),els=closed.els;
+  for(const [m,f] of closed.first)original.set(m,original.get(f)??f);
+  const all=els.map(e=>e.text).join("\n");
   // A value found in the page's text, and the line it starts in.
   const starts:number[]=[];
   els.reduce((at,e)=>{starts.push(at);return at+e.text.length+1},0);
@@ -188,7 +233,7 @@ export function header(lines:TextLine[]):LogHeader&{mark?:number}{
   const src:Partial<Record<HeaderField,TextLine>>={};
   const take=<T>(key:HeaderField,v:{text:string;src:TextLine}|undefined,parse:(t:string)=>T|undefined)=>{
     const value=v?parse(v.text):undefined;
-    if(value!==undefined)src[key]=v!.src;
+    if(value!==undefined)src[key]=original.get(v!.src)??v!.src;
     return value;
   };
   // A title "LOG OF BOREHOLE BH3 … 1 OF 3" gives the ID and the sheet, so the pages of one log can be joined.
@@ -206,13 +251,15 @@ export function header(lines:TextLine[]):LogHeader&{mark?:number}{
   }
   const gwl=match(/GWL\s*([\d.,]+)/i);
   const head:LogHeader&{mark?:number}={
-    id:take("id",title??fieldAt(els,/^(?:bore\s*hole|boring|forage|sondage|bohrung)\s*(?:no\.?|id|nr\.?|number)?\s*[:.]?(?![a-z])|^ボーリング(?:名|番号|No\.?)|^孔番号/i,isId),t=>t.replace(/\s+/g,"")),
+    id:take("id",title??fieldAt(els,/^(?:bore\s*hole|boring|forage|sondage|bohrung)\s*(?:no\.?|id|nr\.?|number)?\s*[:.]?(?![a-z])|^ボーリング(?:名|番号|No\.?)|^孔番号/i,t=>isId(t.replace(ID_NOTE,""))),t=>t.replace(/\s+/g,"")),
     sheet:sheet?[+sheet[1],+sheet[2]]:undefined,
     // The ground level may stand before its words ("12.30 Ground Surface").
     // A header's "ELEVATION: 14.20 m" (with its colon, so not an elevation column's heading) is the ground level too.
-    ground:take("ground",fieldAt(els,/(?:ground (?:level|surface)|(?:ground|surface|collar) elev(?:ation)?\.?|maaiveld(?:hoogte)?|cote du terrain|niveau du sol|gel[äa]ndeh[öo]he|ansatzh[öo]he)(?![a-z])|^孔口標高|^地盤高/i,isLevel)??fieldAt(els,/^elev(?:ation)?\.?\s*[:=]/i,isDec),firstNum),
+    ground:take("ground",fieldAt(els,/(?:ground (?:level|surface)|(?:ground|surface|collar) elev(?:ation)?\.?|maaiveld(?:hoogte)?|cote du terrain|niveau du sol|gel[äa]ndeh[öo]he|ansatzh[öo]he)(?![a-z])|^孔口標高|^地盤高/i,isLevel)??fieldAt(els,/^elev(?:ation)?\.?\s*[:=]/i,isDec),levelNum),
     // The depth the hole was taken to ("TERMINATION DEPTH (M) : 10.00", "END OF BOREHOLE AT 6.50 mbgs", 総掘進長).
-    final:take("final",fieldAt(els,/^(?:termination(?:\s*depth)?|final depth|total depth|depth of (?:bore ?hole|hole)|hole depth|end of (?:bore ?hole|hole)(?: at)?)(?![a-z])|^総掘進長|^掘進長/i,isDec),firstNum),
+    // A Japanese header's total depth may be a whole number of metres ("20 m"): its label leaves no doubt.
+    final:take("final",fieldAt(els,/^(?:termination(?:\s*depth)?|final depth|total depth|depth of (?:bore ?hole|hole)|hole depth|end of (?:bore ?hole|hole)(?: at)?)(?![a-z])/i,isDec)??
+      fieldAt(els,/^総掘進長|^総削孔長|^掘進長|^掘削深度|^掘さく深度/,t=>isNum(t.replace(/^GL\s*[-−]\s*/i,""))),firstNum),
     // A table of readings first, then a labelled value, then the water mark on the log.
     // A remark under a heading that names the water level ("0.6m: sample disturbed" in a comments column) is none.
     water:take("water",reading??fieldAt(els,/^(?:groundwater|ground water|grondwater(?:stand)?|nappe|grundwasser|water level|w\.\s*l\.|gwl|gwt|g\.\s*w\.\s*t\.|swl|swt|static water(?: level| table)?)(?![a-z])|^孔内水位|^地下水位/i,t=>isDec(t)&&!REMARK.test(t))??gwl,firstNum),
@@ -232,7 +279,18 @@ export function header(lines:TextLine[]):LogHeader&{mark?:number}{
   if(lat&&lon){
     head.lat=+lat.text.replace(",",".")*(/S/i.test(lat.m[1]??lat.m[2]??"")?-1:1);
     head.lon=+lon.text.replace(",",".")*(/W/i.test(lon.m[1]??lon.m[2]??"")?-1:1);
-    src.lat=lat.src;src.lon=lon.src;
+    src.lat=original.get(lat.src)??lat.src;src.lon=original.get(lon.src)??lon.src;
+  }else{
+    // In degrees, minutes and seconds, after a label: 北緯 / 東経 (with or without 度), latitude / longitude, or N / E.
+    // The label and its value may be cells of their own ("北", "緯", then the value).
+    const dlat=match(new RegExp(String.raw`(?:北\s*緯|南\s*緯|緯\s*度|lat(?:itude)?\.?|\bN)[\s:：=]{0,6}${DMS}\s*([NS])?`,"i"),1);
+    const dlon=match(new RegExp(String.raw`(?:東\s*経|西\s*経|経\s*度|lon(?:g(?:itude)?)?\.?|\bE)[\s:：=]{0,6}${DMS}\s*([EW])?`,"i"),1);
+    const a=dms(dlat?.m,1),o=dms(dlon?.m,1);
+    if(a!==undefined&&o!==undefined&&a<=90&&o<=180){
+      const south=/南\s*緯/.test(dlat!.m[0])||dlat!.m[4]?.toUpperCase()==="S",west=/西\s*経/.test(dlon!.m[0])||dlon!.m[4]?.toUpperCase()==="W";
+      head.lat=south?-a:a;head.lon=west?-o:o;
+      src.lat=original.get(dlat!.src)??dlat!.src;src.lon=original.get(dlon!.src)??dlon!.src;
+    }
   }
   // "GWT: Ground level": the water stands at the ground surface, a depth of 0 (flagged). Only as the label's own line:
   // a "Ground level" in the next cell of a row of headings is a label of its own.

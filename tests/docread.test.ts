@@ -320,6 +320,22 @@ describe("header values",()=>{
   it("reads a header's elevation with its colon as the ground level",()=>{
     expect(header([L("BORING NO.: BH-3",40,40),L("ELEVATION: 14.20 m.",40,60)])).toMatchObject({id:"BH-3",ground:14.2});
   });
+  // Invented values, laid out as the Japanese log form sets them: labels spaced out or cut into one cell per character,
+  // positions in degrees, minutes and seconds, levels with their datum before them.
+  it("reads a Japanese form's header with spaced-out labels and latitude and longitude in degrees, minutes and seconds",()=>{
+    const lines=[L("ボーリング名",40,40,72),L("BV-7(測点No.12)",130,40),L("北",600,40,12),L("緯",640,40,12),L("35° 10’ 30.0”",660,40),
+      L("東",600,60,12),L("経 139°20′15.5′′",640,60),L("孔 口 標 高",40,80,72),L("KBM2= -1.25m",130,80),L("総 掘 進 長",40,100,72),L("12 m",130,100)];
+    const h=header(lines);
+    expect(h).toMatchObject({id:"BV-7(測点No.12)",ground:-1.25,final:12,lat:35.175,lon:139.3376389});
+    expect(h.src?.ground).toBe(lines[8]);
+  });
+  it("reads a level whose datum stands over it in the next cell, and keeps a datum's number out of the value",()=>{
+    expect(header([L("孔",40,80,12),L("口",58,80,12),L("標",76,80,12),L("高",94,80,12),L("T.P.",120,70),L("4.06m",120,90)]).ground).toBe(4.06);
+    expect(header([L("孔口標高",40,80),L("GH= 121.50m",120,80)]).ground).toBe(121.5);
+  });
+  it("leaves a position out where minutes or seconds are out of range",()=>{
+    expect(header([L("北緯 35° 75’ 30.0”",40,40,200),L("東経 139° 20’ 15.5”",40,60,200)]).lat).toBeUndefined();
+  });
 });
 
 describe("unit rules for real logs",()=>{
