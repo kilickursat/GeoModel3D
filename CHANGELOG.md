@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.31.1 — 2026-11-26
+
+### Fixed
+- A sheet's number beside the borehole's label ("Sheet 1 of 2" under "BOREHOLE No") was taken for its name ("Sheet1of2"), and "BOREHOLE LOG" for the label of a name. The name beside the label is read again, as before 0.31.0.
+- Boundaries read from lines drawn across the descriptions took the frame of the log and the boxes of the notes under it for boundaries, which made one layer of a whole sheet and layers of the notes (since 0.31.0). Now:
+  - a line parts two layers only where there are descriptions above and below it;
+  - the deepest line, with descriptions only above it, is the base of the log, unless it lies below the scale or the final depth, or ends a sheet the log carries on from;
+  - where a layer the lines make would have no description, they are not used.
+- The notes under a log ("REMARKS: …") and the text after its end ("Borehole completed at …") are no description. On a sheet that carries a log on, the small rows of the column headings are none either.
+- The column under a "DESCRIPTION" heading is the description column, even where a column of test results beside it has more letters.
+- Words whose "ti" and "ft" ligatures a PDF maps to "7" and "&" ("s7ff", "so&", "Con7nued") are read as written ("stiff", "soft", "Continued").
+
+### Added
+- Read logs that give their boundaries as reduced levels only: an "R.L." column (or "RL", "Elevation") beside a depth scale with no depth written, against the header's surface level ("SURFACE RL 5.40m"). Each level is the boundary at the surface level less that level, where it fits its place on the depth scale. A level printed at the bottom of a sheet the log carries on from is where the sheet ends, not a boundary.
+- Read with them:
+  - positions written with their letters after the numbers ("COORDINATES 412345.0 E; 6801234.5 N");
+  - the final depth as "Borehole completed at 8.00m";
+  - SPT tests written as their counts over their N value ("4, 6, 8" over "N=14"; "hw, hw, hw" over "N<1", no blow counted);
+  - soil names written after their qualifier ("Silty CLAY (Topsoil)", "Clayey SAND"), each with its own layer where a thin layer's text runs on below its base.
+- Name metamorphosed rocks ("metagreywacke", "metasandstone") as rock.
+
 ## 0.31.0 — 2026-11-25
 
 ### Added
