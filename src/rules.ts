@@ -65,7 +65,8 @@ export const lithologyRules:UnitRule[]=[
   {match:rockFirst(words("mudstone|siltstone|claystone|shale|marl|argillite|mudrock")),unit:"Mudstone and siltstone"},
   {match:rockFirst(words("sandstone|conglomerate|(?<!volcanic )breccia|greywacke|graywacke|arkose|wacke|arenite|gritstone")),unit:"Sandstone"},
   {match:rockFirst(`${words("limestone|chalk|dolomite|dolostone|travertine|tufa")}|kalksteen|krijt\\b`),unit:"Limestone and chalk"},
-  {match:rockFirst(words(`${IGNEOUS}|${METAMORPHIC}|chert|ironstone|rock|bedrock`)),unit:"Rock"},
+  // Metamorphosed rocks named by what they were ("metagreywacke", "metasandstone") are metamorphic rocks.
+  {match:rockFirst(words(`${IGNEOUS}|${METAMORPHIC}|chert|ironstone|rock|bedrock|meta[a-z]{4,}`)),unit:"Rock"},
   {match:firstNoun("gravel"),unit:"Gravel"},
   {match:firstNoun("sand"),unit:"Sand"},
   {match:firstNoun("silt"),unit:"Silt"},

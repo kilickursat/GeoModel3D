@@ -182,6 +182,7 @@ const DATE=/\d{1,2}[./-]\d{1,2}[./-]\d{2,4}/;
 // A note in brackets after an ID ("BR-2(6.25k+65m右岸)", "No.2(測点No.67 R5.0)") is part of the name as printed.
 const ID_NOTE=/\s*[(（][^)）]*[)）]?\s*$/;
 const isId=(t:string)=>/^[A-Za-z.#\-]{0,6}\s?\d[\w.\-/]{0,12}$/.test(t.trim());
+const SHEET_MARK=/\b(?:sheet|page)\b|\d\s+of\s+\d/i;
 const isNum=(t:string)=>/^\D{0,3}\d/.test(t)&&!DATE.test(t);
 const isDec=(t:string)=>/^\D{0,3}\d+[.,]\d/.test(t)&&!DATE.test(t);
 const REMARK=/^\s*\d+(?:[.,]\d+)?\s*m\s*:\s*\p{L}/u;
@@ -270,16 +271,18 @@ export function header(lines:TextLine[]):LogHeader&{mark?:number}{
   }
   const gwl=match(/GWL\s*([\d.,]+)/i);
   const head:LogHeader&{mark?:number}={
-    id:take("id",title??fieldAt(els,/^(?:bore\s*hole|boring|forage|sondage|bohrung)\s*(?:no\.?|id|nr\.?|number)?\s*[:.]?(?![a-z])|^ボーリング(?:名|番号|No\.?)|^孔番号|^(?:hole\s*)?number\s*:/i,t=>isId(t.replace(ID_NOTE,"").replace(/\s+/g,""))),
+    // "BOREHOLE LOG" is a title, not the label of a name; and a sheet's number ("Sheet 1 of 2") beside the label is no name.
+    id:take("id",title??fieldAt(els,/^(?:bore\s*hole|boring|forage|sondage|bohrung)(?!\s+log)\s*(?:no\.?|id|nr\.?|number)?\s*[:.]?(?![a-z])|^ボーリング(?:名|番号|No\.?)|^孔番号|^(?:hole\s*)?number\s*:/i,t=>!SHEET_MARK.test(t)&&isId(t.replace(ID_NOTE,"").replace(/\s+/g,""))),
       // A continuation sheet's "(cont.)" is no part of the ID.
       t=>t.replace(/\s*\((?:cont(?:inued|'d|\.)?|continuation)\)\s*$/i,"").replace(/\s+/g,"")),
     sheet:sheet?[+sheet[1],+sheet[2]]:undefined,
     // The ground level may stand before its words ("12.30 Ground Surface").
     // A header's "ELEVATION: 14.20 m" (with its colon, so not an elevation column's heading) is the ground level too.
-    ground:take("ground",fieldAt(els,/(?:ground (?:level|surface)|(?:ground|surface|collar) elev(?:ation)?\.?|maaiveld(?:hoogte)?|cote du terrain|niveau du sol|gel[äa]ndeh[öo]he|ansatzh[öo]he)(?![a-z])|^孔口標高|^地盤高/i,isLevel)??fieldAt(els,/^elev(?:ation)?\.?\s*[:=]/i,isDec),levelNum),
+    // Australian logs give it as a reduced level: "SURFACE RL 5.40m" (not a bare "R.L.", the heading of a column of levels).
+    ground:take("ground",fieldAt(els,/(?:ground (?:level|surface)|(?:ground|surface|collar) elev(?:ation)?\.?|(?:ground|surface|collar)\s*r\.?\s*l\.?|r\.?\s*l\.?\s*(?:of\s*)?(?:ground|surface|collar)|maaiveld(?:hoogte)?|cote du terrain|niveau du sol|gel[äa]ndeh[öo]he|ansatzh[öo]he)(?![a-z])|^孔口標高|^地盤高/i,isLevel)??fieldAt(els,/^elev(?:ation)?\.?\s*[:=]/i,isDec),levelNum),
     // The depth the hole was taken to ("TERMINATION DEPTH (M) : 10.00", "END OF BOREHOLE AT 6.50 mbgs", 総掘進長).
     // A Japanese header's total depth may be a whole number of metres ("20 m"): its label leaves no doubt.
-    final:take("final",fieldAt(els,/^(?:termination(?:\s*depth)?|final depth|total depth|depth of (?:bore ?hole|hole)|hole depth|end of (?:bore ?hole|hole)(?: at)?)(?![a-z])/i,isDec)??
+    final:take("final",fieldAt(els,/^(?:termination(?:\s*depth)?|final depth|total depth|depth of (?:bore ?hole|hole)|hole depth|end of (?:bore ?hole|hole)(?: at)?|(?:bore ?hole|hole|bh)\s+(?:completed|terminated|discontinued|abandoned)\s+at)(?![a-z])/i,isDec)??
       fieldAt(els,/^総掘進長|^総削孔長|^掘進長|^掘削深度|^掘さく深度/,t=>isNum(t.replace(/^GL\s*[-−]\s*/i,""))),firstNum),
     // A table of readings first, then a labelled value, then the water mark on the log.
     // A remark under a heading that names the water level ("0.6m: sample disturbed" in a comments column) is none.
@@ -290,6 +293,9 @@ export function header(lines:TextLine[]):LogHeader&{mark?:number}{
   // Dutch and Flemish reports: "Z (mTAW): 1.42" is the ground level, "Diepte (m): 0.00 - 24.00" the depth logged.
   if(head.ground===undefined){const z=match(/(?:^|\n)Z\s*\((?:m\s*)?(?:TAW|NAP|NN|mTAW|mNAP)?[^)\n]{0,8}\)\s*:\s*(-?\d+(?:[.,]\d+)?)/i);if(z){head.ground=firstNum(z.text);src.ground=original.get(z.src)??z.src}}
   if(head.final===undefined){const r=match(/diepte\s*\(m\)\s*:\s*\d+(?:[.,]\d+)?\s*-\s*(\d+(?:[.,]\d+)?)/i)??match(/(?:^|\n)T\.\s*D\.\s*(\d+(?:[.,]\d+)?)/);if(r){head.final=firstNum(r.text);src.final=original.get(r.src)??r.src}}
+  // Easting and northing with their letters after them ("COORDINATES 412345.0 E; 6801234.5 N", "412345mE 6801234mN").
+  const en=match(/(?:^|[^\w.])(\d{5,7}(?:[.,]\d+)?)\s*m?E\b[\s;,/]*(\d{6,8}(?:[.,]\d+)?)\s*m?N\b/m);
+  if(head.x===undefined&&head.y===undefined&&en){head.x=firstNum(en.m[1]);head.y=firstNum(en.m[2]);src.x=src.y=original.get(en.src)??en.src}
   // Northing and easting where there is no X and Y. In UTM the northing is the one in millions: labels the other way
   // round are swapped, and flagged.
   const north=match(/(?:^|[^A-Za-z])(?:N|Northing)\s*[=:]?\s*(-?\d{5,}(?:[.,]\d+)?)/m),east=match(/(?:^|[^A-Za-z])(?:E|Easting)\s*[=:]?\s*(-?\d{5,}(?:[.,]\d+)?)/m);
@@ -376,12 +382,15 @@ const kanji=(t:string)=>/[぀-ヿ一-鿿]/.test(t)?t.replace(/[质风砾软层�
 // Hatching read as text: short mixes of digits with D, b, p, q, O or U ("D0D", "bb0", "6DD"), runs of D, lone marks,
 // and one or two kanji inside Latin text.
 // A sheet's marks that a layer runs on ("(continued)", "Continued next page") are no description.
-const CONTINUED_MARK=/\(\s*continued[^)]*\)|\bcontinued\s+(?:on\s+|to\s+|from\s+)?(?:the\s+)?(?:next|previous|last)\s+(?:page|sheet)\b|^\s*continued\s*$/gi;
+const CONTINUED_MARK=/\(\s*continued[^)]*\)|\bcontinued\s+(?:on\s+|to\s+|from\s+)?(?:the\s+)?(?:next|previous|last)\s+(?:page|sheet)\b|^\s*continued\s*$|\bcont['’]d\.?(?=\s|$)/gi;
 // OCR reads some capitals as small letters of the same shape (c, o, s, v, w, x, z): "SILTY cLAY," is "SILTY CLAY,".
 const capitals=(t:string)=>t.replace(/\b[cosvwxz](?=[A-Z]{2,}\b)/g,c=>c.toUpperCase()).replace(/\b([A-Z]+)([cosvwxz])(?=[A-Z]{2,}\b)/g,(_,a,c)=>a+c.toUpperCase())
   .replace(/\b([A-Z]{2,})([cosvwxz])(?=[A-Z]+\b)/g,(_,a,c)=>a+c.toUpperCase());
+// Some PDFs map their font's "ti" and "ft" ligatures to "7" and "&" ("s7ff", "so&.", "Con7nued"): inside a word of small
+// letters, they are put back.
+export const ligatures=(t:string)=>t.replace(/(?<=[a-z])7(?=[a-z])/g,"ti").replace(/(?<=[a-z])&(?=[a-z.,;:)]|\s|$)/g,"ft");
 function clean(t:string,latin=(t.match(/[A-Za-z]/g)??[]).length>=5){
-  t=capitals(t.replace(CONTINUED_MARK," "));
+  t=capitals(ligatures(t).replace(CONTINUED_MARK," "));
   return t.split(/\s+/).filter(w=>!(/^(?=.*\d)(?=.*[DdbpqOoUu])[0-9DdbpqOoUu]{2,4}$/.test(w)||/^[Dd]{2,}$/.test(w)||/^[?!)(\]\[}{|]+$/.test(w)||
     (latin&&/^[぀-ヿ一-鿿]{1,2}$/.test(w)))).join(" ").trim();
 }
@@ -389,7 +398,8 @@ function clean(t:string,latin=(t.match(/[A-Za-z]/g)??[]).length>=5){
 // Layer titles: an UPPERCASE soil name and a colon, comma or bracket ("FILL:", "SANDY SILT,", "TOP SOIL (100 mm)"), or
 // a thickness and a name ("200mm AGGREGATE"). Titles are found without overlapping ("SOIL" inside "TOP SOIL" is not one).
 const UPPER_WORDS="[A-Z]{2,}(?:\\s+[A-Z]{2,}(?![A-Za-z]*\\s*[,:(]))*";
-const TITLE_SRC=`(?:\\d+(?:[.,]\\d+)?\\s?mm\\s+${UPPER_WORDS}|[A-Z]{2,}(?:\\s+[A-Z]{2,})*\\s*(?:\\([^)]*\\)|:|,))`;
+// The soil may follow its qualifier, capitalised ("Silty CLAY (Topsoil)", "Clayey SAND"), as Australian logs write it.
+const TITLE_SRC=`(?:\\d+(?:[.,]\\d+)?\\s?mm\\s+${UPPER_WORDS}|(?:[A-Z][a-z]*y\\s+)?[A-Z]{2,}(?:\\s+[A-Z]{2,})*\\s*(?:\\([^)]*\\)|:|,))`;
 const TITLE=new RegExp("^"+TITLE_SRC);
 const titleStarts=(d:string)=>[...d.matchAll(new RegExp("(^|\\s)"+TITLE_SRC,"g"))].map(m=>m.index!+m[1].length);
 // Where the description boxes are not drawn to scale (thin layers pushing the text down, with leader lines to the true
@@ -496,7 +506,7 @@ const SAME=/^[\s\-–—]*(?:same\s+(?:materials?|soil|as\s+(?:above|before|prev
 const EMPTY=/^(?:no (?:recovery|penetration|sample)|refusal|core loss|lost core)\b/i;
 // The note's brackets may be read apart from it ("Rec: 38/45 cm.)").
 const RECOVERY=/\(?\s*\brec(?:overy)?\.?\s*[:=]\s*[\d\s.,/%-]*(?:cm|mm|m)?\.?\s*\)?/gi;
-const LOG_END=/^(?:end of (?:bore ?hole|boring|hole|log)|bottom of (?:bore ?hole|hole)|termination of (?:bore ?hole|hole)|e\.?\s*o\.?\s*h\.?\b)/i;
+const LOG_END=/^(?:end of (?:bore ?hole|boring|hole|log)|bottom of (?:bore ?hole|hole)|termination of (?:bore ?hole|hole)|e\.?\s*o\.?\s*h\.?\b|(?:bore ?hole|hole|bh)\s+(?:completed|terminated|discontinued|abandoned)\b)/i;
 const NOTE=/^(?:notes?|remarks?|legend)\s*:/i;
 const CHANGE=/(?:approx(?:imate(?:ly)?|\.)?\s+)?(?:change (?:of |in )?(?:formation|stratum|strata|layer|material|soil)|(?:formation|stratum|layer) change|(?:encountered |top of )?bed ?rock|top of rock)\s*(?:@|at)\s*(\d+(?:[.,]\d+)?)\s*m\b\.?/gi;
 const tidy=(t:string)=>t.replace(/\s+/g," ").replace(/\s+([.,;])/g,"$1").replace(/^[\s;,]+|[\s;,]+$/g,"").replace(/;\s*;/g,";");
@@ -735,6 +745,33 @@ function stacked(els:TextLine[]){
   }
   return words.map(w=>({text:w.map(e=>e.text.trim()).join(""),x0:Math.min(...w.map(e=>e.x0)),x1:Math.max(...w.map(e=>e.x1)),y1:w[w.length-1].y1}));
 }
+// A log may give its boundaries as reduced levels only: a column headed "R.L. (m)" (or "RL", "Elevation") with 5.25,
+// 3.40… at the boundaries, beside a depth scale with no depth written, and the ground's level in the header ("SURFACE
+// RL 5.40m"). Each level is the boundary at ground − level, where that agrees with its place on the scale (a level is
+// written on or just above its line); most of the column must agree.
+const LEVEL_HEAD=/^(?:r\.?\s?l\.?|reduced\s+levels?|elev(?:ation)?\.?)(?:\s*\(\s*m(?:\s*(?:AHD|asl|msl|OD))?\s*\))?$/i;
+function levelBounds(els:TextLine[],scale:DepthScale,ground:number){
+  for(const hd of els.filter(e=>LEVEL_HEAD.test(e.text.trim()))){
+    const w=Math.max(hd.x1-hd.x0,hd.y1-hd.y0);
+    const col=els.filter(e=>e.cy>hd.y1&&isDecimal(e)&&e.x1>hd.x0-w&&e.x0<hd.x1+w);
+    const fit=col.map(e=>({e,d:+(ground-num(e.text)).toFixed(2)})).filter(x=>x.d>0&&Math.abs(scale.depthAt(x.e.cy)-x.d)<0.3);
+    if(fit.length&&fit.length>=0.7*col.length)return fit;
+  }
+  return [];
+}
+// Tests written as their counts over their N value ("7, 9, 7" over "N=16"; "hw, hw, hw" over "N<1", where the sampler
+// sank under the hammer's weight and no blow was counted), at the depth of the counts on the scale.
+const N_VALUE=/^N\s*(?:=\s*(\d{1,3})|<\s*1)$/i,N_COUNTS=/^(?:(?:\d{1,3}|hw|hb|sw)\s*,\s*){1,3}(?:\d{1,3}|hw|hb|sw)$/i;
+function testsByNValue(els:TextLine[],scale:DepthScale):SptTest[]{
+  const out:SptTest[]=[];
+  for(const e of els.filter(e=>N_VALUE.test(e.text.trim()))){
+    const h=Math.max(e.y1-e.y0,1),c=els.find(k=>N_COUNTS.test(k.text.trim())&&e.cy-k.cy>0.3*h&&e.cy-k.cy<2.5*h&&Math.abs(k.cx-e.cx)<4*h);
+    if(!c)continue;
+    const m=N_VALUE.exec(e.text.trim())!,d=scale.depthAt(c.cy);
+    if(d>=0)out.push({depth:+d.toFixed(2),blows:m[1]===undefined?0:+m[1],penetration:30,src:[c,e]});
+  }
+  return out;
+}
 function waterColumn(els:TextLine[],scale:DepthScale){
   const heads=[...els.filter(e=>/孔内水位|地下水位/.test(e.text.replace(/\s/g,""))).map(e=>({x0:e.x0,x1:e.x1,y1:e.y1})),...stacked(els).filter(w=>/孔内水位|地下水位|水位/.test(w.text))];
   for(const hd of heads){
@@ -798,6 +835,8 @@ export function rebuild(els:TextLine[],width:number,height=Infinity,rules:Rule[]
   const misfit=(e:TextLine)=>!agree(e)&&num(e.text)>=top&&num(e.text)<=base;
   const boundaries=!!bcol&&bcol.els.filter(agree).length>bcol.els.filter(misfit).length;
   const bels=boundaries?bcol.els.filter(agree):[];
+  // No depths at the boundaries, but their reduced levels against the header's ground level (see levelBounds).
+  const lev=bels.length<2&&head.ground!==undefined?levelBounds(els,scale,head.ground):[];
   // Descriptions: the log's text (not numbers, not the water mark) grouped into columns; the column with the most
   // letters is the description column (a hatched legend reads as "000" or "C C T"). The body starts below the column
   // headings ("DESCRIPTION", "土質区分"), which repeat on continued pages; without them, at the depth 0. The headings sit
@@ -806,6 +845,16 @@ export function rebuild(els:TextLine[],width:number,height=Infinity,rules:Rule[]
   const topY=Math.min(...scale.labels.map(e=>e.cy));
   const heads=els.filter(e=>/descri|soil profile|stratigraph|litholog|omschrijving|beschrijving|土質|記事|地層/i.test(e.text)&&e.cy<topY+0.5*scale.b);
   const above=heads.filter(e=>e.cy<topY),startY=heads.length?Math.max(...(above.length?above:heads).map(e=>e.y1)):scale.yAt(0);
+  // The body of the log stops at the line that ends the log ("Borehole completed at 8.00m"), and the notes under its
+  // scale ("REMARKS: …", a line that runs under several columns and would join them) are no description. On a sheet
+  // that carries a log on, the body starts a step of the scale above its first label (10 m on a sheet whose labels
+  // start at 11): the smaller rows of the column headings above it ("REC %", "CASING") are no description either. (On a
+  // first sheet the depth 0 is its top: OCR may miss the first labels of a scan.)
+  const marks=scale.labels.map(e=>scale.depthAt(e.cy)).sort((a,b)=>a-b);
+  const markStep=median(marks.slice(1).map((v,k)=>v-marks[k]).filter(g=>g>0.2))||1;
+  const scaleEnd=marks[marks.length-1]+markStep,sheetTop=head.sheet&&head.sheet[0]>1?Math.max(0,marks[0]-markStep):0;
+  const endLine=els.filter(e=>LOG_END.test(e.text.trim())&&e.cy>startY).sort((p,q)=>p.cy-q.cy)[0];
+  const inBody=(e:TextLine)=>scale.depthAt(e.cy)>=sheetTop&&(!endLine||e.cy<endLine.y0)&&!(NOTE.test(e.text.trim())&&scale.depthAt(e.cy)>marks[marks.length-1]);
   // Text of fewer than two letters is no description (a page code "A2-17" under the log, which would join its columns,
   // or a mark), unless it is a Japanese name ("砂").
   // Japanese forms give each layer's soil name (土質区分: "礫混じり粘性土", "(C-G)") in a column of its own, beside the
@@ -815,10 +864,15 @@ export function rebuild(els:TextLine[],width:number,height=Infinity,rules:Rule[]
   const japanese=els.some(e=>/[一-鿿]/.test(e.text));
   const describe=(bottom:number)=>{
     const body=els.filter(e=>!Number.isFinite(num(e.text))&&!/^GWL/i.test(e.text)&&(letters(e.text)>=2||/[぀-ヿ一-鿿]/.test(e.text)||japanese&&SOIL_CODE.test(e.text.trim()))&&
-      e.cy>startY&&scale.depthAt(e.cy)>=0&&scale.depthAt(e.cy)<=bottom+0.5);
+      e.cy>startY&&inBody(e)&&scale.depthAt(e.cy)<=bottom+0.5);
     const lettersOf=(c:Column)=>c.els.reduce((s,e)=>s+letters(e.text),0);
     const cols=columns(body,rules).sort((p,q)=>lettersOf(q)-lettersOf(p));
     let main:Column|undefined=cols[0],names:Column|undefined;
+    // Under a "DESCRIPTION" heading, its column is the description column, even where another (test results) has
+    // more letters: a sheet that carries a layer on may describe it in a line or two.
+    const dh=japanese?undefined:heads.find(e=>/descri/i.test(e.text));
+    const under=dh&&cols.filter(c=>c.x0<dh.x1&&c.x1>dh.x0).sort((p,q)=>lettersOf(q)-lettersOf(p))[0];
+    if(under)main=under;
     if(main&&soilNames(main)){
       const remarks=cols.find(c=>c!==main&&!soilNames(c)&&median(c.els.map(e=>e.text.replace(/\s/g,"").length))>6&&lettersOf(c)>=0.25*lettersOf(main!));
       // No remarks column at all: the names are the descriptions.
@@ -833,7 +887,7 @@ export function rebuild(els:TextLine[],width:number,height=Infinity,rules:Rule[]
   // its place beside such a log is a laboratory result ("Gs = 2.68" at 2.7 m), not a boundary, so the samples win where
   // they outnumber the boundaries. Only the last sheet of a log (or a log on one sheet) reaches its final depth; the
   // sheets of one log are joined by their samples.
-  if(bels.length<2){
+  if(bels.length+lev.length<2){
     const {lines,latin}=describe(Infinity),samples=readSamples(lines,scale,latin);
     if(samples.filter(x=>!x.empty).length>bels.length){
       const last=!head.sheet||head.sheet[0]>=head.sheet[1],read=sampleLayers(samples,last?head.final:undefined);
@@ -845,11 +899,19 @@ export function rebuild(els:TextLine[],width:number,height=Infinity,rules:Rule[]
   const labels=[...bels];
   bels.forEach(e=>used.add(e));
   const values=bels.map(e=>num(e.text)),flagged:number[]=[],why=new Map<number,string>();
+  // A level printed at the bottom of a sheet the log carries on from ("-5.60" at 11.00 m on sheet 1 of 2) is where the
+  // sheet ends, not a boundary.
+  const carriesOn=!!head.sheet&&head.sheet[0]<head.sheet[1];
+  for(const x of lev){
+    if(carriesOn&&Math.abs(x.d-scaleEnd)<=0.05)continue;
+    values.push(x.d);labels.push({...x.e,text:String(x.d)});used.add(x.e);
+  }
   // No depths written at the boundaries: a log may draw them only, as lines across its descriptions (a scanned log in
   // feet with a depth scale every 2 ft). Each line that runs across most of the description column is a boundary, at
   // the depth the scale gives its place (to the nearest twentieth of a scale step), flagged.
-  if(bels.length<2&&rules.length){
-    const {lines:desc}=describe(Infinity);
+  if(bels.length+lev.length<2&&rules.length){
+    // Descriptions only: not the end of the log, nor a mark that the log carries on ("Continued on next sheet").
+    const desc=describe(Infinity).lines.filter(e=>!LOG_END.test(e.text.trim())&&clean(e.text).length>0);
     if(desc.length>=2){
       const x0=Math.min(...desc.map(e=>e.x0)),x1=Math.max(...desc.map(e=>e.x1)),w=x1-x0,mid=(x0+x1)/2;
       const at=scale.labels.map(e=>scale.depthAt(e.cy)).sort((a,b)=>a-b),gaps=at.slice(1).map((v,k)=>v-at[k]).filter(g=>g>0.2);
@@ -860,10 +922,21 @@ export function rebuild(els:TextLine[],width:number,height=Infinity,rules:Rule[]
       // Lines at an even spacing are a grid (a graph, a cross-hatching), not boundaries.
       const spacing=groups.slice(1).map((g,k)=>g[0]-groups[k][0]),even=median(spacing);
       const grid=groups.length>=6&&spacing.filter(d=>Math.abs(d-even)<=0.12*even).length>=0.7*spacing.length;
+      // A line parts two layers where there are descriptions above and below it: the frame above the log, and the boxes
+      // of the notes under it, part none. A line with descriptions only above it is the base of the log, unless it lies
+      // below the scale or the final depth, or ends a sheet the log carries on from (the frame of that sheet).
+      const drawn:number[]=[];
       for(const g of grid?[]:groups){
-        const d=Math.round(scale.depthAt((g[0]+g[g.length-1])/2)/step)*step,v=+d.toFixed(3);
-        if(v>step&&v<=last&&!values.some(u=>Math.abs(u-v)<1.5*step)){values.push(v);flagged.push(v);why.set(v,"read from the line drawn across the descriptions, by its place on the depth scale")}
+        const y=(g[0]+g[g.length-1])/2;
+        if(!desc.some(e=>e.cy<y))continue;
+        const v=+(Math.round(scale.depthAt(y)/step)*step).toFixed(3);
+        if(!desc.some(e=>e.cy>y)&&(v>scaleEnd+0.05||carriesOn&&Math.abs(v-scaleEnd)<=0.05||head.final!==undefined&&v>head.final+0.05))continue;
+        if(v>step&&v<=last&&!values.some(u=>Math.abs(u-v)<1.5*step)&&!drawn.some(u=>Math.abs(u-v)<1.5*step))drawn.push(v);
       }
+      // Every layer the lines make must have a description of its own; if one would not, they are not its boundaries.
+      const cuts=[...values,...drawn].sort((a,b)=>a-b),depths=desc.map(e=>scale.depthAt(e.cy));
+      if(cuts.every((v,k)=>depths.some(d=>d>=(k?cuts[k-1]:-Infinity)&&d<v)))
+        for(const v of drawn){values.push(v);flagged.push(v);why.set(v,"read from the line drawn across the descriptions, by its place on the depth scale")}
     }
   }
   // A label in that column that disagrees with its position: first the usual OCR digit confusions, then the depth its
@@ -943,7 +1016,8 @@ export function rebuild(els:TextLine[],width:number,height=Infinity,rules:Rule[]
   }
   // The penetration tests: from their column of depths, or from a column of blow counts under its heading.
   const feet=els.some(e=>/\(\s*(?:feet|ft)\s*\)|blows\s*\/\s*ft/i.test(e.text));
-  const spt=tcol?testsByDepths(els,tcol.els.filter(agree),width):testsByColumn(els,scale,feet);
+  const byColumn=tcol?testsByDepths(els,tcol.els.filter(agree),width):testsByColumn(els,scale,feet);
+  const spt=byColumn.length?byColumn:testsByNValue(els,scale);
   // Names first, so that a layer joined over several sheets keeps its name before its remarks.
   const texts=[...named.map(n=>({depth:scale.depthAt(n.src[0].cy),text:n.text,src:n.src[0]})),
     ...lines.map(e=>({depth:depthOf(e),text:clean(kanji(e.text),latin),src:e})).filter(t=>t.text)];
