@@ -1,9 +1,9 @@
 import {describe,it,expect} from "vitest";
 import {readFileSync} from "node:fs";
 import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
-import {TextLine,textLine,readDocument,readPage,header,ReadLog,sameId} from "../src/docread/reconstruct";
+import {TextLine,textLine,readDocument,readPage,header,ReadLog,sameId,ligatures} from "../src/docread/reconstruct";
 import {linesFromItems,PdfTextItem,judgeText,wordShare,agreement} from "../src/docread/textlines";
-import {draftHoles,checkDraft,draftTables,pageRanges,DraftHole} from "../src/docread/draft";
+import {draftHoles,checkDraft,draftTables,pageRanges,DraftHole,unitFor} from "../src/docread/draft";
 import {projectFromTables} from "../src/tables";
 import {applyUnitRules,lithologyRules} from "../src/rules";
 
@@ -538,5 +538,65 @@ describe("page images read by OCR (recorded PP-OCRv6 small output)",()=>{
     expect(n).toBe(72);
     expect(b).toBeGreaterThanOrEqual(66);
     expect(d).toBeGreaterThanOrEqual(61);
+  });
+});
+
+// A log in the Australian style, with invented values: a depth scale and no depth written at the boundaries, which it
+// gives as reduced levels in an "R.L." column (written just above their lines) against the header's surface level;
+// the text of the thin top layer runs on below its base; tests are written as their counts over their N value.
+function levelLog(sheet="Sheet 1 of 1",extra:TextLine[]=[]){
+  return [L("BOREHOLE LOG",400,40),L("BOREHOLE No",700,40),L("BH-X7",830,40),L(sheet,760,64),
+    L("COORDINATES 412345.0 E; 6801234.5 N",500,90,300),L("SURFACE RL 5.40m",40,90),
+    L("R.L.",90,150,30),L("(m)",90,162,24),L("DEPTH (m)",20,150,70),L("MATERIAL DESCRIPTION",300,150,160),L("TESTS",850,150,40),
+    ...Array.from({length:10},(_,d)=>L(String(d+1),40,yAt(d+1),10)),
+    L("5.25",90,yAt(0.15)-6,30),L("3.40",90,yAt(2)-6,30),L("-0.10",90,yAt(5.5)-6,36),
+    L("Silty CLAY (Topsoil)",300,yAt(0.25)),L("Dark brown, moist.",300,yAt(0.55)),
+    L("Clayey SAND (Alluvium)",300,yAt(1)),L("Grey, wet, loose.",300,yAt(1.3)),
+    L("Sandy GRAVEL, brown, dense.",300,yAt(3)),L("SANDSTONE, grey, very s7ff, so& matrix.",300,yAt(6)),
+    L("hw, hw, hw",850,yAt(1.5),60),L("N<1",850,yAt(1.5)+14,24),L("4, 6, 8",850,yAt(3),48),L("N=14",850,yAt(3)+14,32),...extra];
+}
+
+describe("logs that give their boundaries as reduced levels",()=>{
+  it("reads the name beside its label, not the sheet's number under it, and the header's level, position and end",()=>{
+    const h=header(levelLog("Sheet 1 of 2",[L("Borehole completed at 8.00m",300,yAt(8.2),200)]));
+    expect(h).toMatchObject({id:"BH-X7",sheet:[1,2],ground:5.4,x:412345,y:6801234.5,final:8});
+  });
+  it("takes each boundary at the surface level less the level written at it, where that fits the depth scale",()=>{
+    const lines=levelLog("Sheet 1 of 1",[L("-2.60",90,yAt(8)-6,36),L("Borehole completed at 8.00m",300,yAt(8.2),200),
+      L("REMARKS: invented values for a test.",20,yAt(10.8),500)]);
+    const [log]=readPage(lines,1000,800);
+    expect(log.layers.map(l=>[l.from,l.to,l.description])).toEqual([[0,0.15,"Silty CLAY (Topsoil) Dark brown, moist."],
+      [0.15,2,"Clayey SAND (Alluvium) Grey, wet, loose."],[2,5.5,"Sandy GRAVEL, brown, dense."],[5.5,8,"SANDSTONE, grey, very stiff, soft matrix."]]);
+    expect(log.flagged).toEqual([]);
+    expect(log.spt?.map(t=>[t.depth,t.blows,t.penetration])).toEqual([[1.5,0,30],[3,14,30]]);
+    expect(draftHoles(0,"f.pdf",readDocument([{page:1,width:1000,height:800,lines}]).logs)[0].layers.map(l=>l.unit)).toEqual(["Made ground","Sand","Gravel","Sandstone"]);
+  });
+  it("takes no boundary from the level at the bottom of a sheet the log carries on from",()=>{
+    const [log]=readPage(levelLog("Sheet 1 of 2",[L("-5.60",90,yAt(11)-6,36)]),1000,800);
+    expect(log.bounds).toEqual([0.15,2,5.5]);
+  });
+  it("names metamorphosed rocks as rock, and puts back ligatures a PDF maps to 7 and &",()=>{
+    expect(unitFor("METAGREYWACKE (DCf) SW: dark grey")).toBe("Rock");
+    expect(ligatures("very s7ff, so&. Con7nued a&er")).toBe("very stiff, soft. Continued after");
+    expect(ligatures("BH7A, N=16, sand & gravel, 7 m")).toBe("BH7A, N=16, sand & gravel, 7 m");
+  });
+});
+
+describe("boundaries from drawn lines, safely",()=>{
+  const plain=()=>drawnLog().filter(e=>!["1.20","4.50","9.80"].includes(e.text));
+  const across=(...ds:number[])=>ds.map(d=>({x0:280,y0:yAt(d),x1:520,y1:yAt(d)}));
+  it("takes no boundary from the frame of the log, nor from the box of the notes under it",()=>{
+    const [log]=readPage([...plain(),L("Sheet 1 of 2",700,60),L("REMARKS: see the notes.",20,yAt(11.3),400)],1000,800,across(0,1.2,4.5,11,11.5));
+    expect(log.layers.map(l=>[l.from,l.to])).toEqual([[0,1.2],[1.2,4.5]]);
+    expect(log.flagged).toEqual([1.2,4.5]);
+  });
+  it("takes none where a layer the lines make would have no description",()=>{
+    const [log]=readPage(plain(),1000,800,across(1.2,4.5,6,9.8));
+    expect(log.layers).toEqual([]);
+  });
+  it("reads the column under its DESCRIPTION heading, though a column of results has more letters",()=>{
+    const results=[0.6,2.6,5,8].map(d=>L("Point load index recorded as invented",650,yAt(d),300));
+    const [log]=readPage(drawnLog(results),1000,800);
+    expect(log.layers.map(l=>l.description)).toEqual(["FILL: sand and gravel","CLAY: soft, grey","SAND: dense"]);
   });
 });
