@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- The report reader checks Japanese water-level columns against measurement dates and uses the logged soil-name column for material grouping. Missing or conflicting soil names are left for review. Scans with invisible text over an image go through local OCR, and ruled boundaries are extracted before the page pixels move to the OCR worker.
+- The report reader checks Japanese water-level columns against measurement dates and uses the logged soil-name column for material grouping. The reader aligns descriptions to the ruled cells when multiple printed boundary depths confirm a shift in the depth scale. Missing or conflicting soil names are left for review. Scans with invisible text over an image go through local OCR, and ruled boundaries are extracted before the page pixels move to the OCR worker.
 - The reader recognizes split SPT blow-count headings and explicit penetration units. It identifies logs with recognized depth headings in feet for manual conversion before import.
 - Model builds retain the coordinate system used to convert geographic report collars. Mixed projected and geographic positions require a declared projection.
 - Project JSON imports preserve missing coordinates and readings. Only logs admitted to the model contribute units to its horizons. Cross-validation withholds all logs at the tested collar.

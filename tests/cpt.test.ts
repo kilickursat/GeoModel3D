@@ -124,6 +124,10 @@ describe("reading CPT files",()=>{
     c.qc[c.qc.length-1]=38;
     expect(cptLogSvg(c,{width:220,height:240})).toContain("qc 0–40 MPa");
     expect(cptPlotScale([c,{...c,qc:[Infinity,52]}])).toBe(60);
+    const model=buildGeologicalModel({...layered,cpts:[{...c,z:10}]});
+    const section=computeSection(model,{azimuth:0,offset:0});
+    const report=reportHtml(model,section,{paper:"A4",date:"2026-11-28",version:"test",credits:[],notes:[],sectionBuffer:100,ve:1});
+    expect(report).toContain("(4.00–38.00)");
   });
 
   it("gives the friction ratio, readings at a depth, averages over depth and the readings to draw",()=>{

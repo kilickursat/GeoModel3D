@@ -40,7 +40,9 @@ const fmt=(v:number)=>String(+v.toFixed(3));
 // open for review. Remarks often name a rock in the matrix of a gravel layer.
 export function unitFor(description:string,soilName?:string){
   const d=description.trim();
-  if(!d)return "";
+  // “Idem” refers back to a prior row; material mentioned afterwards can describe
+  // inclusions or a transition. Keep the source text and ask for a reviewed unit.
+  if(!d||/^idem\b/i.test(d))return "";
   const japanese=soilName!==undefined||CJK.test(d);
   let name=d;
   if(japanese){

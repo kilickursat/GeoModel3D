@@ -360,6 +360,13 @@ describe("reading a Japanese log form",()=>{
     expect(draftHoles(0,"f.pdf",readDocument([{page:1,width:1000,height:800,lines:japaneseForm()}]).logs)[0].layers.map(l=>l.unit))
       .toEqual(["Fill and topsoil","Clay and silt","Sand"]);
   });
+  it("uses ruled boundary cells when metre labels are printed below their ticks",()=>{
+    const lines=japaneseForm().map(e=>e.x0===40&&/^\d+$/.test(e.text)?{...e,cy:e.cy+16,y0:e.y0+16,y1:e.y1+16}:e);
+    const rules=[0.8,3.4,6].map(d=>({x0:95,x1:600,y0:yAt(d),y1:yAt(d)}));
+    const [h]=draftHoles(0,"ruled.pdf",readDocument([{page:1,width:1000,height:800,lines,rules}]).logs);
+    expect(h.layers.map(l=>[l.to,l.unit])).toEqual([["0.8","Fill and topsoil"],["3.4","Clay and silt"],["6","Sand"]]);
+    expect(h.layers[1].description).toContain("含水は中位");
+  });
   it("keeps rock in a gravel layer's remarks out of the unit, including when its name cell is missing",()=>{
     const lines=japaneseForm().map(e=>({...e,text:e.text==="細砂"?"砂礫":e.text==="(FS)"?"(GS)":e.text==="均質な細砂。含水は高い。"?"固結状の凝灰質粘土にて充填。":e.text}));
     const draft=(lines:TextLine[])=>draftHoles(0,"log.pdf",readDocument([{page:1,width:1000,height:800,lines}]).logs)[0];
@@ -467,6 +474,11 @@ describe("unit rules for real logs",()=>{
   const unit=(name:string)=>applyUnitRules([{id:"b",x:0,y:0,z:0,intervals:[{from:0,to:1,unit:"",name}]}],lithologyRules).boreholes[0].intervals[0].unit;
   it("counts topsoil written in two words and road layers as made ground",()=>{
     for(const n of ["TOP SOIL (100 mm)","200mm AGGREGATE","GRANULAR BASE (250mm): gravelly sand","GRANULAR SUBBASE: sand with gravel"])expect(unit(n)).toBe("Made ground");
+  });
+  it("groups Dutch and French fill descriptions into the same unit",()=>{
+    expect(unit("Aangevulde grond")).toBe("Made ground");
+    expect(unit("Terrain rapporté")).toBe("Made ground");
+    expect(unit("Klei onder aangevulde grond")).toBe("Clay");
   });
   it("names igneous and metamorphic rocks as rock, and takes rock names as whole words",()=>{
     for(const n of ["Dark green DUNITE, fresh, very strong","welded TUFF, highly weathered","SERPENTINITE, sheared","Grey GNEISS, fresh"])expect(unit(n)).toBe("Rock");

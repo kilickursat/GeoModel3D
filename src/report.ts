@@ -222,7 +222,12 @@ function cptPage(model:GeoModel,section:Section,buffer:number,foot:(part:string)
 <p class="muted">Soil behaviour type (SBT) by Robertson (2009): the index Ic of the normalised cone resistance and friction ratio, with the unit weight from the CPT (Robertson &amp; Cabal 2010) and the water table of the project. Cone resistance qc and friction ratio Rf (fs/qc where the data give no ratio) against elevation in metres; behind them the units of the model where each CPT stands${model.cptLogs.length?", built with the CPT layers":", which the CPTs did not log"}.${section.cpts.length>shown.length?` The first ${shown.length} of the ${section.cpts.length} CPTs on the section.`:""}</p>`;
   }else logs=`<p class="muted">No CPT lies within ${fmt(buffer)} m of the section.</p>`;
   // Readings by the unit of the model at their elevation; CPTs outside the model are left out.
-  const acc=model.units.map(()=>({cpts:new Set<string>(),qc:[] as number[],fs:[] as number[],rf:[] as number[]}));
+  const totals=()=>({sum:0,count:0,min:Infinity,max:-Infinity});
+  const add=(t:ReturnType<typeof totals>,v:number|undefined)=>{
+    if(v===undefined||!Number.isFinite(v))return;
+    t.count++;t.sum+=v;t.min=Math.min(t.min,v);t.max=Math.max(t.max,v);
+  };
+  const acc=model.units.map(()=>({cpts:new Set<string>(),qc:totals(),fs:totals(),rf:totals()}));
   for(const c of model.cpts){
     const z=sampleModel(model,c.x,c.y);
     if(!z)continue;
@@ -232,12 +237,10 @@ function cptPage(model:GeoModel,section:Section,buffer:number,foot:(part:string)
       if(k<0)return;
       const a=acc[k];
       a.cpts.add(c.id);
-      if(Number.isFinite(c.qc[i]))a.qc.push(c.qc[i]);
-      if(Number.isFinite(c.fs?.[i]??NaN))a.fs.push(c.fs![i]);
-      if(Number.isFinite(rf[i]))a.rf.push(rf[i]);
+      add(a.qc,c.qc[i]);add(a.fs,c.fs?.[i]);add(a.rf,rf[i]);
     });
   }
-  const stat=(v:number[],d:number)=>v.length?`${fmt(v.reduce((x,y)=>x+y,0)/v.length,d)} <span class="muted">(${fmt(Math.min(...v),d)}–${fmt(Math.max(...v),d)})</span>`:"";
+  const stat=(t:ReturnType<typeof totals>,d:number)=>t.count?`${fmt(t.sum/t.count,d)} <span class="muted">(${fmt(t.min,d)}–${fmt(t.max,d)})</span>`:"";
   const byUnit=acc.some(a=>a.cpts.size)?`<h3>Readings by unit of the model</h3><table><thead><tr><th>Unit</th><th>CPTs</th><th>qc (MPa)</th><th>fs (kPa)</th><th>Rf (%)</th></tr></thead><tbody>${
     model.units.map((u,k)=>acc[k].cpts.size?`<tr><td><i class="swatch" style="background:${esc(u.color)}"></i>${esc(u.name)}</td><td class="num">${acc[k].cpts.size}</td><td class="num">${stat(acc[k].qc,2)}</td><td class="num">${stat(acc[k].fs,0)}</td><td class="num">${stat(acc[k].rf,1)}</td></tr>`:"").join("")
   }</tbody></table><p class="muted">Mean (range) of every reading, by the unit of the model at its elevation: the units come from the boreholes, not from the CPTs.</p>`:"";

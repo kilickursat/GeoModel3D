@@ -278,7 +278,7 @@ export function header(lines:TextLine[]):LogHeader&{mark?:number}{
   const gwl=match(/GWL\s*([\d.,]+)/i);
   const head:LogHeader&{mark?:number}={
     // "BOREHOLE LOG" is a title, not the label of a name; and a sheet's number ("Sheet 1 of 2") beside the label is no name.
-    id:take("id",title??fieldAt(els,/^(?:bore\s*hole|boring|forage|sondage|bohrung)(?!\s+log)\s*(?:no\.?|id|nr\.?|number)?\s*[:.]?(?![a-z])|^ボーリング(?:名|番号|No\.?)|^孔番号|^(?:hole\s*)?number\s*:/i,t=>!SHEET_MARK.test(t)&&isId(t.replace(ID_NOTE,"").replace(/\s+/g,""))),
+    id:take("id",title??fieldAt(els,/^(?:bore\s*hole|boring|forage|sondage|bohrung)(?!\s+log)\s*(?:no\.?|id|nr\.?|number)?\s*[:.]?(?![a-z])|^ボーリング(?:名|番号|No\.?)|^孔番号|^Proefnummer\s*:|^(?:hole\s*)?number\s*:/i,t=>!SHEET_MARK.test(t)&&isId(t.replace(ID_NOTE,"").replace(/\s+/g,""))),
       // A continuation sheet's "(cont.)" is no part of the ID.
       t=>t.replace(/\s*\((?:cont(?:inued|'d|\.)?|continuation)\)\s*$/i,"").replace(/\s+/g,"")),
     sheet:sheet?[+sheet[1],+sheet[2]]:undefined,
@@ -353,6 +353,23 @@ function soilNames(c:{els:TextLine[]}){
   const t=[...c.els].sort((p,q)=>p.cy-q.cy).map(e=>e.text.replace(/\s/g,"")),all=t.join(""),cjk=all.match(/[぀-ヿ㐀-鿿]/g)?.length??0;
   const found=all.match(new RegExp(SOIL_NAME.source,"g"))?.length??0,plain=all.replace(/[(（][^)）]*[)）]/g,"");
   return cjk>=2&&cjk>=0.6*plain.length&&median(t.map(x=>x.length))<=6&&found>=2&&found>=all.length/12;
+}
+// Tick labels can sit below their ticks. On a ruled log, the printed boundary depths beside
+// the description cells give an independent check on that vertical offset. Use it only when
+// several distinct depths touch long horizontal lines and agree on the displacement.
+function ruledDescriptionOffset(labels:TextLine[],rules:Rule[],scale:DepthScale){
+  if(labels.length<3||!rules.length)return 0;
+  const offsets=new Map<number,number>();
+  for(const e of labels){
+    const h=e.y1-e.y0;
+    const edges=rules.filter(r=>!isVertical(r)&&r.x0<=e.cx&&r.x1>=e.cx&&r.x1-r.x0>3*(e.x1-e.x0))
+      .map(r=>yAt(r,e.cx)).filter(y=>y>=e.y0-h/4&&y<=e.y1+h/4);
+    if(edges.length===1)offsets.set(num(e.text),edges[0]-scale.yAt(num(e.text)));
+  }
+  const values=[...offsets.values()],offset=median(values),height=median(labels.map(e=>e.y1-e.y0));
+  if(Math.abs(offset)<height/2)return 0;
+  const agree=values.filter(v=>Math.abs(v-offset)<=height/2);
+  return agree.length>=3&&agree.length>labels.length/2?median(agree):0;
 }
 // The lines of a name column as names: a name ends with its code in brackets ("礫混じり粘性土(C-G)"), or where the next
 // line starts below a boundary once the name is a whole word ("凝灰質粘土" before "粘土(CH)"). A code on a line of its
@@ -862,9 +879,13 @@ export function rebuild(els:TextLine[],width:number,height=Infinity,rules:Rule[]
   // headings ("DESCRIPTION", "土質区分"), which repeat on continued pages; without them, at the depth 0. The headings sit
   // above the scale's first label where any do: a line further down that names a description is a note under the log
   // ("* = field description").
+  const japanese=els.some(e=>/[一-鿿]/.test(e.text));
+  const offset=japanese?ruledDescriptionOffset(bels,rules,scale):0;
+  const descriptionDepth=(y:number)=>scale.depthAt(y-offset);
+  const descriptionY=(d:number)=>scale.yAt(d)+offset;
   const topY=Math.min(...scale.labels.map(e=>e.cy));
   const heads=els.filter(e=>/descri|soil profile|stratigraph|litholog|omschrijving|beschrijving|土質|記事|地層/i.test(e.text)&&e.cy<topY+0.5*scale.b);
-  const above=heads.filter(e=>e.cy<topY),startY=heads.length?Math.max(...(above.length?above:heads).map(e=>e.y1)):scale.yAt(0);
+  const above=heads.filter(e=>e.cy<topY),startY=heads.length?Math.max(...(above.length?above:heads).map(e=>e.y1)):descriptionY(0);
   // The body of the log stops at the line that ends the log ("Borehole completed at 8.00m"), and the notes under its
   // scale ("REMARKS: …", a line that runs under several columns and would join them) are no description. On a sheet
   // that carries a log on, the body starts a step of the scale above its first label (10 m on a sheet whose labels
@@ -874,17 +895,16 @@ export function rebuild(els:TextLine[],width:number,height=Infinity,rules:Rule[]
   const markStep=median(marks.slice(1).map((v,k)=>v-marks[k]).filter(g=>g>0.2))||1;
   const scaleEnd=marks[marks.length-1]+markStep,sheetTop=head.sheet&&head.sheet[0]>1?Math.max(0,marks[0]-markStep):0;
   const endLine=els.filter(e=>LOG_END.test(e.text.trim())&&e.cy>startY).sort((p,q)=>p.cy-q.cy)[0];
-  const inBody=(e:TextLine)=>scale.depthAt(e.cy)>=sheetTop&&(!endLine||e.cy<endLine.y0)&&!(NOTE.test(e.text.trim())&&scale.depthAt(e.cy)>marks[marks.length-1]);
+  const inBody=(e:TextLine)=>descriptionDepth(e.cy)>=sheetTop&&(!endLine||e.cy<endLine.y0)&&!(NOTE.test(e.text.trim())&&scale.depthAt(e.cy)>marks[marks.length-1]);
   // Text of fewer than two letters is no description (a page code "A2-17" under the log, which would join its columns,
   // or a mark), unless it is a Japanese name ("砂").
   // Japanese forms give each layer's soil name (土質区分: "礫混じり粘性土", "(C-G)") in a column of its own, beside the
   // remarks (記事), which have the most letters. The names are read too, and lead each layer's description; where the
   // names have more letters than the remarks (short remarks), the remarks are still the description column.
   // A soil's code in brackets on a line of its own ("(B)") is part of its name on a Japanese form.
-  const japanese=els.some(e=>/[一-鿿]/.test(e.text));
   const describe=(bottom:number)=>{
     const body=els.filter(e=>!Number.isFinite(num(e.text))&&!/^GWL/i.test(e.text)&&(letters(e.text)>=2||/[぀-ヿ一-鿿]/.test(e.text)||japanese&&SOIL_CODE.test(e.text.trim()))&&
-      e.cy>startY&&inBody(e)&&scale.depthAt(e.cy)<=bottom+0.5);
+      e.cy>startY&&inBody(e)&&descriptionDepth(e.cy)<=bottom+0.5);
     const lettersOf=(c:Column)=>c.els.reduce((s,e)=>s+letters(e.text),0);
     const cols=columns(body,rules).sort((p,q)=>lettersOf(q)-lettersOf(p));
     let main:Column|undefined=cols[0],names:Column|undefined;
@@ -991,7 +1011,7 @@ export function rebuild(els:TextLine[],width:number,height=Infinity,rules:Rule[]
   // otherwise ends the description above ("…brown, moist").
   const titles=lines.filter(e=>TITLE.test(clean(kanji(e.text),latin))).length>=2;
   const depthOf=(e:TextLine)=>{
-    const d=scale.depthAt(e.cy),b=titles?bounds.find(v=>scale.yAt(v)>=e.y0&&scale.yAt(v)<=e.y1):undefined;
+    const d=descriptionDepth(e.cy),b=titles?bounds.find(v=>descriptionY(v)>=e.y0&&descriptionY(v)<=e.y1):undefined;
     return b===undefined?d:TITLE.test(clean(kanji(e.text),latin))?Math.max(d,b):Math.min(d,b-1e-6);
   };
   for(const e of lines){
@@ -999,10 +1019,10 @@ export function rebuild(els:TextLine[],width:number,height=Infinity,rules:Rule[]
     if(l){const t=clean(kanji(e.text),latin);if(t){l.description=(l.description+" "+t).trim();used.add(e)}}
   }
   // Soil names lead the descriptions of the layers they start in.
-  const named=latin?[]:groupNames(names,bounds.map(v=>scale.yAt(v)));
+  const named=latin?[]:groupNames(names,bounds.map(descriptionY));
   const nameAt=new Map<ReadLayer,string[]>();
   for(const n of named){
-    const d=scale.depthAt(n.src[0].cy),l=layers.find(l=>d>=l.from&&d<l.to);
+    const d=descriptionDepth(n.src[0].cy),l=layers.find(l=>d>=l.from&&d<l.to);
     if(!l)continue;
     nameAt.set(l,[...(nameAt.get(l)??[]),n.text]);n.src.forEach(e=>used.add(e));l.src.push(...n.src);
   }
@@ -1037,7 +1057,7 @@ export function rebuild(els:TextLine[],width:number,height=Infinity,rules:Rule[]
   const byColumn=tcol?testsByDepths(els,tcol.els.filter(agree),width):testsByColumn(els,scale);
   const spt=byColumn.length?byColumn:testsByNValue(els,scale);
   // Names first, so that a layer joined over several sheets keeps its name before its remarks.
-  const texts=[...named.map(n=>({depth:scale.depthAt(n.src[0].cy),text:n.text,src:n.src[0],isSoilName:true})),
+  const texts=[...named.map(n=>({depth:descriptionDepth(n.src[0].cy),text:n.text,src:n.src[0],isSoilName:true})),
     ...lines.map(e=>({depth:depthOf(e),text:clean(kanji(e.text),latin),src:e})).filter(t=>t.text)];
   return {...head,kind:"scale",layers,used,flagged,texts,bounds,evidence,...extra,...(spt.length?{spt}:{})};
 }
@@ -1165,6 +1185,13 @@ export function readPage(els:TextLine[],width:number,height:number,rules:Rule[]=
   const cuts=starts.length>1?starts.map((y,k)=>k?y-0.02*height:-Infinity):[-Infinity];
   return cuts.map((y0,k)=>{
     const y1=k<cuts.length-1?cuts[k+1]:Infinity,part=els.filter(e=>e.cy>=y0&&e.cy<y1);
+    // A DOV interpretation appendix also has Van/Tot/Beschrijving columns, but its rows are
+    // formations or ages. They neither describe new samples nor warrant an OCR retry.
+    if(part.some(e=>/^DOV Boorrapport$/i.test(e.text.trim()))&&
+      part.some(e=>/^(?:in)?formele stratigrafie\b/i.test(e.text.trim()))&&
+      !part.some(e=>/^(?:lithologische beschrijving\b|boring$|proefnummer\s*:)/i.test(e.text.trim()))){
+      return {kind:"table",layers:[],used:new Set<TextLine>(),flagged:[],bounds:[],texts:[],error:"a stratigraphic interpretation",evidence:false};
+    }
     const log=headingPairs(part,width).length?rebuildTable(part,width):rebuild(part,width,height,rules,continuing&&k===0);
     return hasFeetDepth(part)?{...log,depthInFeet:true}:log;
   });
