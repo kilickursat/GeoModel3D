@@ -86,7 +86,6 @@ export function boreholeContacts(b:Borehole,units:UnitDef[]):BoreholeContacts{
     prevTo=Math.max(prevTo,i.to);
   }
   const eoh=Math.max(boreholeDepth(b),prevTo);
-  if(deepest>=0&&eoh>prevTo+1e-6)notes.push(`the deepest interval used ends at ${fmt(prevTo)} m. Material down to the final depth of ${fmt(eoh)} m is inferred`);
   return {depth,eroded,deepest,outOfOrder,loggedTo:prevTo,eoh,notes,...(start!==undefined?{start}:{})};
 }
 
@@ -318,7 +317,15 @@ export function buildGeologicalModel(project:GeoProject,options:{probe?:XY;trian
   const logOnlyReason=boreholes.length===1&&outOfOrder
     ?`${boreholes[0].id}: this log departs from the project's stratigraphic order. Only the logged intervals are shown. Continuous horizons and volumes require a supported layer sequence.`:undefined;
   if(logOnlyReason)warnings.push(logOnlyReason);
-  else contacts.forEach((c,i)=>{for(const n of c.notes)warnings.push(`${boreholes[i].id}: ${n}`)});
+  else{
+    const tails:string[]=[];
+    contacts.forEach((c,i)=>{
+      const id=boreholes[i].id;
+      for(const n of c.notes)warnings.push(`${id}: ${n}`);
+      if(c.eoh>c.loggedTo+1e-6)tails.push(`${id} (${fmt(c.loggedTo)}–${fmt(c.eoh)} m)`);
+    });
+    if(tails.length)warnings.push(`Below the deepest interval used, material is inferred to final depth in ${tails.length} ${tails.length===1?"log":"logs"}. ${tails.join(", ")}.`);
+  }
   // The model covers the outline of the logs, or extends beyond it on a frame of nodes. Logs that enclose no area are
   // given an extent, so that one or two boreholes still make a model.
   const NB=nodes.length;

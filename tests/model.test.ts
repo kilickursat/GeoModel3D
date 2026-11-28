@@ -121,7 +121,7 @@ describe("reading a log",()=>{
     expect(Array.from(m.horizons[1].observed)).toEqual([0,1,1]);
     expect(m.base).toBe(80);
     expect(m.boreholes[0]).toMatchObject({depth:20,intervals:[{from:0,to:4,unit:"A"}]});
-    expect(m.warnings.join("\n")).toMatch(/H: .*4.*20 m.*inferred/);
+    expect(m.warnings).toContain("Below the deepest interval used, material is inferred to final depth in 1 log. H (4–20 m).");
   });
 
   it("leaves the contacts above a log that begins below the collar unknown",()=>{
