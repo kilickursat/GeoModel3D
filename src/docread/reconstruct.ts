@@ -810,6 +810,12 @@ export function rebuild(els:TextLine[],width:number,height=Infinity,rules:Rule[]
   if(!evidence)return empty("no log title or description heading",false);
   const ys=scale.labels.map(e=>e.cy),tall=Math.min(height,Math.max(...els.map(e=>e.y1))-Math.min(...els.map(e=>e.y0)));
   if(!title&&(scale.kind==="decimals"||ys.length<4||Math.max(...ys)-Math.min(...ys)<0.15*tall))return empty("no log title, and its numbers are no depth scale",false);
+  // The water level in the borehole, on a Japanese form: a depth in the column headed 孔内水位 (its heading set one
+  // character to a line), written where the water stood on the scale, beside the date it was measured.
+  if(head.water===undefined){
+    const w=waterColumn(els,scale);
+    if(w){head.water=num(w.text);head.src={...head.src,water:w}}
+  }
   const used=new Set(scale.labels);
   // Boundaries: the column of decimal numbers whose values agree with their positions on the scale (within 0.6 m).
   // Other columns of decimals (elevations, thicknesses) agree only by chance, so they lose to it.
@@ -1026,13 +1032,6 @@ export function rebuild(els:TextLine[],width:number,height=Infinity,rules:Rule[]
   const deepest=Math.max(bounds.at(-1)??0,scale.depthAt(Math.max(...els.map(e=>e.cy))));
   if(head.water!==undefined&&head.ground!==undefined&&head.water>deepest+5&&Math.abs(head.ground-head.water)<deepest+5){
     head.waterFlag=`read as the elevation ${head.water}`;head.water=+(head.ground-head.water).toFixed(2);
-  }
-  // For logs over several pages: each description line with its depth.
-  // The water level in the borehole, on a Japanese form: a depth in the column headed 孔内水位 (its heading set one
-  // character to a line), written where the water stood on the scale, beside the date it was measured.
-  if(head.water===undefined){
-    const w=waterColumn(els,scale);
-    if(w){head.water=num(w.text);head.src={...head.src,water:w}}
   }
   // The penetration tests: from their column of depths, or from a column of blow counts under its heading.
   const byColumn=tcol?testsByDepths(els,tcol.els.filter(agree),width):testsByColumn(els,scale);

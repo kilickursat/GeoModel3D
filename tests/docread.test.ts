@@ -169,6 +169,14 @@ describe("logs that describe their samples",()=>{
     const [hole]=draftHoles(0,"log.pdf",readDocument([{page:1,width:1000,height:800,lines}]).logs);
     expect(hole.samples).toBe(true);
   });
+  it("retains a dated graphical water reading on a sheet described by samples",()=>{
+    const lines=sheet(["BORING NO.: BH-9"],[1,2,3,4,5,6],[
+      [at(1),"(1.0-1.45 m) Brown clayey SAND, loose."],[at(2),"(2.0-2.45 m) Gray CLAY, soft."]],
+      [...[..."孔内水位"].map((c,i)=>L(c,620,135+13*i,12)),L("09/28",615,yAt(1.4)-13,21),L("1.40",615,yAt(1.4),21)]);
+    const [log]=readPage(lines,1000,800);
+    expect(log.samples).toHaveLength(2);
+    expect(log.water).toBe(1.4);
+  });
   it("skips runs that brought up nothing and joins runs described in the same words",()=>{
     const lines=sheet(["BORING NO.: BH-2","FINAL DEPTH: 6.00 m."],[1,2,3,4,5,6,7,8,9,10],[
       [at(1),"(1.0-2.0 m) Reddish brown gravelly SAND, dense."],[at(2),"(2.0-2.0 m) No penetration, test refused."],
