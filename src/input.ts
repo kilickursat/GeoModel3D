@@ -4,6 +4,7 @@
 // the log of one borehole with the stresses down it, and what the importer and the model report. The tables become CSV
 // and go through the importer, so typed data are checked exactly as imported files are.
 import {GeoProject} from "./schema";
+import {createCorrelationReview, type CorrelationReviewSelection} from "./correlationReview";
 import {loggedIntervalsTable} from "./report";
 import {WorkspaceDocument,createWorkspace,updateDraft,checkpoint,restoreRevision,toWorkspaceJson,createScenario,switchScenario,renameScenario} from "./workspace";
 import {chooseImageExport,exportImages,projectWithoutPagePreviews,workspaceWithoutPagePreviews} from "./exportImages";
@@ -22,8 +23,9 @@ import {stressAt,unitWeights,UnitWeight,ASSUMED_WEIGHT,earthPressure,pressurePro
 import {convexHull} from "./terrain";
 import {COLUMNS,TABLE_NAMES,TableName,EditorTables,tablesFromProject,projectFromTables,projectForCorePhotos,emptyTables,exampleTables,fillUnits,tableCsv} from "./tables";
 
-type Step="start"|"project"|"history"|"scenarios"|TableName;
-const STEPS:Step[]=["start","project","boreholes","logs","water","spt","tests","units","scenarios","history"];
+type Step="start"|"project"|"history"|"scenarios"|"correlations"|TableName;
+const isTableStep=(s:Step):s is TableName=>Object.hasOwn(COLUMNS,s);
+const STEPS:Step[]=["start","project","boreholes","logs","water","spt","tests","units","correlations","scenarios","history"];
 const PER_HOLE:TableName[]=["logs","water","spt","tests"];
 const MAX_ROWS=400;
 const esc=(s:string)=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]!));
@@ -88,6 +90,7 @@ export function createInputWorkspace(o:InputOptions):InputWorkspace{
   let step:Step="start",filter="",selected="",message="",imported:string[]=[];
   let preview:{result?:ImportResult;model?:GeoModel;error?:string}={};
   let timer:ReturnType<typeof setTimeout>|undefined;
+  let correlationSelection:CorrelationReviewSelection={};
   let view:View="stress",navMarkup="",compareBefore="",compareAfter="";
   const store=createWorkspaceStore();
   let workspaceDocument:WorkspaceDocument|null=null,saved:WorkspaceDocument|null=null,loading=true;
@@ -161,7 +164,7 @@ export function createInputWorkspace(o:InputOptions):InputWorkspace{
     t=copy(tables);origin=copy(tables);base=from?structuredClone(from):undefined;originBase=base?structuredClone(base):undefined;
     workspaceDocument=resume?structuredClone(resume):createWorkspace(t,base);
     if(from&&!resume)workspaceDocument=checkpoint(workspaceDocument,from,"Opened project");
-    step=first;filter="";selected="";message=text;imported=notes;
+    step=first;filter="";selected="";correlationSelection={};message=text;imported=notes;
     render();refresh(true);return true;
   }
 
@@ -193,15 +196,15 @@ export function createInputWorkspace(o:InputOptions):InputWorkspace{
 
   function renderNav(){
     const markup=STEPS.map((s,i)=>{
-      const label=s==="start"?"Start":s==="project"?"Project":s==="history"?"Revisions":s==="scenarios"?"Scenarios":TABLE_NAMES[s];
-      const n=s==="start"||s==="project"?"":s==="history"?`<span>${workspaceDocument?.revisions.length??0}</span>`:s==="scenarios"?`<span>${workspaceDocument?.scenarios.length??0}</span>`:`<span>${count(s)}</span>`;
+      const label=s==="start"?"Start":s==="project"?"Project":s==="history"?"Revisions":s==="scenarios"?"Scenarios":s==="correlations"?"Correlation review":TABLE_NAMES[s];
+      const n=s==="start"||s==="project"||s==="correlations"?"":s==="history"?`<span>${workspaceDocument?.revisions.length??0}</span>`:s==="scenarios"?`<span>${workspaceDocument?.scenarios.length??0}</span>`:`<span>${count(s)}</span>`;
       return `<button data-step="${s}"${s===step?' aria-current="step"':""}${!t&&s!=="start"?" disabled":""}><i>${i||""}</i>${label}${n}</button>`;
     }).join("");
     if(markup!==navMarkup){nav.innerHTML=markup;navMarkup=markup}
   }
   function render(){
-    body.innerHTML=step==="start"?startView():step==="project"?projectView():step==="history"?historyView():step==="scenarios"?scenariosView():tableView(step);
-    el.querySelector<HTMLButtonElement>(".ws-csv")!.hidden=step==="start"||step==="project"||step==="history"||step==="scenarios";
+    body.innerHTML=step==="start"?startView():step==="project"?projectView():step==="history"?historyView():step==="scenarios"?scenariosView():step==="correlations"?'<div class="ws-correlations"></div>':tableView(step);
+    el.querySelector<HTMLButtonElement>(".ws-csv")!.hidden=!isTableStep(step);
     for(const b of el.querySelectorAll<HTMLButtonElement>(".ws-json,.ws-workspace,.ws-discard,.ws-build"))b.disabled=!t;
     renderLists();
     status.textContent=message;status.title=message;renderSaveStatus();
@@ -307,13 +310,21 @@ ${field("margin","Model extent beyond the boreholes (m)","The model reaches this
       if(t){
         try{
           const result=projectFromTables(t,base);
-          // The preview leaves out the terrain grid: it shows the logs, and stays quick to rebuild.
-          const p:GeoProject={...result.project,terrain:undefined};
-          preview={result,...(p.boreholes.length?{model:buildGeologicalModel(p)}:{})};
+          // The table preview omits the terrain grid. Correlation decisions use the complete project model.
+          const p:GeoProject=step==="correlations"?result.project:{...result.project,terrain:undefined};
+          preview={result,...(p.boreholes.length||step==="correlations"&&p.cpts?.length?{model:buildGeologicalModel(p)}:{})};
         }catch(e){preview={error:(e as Error).message}}
       }else preview={};
       renderNav();
       renderPreview();
+      if(step==="correlations"&&t){
+        const host=body.querySelector<HTMLElement>(".ws-correlations")!;
+        if(preview.model)createCorrelationReview(host,t,preview.model,correlationSelection,text=>{
+          message=text;status.textContent=text;status.title=text;
+          refresh(true);
+        });
+        else host.innerHTML=`<h2>Correlation review</h2><p>${esc(preview.error??"Add a borehole log or contributing CPT to review its correlation.")}</p>`;
+      }
     };
     if(now)run();else timer=setTimeout(run,300);
   }
@@ -472,7 +483,7 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
       step=b.dataset.step as Step;
       // A large table opens on the first borehole that has rows in it.
       filter=t&&PER_HOLE.includes(step as TableName)&&t.rows[step as TableName].length>MAX_ROWS?t.rows[step as TableName].find(r=>r[0].trim())?.[0]??"":PER_HOLE.includes(step as TableName)?filter:"";
-      render();return;
+      render();if(step==="correlations")refresh(true);return;
     }
     if(!t)return;
     if(b.classList.contains("ws-core-photos")){
@@ -555,7 +566,7 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
       return;
     }
     if(b.classList.contains("ws-discard")){if(origin&&confirm("Discard the edits made since this case was opened?")){t=copy(origin);base=originBase?structuredClone(originBase):undefined;message="Edits discarded";render();refresh(true)}return}
-    if(step==="start"||step==="project"||step==="history"||step==="scenarios")return;
+    if(!isTableStep(step))return;
     const name=step,row=Number(b.closest("tr")?.dataset.r);
     if(b.classList.contains("ed-evidence")){
       const record=sourceRecord(name,row);
@@ -591,7 +602,7 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
       t.groundwaterDraft=draft;refresh();return;
     }
     if(f.dataset.field){t.project[f.dataset.field as keyof EditorTables["project"]]=f.value;refresh();return}
-    if(f.dataset.r===undefined||step==="start"||step==="project"||step==="history"||step==="scenarios")return;
+    if(f.dataset.r===undefined||!isTableStep(step))return;
     const v=f instanceof HTMLInputElement&&f.type==="checkbox"?(f.checked?"yes":""):f.value;
     setTableCell(step,Number(f.dataset.r),Number(f.dataset.c),v);
     if(f instanceof HTMLInputElement&&f.type==="color"){f.classList.remove("ed-blank");f.title=v}
@@ -622,7 +633,7 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
   // The preview follows the row being edited.
   el.addEventListener("focusin",e=>{
     const f=e.target as HTMLInputElement;
-    if(!t||f.dataset.r===undefined||step==="start"||step==="project"||step==="history"||step==="scenarios"||step==="units")return;
+    if(!t||f.dataset.r===undefined||!isTableStep(step)||step==="units")return;
     const id=t.rows[step][Number(f.dataset.r)]?.[0]?.trim();
     if(id&&id!==selected&&preview.model?.boreholes.some(b=>b.id===id)){selected=id;renderPreview()}
   });
@@ -630,7 +641,7 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
   // rows where needed.
   el.addEventListener("paste",e=>{
     const f=e.target as HTMLInputElement,text=e.clipboardData?.getData("text/plain")??"";
-    if(!t||f.dataset.r===undefined||step==="start"||step==="project"||step==="history"||step==="scenarios"||!/[\t\n]/.test(text.trim()))return;
+    if(!t||f.dataset.r===undefined||!isTableStep(step)||!/[\t\n]/.test(text.trim()))return;
     e.preventDefault();
     const name=step,lines=text.replace(/\r/g,"").replace(/\n+$/,"").split("\n").map(l=>l.split("\t"));
     const shown=shownRows(name).rows.map(q=>q.i),c0=Number(f.dataset.c),p0=shown.indexOf(Number(f.dataset.r));

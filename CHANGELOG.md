@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Correlation review compares the modelled beds at each contributing collar with its logged intervals. Reviewers can identify separate occurrences of the same material or record why they accept a discrepancy. Pending intervals mark volumes as provisional in the viewer and the printable report.
+
 - Dutch DOV reports retain their printed borehole identifiers and skip separate stratigraphic appendices. A leading “idem” requires material review. Dutch and French descriptions of made ground map to the same group.
 - When a single borehole contradicts the project’s stratigraphic order, the viewer and report show its logged intervals and omit estimated solid volumes. Multi-hole model summaries flag intervals reassigned during correlation.
 - The source preview appears while local OCR is running.

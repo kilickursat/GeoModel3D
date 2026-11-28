@@ -25,6 +25,7 @@ Then fill in the steps:
 | SPT | Borehole, depth, blows, penetration |
 | Tests | Borehole, depth, to, property, value: any laboratory or in-situ result |
 | Units | Unit, name, colour, erosive, γ, γsat, c′, φ′, su, E, k, K0, source, in stratigraphic order (▲ ▼ to reorder) |
+| Correlation review | Agreement between logged intervals and the modelled beds at their collars, with the option to assign an interpreted bed or record a reason for a difference |
 | Scenarios | Independent named interpretations, their unfinished drafts, and fixed-revision comparisons |
 | Revisions | Complete projects recorded when opened or built; restore an earlier project while retaining later revisions |
 
@@ -42,6 +43,14 @@ Good to know:
 - **Nothing is uploaded.** The input workspace is saved in this browser, including terrain, CPTs, alignments, rules and parameters from its base project. The status under the editor says when a save has completed, or explains if browser storage is unavailable. Starting another case replaces the browser save.
 - **Save workspace** downloads the unfinished tables, complete base project and revision history. Import that file on its own to continue editing, including on another computer. Source evidence, highlighted page previews and correction history are included where available; original PDF/image files are not embedded. **Save case (JSON)** and **Export → Project (JSON)** keep only the current project; **Download table (CSV)** saves one table.
 - **Revisions:** opening a project records its baseline. **Build model** records a new revision when its project differs from the selected revision. Under **Revisions**, restore a project, then build it to show it in 3-D. Building changes after a restore creates a revision based on that earlier project; later revisions stay available. Unfinished edits are kept in the workspace draft but are not themselves build revisions. Each revision is a complete project, but boreholes, CPTs, alignments, terrain, evidence and core-photo registrations that did not change are stored once and shared between revisions, so a long history grows with what you changed, not with the number of builds.
+
+### Reviewing a bed correlation
+
+Open **Input data → Correlation review** to check the current draft against the boreholes and contributing CPTs. The totals give the length of log with a matching unit, a different unit, or no model coverage. Select a collar and a logged interval to see each difference, its depth range and thickness. **View source evidence** opens the report extract when available.
+
+If the same material occurs in distinct beds, select **Assign an interpreted bed**, enter a new bed ID and choose its position in the unit order. For example, a sand bed below a clay layer can have a different ID from the sand above it. The new bed inherits the source unit's properties. To correlate it across boreholes, choose **All logged intervals**, select the corresponding interval at the next hole, and choose the existing bed ID. The original material, description, depths and linked evidence remain available after the assignment.
+
+If a difference represents a deliberate engineering interpretation, enter a **Reason for acceptance** and select **Accept interval differences**. The review records the reason for the modelled subranges shown. Changing their geometry or the source interval requires another review. A gap in model coverage remains open. **Save case (JSON)** preserves decisions for this project, and **Save workspace** preserves them with their scenarios and revisions.
 
 ## Scenarios and comparisons
 

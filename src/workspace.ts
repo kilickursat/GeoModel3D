@@ -1,3 +1,4 @@
+import {parseCorrelationAcceptances} from "./correlationDecisions";
 // A saved editing draft and immutable build checkpoints. Projects remain compatible with the existing project
 // JSON format; workspace files add history without changing that format or making the model depend on the editor.
 import pkg from "../package.json";
@@ -262,7 +263,8 @@ function parseTables(value:unknown,image:ImageResolver,path="draft.tables"):Edit
   for(const [name,columns] of Object.entries(COLUMNS)){
     list(rows[name],`${path}.rows.${name}`).forEach((row,i)=>{
       const cells=list(row,`${path}.rows.${name}[${i}]`);
-      if(cells.length!==columns.length)invalid(`${path}.rows.${name}[${i}]`,`must have ${columns.length} cells`);
+      const legacyUnit=name==="units"&&cells.length===columns.length-1;
+      if(!legacyUnit&&cells.length!==columns.length)invalid(`${path}.rows.${name}[${i}]`,`must have ${columns.length} cells`);
       cells.forEach((cell,j)=>text(cell,`${path}.rows.${name}[${i}][${j}]`));
     });
   }
@@ -273,6 +275,12 @@ function parseTables(value:unknown,image:ImageResolver,path="draft.tables"):Edit
     if(typeof policy.includeUndated!=="boolean")invalid(`${path}.groundwaterDraft.includeUndated`,"must be a boolean");
   }
   const parsed=clone(t) as unknown as EditorTables;
+  if(t.extraUnitParams!==undefined)for(const [id,values] of Object.entries(record(t.extraUnitParams,`${path}.extraUnitParams`))){
+    const field=`${path}.extraUnitParams.${id}`;
+    for(const [key,value] of Object.entries(record(values,field)))number(value,`${field}.${key}`);
+  }
+  if(t.correlationAcceptances!==undefined)parsed.correlationAcceptances=parseCorrelationAcceptances(t.correlationAcceptances);
+  for(const row of parsed.rows.units)if(row.length===COLUMNS.units.length-1)row.push("");
   if(t.evidence!==undefined)parsed.evidence=evidenceCollection(t.evidence,`${path}.evidence`,image);
   // A draft may contain unfinished collar/unit edits. Resolve its source images now; check geological references
   // when building, without dropping annotations or making an unfinished workspace impossible to reopen.
@@ -319,6 +327,7 @@ function parseProject(value:unknown,path:string,image:ImageResolver):GeoProject{
   delete p.format;delete p.version;
   text(p.name,`${path}.name`,true);optionalStrings(p,["description","source","crs","crsCode","crsProj4"],path);
   optionalNumbers(p,["base","groundwaterDepth","margin"],path);optionalBoolean(p,"cptLayers",path);
+  if(p.correlationAcceptances!==undefined)p.correlationAcceptances=parseCorrelationAcceptances(p.correlationAcceptances);
   if(p.groundwater!==undefined)try{p.groundwater=parseGroundwater(p.groundwater)}catch(error){invalid(`${path}.groundwater`,(error as Error).message)}
   if(p.evidence!==undefined)p.evidence=evidenceCollection(p.evidence,`${path}.evidence`,image);
   const evidenceIds=new Set((p.evidence as EvidenceCollection|undefined)?.records.map(r=>r.id)??[]);
@@ -326,7 +335,7 @@ function parseProject(value:unknown,path:string,image:ImageResolver):GeoProject{
   unique(units,"id",`${path}.units`);unique(holes,"id",`${path}.boreholes`);
   for(const [i,u] of units.entries()){
     const at=`${path}.units[${i}]`;text(u.name,`${at}.name`);text(u.color,`${at}.color`);
-    optionalStrings(u,["source"],at);optionalNumbers(u,["gamma","gammaSat"],at);optionalBoolean(u,"erosive",at);
+    optionalStrings(u,["source","materialId"],at);optionalNumbers(u,["gamma","gammaSat"],at);optionalBoolean(u,"erosive",at);
     if(u.params!==undefined)for(const [key,v] of Object.entries(record(u.params,`${at}.params`)))number(v,`${at}.params.${key}`);
   }
   for(const [i,b] of holes.entries()){

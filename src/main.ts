@@ -5,6 +5,7 @@ import {CSS2DRenderer,CSS2DObject} from "three/addons/renderers/CSS2DRenderer.js
 import pkg from "../package.json";
 import {GeoProject,UnitDef,UnitRule,Alignment,Cpt,sampleProjects,realSites,boreholeDepth,cptDepth} from "./geology";
 import {buildGeologicalModel,GeoModel,unitVolume,unitCubicMetres,modelBounds,footprintArea,sampleModel} from "./model";
+import {readCollarReview,collarReviewLabel} from "./correlationSummary";
 import {volumeGeometry} from "./volume";
 import {terrainOutside,convexHull,TerrainGrid} from "./terrain";
 import {computeSection,offsetRange,offsetThrough,principalAzimuth,Section,sectionRuns,joined,alongOf} from "./section";
@@ -104,6 +105,7 @@ const invalidate=()=>{dirty=2};
 let project:GeoProject=sampleProjects[0];
 let imported:GeoProject|null=null;
 let model:GeoModel;
+let provisionalVolumes=false;
 let section:Section;
 let origin={x:0,y:0,z:0},extent=1,sectionBuffer=1;
 // `field` colours the section: "units", a stress (sv, u, s) or a measured property. `alignment` is the line the section
@@ -844,7 +846,7 @@ ui.innerHTML=`<div class="topbar"></div><h1 class="title">GeoModel3D <span>${pkg
   <select class="dataset" aria-label="Site"></select>
   <div class="desc"></div><button class="desc-more" hidden>More</button>
   <div class="stats"></div>
-  <h3>Units</h3>
+  <h3>Units</h3><p class="volume-review" hidden></p>
   <div class="legend"></div>
   <div class="cpt-layers" hidden><label><input type="checkbox" class="use-cpt-layers"><span>Use the CPT layers in the model</span></label><p class="cpt-note"></p></div>
   <details class="rules"><summary>Unit rules</summary><div class="rule-list"></div>
@@ -1103,10 +1105,14 @@ function renderPanel(){
   more.textContent="More";
   const count=(n:number,what:string)=>`${n} ${what}${n===1?"":"s"}`;
   const stats=[count(model.boreholes.length,"borehole"),...(model.cpts.length?[count(model.cpts.length,"CPT")]:[]),count(model.units.length,"unit"),...(model.logOnlyReason?["Logged intervals only"]:[count(model.horizons.length,"horizon")])];
-  if(model.simplifiedIntervals)stats.push(`${count(model.simplifiedIntervals,"logged interval")} assigned a different unit in the model`);
+  const review=readCollarReview(model);
+  provisionalVolumes=review.pending>0;
+  const volumeNote=ui.querySelector<HTMLElement>(".volume-review")!;
+  volumeNote.textContent=collarReviewLabel(review);
+  volumeNote.hidden=!volumeNote.textContent;
   if(model.triangles.length)stats.push(`footprint ${fmtArea(footprintArea(model))}`);
   if(project.terrain)stats.push(`terrain ${fmt(project.terrain.dx,1)} m grid`);
-  ui.querySelector(".stats")!.innerHTML=stats.join(" · ");
+  ui.querySelector(".stats")!.textContent=stats.join(" · ");
   const crs=projectCrs(project),input=ui.querySelector<HTMLInputElement>(".crs-input")!;
   input.value=crs?`${crs.code?crs.code+" · ":""}${crs.name}`:project.crs??"";
   input.title=crs?.note??(crs?"":"Not georeferenced: choose the coordinate system the data are in to fetch terrain and show a map");
@@ -1197,9 +1203,9 @@ function renderRules(){
   ruleList.innerHTML=rules.map(ruleRow).join("")+`<datalist id="unit-options">${project.units.map(u=>`<option value="${esc(u.id)}">${esc(u.name)}</option>`).join("")}</datalist>`;
   const notes:string[]=[];
   if(target==="rules"){
-    const {unmatched}=applyUnitRules(project.boreholes,rules);
+    const {unmatched}=applyUnitRules(project.boreholes,rules,project.units);
     const names=new Set(project.boreholes.flatMap(b=>b.intervals.map(i=>i.name).filter(Boolean)));
-    notes.push(`${names.size} descriptions in the logs. The first rule that matches gives the unit.`);
+    notes.push(`${names.size} descriptions in the logs. The first rule that matches gives the unit. Interpreted bed assignments are retained.`);
     if(unmatched.size)notes.push(`No rule matches: ${listed(unmatched)}`);
   }else{
     notes.push("The first rule that matches a CPT layer's soil and the elevation of its top gives its unit.");
@@ -1221,7 +1227,7 @@ function applyRules(){
   const rules=readRules(),target=ruleTarget(),notes=[`${rules.length} ${target==="rules"?"unit rules":"rules for the CPT layers"} applied`];
   let boreholes=project.boreholes;
   if(target==="rules"){
-    const r=applyUnitRules(project.boreholes,rules);
+    const r=applyUnitRules(project.boreholes,rules,project.units);
     boreholes=r.boreholes;
     if(r.unmatched.size)notes.push(`Descriptions that no rule assigns to a unit are modelled as units of their own: ${[...r.unmatched].map(([n,c])=>`${n} (${c})`).join(", ")}`);
   }
@@ -1230,7 +1236,8 @@ function applyRules(){
   const used=new Set([...boreholes.flatMap(b=>b.intervals.map(i=>i.unit)),...(cpts??[]).flatMap(c=>(c.layers??[]).map(l=>l.unit))].filter(Boolean));
   // Accepted photograph annotations retain their original unit definitions when model rules are changed.
   for(const run of project.corePhotos?.runs??[])for(const row of run.rows)for(const piece of row.pieces)if(piece.unit)used.add(piece.unit);
-  const kept=project.units.filter(u=>used.has(u.id)),added=[...used].filter(id=>!kept.some(u=>u.id===id));
+  const materials=new Set(project.units.filter(u=>used.has(u.id)).map(u=>u.materialId));
+  const kept=project.units.filter(u=>used.has(u.id)||materials.has(u.id)),added=[...used].filter(id=>!kept.some(u=>u.id===id));
   if(added.length)notes.push(`New units added at the bottom of the column: ${added.join(", ")}`);
   const unmatched=unmatchedLayers(cpts);
   if(unmatched.size)notes.push(`CPT layers no rule matches stay out of the model: ${listed(unmatched)}`);
@@ -2133,7 +2140,7 @@ function updateTooltip(){
     const hit=volumeHit;
     if(hit){
       const u=model.units[hit.object.userData.unit],props=unitProperties(u);
-      html=`<b>${esc(u.name)}</b>${u.erosive?" · erosive base":""}<span>${fmtVolume(unitCubicMetres(model,hit.object.userData.unit))} in the model · elevation ${fmt(hit.point.z/view.ve+origin.z,1)} m</span>${props?`<span>${esc(props)}</span>`:""}`;
+      html=`<b>${esc(u.name)}</b>${u.erosive?" · erosive base":""}<span>${provisionalVolumes?"Provisional volume · ":""}${fmtVolume(unitCubicMetres(model,hit.object.userData.unit))} in the model · elevation ${fmt(hit.point.z/view.ve+origin.z,1)} m</span>${props?`<span>${esc(props)}</span>`:""}`;
     }
   }
   if(!html&&terrainMesh?.visible){

@@ -19,6 +19,8 @@ Using the reviewed values without editing produced four boreholes, five grouped 
 
 Leaving each collar out puts only B-4 inside the other collars. At B-4, the model predicted the top of rock and cemented soil 2.2 m above the logged contact and matched the logged unit over 60.6% of logged depth. The other three checks extrapolate beyond the remaining collars. Fill and volcanic ash appear in only one hole each. These numbers describe this site and grouping only. [Chromium model and holdout results](tochigi-118010314.png)
 
+The GitHub Pages deployment of merge commit `edf820c` was checked with the same four originals at 03:36 UTC on 28 November. Its entry asset was `index-C6k3L7gT.js`. WebGL 2 drew the collars and layers. All 16 interval bases, the coordinate system and the B-4 holdout results were reproduced. Chromium intercepted 94 basemap tile requests from the startup sample. After report import began there were zero external request attempts through validation. [Deployment](https://github.com/kilickursat/GeoModel3D/actions/runs/46103146065)
+
 ## Hirosaki scanned log
 
 Hirosaki City (弘前市), オープンデータひろさき 地質・測量, Ringo No. 1, page 1. The publisher grants CC BY 4.0. [Dataset and terms](https://www.city.hirosaki.aomori.jp/gaiyou/opendata/od-chisitsu-sokuryo.html) · [Source PDF](https://www.city.hirosaki.aomori.jp/gaiyou/opendata/files/20170308_hirosaki_ringo_boringutyuujouzu1.pdf) · [Licence](https://creativecommons.org/licenses/by/4.0/)
@@ -48,6 +50,8 @@ Three newly selected Antwerp reports originally all appeared as “Page 1”. Th
 On the separate two-page GEO-69/355-A report the corrected reader preserved all twelve intervals, a 24 m final depth, a 1.42 m collar elevation and a 1.30 m water depth. It skipped the interpretation appendix without starting OCR and requested material review for two “idem” rows that refer to preceding descriptions. The projected coordinates were retained on a local grid until a CRS is supplied.
 
 Before the modeling fix, that single reviewed borehole generated an assumed 25 m lateral extension and zero peat volume despite peat logged at 1–3 m. Its clay/peat/sand sequence recurred in a different order further down. The browser and A4 report now show all twelve measured intervals with no modeled footprint or volume estimates in this case. Multi-hole models identify how many intervals were assigned a different unit by the correlation. The individual depths and substitutions are recorded in the model notes.
+
+On the correlation-review branch, a fresh import of the three Antwerp PDFs reproduced 84.91 matching metres and 66.39 metres assigned to a different unit out of 151.30 logged metres. Assigning only B100's 84–92 m sand interval to a trial lower sand bed at the bottom of the order increased collar agreement to 92.91 m. The remaining 58.39 m in five intervals kept the quantities provisional. The trial tests the effect of one interpretation on known collars. Lateral extent needs separate geological evidence.
 
 ## Engineering validation priorities
 

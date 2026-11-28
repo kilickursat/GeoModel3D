@@ -1,3 +1,4 @@
+import {parseCorrelationAcceptances} from "./correlationDecisions";
 import proj4 from "proj4";
 import {Borehole,GeoProject,Interval,UnitDef,UnitRule,SptTest,WaterLevel,TestResult,Alignment,AlignmentPoint,DesignLevel,Cpt,boreholeDepth,sptN,cptDepth} from "./schema";
 import {CptRead,CptRow,cptReadings,pressureKpa,frictionRatio,isGef,readGef,isBroCpt,readBroCpt,isDovCpt,readDovCpt} from "./cpt";
@@ -135,6 +136,7 @@ const ALIASES={
   gamma:["gamma","unitweight","bulkunitweight","gammabulk","gammaknm3"],
   gammaSat:["gammasat","saturatedunitweight","gammasaturated","satunitweight"],
   source:["source","reference","ref","provenance"],
+  materialId:["materialid"],
   evidenceId:["evidenceid"]
 };
 type Field=keyof typeof ALIASES;
@@ -297,7 +299,7 @@ function readCsvTable(file:TextFile,t:Tables){
       if(!id)continue;
       const params:Record<string,number>={};
       for(const {i,p} of props)if(p.key!=="gamma"&&Number.isFinite(num(r[i])))params[p.key]=converted(num(r[i]),p.scale);
-      t.units.push(unitDef({id,name:cell(r,"name"),color:cell(r,"color"),erosive:cell(r,"erosive"),gamma:cell(r,"gamma"),gammaSat:cell(r,"gammaSat"),source:cell(r,"source"),params}));
+      t.units.push(unitDef({id,materialId:cell(r,"materialId"),name:cell(r,"name"),color:cell(r,"color"),erosive:cell(r,"erosive"),gamma:cell(r,"gamma"),gammaSat:cell(r,"gammaSat"),source:cell(r,"source"),params}));
     }
   }else if(has("id","testDepth")&&(props.length||has("blows"))){
     for(const r of data){
@@ -449,8 +451,9 @@ function readGeoreport3D(doc:any,file:string):ImportResult{
   return result;
 }
 // A unit definition from loosely typed input: booleans as yes/no/true/1, numbers as text or numbers.
-function unitDef(u:{id:string;name?:unknown;color?:unknown;erosive?:unknown;gamma?:unknown;gammaSat?:unknown;source?:unknown;params?:unknown}):UnitDef{
+function unitDef(u:{id:string;materialId?:unknown;name?:unknown;color?:unknown;erosive?:unknown;gamma?:unknown;gammaSat?:unknown;source?:unknown;params?:unknown}):UnitDef{
   const out:UnitDef={id:u.id,name:typeof u.name==="string"&&u.name.trim()?u.name.trim():u.id,color:normaliseColor(u.color)??""};
+  if(typeof u.materialId==="string"&&u.materialId.trim()&&u.materialId.trim()!==u.id)out.materialId=u.materialId.trim();
   if(u.erosive===true||typeof u.erosive==="string"&&/^(y|yes|true|1|x)$/i.test(u.erosive.trim()))out.erosive=true;
   const gamma=num(u.gamma);
   const gammaSat=num(u.gammaSat);
@@ -506,6 +509,7 @@ function readProjectJson(doc:any,file:string):ImportResult{
   if(doc.source)result.project.source=String(doc.source);
   if(Number.isFinite(doc.base))result.project.base=Number(doc.base);
   if(Number.isFinite(doc.groundwaterDepth))result.project.groundwaterDepth=Number(doc.groundwaterDepth);
+  if(doc.correlationAcceptances!==undefined)result.project.correlationAcceptances=parseCorrelationAcceptances(doc.correlationAcceptances);
   if(doc.groundwater!==undefined)result.project.groundwater=parseGroundwater(doc.groundwater);
   if(Number.isFinite(doc.margin)&&doc.margin>0)result.project.margin=Number(doc.margin);
   // Alignments: lines with a problem are left out, and named in the notes.
@@ -524,9 +528,11 @@ function readProjectJson(doc:any,file:string):ImportResult{
   // CPTs: readings as lists of one length, null where a reading has no value.
   if(Array.isArray(doc.cpts)){
     const list=(v:unknown)=>Array.isArray(v)?v.map(num):undefined;
-    const cpts:Cpt[]=[];
+    const cpts:Cpt[]=[],ids=new Set<string>();
     for(const c of doc.cpts){
       const id=String(c?.id??"").trim(),depth=list(c?.depth),qc=list(c?.qc);
+      if(id&&ids.has(id))throw new Error(`${file}: duplicate CPT ID “${id}”. Each CPT needs a unique ID.`);
+      ids.add(id);
       const x=num(c?.x),y=num(c?.y);
       if(!id||!depth?.some(Number.isFinite)||qc?.length!==depth.length||!Number.isFinite(x)||!Number.isFinite(y)){result.warnings.push(`${file}: CPT ${id||"without a name"} is incomplete and was left out`);continue}
       const missing=depth.reduce((n,d)=>Number.isFinite(d)?n:n+1,0);
@@ -558,7 +564,7 @@ function readProjectJson(doc:any,file:string):ImportResult{
 export function toProjectJson(p:GeoProject){
   const doc={format:"geomodel3d-project",version:1,name:p.name,description:p.description,source:p.source,crs:p.crs,crsCode:p.crsCode,crsProj4:p.crsProj4,
     base:p.base,groundwaterDepth:p.groundwaterDepth,groundwater:p.groundwater,margin:p.margin,units:p.units,rules:p.rules,boreholes:p.boreholes,alignments:p.alignments,
-    cpts:p.cpts,cptLayers:p.cptLayers,cptRules:p.cptRules,terrain:p.terrain,evidence:p.evidence,corePhotos:p.corePhotos};
+    cpts:p.cpts,cptLayers:p.cptLayers,cptRules:p.cptRules,terrain:p.terrain,evidence:p.evidence,corePhotos:p.corePhotos,correlationAcceptances:p.correlationAcceptances};
   // Long lists of numbers (the terrain grid, CPT readings) take one line each, and so does each layer of a CPT.
   return JSON.stringify(doc,null,1).replace(/"(z|depth|qc|fs|u2|rf|qt)": \[[^\]{}"]*\]/g,m=>m.replace(/\s+/g,""))
     .replace(/\{\s*"from": [^{}\]]*?"name": "[^"]*"\s*\}/g,m=>m.replace(/\n\s*/g,""))+"\n";
@@ -638,7 +644,7 @@ function assemble(t:Tables,name:string,crsName:string|undefined,inferUnits:boole
     // reinterpret their free-text descriptions; the user can still change units explicitly in the editor.
     const fixed=new Set(options.evidence?.records.filter(r=>r.method==="manual"&&r.fields.coreRunId&&r.fields.runReview&&r.fields.unit).map(r=>r.id));
     const selected=boreholes.map(b=>({...b,intervals:b.intervals.filter(i=>!i.evidenceId||!fixed.has(i.evidenceId))}));
-    const mapped=applyUnitRules(selected,rules);
+    const mapped=applyUnitRules(selected,rules,t.units);
     boreholes.splice(0,boreholes.length,...boreholes.map((b,index)=>{
       let cursor=0;return {...b,intervals:b.intervals.map(i=>i.evidenceId&&fixed.has(i.evidenceId)?i:mapped.boreholes[index].intervals[cursor++])};
     }));

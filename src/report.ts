@@ -15,6 +15,7 @@ import {unitStatistics,measuredProperties,propertyDef,formatValue} from "./prope
 import {CrossValidation} from "./validation";
 import {EvidenceField,EvidenceRecord} from "./evidence";
 import {groundwaterSummary} from "./groundwater";
+import {readCollarReview,collarReviewLabel} from "./correlationSummary";
 
 export interface ReportOptions {
   paper:"A3"|"A4";
@@ -46,6 +47,7 @@ export function loggedIntervalsTable(model:GeoModel){
 
 export function reportHtml(model:GeoModel,section:Section,o:ReportOptions){
   const p=model.project,crs=projectCrs(p);
+  const review=readCollarReview(model);
   const [w,h]=o.paper==="A3"?[420,297]:[297,210];
   const azimuth=String(Math.round(section.azimuth)).padStart(3,"0"),line=section.alignment;
   const sectionName=line?sectionTitle(section):`Section A–A′ · ${azimuth}° · ${section.offset>=0?"+":""}${Math.round(section.offset)} m`;
@@ -54,7 +56,7 @@ export function reportHtml(model:GeoModel,section:Section,o:ReportOptions){
     ["Coordinate system",crs?`${crs.name}${crs.code?` (${crs.code})`:""}`:p.crs?`${p.crs} (not georeferenced)`:"Local, not georeferenced"],
     ["Boreholes",String(model.boreholes.length)],
     ...(model.cpts.length?[["CPTs",`${model.cpts.length}${model.cptLogs.length?`, ${model.cptLogs.length} with their layers in the model`:""}`] as [string,string]]:[]),
-    ...(model.simplifiedIntervals?[["Correlation",`${model.simplifiedIntervals} logged interval(s) assigned a different unit in the model. See model notes for depths.`]] as [string,string][]:[]),
+    ...(review.rows.length?[["Correlation",collarReviewLabel(review)]] as [string,string][]:[]),
     ["Footprint",model.triangles.length?`${fmt(footprintArea(model)/1e4,2)} ha`:"—"],
     ["Ground",model.logOnlyReason?"Surveyed start elevation":p.terrain?`Terrain: ${p.terrain.source??"terrain grid"}, ${fmt(p.terrain.dx,1)} m cells`:"Surface through the collars"],
     ["Data",p.source??"—"],
@@ -130,13 +132,16 @@ table.chainage td,table.chainage th{padding:0.5mm 1.4mm}
 .evidence tr{break-inside:avoid}
 .evidence p{margin:0 0 1mm}
 .evidence-sources{padding-left:4mm;font-size:0.85em;overflow-wrap:anywhere}
+.collar-review{display:block;overflow-wrap:anywhere}
+.collar-review td:last-child{white-space:pre-wrap}
+.collar-review thead{display:table-header-group}
 </style></head><body>
 <section class="page">
 <header><div><h1>${esc(p.name)}</h1><div class="desc">${esc(p.description??"")}</div></div>
 <table class="block"><tbody>${block.map(([k,v])=>`<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join("")}</tbody></table></header>
 <div class="main"><div class="view">${o.image?`<img src="${o.image}" alt="3-D view of the model">`:`<div class="missing">The 3-D view could not be captured with this renderer. Open the page with ?backend=webgl to include it.</div>`}
 <div class="credits">${o.credits.map(esc).join(" · ")}</div></div>
-<div><h3>Units</h3><table><thead><tr><th>${model.logOnlyReason?"Logged unit":"Unit (top to bottom)"}</th><th>Volume in the model</th><th>Properties</th></tr></thead><tbody>${legend}</tbody></table>${rules?`<p class="muted">The units are assigned to the logged descriptions by rules; they are listed with the boreholes.</p>`:""}</div></div>
+<div><h3>Units</h3><table><thead><tr><th>${model.logOnlyReason?"Logged unit":"Unit (top to bottom)"}</th><th>${review.pending?"Provisional volume in the model":"Volume in the model"}</th><th>Properties</th></tr></thead><tbody>${legend}</tbody></table>${rules?`<p class="muted">The units are assigned to the logged descriptions by rules; they are listed with the boreholes.</p>`:""}</div></div>
 ${foot("Overview")}</section>
 <section class="page"><h2>${model.logOnlyReason?"Logged intervals":esc(sectionName)}</h2><div class="section">${model.logOnlyReason?loggedIntervalsTable(model):svg}</div>
 ${model.logOnlyReason?"":line?`<p class="muted">Along ${esc(line.name)}, ${line.s.length} points from (${fmt(line.x[0],1)}, ${fmt(line.y[0],1)}) to (${fmt(line.x[line.x.length-1],1)}, ${fmt(line.y[line.y.length-1],1)}) in ${esc(crs?.name??p.crs??"project coordinates")}; boreholes within ${fmt(o.sectionBuffer)} m of the line are projected onto it at their nearest point.${outsideStretches(section).map(([a,b])=>` Chainage ${fmt(a)}–${fmt(b)} m lies outside the model.`).join("")}</p>`
@@ -148,12 +153,28 @@ ${o.field?`<section class="page"><h2>${esc(sectionName)} · ${esc(o.field.name)}
 ${foot(`Section: ${o.field.name.toLowerCase()}`)}</section>`:""}
 ${model.cpts.length?cptPage(model,section,o.sectionBuffer,foot):""}
 ${o.validation?validationPage(o.validation,foot):""}
+${correlationPage(review,model,foot)}
 <section class="page">${params}${rules}<h2>Boreholes</h2>
 <table><thead><tr><th>Borehole</th><th>Easting (m)</th><th>Northing (m)</th><th>Collar (m)</th><th>Depth (m)</th><th>Latitude</th><th>Longitude</th><th>Shallowest logged water (all dates, m deep)</th><th>SPT tests</th></tr></thead><tbody>${holes}</tbody></table>
 ${notes.length?`<h3>Notes on the model (${notes.length})</h3><ul class="notes">${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul>`:""}
 ${foot(rules?"Ground parameters, interpretation, boreholes and notes":"Ground parameters, boreholes and notes")}</section>
 ${evidencePages(model,o.paper,foot)}
 </body></html>`;
+}
+
+function correlationPage(review:ReturnType<typeof readCollarReview>,model:GeoModel,foot:(part:string)=>string){
+  if(!review.rows.length)return "";
+  const materials=new Map(model.units.map(u=>[u.id,u.materialId??u.id]));
+  const depth=(v:number)=>v.toLocaleString("en-US",{maximumFractionDigits:6});
+  const rows=review.rows.flatMap(({interval,acceptance})=>interval.discrepancies.map(d=>{
+    const material=materials.get(interval.unit)??interval.unit;
+    const logged=material===interval.unit?esc(material):`${esc(material)} (bed ${esc(interval.unit)})`;
+    return `<tr><td>${interval.kind==="cpt"?"CPT ":""}${esc(interval.holeId)}</td><td>${depth(interval.from)}–${depth(interval.to)} m</td><td>${logged}</td><td>${depth(d.mismatchFrom)}–${depth(d.mismatchTo)} m</td><td>${d.modelledUnit===null?"Outside model coverage":esc(d.modelledUnit)}</td><td>${acceptance?`Accepted · ${esc(acceptance.rationale)}`:"Pending"}</td></tr>`;
+  }));
+  return `<section class="page collar-review"><h2>Correlation at the contributing collars</h2>
+<p>${review.pending} pending · ${review.accepted} accepted with a reason. ${depth(review.audit.mismatchedMetres)} m assigned a different unit and ${depth(review.audit.unknownMetres)} m outside model coverage across ${depth(review.audit.loggedMetres)} logged m. Depths are measured below each collar.</p>
+<table><thead><tr><th>Collar</th><th>Logged interval</th><th>Logged material / bed</th><th>Discrepant depth range</th><th>Modelled bed</th><th>Review of logged interval</th></tr></thead><tbody>${rows.join("")}</tbody></table>
+${foot("Collar correlation review")}</section>`;
 }
 
 // Only observations still attached to the current project are printed. Deleted-row evidence can remain in the

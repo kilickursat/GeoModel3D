@@ -1,4 +1,5 @@
 import {test,expect} from "@playwright/test";
+import type {GeoProject} from "../../src/schema";
 import {build,downloadJson,expectComplete,importFixture,importJson,openInput,prepare,rename,resume,saved} from "./helpers";
 
 test.beforeEach(async({page})=>{await prepare(page);await page.goto("/?backend=webgl#input")});
@@ -202,4 +203,71 @@ test("a lost graphics context leaves the workspace available for export",async({
   await expect(status.getByRole("link")).toHaveAttribute("href",page.url());
   await openInput(page);
   expectComplete(await downloadJson(page,".ws-json"));
+});
+
+test("reviews repeated clay, reopens the decision after a depth edit, and correlates a separate bed",async({page})=>{
+  const collar={z:10,intervals:[{from:0,to:1,unit:"clay",name:"Upper clay"},{from:1,to:5,unit:"sand",name:"Dense sand"}]};
+  const project={
+    name:"Repeated clay",units:[{id:"clay",name:"Clay",color:"#97634c"},{id:"sand",name:"Sand",color:"#ebc77f"}],
+    boreholes:[
+      {id:"BH-1",x:0,y:0,z:10,intervals:[collar.intervals[0],{...collar.intervals[1],to:3},{from:3,to:5,unit:"clay",name:"Stiff laminated clay"}]},
+      {...collar,id:"BH-2",x:20,y:0},{...collar,id:"BH-3",x:0,y:20}
+    ]
+  };
+  await openInput(page);
+  await importJson(page,project,"repeated-clay.json");
+  await expect(page.locator(".ws-status")).toContainText("Imported repeated-clay.json");
+  const step=page.locator('[data-step="correlations"]'),review=page.locator(".ws-correlations");
+  const showModel=async()=>{
+    await page.locator(".ws-build").click();
+    await expect(page.getByRole("tab",{name:"3-D model",exact:true})).toHaveAttribute("aria-selected","true");
+  };
+  await showModel();
+  await expect(page.locator(".volume-review")).toContainText("Provisional volumes");
+  await openInput(page);
+  await step.click();
+  const segment=review.getByRole("table",{name:"Differences at this collar"}).locator("tbody tr");
+  await expect(segment.getByRole("cell")).toHaveText(["sand","3","5","2"]);
+  const rationale="The lower clay lens is local to BH-1 and its extent is unknown.";
+  await review.getByLabel("Reason for acceptance").fill(rationale);
+  await review.getByRole("button",{name:"Accept interval differences"}).click();
+  const accepted=await downloadJson<GeoProject>(page,".ws-json");
+  expect(accepted.correlationAcceptances).toEqual([expect.objectContaining({holeId:"BH-1",from:3,to:5,rationale})]);
+  expect(accepted.boreholes[0].intervals).toEqual(project.boreholes[0].intervals);
+
+  page.once("dialog",dialog=>dialog.accept());
+  await importJson(page,accepted,"accepted-clay.json");
+  await expect(page.locator(".ws-status")).toContainText("Imported accepted-clay.json");
+  await step.click();
+  await expect(review).toContainText(rationale);
+  await showModel();
+  await expect(page.locator(".volume-review")).toContainText("Collar differences accepted with reasons for 1 logged interval");
+  await openInput(page);
+  await page.locator('[data-step="logs"]').click();
+  await page.locator('input[data-r="2"][data-c="2"]').fill("4.8");
+  await step.click();
+  await expect(review.locator(".cr-summary")).toContainText("1 interval pending review");
+  await expect(review.getByLabel("Reason for acceptance")).toHaveValue("");
+  await expect(segment.getByRole("cell")).toHaveText(["sand","3","4.8","1.8"]);
+  await showModel();
+  await expect(page.locator(".volume-review")).toContainText("Provisional volumes");
+  await openInput(page);
+  await step.click();
+
+  await review.getByText("Assign an interpreted bed",{exact:true}).click();
+  await review.getByLabel("Bed assignment").selectOption("new");
+  await review.getByLabel("New bed ID").fill("lower-clay");
+  await review.getByLabel("Position in unit order").selectOption({label:"At the bottom"});
+  await review.getByRole("button",{name:"Assign bed",exact:true}).click();
+  await expect(review.locator(".cr-summary")).toContainText("All logged intervals match the model");
+  const resolved=await downloadJson<GeoProject>(page,".ws-json");
+  expect(resolved.units.map(u=>u.id)).toEqual(["clay","sand","lower-clay"]);
+  expect(resolved.units[2].materialId).toBe("clay");
+  expect(resolved.boreholes[0].intervals).toEqual([
+    project.boreholes[0].intervals[0],project.boreholes[0].intervals[1],
+    {from:3,to:4.8,unit:"lower-clay",name:"Stiff laminated clay"}
+  ]);
+  await showModel();
+  await expect(page.locator(".stats")).toContainText("3 boreholes");
+  await expect(page.locator(".volume-review")).toBeHidden();
 });

@@ -1,3 +1,4 @@
+import {parseCorrelationAcceptances,type CorrelationAcceptance} from "./correlationDecisions";
 // The data editor's tables: a project as rows of text a person can type or paste, and back. A project is rebuilt from
 // the tables through the CSV importer, so data typed in are checked exactly as imported files are.
 import {GeoProject,UnitRule,Borehole,boreholeDepth} from "./schema";
@@ -30,7 +31,7 @@ export const COLUMNS:Record<TableName,Array<{label:string;csv:string;numeric?:bo
     {label:"γ (kN/m³)",csv:"gamma",numeric:true},{label:"γsat (kN/m³)",csv:"gamma_sat",numeric:true},{label:"c′ (kPa)",csv:"c",numeric:true},
     {label:"φ′ (°)",csv:"phi",numeric:true},{label:"su (kPa)",csv:"su",numeric:true},{label:"E (MPa)",csv:"E",numeric:true},
     {label:"k (m/s)",csv:"k",numeric:true},{label:"K0",csv:"K0",numeric:true,hint:"Earth pressure coefficient at rest: the horizontal effective stress is K0 · σ′v"},
-    {label:"Source",csv:"source",hint:"Where the values come from"}
+    {label:"Source",csv:"source",hint:"Where the values come from"},{label:"Original material",csv:"material_id",hint:"Material group from which this interpreted bed was assigned"}
   ]
 };
 // Design values given per unit in the Units table, keyed as in src/properties.ts.
@@ -39,6 +40,9 @@ export const TABLE_NAMES:Record<TableName,string>={boreholes:"Boreholes",logs:"L
 export interface ProjectFields { name:string; description:string; source:string; crs:string; groundwaterDepth:string; base:string; margin:string }
 export interface EditorTables {
   project:ProjectFields; rows:Record<TableName,string[][]>;
+  // Design properties without their own editor column, including those inherited by a new bed.
+  extraUnitParams?:Record<string,Record<string,number>>;
+  correlationAcceptances?:CorrelationAcceptance[];
   evidence?:EvidenceCollection;
   corePhotos?:CoreCollection;
   // Entries move with their rows when the editor inserts, removes or reorders rows. null is an unsourced row.
@@ -70,11 +74,17 @@ export function tablesFromProject(p:GeoProject):EditorTables{
     for(const t of b.tests??[])rows.tests.push([b.id,text(t.depth),text(t.to),t.property,text(t.value)]);
   }
   for(const u of p.units)rows.units.push([u.id,u.name,u.color,u.erosive?"yes":"",text(u.gamma),text(u.gammaSat),
-    ...DESIGN_KEYS.map(k=>text(u.params?.[k])),u.source??""]);
+    ...DESIGN_KEYS.map(k=>text(u.params?.[k])),u.source??"",u.materialId??""]);
+  const extras=Object.fromEntries(p.units.flatMap(u=>{
+    const values=Object.entries(u.params??{}).filter(([k])=>!DESIGN_KEYS.includes(k));
+    return values.length?[[u.id,Object.fromEntries(values)]]:[];
+  }));
   return {project:{name:p.name,description:p.description??"",source:p.source??"",crs:crs?(crs.code&&findCrs(crs.code)?crs.code:crs.proj4):p.crs??"",
     groundwaterDepth:text(p.groundwaterDepth),base:text(p.base),margin:text(p.margin)},rows,
+    ...(Object.keys(extras).length?{extraUnitParams:extras}:{}),
     ...(p.groundwater?{groundwaterDraft:{mode:p.groundwater.mode,depth:p.groundwater.mode==="assumed-depth"?String(p.groundwater.depth):"",
       date:p.groundwater.mode==="as-of"?p.groundwater.date:"",includeUndated:p.groundwater.mode==="as-of"&&!!p.groundwater.includeUndated}}:{}),
+    ...(p.correlationAcceptances?{correlationAcceptances:structuredClone(p.correlationAcceptances)}:{}),
     ...(p.evidence?{evidence:structuredClone(p.evidence)}:{}),
     ...(p.corePhotos?{corePhotos:structuredClone(p.corePhotos)}:{}),
     ...(Object.values(evidenceRows).some(ids=>ids.some(id=>id!==null))?{evidenceRows}:{})};
@@ -125,7 +135,7 @@ export function crsFromText(value:string):Crs|undefined{
 const filled=(r:string[])=>r.some(c=>c.trim()!=="");
 const csvOf=(name:TableName,rows:string[][],evidenceRows?:(string|null)[])=>({name:`${name}.csv`,text:toCsv([
   [...COLUMNS[name].map(c=>c.csv),...(evidenceRows?["evidence_id"]:[])],
-  ...rows.flatMap((row,i)=>filled(row)?[[...row,...(evidenceRows?[evidenceRows[i]??""]:[])]]:[])
+  ...rows.flatMap((row,i)=>filled(row)?[[...COLUMNS[name].map((_,c)=>row[c]??""),...(evidenceRows?[evidenceRows[i]??""]:[])]]:[])
 ])});
 export const tableCsv=(t:EditorTables,name:TableName)=>csvOf(name,t.rows[name]).text;
 
@@ -161,6 +171,8 @@ function projectFromEditorTables(t:EditorTables,base:GeoProject|undefined,forCor
   if(evidence)result.project.evidence=structuredClone(evidence);
   result.warnings.push(...notes);
   const p=result.project,f=t.project,num=(s:string)=>s.trim()===""?undefined:Number(s.replace(",","."));
+  const acceptances=t.correlationAcceptances??base?.correlationAcceptances;
+  if(acceptances)p.correlationAcceptances=parseCorrelationAcceptances(acceptances);
   p.name=f.name.trim()||"Untitled project";
   if(f.description.trim())p.description=f.description.trim();
   if(f.source.trim())p.source=f.source.trim();
@@ -190,11 +202,13 @@ function projectFromEditorTables(t:EditorTables,base:GeoProject|undefined,forCor
       const left=[base.alignments?.length?`${base.alignments.length} line${base.alignments.length>1?"s":""}`:"",base.cpts?.length?`${base.cpts.length} CPT${base.cpts.length>1?"s":""}`:""].filter(Boolean);
       if(left.length)result.warnings.push(`The coordinate system changed: ${left.join(" and ")} of the project left out, as their positions are in the old one`);
     }
-    const before=new Map(base.units.map(u=>[u.id,u]));
-    for(const u of p.units){
-      const extra=Object.entries(before.get(u.id)?.params??{}).filter(([k])=>!DESIGN_KEYS.includes(k));
-      if(extra.length)u.params={...Object.fromEntries(extra),...u.params};
-    }
+  }
+  const before=new Map(base?.units.map(u=>[u.id,u]));
+  for(const u of p.units){
+    const saved=t.extraUnitParams&&Object.hasOwn(t.extraUnitParams,u.id)?t.extraUnitParams[u.id]:
+      (before.get(u.id)??before.get(u.materialId??""))?.params;
+    const extra=Object.entries(saved??{}).filter(([k])=>!DESIGN_KEYS.includes(k));
+    if(extra.length)u.params={...Object.fromEntries(extra),...u.params};
   }
   if(t.groundwaterDraft){
     const g=t.groundwaterDraft;

@@ -2,7 +2,7 @@
 // (if any) contain the median SPT N-value inside the interval and the elevation of its top, gives its unit. An
 // interval that no rule matches keeps its description as its unit, so nothing is dropped silently; such
 // descriptions are counted.
-import {Borehole,UnitRule,sptN} from "./schema";
+import {Borehole,UnitDef,UnitRule,sptN} from "./schema";
 
 const median=(v:number[])=>{const s=[...v].sort((a,b)=>a-b),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2};
 const literal=(s:string)=>s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
@@ -14,11 +14,12 @@ export function intervalN(b:Borehole,from:number,to:number){
   return n.length?median(n):NaN;
 }
 
-export function applyUnitRules(boreholes:Borehole[],rules:UnitRule[]){
+export function applyUnitRules(boreholes:Borehole[],rules:UnitRule[],units:UnitDef[]=[]){
+  const correlated=new Set(units.filter(u=>u.materialId).map(u=>u.id));
   const compiled=rules.map(r=>({...r,re:rulePattern(r.match)}));
   const unmatched=new Map<string,number>();
   const out=boreholes.map(b=>({...b,intervals:b.intervals.map(i=>{
-    if(i.name===undefined)return i;
+    if(i.name===undefined||correlated.has(i.unit))return i;
     const n=intervalN(b,i.from,i.to),top=b.z-i.from;
     const rule=compiled.find(r=>r.re.test(i.name!)&&(r.minN===undefined||n>=r.minN)&&(r.maxN===undefined||n<r.maxN)
       &&(r.minZ===undefined||top>=r.minZ)&&(r.maxZ===undefined||top<r.maxZ));

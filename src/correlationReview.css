@@ -1,0 +1,22 @@
+.ws-correlations{max-width:900px;line-height:1.45}
+.ws-correlations h2{margin:0 0 6px;font-size:18px}
+.ws-correlations p{margin:6px 0 12px;overflow-wrap:anywhere}
+.cr-totals{display:flex;flex-wrap:wrap;gap:10px 28px;margin:16px 0}
+.cr-totals dt,.cr-summary{color:var(--text-2)}
+.cr-totals dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums}
+.cr-pickers,.cr-new{display:flex;flex-wrap:wrap;gap:8px 16px}
+.ws-correlations label{display:flex;flex-direction:column;gap:4px;color:var(--text-2)}
+.ws-correlations :is(select,input,textarea){max-width:100%;min-width:0;color:var(--text);background:var(--surface);border:1px solid var(--border-strong);border-radius:5px;padding:5px}
+.cr-pickers label,.cr-new label{min-width:0;max-width:100%}
+.cr-detail{margin:16px 0;padding-top:8px;border-top:1px solid var(--border)}
+.cr-detail h3{font-size:15px;overflow-wrap:anywhere}
+.cr-segments{margin:12px 0;border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+.cr-segments caption{text-align:left;font-weight:600}
+.cr-segments :is(th,td){text-align:right;padding:5px;border-bottom:1px solid var(--border)}
+.cr-segments :is(th,td):first-child{text-align:left;overflow-wrap:anywhere}
+.cr-accept,.cr-assign{display:grid;gap:8px;margin:10px 0}
+.cr-detail button{justify-self:start;color:var(--text);background:var(--surface);border:1px solid var(--border-strong);border-radius:5px;padding:5px 10px;cursor:pointer}
+.cr-detail summary{color:var(--accent);cursor:pointer}
+.cr-bed{margin:14px 0}
+.cr-error{color:var(--danger)}
+.cr-error:empty,.cr-new[hidden]{display:none}
