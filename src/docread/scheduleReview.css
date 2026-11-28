@@ -1,0 +1,8 @@
+.dr-schedule{border:1px solid var(--border);border-radius:var(--radius);padding:10px;margin:10px 0}
+.dr-schedule h3,.dr-schedule p,.dr-schedule ul{margin:0 0 6px}
+.dr-schedule h3{font-size:14px}
+.dr-schedule ul{padding-left:20px}
+.dr-schedule-row{border-top:1px solid var(--border);padding:7px 0}
+.dr-schedule-row strong{display:block;margin:0 0 4px}
+.dr-schedule-row table{margin:4px 0;width:100%;text-align:left}
+.dr-schedule-row.on strong{color:var(--accent)}

@@ -1,4 +1,5 @@
 import {Rule,isVertical,xAt,yAt} from "./ruling";
+import {graphicRangeLog} from "./graphicLog";
 // Borehole logs from the text of a page: lines of text with their boxes, from a PDF's own text layer or from OCR of a
 // page image, become logs (header values and layers) with no template for any layout. Drawn logs are read by their
 // depth scale, logs set out as tables by their From and To columns. Each layer keeps the lines it was read from, so the
@@ -31,6 +32,7 @@ export interface LogHeader {
 // more. `src`: the lines it was read from.
 export interface SptTest { depth:number; blows:number; penetration?:number; src:TextLine[] }
 export interface PageLog extends LogHeader {
+  rangeLabels?:boolean;
   depthInFeet?:boolean;
   spt?:SptTest[];
   kind:"scale"|"table"; layers:ReadLayer[]; used:Set<TextLine>; flagged:number[]; bounds:number[];
@@ -39,6 +41,7 @@ export interface PageLog extends LogHeader {
 }
 // `core`: the rock core logs of the borehole, by their pages: runs and the rock described, kept for the review.
 export interface ReadLog extends LogHeader {
+  rangeLabels?:boolean;
   kind:"scale"|"table"; pages:number[]; layers:ReadLayer[]; flagged:number[]; samples?:boolean; spt?:SptTest[];
   core?:CoreSheet&{pages:number[]};
 }
@@ -1115,6 +1118,14 @@ export function rebuildTable(els:TextLine[],width:number):PageLog{
   type Candidate={score:number;chain:Row[];f:TextLine;t:TextLine;read:ReturnType<typeof describeRows>};
   let best:Candidate|null=null,error="no rows of depths under the From and To headings";
   for(const [f,t] of headingPairs(els,width)){
+    // A compiled stratigraphy from neighbouring wells can have the same TOP/BOTTOM columns.
+    // Its caption belongs to this table; another measured log on the page can still be read.
+    const caption=els.filter(l=>l.cy<f.cy&&f.cy-l.cy<8*(f.y1-f.y0)&&/^table\s+[\w.]+\s*[:.]/i.test(l.text.trim()))
+      .sort((a,b)=>b.cy-a.cy)[0];
+    if(caption&&/\b(?:local|neighbou?ring|nearby|regional)\b.*\bstratigraphy\b|\b(?:expected|pre[- ]drill(?:ing)?|predicted)\b/i.test(caption.text)){
+      error="a reference or predicted stratigraphy table";
+      continue;
+    }
     const half=(t.cx-f.cx)/2,top=Math.max(f.y1,t.y1);
     const stop=Math.min(Infinity,...els.filter(e=>e.cy>top&&e.x0<=f.x0&&e.x1>=t.x1).map(e=>e.cy));
     const below=(e:TextLine)=>e.cy>top&&e.cy<stop;
@@ -1192,7 +1203,7 @@ export function readPage(els:TextLine[],width:number,height:number,rules:Rule[]=
       !part.some(e=>/^(?:lithologische beschrijving\b|boring$|proefnummer\s*:)/i.test(e.text.trim()))){
       return {kind:"table",layers:[],used:new Set<TextLine>(),flagged:[],bounds:[],texts:[],error:"a stratigraphic interpretation",evidence:false};
     }
-    const log=headingPairs(part,width).length?rebuildTable(part,width):rebuild(part,width,height,rules,continuing&&k===0);
+    const log=graphicRangeLog(part)??(headingPairs(part,width).length?rebuildTable(part,width):rebuild(part,width,height,rules,continuing&&k===0));
     return hasFeetDepth(part)?{...log,depthInFeet:true}:log;
   });
 }
@@ -1233,7 +1244,8 @@ function joinLayers(pages:Array<PageLog&{page:number}>,head:LogHeader,at:number[
   }
   if(pages.length===1&&first.samples?.length)return {...head,kind:"scale",pages:at,layers:first.layers,flagged:first.flagged,samples:true};
   if(pages.length===1||pages.every(p=>p.kind==="table"))
-    return {...head,kind:first.kind,pages:at,layers:pages.flatMap(p=>p.layers).sort((a,b)=>a.from-b.from),flagged:pages.flatMap(p=>p.flagged)};
+    return {...head,kind:first.kind,...(pages.every(p=>p.rangeLabels)?{rangeLabels:true}:{}),pages:at,
+      layers:pages.flatMap(p=>p.layers).sort((a,b)=>a.from-b.from),flagged:pages.flatMap(p=>p.flagged)};
   const bounds:number[]=[];
   for(const p of pages)for(const b of p.bounds)if(!bounds.some(v=>Math.abs(v-b)<0.03))bounds.push(b);
   bounds.sort((a,b)=>a-b);
