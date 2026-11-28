@@ -531,6 +531,17 @@ describe("the review's draft, its checks and the Input data tables",()=>{
     expect(checkDraft(holes).filter(c=>/position|named/.test(c.text))).toEqual([]);
     expect(holes[0].layers.map(l=>l.from)).toEqual(["0","1.8","2.5"]);
   });
+  it("flags unlogged depth below the last interval and preserves the drilled depth and measured endpoints",()=>{
+    const partial=hole("BH-A",[["0","4"]],{final:"12.5"});
+    const checks=()=>checkDraft([partial]).filter(c=>c.field==="final");
+    expect(checks()).toEqual([{hole:0,field:"final",level:"warn",text:"No layer was read from 4 to 12.5 m. Check for a continuation sheet or confirm that this section was unlogged."}]);
+    expect(partial.values.final).toBe("12.5");
+    expect(partial.layers.map(l=>l.to)).toEqual(["4"]);
+    partial.layers.push({...partial.layers[0],from:"4",to:"12.5"});
+    expect(checks()).toEqual([]);
+    partial.values.final="";
+    expect(checks()).toEqual([]);
+  });
   it("turns the boreholes in use into Input data tables that build",()=>{
     const holes=[...drafts(),hole("BH-8",[["0","2,5"],["2,5","6"]],{water:"1,2"})];
     holes[0].values.x="100";holes[0].values.y="250";

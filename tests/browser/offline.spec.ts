@@ -16,6 +16,9 @@ test("standalone HTML can import, build and export a complete workspace without 
   const errors:string[]=[];
   page.on("pageerror",error=>errors.push(error.message));
   await page.goto(`${APP_ORIGIN}/standalone-test.html?backend=webgl#input`);
+  await expect(page.locator(".ws-start")).toBeVisible();
+  await expect(page.locator('[data-start="pdf"]')).toHaveCount(0);
+  await expect(page.locator("input.file")).not.toHaveAttribute("accept", /\.pdf\b/);
   await importFixture(page);
   await rename(page,"Offline review");
   await build(page);

@@ -47,8 +47,8 @@ const fmtArea=(v:number)=>v>=1e4?fmt(v/1e4,2)+" ha":fmt(v)+" m²";
 const compactQuery=matchMedia(COMPACT),sideQuery=matchMedia(COMPACT_SIDE),touchQuery=matchMedia("(pointer: coarse)");
 const compact=()=>compactQuery.matches;
 const calm=matchMedia("(prefers-reduced-motion: reduce)");
-// Borehole logs are read from PDFs in the hosted app; the offline file (opened from disk) leaves the reader out.
-const pdfReading=location.protocol!=="file:";
+// The standalone HTML omits document-reader assets, including when served over HTTP.
+const pdfReading=location.protocol!=="file:"&&!document.querySelector('meta[name="geomodel3d-standalone"]');
 // Documents to read: PDFs, and images of logs (scans, photographs).
 const isDocument=(f:File)=>/\.(pdf|png|jpe?g|webp)$/i.test(f.name)||/^(application\/pdf|image\/(png|jpeg|webp))$/.test(f.type);
 const DOCUMENTS=".pdf,.png,.jpg,.jpeg,.webp";
