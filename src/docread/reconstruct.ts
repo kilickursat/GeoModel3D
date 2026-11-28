@@ -1,5 +1,6 @@
 import {DMS,SOIL_CODE,SOIL_NAME} from "./nativeLogFields";
 import {Rule,isVertical,xAt,yAt} from "./ruling";
+import {recoverMetricStrips} from "./metricContinuation";
 import {graphicRangeLog} from "./graphicLog";
 // Borehole logs from the text of a page: lines of text with their boxes, from a PDF's own text layer or from OCR of a
 // page image, become logs (header values and layers) with no template for any layout. Drawn logs are read by their
@@ -33,6 +34,7 @@ export interface LogHeader {
 // more. `src`: the lines it was read from.
 export interface SptTest { depth:number; blows:number; penetration?:number; src:TextLine[] }
 export interface PageLog extends LogHeader {
+  printedBeds?:boolean; // Continuation rows verified against the first sheet’s metric columns.
   rangeLabels?:boolean;
   depthInFeet?:boolean;
   spt?:SptTest[];
@@ -1243,7 +1245,7 @@ function joinLayers(pages:Array<PageLog&{page:number}>,head:LogHeader,at:number[
     return {...head,kind:"scale",pages:at,layers:read.layers,flagged:read.flagged,samples:true};
   }
   if(pages.length===1&&first.samples?.length)return {...head,kind:"scale",pages:at,layers:first.layers,flagged:first.flagged,samples:true};
-  if(pages.length===1||pages.every(p=>p.kind==="table"))
+  if(pages.length===1||pages.every(p=>p.kind==="table")||pages.slice(1).every(p=>p.printedBeds))
     return {...head,kind:first.kind,...(pages.every(p=>p.rangeLabels)?{rangeLabels:true}:{}),pages:at,
       layers:pages.flatMap(p=>p.layers).sort((a,b)=>a.from-b.from),flagged:pages.flatMap(p=>p.flagged)};
   const bounds:number[]=[];
@@ -1329,6 +1331,7 @@ export function upright(p:PageLines):PageLines{
 export function readDocument(pages:PageLines[]){
   const turned=pages.map(p=>upright({...p,lines:p.lines.map(l=>({...l,page:p.page}))}));
   const read=turned.map(p=>readPage(p.lines,p.width,p.height,p.rules).map(log=>({...log,page:p.page})));
+  recoverMetricStrips(turned,read);
   // A sheet with a depth scale but no title or headings, after a sheet with a log, may be that log's next sheet: read
   // as one, it is kept where its scale carries on below the log before it.
   for(let i=1;i<turned.length;i++){
