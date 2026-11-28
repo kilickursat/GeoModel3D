@@ -41,6 +41,9 @@ export interface BoreholeContacts { depth:Array<number|null>; eroded:Array<numbe
 
 const fmt=(v:number)=>String(Math.round(v*100)/100);
 
+// Positions that round to the same millimetre share a collar in the model and its validation.
+export function collarKey(p:XY){return Math.round(p.x*1000)+","+Math.round(p.y*1000)}
+
 // Reads one log as a layer-cake: depth[k] is the depth of horizon k where the log shows it, `deepest` the last
 // unit the hole entered (its base is not seen), `eoh` the final depth. Units skipped by the log have zero
 // thickness, unless the unit above the contact is erosive: then the skipped units were eroded, and eroded[k] is
@@ -283,30 +286,33 @@ export function buildGeologicalModel(project:GeoProject,options:{probe?:XY;trian
   // The logs: the boreholes', then, where the project builds the model with them, the CPTs' layers that have units.
   const layered=project.cptLayers?modelCptLogs(project,warnings):[];
   const declared=new Set(project.units.map(u=>u.id)),used=new Set<string>(),unknown=new Set<string>();
-  for(const b of [...project.boreholes,...layered])for(const i of b.intervals)(declared.has(i.unit)?used:unknown).add(i.unit);
-  if(unknown.size)warnings.push(`Intervals in units missing from the unit list were ignored: ${[...unknown].join(", ")}`);
-  const units=project.units.filter(u=>used.has(u.id));
-  // Units only the CPT layers have are not modelled while the model is built from the boreholes alone.
-  const inLayers=new Set((project.cpts??[]).flatMap(c=>(c.layers??[]).map(l=>l.unit)));
-  const unobserved=project.units.filter(u=>!used.has(u.id)&&(project.cptLayers||!inLayers.has(u.id)));
-  if(unobserved.length)warnings.push(`Units with no logged intervals are not modelled: ${unobserved.map(u=>u.name).join(", ")}`);
-  const K=units.length;
-
-  const boreholes:Borehole[]=[],nodes:XY[]=[],contacts:BoreholeContacts[]=[];
+  const boreholes:Borehole[]=[],nodes:XY[]=[];
   const positions=new Map<string,string>();
   let fromBoreholes=0;
   for(const b of [...project.boreholes,...layered]){
     const cpt=layered.includes(b),what=cpt?"CPT":"borehole";
+    for(const i of b.intervals)if(!declared.has(i.unit))unknown.add(i.unit);
     if(![b.x,b.y,b.z].every(Number.isFinite)){warnings.push(`${b.id}: ${cpt?"position or start level":"collar position or elevation"} missing; ${what} not used`);continue}
-    const c=boreholeContacts(b,units);
-    if(c.deepest<0){warnings.push(`${b.id}: no ${cpt?"layers":"intervals"} in the modelled units; ${what} not used`);continue}
-    const key=Math.round(b.x*1000)+","+Math.round(b.y*1000);
+    if(!b.intervals.some(i=>declared.has(i.unit))){warnings.push(`${b.id}: no ${cpt?"layers":"intervals"} in the modelled units; ${what} not used`);continue}
+    const key=collarKey(b);
     if(positions.has(key)){warnings.push(`${b.id}: same ${cpt?"position":"collar position"} as ${positions.get(key)}; ${what} not used${cpt?" in the model":""}`);continue}
     positions.set(key,b.id);
-    for(const n of c.notes)warnings.push(`${b.id}: ${n}`);
-    boreholes.push(b);nodes.push({x:b.x,y:b.y});contacts.push(c);
+    for(const i of b.intervals)if(declared.has(i.unit))used.add(i.unit);
+    boreholes.push(b);nodes.push({x:b.x,y:b.y});
     if(!cpt)fromBoreholes++;
   }
+  if(unknown.size)warnings.push(`Intervals in units missing from the unit list were ignored: ${[...unknown].join(", ")}`);
+  // Pick horizons after admitting logs: a rejected hole cannot introduce a layer beneath the others.
+  const units=project.units.filter(u=>used.has(u.id));
+  const inLayers=new Set((project.cpts??[]).flatMap(c=>(c.layers??[]).map(l=>l.unit)));
+  const unobserved=project.units.filter(u=>!used.has(u.id)&&(project.cptLayers||!inLayers.has(u.id)));
+  if(unobserved.length)warnings.push(`Units with no logged intervals at modelled positions are not modelled: ${unobserved.map(u=>u.name).join(", ")}`);
+  const K=units.length;
+  const contacts=boreholes.map(b=>{
+    const c=boreholeContacts(b,units);
+    for(const n of c.notes)warnings.push(`${b.id}: ${n}`);
+    return c;
+  });
   // The model covers the outline of the logs, or extends beyond it on a frame of nodes. Logs that enclose no area are
   // given an extent, so that one or two boreholes still make a model.
   const NB=nodes.length;

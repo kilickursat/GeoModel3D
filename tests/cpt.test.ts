@@ -1,5 +1,5 @@
 import {describe,it,expect} from "vitest";
-import {readGef,isGef,readBroCpt,isBroCpt,readDovCpt,isDovCpt,frictionRatio,cptAt,cptAverages,thinned,cptScale,pressureKpa} from "../src/cpt";
+import {readGef,isGef,readBroCpt,isBroCpt,readDovCpt,isDovCpt,frictionRatio,cptAt,cptAverages,thinned,cptScale,cptPlotScale,pressureKpa} from "../src/cpt";
 import {importFiles,toProjectJson,toCptCsv,isCptTable} from "../src/io";
 import {buildGeologicalModel} from "../src/model";
 import {computeSection} from "../src/section";
@@ -115,6 +115,15 @@ describe("reading CPT files",()=>{
     expect(cpt).toMatchObject({id:"GEO-15/133-S54",x:151000,y:212000,z:5.71,date:"2015-12-01",depth:[0.99,1.01],qc:[2.5,3],fs:[25,30],u2:[12,13]});
     expect(crs).toBe("EPSG:31370");
     expect(notes.join(" ")).toMatch(/metres TAW.*does not say where/);
+  });
+
+  it("draws dense CPT logs and scales the whole site using its largest finite reading",()=>{
+    const depth=Array.from({length:200_000},(_,i)=>i/10_000);
+    const c:Cpt={id:"dense",x:0,y:0,z:20,depth,qc:depth.map(()=>4)};
+    c.qc[1]=NaN;
+    c.qc[c.qc.length-1]=38;
+    expect(cptLogSvg(c,{width:220,height:240})).toContain("qc 0–40 MPa");
+    expect(cptPlotScale([c,{...c,qc:[Infinity,52]}])).toBe(60);
   });
 
   it("gives the friction ratio, readings at a depth, averages over depth and the readings to draw",()=>{

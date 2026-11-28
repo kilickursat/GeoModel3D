@@ -7,7 +7,7 @@ import {sectionSvg,sectionTitle} from "./sectionSvg";
 import {chainageTable,outsideStretches,unitLabel,lineCrossings} from "./alignment";
 import {projectCrs} from "./crs";
 import {boreholeDepth,sptN,cptDepth} from "./schema";
-import {frictionRatio,cptScale} from "./cpt";
+import {frictionRatio,cptPlotScale} from "./cpt";
 import {cptLogSvg} from "./cptSvg";
 import {cptBehaviour,SBT_ZONES} from "./sbt";
 import {SectionField,unitWeights,unitOfReading} from "./fields";
@@ -213,7 +213,7 @@ function cptPage(model:GeoModel,section:Section,buffer:number,foot:(part:string)
   let logs="";
   if(shown.length){
     const top=Math.max(...shown.map(({c})=>c.z)),bottom=Math.min(...shown.map(({c})=>c.z-cptDepth(c))),pad=Math.max(0.3,(top-bottom)*0.02);
-    const qcMax=cptScale(Math.max(...shown.flatMap(({c})=>c.qc.filter(Number.isFinite)),1));
+    const qcMax=cptPlotScale(shown.map(({c})=>c));
     logs=`<div class="cpt-logs">${shown.map(({p,c})=>{
       const z=sampleModel(model,c.x,c.y),units=z?model.units.map((u,k)=>({top:z[k],bottom:z[k+1],color:u.color,name:u.name})).filter(b=>b.top-b.bottom>1e-6):[];
       const behaviour=cptBehaviour(model.project,c),unavailable=behaviour.notes.find(n=>n.startsWith("No eligible groundwater"));

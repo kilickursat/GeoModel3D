@@ -178,3 +178,15 @@ test("continue saved case flushes a pending current draft instead of reopening s
   await resume(page);
   expect((await downloadJson(page)).draft.tables.project.name).toBe("Most recent typing");
 });
+
+test("adding a private alignment to a mapped site requires a fresh map choice",async({page})=>{
+  await page.getByRole("tab",{name:"3-D model",exact:true}).click();
+  const map=page.locator('[data-view="map"]');
+  await expect(map).toBeChecked();
+  await page.locator(".file").setInputFiles({
+    name:"private-centreline.csv",mimeType:"text/csv",
+    buffer:Buffer.from("point,x,y,chainage\nP1,0,0,0\nP2,25,0,25")
+  });
+  await expect(page.locator(".dataset option:checked")).toContainText("Your data");
+  await expect(map).not.toBeChecked();
+});

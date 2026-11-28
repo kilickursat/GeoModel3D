@@ -5,15 +5,10 @@
 // anywhere else. Scripts in a PDF never run: PDF.js 6 has no eval path, and its scripting is not used.
 import * as pdfjs from "pdfjs-dist";
 import workerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
-import {linesFromItems,textChars,judgeText,PdfTextItem,TextLayer} from "./textlines";
-import {logEvidence,type TextLine} from "./reconstruct";
-import {pdfRules,type Rule,type Ops} from "./ruling";
+import {extractPageText,READ_SCALE} from "./pdfpage";
+export {READ_SCALE,type PageText} from "./pdfpage";
 
 pdfjs.GlobalWorkerOptions.workerSrc=workerUrl;
-// Pages are read at 150 dpi, as page images are for the reading model, so both reach the reconstruction at one scale.
-export const READ_SCALE=150/72;
-// A page with fewer characters than this in its text layer is taken for a scanned image.
-const MIN_CHARS=30;
 // The largest canvas drawn: about 16 million pixels, which every browser (Safari on iPhone included) draws.
 const MAX_PIXELS=16e6;
 // Images are read with their long side at most this long: an A4 page at about 200 dpi.
@@ -70,24 +65,8 @@ export async function openPdf(name:string,data:Uint8Array):Promise<Doc&{doc:pdfj
   };
 }
 
-// `layer` says whether the page's own text can be used (see judgeText); `share` is how much of it reads as words.
-// `rules`: the ruled lines of a page that looks like a log (ruling.ts), from the PDF's drawing or from its image.
-export interface PageText { page:number; width:number; height:number; lines:TextLine[]; scanned:boolean; layer?:TextLayer; share?:number; rules?:Rule[] }
-export async function pageText(d:Doc&{doc:pdfjs.PDFDocumentProxy},n:number):Promise<PageText>{
-  const page=await d.doc.getPage(n),view=page.getViewport({scale:READ_SCALE});
-  // Marked-content items have no text; linesFromItems passes over them.
-  const items=(await page.getTextContent()).items as unknown as PdfTextItem[];
-  const judged=judgeText(items.map(i=>i.str??""),textChars(items),MIN_CHARS);
-  let lines=linesFromItems(items,view.transform),rules:Rule[]|undefined;
-  // The drawing is read only on a page that looks like a log: its ruled lines part the columns.
-  if(judged.layer!=="none"&&logEvidence(lines)){
-    const ops=await page.getOperatorList();
-    rules=pdfRules(ops.fnArray,ops.argsArray,pdfjs.OPS as unknown as Ops,view.transform);
-    if(rules.length)lines=linesFromItems(items,view.transform,rules);
-  }
-  const text={page:n,width:view.width,height:view.height,lines,scanned:judged.layer==="none",layer:judged.layer,share:judged.share,...(rules?.length?{rules}:{})};
-  page.cleanup();
-  return text;
+export async function pageText(d:Doc&{doc:pdfjs.PDFDocumentProxy},n:number){
+  return extractPageText(await d.doc.getPage(n),pdfjs.OPS);
 }
 
 // An image as a document of one page, read at its own size or with its long side at MAX_IMAGE px.

@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- The report reader checks Japanese water-level columns against measurement dates and uses the logged soil-name column for material grouping. Missing or conflicting soil names are left for review. Scans with invisible text over an image go through local OCR, and ruled boundaries are extracted before the page pixels move to the OCR worker.
+- The reader recognizes split SPT blow-count headings and explicit penetration units. It identifies logs with recognized depth headings in feet for manual conversion before import.
+- Project JSON imports preserve missing coordinates and readings. Only logs admitted to the model contribute units to its horizons. Cross-validation withholds all logs at the tested collar.
+- Importing an alignment or CPTs into an open mapped site clears its map selection before requesting tiles for the new data. Dense CPT collections can be drawn in the 3-D view, sections and reports. CPT-only sites use their collar elevations for the flat basemap.
+
 ## 0.31.1 — 2026-11-26
 
 ### Fixed

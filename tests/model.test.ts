@@ -146,11 +146,30 @@ describe("model warnings",()=>{
     expect(m.warnings).toEqual(expect.arrayContaining([expect.stringMatching(/^P4: collar/),expect.stringMatching(/^P5: same collar position as P2/)]));
   });
 
+  it("keeps units recorded only in rejected logs out of the model and its volumes",()=>{
+    const boreholes=[
+      {id:"P1",x:0,y:0,z:10,intervals:log},{id:"P2",x:50,y:0,z:11,intervals:log},
+      {id:"P3",x:0,y:50,z:14,intervals:log}
+    ];
+    const reference=buildGeologicalModel(project(boreholes));
+    const rejected=[{from:0,to:20,unit:"Z"}];
+    for(const bad of [
+      {id:"unplaced",x:NaN,y:5,z:10,intervals:rejected},
+      {id:"duplicate",x:50,y:0,z:11,intervals:rejected}
+    ]){
+      const m=buildGeologicalModel(project([...boreholes,bad]));
+      expect(m.units).toEqual(reference.units);
+      expect(m.horizons).toEqual(reference.horizons);
+      expect(unitCubicMetres(m,1)).toBe(unitCubicMetres(reference,1));
+      expect(m.warnings.some(w=>w.startsWith(bad.id+":"))).toBe(true);
+    }
+  });
+
   it("reports units that are undeclared or never logged",()=>{
     const m=buildGeologicalModel(project([{id:"P1",x:0,y:0,z:10,intervals:[...log,{from:9,to:12,unit:"Q"}]}]));
     expect(m.units.map(u=>u.id)).toEqual(["A","B"]);
     expect(m.warnings.join("\n")).toMatch(/missing from the unit list were ignored: Q/);
-    expect(m.warnings.join("\n")).toMatch(/no logged intervals are not modelled: Z/);
+    expect(m.warnings.join("\n")).toMatch(/no logged intervals at modelled positions are not modelled: Z/);
   });
 
   it("extends boreholes on one line to either side, and says so",()=>{

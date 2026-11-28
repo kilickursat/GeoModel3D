@@ -9,8 +9,9 @@ import {Rule,isVertical,xAt,yAt} from "./ruling";
 // the evidence show the line there.
 export interface TextLine { text:string; x0:number; y0:number; x1:number; y1:number; cx:number; cy:number; page?:number; shown?:{x0:number;y0:number;x1:number;y1:number} }
 // A flagged layer says why its base depth needs checking. `gap`: the untested interval its base lies in, where the
-// log describes samples (see sampleLayers).
-export interface ReadLayer { from:number; to:number; description:string; flagged?:boolean; why?:string; gap?:[number,number]; src:TextLine[] }
+// log describes samples (see sampleLayers). On forms with a soil-name column, soilName is its unambiguous
+// label, or an empty string where only remarks or conflicting names were found.
+export interface ReadLayer { from:number; to:number; description:string; soilName?:string; flagged?:boolean; why?:string; gap?:[number,number]; src:TextLine[] }
 export type HeaderField="id"|"ground"|"final"|"water"|"x"|"y"|"lat"|"lon";
 // `src` keeps the line each header value was read from.
 export interface LogHeader {
@@ -30,9 +31,10 @@ export interface LogHeader {
 // more. `src`: the lines it was read from.
 export interface SptTest { depth:number; blows:number; penetration?:number; src:TextLine[] }
 export interface PageLog extends LogHeader {
+  depthInFeet?:boolean;
   spt?:SptTest[];
   kind:"scale"|"table"; layers:ReadLayer[]; used:Set<TextLine>; flagged:number[]; bounds:number[];
-  texts:Array<{depth:number;text:string;src:TextLine}>; error?:string; evidence?:boolean; samples?:Sample[];
+  texts:Array<{depth:number;text:string;src:TextLine;isSoilName?:boolean}>; error?:string; evidence?:boolean; samples?:Sample[];
   closing?:{description:string;src:TextLine[]}; top?:number; core?:CoreSheet;
 }
 // `core`: the rock core logs of the borehole, by their pages: runs and the rock described, kept for the review.
@@ -269,6 +271,10 @@ export function header(lines:TextLine[]):LogHeader&{mark?:number}{
     const v=els.filter(e=>e.cy>wcol.cy+0.4*h&&e.cy-wcol.cy<6*h&&Math.abs(e.cx-wcol.cx)<Math.max((wcol.x1-wcol.x0)/2,2*h)&&isDec(e.text)).sort((p,q)=>p.cy-q.cy)[0];
     if(v)reading={text:v.text,src:v};
   }
+  // A Japanese log also has a graphical water column. A separate bare number beside its
+  // heading can be the first penetration test. A separate header value must give its datum or unit.
+  const jpWater=match(/^(?:孔内水位|地下水位)[ \t]*(?:\(m\)[ \t]*)?[:=]?[ \t]*([+−-]?\d+(?:[.,]\d+)?)[ \t]*m?[ \t]*$/im)??
+    fieldAt(els,/^(?:孔内水位|地下水位)/,t=>/^(?:GL\s*[-−]\s*\d+(?:[.,]\d+)?\s*m?|[+-]?\d+(?:[.,]\d+)?\s*m)$/i.test(t.trim()));
   const gwl=match(/GWL\s*([\d.,]+)/i);
   const head:LogHeader&{mark?:number}={
     // "BOREHOLE LOG" is a title, not the label of a name; and a sheet's number ("Sheet 1 of 2") beside the label is no name.
@@ -286,7 +292,7 @@ export function header(lines:TextLine[]):LogHeader&{mark?:number}{
       fieldAt(els,/^総掘進長|^総削孔長|^掘進長|^掘削深度|^掘さく深度/,t=>isNum(t.replace(/^GL\s*[-−]\s*/i,""))),firstNum),
     // A table of readings first, then a labelled value, then the water mark on the log.
     // A remark under a heading that names the water level ("0.6m: sample disturbed" in a comments column) is none.
-    water:take("water",reading??fieldAt(els,/^(?:groundwater|ground water|grondwater(?:stand)?|nappe|grundwasser|water level|w\.\s*l\.|gwl|gwt|g\.\s*w\.\s*t\.|swl|swt|static water(?: level| table)?)(?![a-z])|water op|^孔内水位|^地下水位/i,t=>isDec(t)&&!REMARK.test(t))??gwl,firstNum),
+    water:take("water",reading??fieldAt(els,/^(?:groundwater|ground water|grondwater(?:stand)?|nappe|grundwasser|water level|w\.\s*l\.|gwl|gwt|g\.\s*w\.\s*t\.|swl|swt|static water(?: level| table)?)(?![a-z])|water op/i,t=>isDec(t)&&!REMARK.test(t))??jpWater??gwl,firstNum),
     // "×" is a common reading of "X".
     // A unit in brackets may follow ("X (mLambert): 151269.0").
     x:take("x",match(/(?:^|[^A-Za-z])[X×]\s*(?:\([^)\n]{0,16}\))?\s*[=:]?\s*(-?[\d.,]{4,})/m),firstNum),y:take("y",match(/(?:^|[^A-Za-z])Y\s*(?:\([^)\n]{0,16}\))?\s*[=:]?\s*(-?[\d.,]{4,})/m),firstNum)};
@@ -719,16 +725,19 @@ function testsByDepths(els:TextLine[],depths:TextLine[],width:number):SptTest[]{
 // Tests in a column of blow counts under its heading ("Blow Count (blows/ft)", "SPT N", "N-value"), each at the depth
 // the scale gives its place: "12" is a complete test; "50/5\"" 50 blows over 5 inches (or cm, on a metric log); "50+"
 // stopped short, its penetration not given; "3/18\"" 3 blows over 18 inches, sunk under the rods' weight.
-function testsByColumn(els:TextLine[],scale:DepthScale,feet:boolean):SptTest[]{
-  const head=els.find(e=>/^(?:blow\s*count|blows(?:\s*\/\s*(?:ft|foot|0\.3\s*m))?|spt(?:\s*n)?|n[- ]?value)\b/i.test(e.text.trim())&&e.text.trim().length<=30);
+function testsByColumn(els:TextLine[],scale:DepthScale):SptTest[]{
+  const heading=/^(?:blow$|\(\s*blows?\s*\/\s*(?:ft|foot|0\.3\s*m)\s*\)$|(?:blow\s*count|blows|spt(?:\s*n)?|n[- ]?value)\b)/i;
+  const head=els.find(e=>heading.test(e.text.trim())&&e.text.trim().length<=30);
   if(!head)return [];
   const w=Math.max(head.x1-head.x0,head.y1-head.y0),cx=head.cx;
-  const VALUE=/^(\d{1,3})(?:\s*(\+)|\s*\/\s*(\d{1,2}(?:\.\d)?)\s*(?:"|”|''|in\.?|cm)?)?$/;
+  const feet=els.some(e=>Math.abs(e.cx-cx)<0.8*w&&/\bblows?\s*\/\s*(?:ft|foot)\b/i.test(e.text));
+  const VALUE=/^(\d{1,3})(?:\s*(\+)|\s*\/\s*(\d{1,2}(?:\.\d)?)\s*("|”|''|in\.?|cm)?)?$/i;
   const out:SptTest[]=[];
   for(const e of els.filter(e=>e.cy>head.y1&&Math.abs(e.cx-cx)<0.8*w&&VALUE.test(e.text.trim())).sort((p,q)=>p.cy-q.cy)){
     const m=VALUE.exec(e.text.trim())!,d=scale.depthAt(e.cy);
     if(d<0)continue;
-    const full=feet?30.48:30,pen=m[3]!==undefined?+m[3]*(feet?2.54:1):m[2]?undefined:full;
+    const inches=m[4]?m[4].toLowerCase()!=="cm":feet;
+    const full=feet?30.48:30,pen=m[3]!==undefined?+m[3]*(inches?2.54:1):m[2]?undefined:full;
     out.push({depth:+d.toFixed(2),blows:+m[1],...(pen!==undefined?{penetration:+pen.toFixed(1)}:{}),src:[e]});
   }
   return out.length>=2?out:[];
@@ -774,10 +783,15 @@ function testsByNValue(els:TextLine[],scale:DepthScale):SptTest[]{
 }
 function waterColumn(els:TextLine[],scale:DepthScale){
   const heads=[...els.filter(e=>/孔内水位|地下水位/.test(e.text.replace(/\s/g,""))).map(e=>({x0:e.x0,x1:e.x1,y1:e.y1})),...stacked(els).filter(w=>/孔内水位|地下水位|水位/.test(w.text))];
+  const dates=els.filter(e=>/^(?:0?[1-9]|1[0-2])\s*(?:\/\s*(?:0?[1-9]|[12]\d|3[01])|月\s*(?:0?[1-9]|[12]\d|3[01])日)$/.test(e.text.trim()));
   for(const hd of heads){
-    const pad=Math.max(hd.x1-hd.x0,12);
-    const v=els.filter(e=>e.cy>hd.y1&&e.cx>hd.x0-pad&&e.cx<hd.x1+pad&&/^\d{1,2}[.,]\d{1,2}$/.test(e.text.trim())&&Math.abs(scale.depthAt(e.cy)-num(e.text))<0.6).sort((p,q)=>p.cy-q.cy)[0];
-    if(v)return v;
+    // The JACIC form prints the measuring date and its depth together in the water column.
+    // SPT start and end depths in the next column agree just as well with the depth scale.
+    const inColumn=(e:TextLine)=>e.cy>hd.y1&&e.x1>hd.x0&&e.x0<hd.x1;
+    const columnDates=dates.filter(inColumn);
+    const readings=els.filter(e=>inColumn(e)&&/^\d{1,2}[.,]\d{1,2}$/.test(e.text.trim())&&Math.abs(scale.depthAt(e.cy)-num(e.text))<0.6&&
+      columnDates.some(d=>Math.abs(d.cy-e.cy)<=2*Math.max(d.y1-d.y0,e.y1-e.y0)&&d.x0<=e.cx&&e.cx<=d.x1));
+    if(readings.length)return readings.sort((p,q)=>p.cy-q.cy)[0];
   }
   return undefined;
 }
@@ -986,7 +1000,13 @@ export function rebuild(els:TextLine[],width:number,height=Infinity,rules:Rule[]
     if(!l)continue;
     nameAt.set(l,[...(nameAt.get(l)??[]),n.text]);n.src.forEach(e=>used.add(e));l.src.push(...n.src);
   }
-  for(const [l,ns] of nameAt)l.description=[ns.join(""),l.description].filter(Boolean).join(" ");
+  // An empty name on a Japanese form is meaningful: only remarks were read in this band.
+  const hasSoilColumn=names.length>0||heads.some(e=>/土質|記事/.test(e.text.replace(/\s/g,"")));
+  if(hasSoilColumn)for(const l of layers){
+    const ns=nameAt.get(l)??[];
+    l.soilName=ns.length===1?ns[0]:"";
+    l.description=[ns.join(""),l.description].filter(Boolean).join(" ");
+  }
   for(const v of thinStack(layers)){flagged.push(v);why.set(v,THIN)}
   fixTitles(layers);
   absorbRest(layers);
@@ -1015,11 +1035,10 @@ export function rebuild(els:TextLine[],width:number,height=Infinity,rules:Rule[]
     if(w){head.water=num(w.text);head.src={...head.src,water:w}}
   }
   // The penetration tests: from their column of depths, or from a column of blow counts under its heading.
-  const feet=els.some(e=>/\(\s*(?:feet|ft)\s*\)|blows\s*\/\s*ft/i.test(e.text));
-  const byColumn=tcol?testsByDepths(els,tcol.els.filter(agree),width):testsByColumn(els,scale,feet);
+  const byColumn=tcol?testsByDepths(els,tcol.els.filter(agree),width):testsByColumn(els,scale);
   const spt=byColumn.length?byColumn:testsByNValue(els,scale);
   // Names first, so that a layer joined over several sheets keeps its name before its remarks.
-  const texts=[...named.map(n=>({depth:scale.depthAt(n.src[0].cy),text:n.text,src:n.src[0]})),
+  const texts=[...named.map(n=>({depth:scale.depthAt(n.src[0].cy),text:n.text,src:n.src[0],isSoilName:true})),
     ...lines.map(e=>({depth:depthOf(e),text:clean(kanji(e.text),latin),src:e})).filter(t=>t.text)];
   return {...head,kind:"scale",layers,used,flagged,texts,bounds,evidence,...extra,...(spt.length?{spt}:{})};
 }
@@ -1118,6 +1137,21 @@ export function rebuildTable(els:TextLine[],width:number):PageLog{
 // A page may hold several logs, one below the other, each under its own title ("BORE / DRILL LOG"): each part is read on
 // its own. A part set out as a table is read as one; any other by its depth scale.
 const LOG_TITLE=/(?:bore|drill|boring|bore\s*hole)\s*[/&]?\s*(?:drill\s*)?log(?![a-z])|(?:log|record) of (?:bore ?hole|boring|test ?pit|drill ?hole)|^bor(?:ing|ehole) ?log|柱状図/i;
+export const FEET_DEPTH_REASON="this borehole gives depths in feet. Convert its depths and levels to metres before entering it in Input data";
+
+// An SPT drive may be reported in blows/ft on a metric log. Look specifically for units attached to a depth heading.
+function hasFeetDepth(lines:TextLine[]){
+  const heading=/^(?:(?:depths?|depth below (?:ground|land) surface|from|to|depth from|depth to)\s*[,:(\[]?\s*(?:in\s+)?(?:ft\.?|feet|foot)\b|(?:all\s+)?depths\s+(?:are\s+)?in\s+feet\b)/i;
+  if(lines.some(l=>heading.test(l.text.trim())))return true;
+  const labels=lines.filter(l=>/^(?:depths?|depth below (?:ground|land) surface|from|to)$/i.test(l.text.trim()));
+  return lines.some(unit=>/^[(\[]?(?:in\s+)?(?:feet|ft\.?|foot)[)\]]?$/i.test(unit.text.trim())&&labels.some(label=>{
+    const h=label.y1-label.y0;
+    const below=unit.cy>=label.cy&&unit.y0-label.y1<=1.5*h&&unit.x0<label.x1&&unit.x1>label.x0;
+    const beside=Math.abs(unit.cy-label.cy)<0.5*h&&unit.x0>=label.x1&&unit.x0-label.x1<h;
+    return below||beside;
+  }));
+}
+
 export function readPage(els:TextLine[],width:number,height:number,rules:Rule[]=[],continuing=false):PageLog[]{
   const starts:number[]=[];
   for(const e of els.filter(e=>LOG_TITLE.test(e.text)).sort((p,q)=>p.cy-q.cy))if(!starts.length||e.cy-starts[starts.length-1]>0.3*height)starts.push(e.cy);
@@ -1132,7 +1166,8 @@ export function readPage(els:TextLine[],width:number,height:number,rules:Rule[]=
   const cuts=starts.length>1?starts.map((y,k)=>k?y-0.02*height:-Infinity):[-Infinity];
   return cuts.map((y0,k)=>{
     const y1=k<cuts.length-1?cuts[k+1]:Infinity,part=els.filter(e=>e.cy>=y0&&e.cy<y1);
-    return headingPairs(part,width).length?rebuildTable(part,width):rebuild(part,width,height,rules,continuing&&k===0);
+    const log=headingPairs(part,width).length?rebuildTable(part,width):rebuild(part,width,height,rules,continuing&&k===0);
+    return hasFeetDepth(part)?{...log,depthInFeet:true}:log;
   });
 }
 
@@ -1180,12 +1215,15 @@ function joinLayers(pages:Array<PageLog&{page:number}>,head:LogHeader,at:number[
   // A sheet repeats the layer it continues from the sheet before ("MUDSTONE (see the rock core
   // log)" again under "(continued)"): the repeat adds nothing to the layer, nor a title to deal (see fixTitles).
   const key=(t:string)=>t.normalize("NFKD").replace(/\p{M}/gu,"").toLowerCase().replace(/\s+/g," ").trim();
+  const hasSoilColumn=pages.some(p=>p.layers.some(l=>l.soilName!==undefined));
   for(const p of pages)for(const t of p.texts){
     const l=layers.find(l=>t.depth>=l.from&&t.depth<l.to);
     if(!l||!t.text.trim())continue;
+    if(t.isSoilName)l.soilName=l.soilName===undefined||l.soilName===t.text?t.text:"";
     if(p!==pages[0]&&key(l.description).includes(key(t.text)))continue;
     l.description=(l.description+" "+t.text).trim();
   }
+  if(hasSoilColumn)for(const l of layers)l.soilName??="";
   const flagged=pages.flatMap(p=>p.flagged),reasons=pages.flatMap(p=>p.layers).filter(l=>l.why),thin=thinStack(layers);
   for(const v of thin)if(!flagged.includes(v))flagged.push(v);
   fixTitles(layers);
@@ -1299,6 +1337,21 @@ export function readDocument(pages:PageLines[]){
     if(before)withCore.set(before.i,[...(withCore.get(before.i)??[]),c]);
   }
   for(const [i,cs] of withCore)logs[i].core=joinCores(cs);
-  const unread=parts.filter(p=>!p.layers.length&&!closed.has(p)&&!cores.includes(p)).map(p=>({page:p.page,id:p.id,error:p.error??"no layers found",log:!!p.evidence}));
-  return {logs:logs.filter(l=>l.layers.length),unread,parts};
+  // Keep all sheets together here. Rejecting just the imperial sheet could turn its unlabeled continuation into a
+  // seemingly valid metric borehole. Other boreholes in the document can still be imported.
+  const feetParts=parts.filter(p=>p.depthInFeet),withheld=new Set(feetParts);
+  const usable=logs.filter((log,i)=>{
+    if(!feetParts.length)return log.layers.length>0;
+    const sheets=[...groups[i].pages,...(withCore.get(i)??[])];
+    const first=Math.min(...sheets.map(p=>p.page)),last=Math.max(...sheets.map(p=>p.page));
+    const start=groups[i].pages[0];
+    const unreadSheet=feetParts.some(p=>!p.layers.length&&p.page>=first-1&&p.page<=last+1&&(
+      p.id&&sameId(p.id)===sameId(log.id)||p.page===first-1&&(!start.id||(!p.id&&start.sheet&&start.sheet[0]>1))));
+    if(!unreadSheet&&!sheets.some(p=>p.depthInFeet))return log.layers.length>0;
+    for(const p of sheets)withheld.add(p);
+    return false;
+  });
+  const unread=parts.filter(p=>withheld.has(p)||(!p.layers.length&&!closed.has(p)&&!cores.includes(p))).map(p=>({
+    page:p.page,id:p.id,error:withheld.has(p)?FEET_DEPTH_REASON:p.error??"no layers found",log:withheld.has(p)||!!p.evidence}));
+  return {logs:usable,unread,parts};
 }

@@ -10,7 +10,7 @@ import {terrainOutside,convexHull,TerrainGrid} from "./terrain";
 import {computeSection,offsetRange,offsetThrough,principalAzimuth,Section,sectionRuns,joined,alongOf} from "./section";
 import {sectionSvg,sectionCsv,sectionFieldCsv,sectionTitle,chainageCsv,cptTraceWidths} from "./sectionSvg";
 import {importFiles,toProjectJson,toBoreholeCsv,toTestsCsv,toCsv,decodeText,assignColors,toAlignmentCsv,toCptCsv} from "./io";
-import {cptAt,thinned,cptScale} from "./cpt";
+import {cptAt,thinned,cptPlotScale} from "./cpt";
 import {cptBehaviour,layerUnits,sbtZone} from "./sbt";
 import {cptLogSvg,CptBand} from "./cptSvg";
 import {alignmentSection,chainages,pointAt,designAt,crossSectionAt,lineCrossings,Crossing} from "./alignment";
@@ -247,7 +247,7 @@ function niceCeil(v:number){const p=10**Math.floor(Math.log10(v));return Math.ce
 function buildCpts(radius:number){
   const cpts=model.cpts;
   if(!cpts.length)return;
-  const qcMax=cptScale(Math.max(...cpts.flatMap(c=>c.qc.filter(Number.isFinite)),1)),k=extent*0.035/qcMax;
+  const qcMax=cptPlotScale(cpts),k=extent*0.035/qcMax;
   const height=Math.max(...cpts.map(c=>cptDepth(c)),1),step=Math.max(0.05,height/800);
   const fill=new THREE.MeshBasicNodeMaterial({color:0x9fb0bd,side:THREE.DoubleSide});
   const edge=new THREE.LineBasicNodeMaterial({color:0x1b2229});
@@ -339,7 +339,7 @@ function buildTerrain(){
   let flat=false,surface:{positions:number[];index:number[]};
   if(t&&at)surface=terrainOutside(t,at,hull,extent*0.25);
   else if(projectCrs(model.project)){
-    const zs=model.boreholes.map(b=>b.z).sort((p,q)=>p-q),z=zs[Math.floor(zs.length/2)];
+    const z=groundLevel();
     const b=modelBounds(model),m=extent*0.25,n=96;
     const grid:TerrainGrid={x0:b.minX-m,y0:b.minY-m,dx:(b.maxX-b.minX+2*m)/n,dy:(b.maxY-b.minY+2*m)/n,ncols:n+1,nrows:n+1,z:[]};
     surface=terrainOutside(grid,()=>z,hull,m);
@@ -1483,9 +1483,11 @@ function renderNotes(){
   box.querySelector("ul")!.innerHTML=currentNotes.map(n=>`<li>${esc(n)}</li>`).join("");
 }
 // keepView rebuilds the same site (new terrain or rules) without moving the camera or resetting the controls.
-function loadProject(p:GeoProject,importWarnings:string[]=[],keepView=false,context:InputModelContext|null=workspaceContext??null){
+function loadProject(p:GeoProject,importWarnings:string[]=[],keepView:boolean|"import"=false,context:InputModelContext|null=workspaceContext??null){
   // Validate/rebuild before changing the displayed project or its scenario identity.
   const nextModel=buildGeologicalModel(p),before={...origin};
+  // A private addition may expand the mapped area. Keep its camera, but require a fresh map choice.
+  if(keepView==="import")view.map=false;
   model=nextModel;project=model.project;workspaceContext=context??undefined;
   if(!sampleProjects.includes(p))imported=project;
   weights=unitWeights(model);
@@ -1556,7 +1558,7 @@ async function importFileList(list:FileList|File[]){
     }
     // Lines or CPTs added to the site shown keep the view, and the first line is shown.
     const added=(!!result.alignments||!!result.cpts)&&result.project.boreholes===project.boreholes;
-    loadProject(result.project,result.warnings,added,null);
+    loadProject(result.project,result.warnings,added?"import":false,null);
     const first=result.alignments?.[0],index=first===undefined?-1:result.project.alignments?.findIndex(a=>a.name===first)??-1;
     if(index>=0&&document.body.dataset.mode!=="input")showLine(index);
   }catch(err){
@@ -1909,7 +1911,11 @@ drawPoints.count=0;
 drawPreview.frustumCulled=drawPoints.frustumCulled=false;
 world.add(drawPreview,drawPoints);
 sizes.observe(drawBar);
-const groundLevel=()=>{const z=model.boreholes.map(b=>b.z).sort((a,b)=>a-b);return z.length?z[Math.floor(z.length/2)]:0};
+function groundLevel(){
+  const logs=model.boreholes.length?model.boreholes:model.cptLogs;
+  const levels=logs.map(b=>b.z).sort((a,b)=>a-b);
+  return levels.length?levels[Math.floor(levels.length/2)]:0;
+}
 const groundAt=(x:number,y:number)=>sampleModel(model,x,y)?.[0]??groundLevel();
 function startDraw(){
   drawing={points:[],holes:[]};

@@ -21,6 +21,13 @@ const scaled=(v:number,f:number)=>f===1||!Number.isFinite(v)?v:Number((v*f).toPr
 export const RF_SCALE=10;
 export function cptScale(max:number){return [5,10,15,20,25,30,40,50,60,80,100,150,200].find(v=>v>=max-1e-9)??Math.ceil(max/50)*50}
 
+// Logs from a full site can have hundreds of thousands of readings in total.
+export function cptPlotScale(cpts:readonly Cpt[]){
+  let max=1;
+  for(const c of cpts)for(const q of c.qc)if(Number.isFinite(q)&&q>max)max=q;
+  return cptScale(max);
+}
+
 // The readings shown as fields and in the read-outs, by their keys in src/properties.ts.
 export const CPT_KEYS=["qc","fs","Rf","u2"] as const;
 export type CptKey=typeof CPT_KEYS[number];

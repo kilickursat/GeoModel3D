@@ -171,6 +171,32 @@ describe("project files",()=>{
     expect(fromCsv.project.boreholes).toEqual(valleyProject.boreholes);
     expect(fromCsv.project.units.map(u=>u.id)).toEqual(valleyProject.units.map(u=>u.id));
   });
+  it("keeps missing JSON collar positions, boundaries and test values out of the model",()=>{
+    const interval={from:"0",to:"4",unit:"clay"};
+    const doc={units:[{id:"clay",gamma:null,params:{phi:null,c:"0"}}],
+      alignments:[{name:"unplaced",points:[{x:null,y:1},{x:0,y:2}]}],boreholes:[
+      {id:"unplaced",x:null,y:3,z:2,lon:" ",lat:null,intervals:[interval]},
+      {id:"unlevelled",x:1,y:3,z:" ",intervals:[interval]},
+      {id:"origin",x:0,y:"0",z:"0",intervals:[{from:null,to:3,unit:"fill"},interval],
+        spt:[{depth:"0",blows:"0",penetration:"300"},{depth:2,blows:null,penetration:300}],
+        water:[{depth:null},{depth:" "},{depth:false},{depth:"0"}],
+        tests:[{depth:"0",to:" ",property:"w",value:"0"},{depth:1,property:"w",value:null}]}
+    ]};
+    const {project,warnings}=importFiles([{name:"report.json",text:JSON.stringify(doc)}]);
+    expect(project.boreholes).toEqual([{id:"origin",x:0,y:0,z:0,intervals:[{from:0,to:4,unit:"clay"}],
+      spt:[{depth:0,blows:0,penetration:300}],water:[{depth:0}],tests:[{depth:0,property:"w",value:0}]}]);
+    expect(warnings).toEqual(expect.arrayContaining([expect.stringMatching(/^unplaced: no collar/),expect.stringMatching(/^unlevelled: no collar/)]));
+    expect(project.alignments).toBeUndefined();
+    expect(project.units[0].params).toEqual({c:0});
+    expect(buildGeologicalModel(project).units.map(u=>u.id)).toEqual(["clay"]);
+  });
+  it("retains aligned CPT measurements at known depths and leaves missing start levels unknown",()=>{
+    const c={id:"C",x:"0",y:0,z:" ",depth:["0",null,"3"],qc:["0","2","4"],fs:[" ","9","30"],
+      layers:[{from:null,to:1,unit:"fill"},{from:"0",to:"3",unit:"sand"}]};
+    const {project,warnings}=importFiles([{name:"cpts.json",text:JSON.stringify({boreholes:[],cpts:[c,{...c,id:"absent",x:null}]})}]);
+    expect(project.cpts).toEqual([{id:"C",x:0,y:0,z:NaN,depth:[0,3],qc:[0,4],fs:[NaN,30],layers:[{from:0,to:3,unit:"sand"}]}]);
+    expect(warnings).toEqual(expect.arrayContaining([expect.stringMatching(/CPT absent is incomplete/),expect.stringMatching(/CPT C.*depth/)]));
+  });
   it("reads only the first structured file of a multi-file drop",()=>{
     const r=importFiles([{name:"p.json",text:toProjectJson(valleyProject)},{name:"extra.csv",text:combined}]);
     expect(r.warnings[0]).toMatch(/Only p.json was read/);

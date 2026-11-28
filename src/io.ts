@@ -143,11 +143,13 @@ function columns(header:string[]){
   for(const f of Object.keys(ALIASES) as Field[])for(const a of ALIASES[f]){const i=h.indexOf(a);if(i>=0){found[f]=i;break}}
   return found;
 }
-function num(v:string|undefined){
-  if(v===undefined)return NaN;
+function num(v:unknown){
+  if(typeof v==="number")return Number.isFinite(v)?v:NaN;
+  if(typeof v!=="string")return NaN;
   const s=v.trim();
   if(s==="")return NaN;
-  return Number(/^-?\d+,\d+$/.test(s)?s.replace(",","."):s);
+  const n=Number(/^-?\d+,\d+$/.test(s)?s.replace(",","."):s);
+  return Number.isFinite(n)?n:NaN;
 }
 
 interface Collar { x:number; y:number; z:number; depth?:number; lon?:number; lat?:number; spt?:SptTest[]; water?:WaterLevel[]; tests?:TestResult[]; evidenceId?:string }
@@ -450,12 +452,12 @@ function readGeoreport3D(doc:any,file:string):ImportResult{
 function unitDef(u:{id:string;name?:unknown;color?:unknown;erosive?:unknown;gamma?:unknown;gammaSat?:unknown;source?:unknown;params?:unknown}):UnitDef{
   const out:UnitDef={id:u.id,name:typeof u.name==="string"&&u.name.trim()?u.name.trim():u.id,color:normaliseColor(u.color)??""};
   if(u.erosive===true||typeof u.erosive==="string"&&/^(y|yes|true|1|x)$/i.test(u.erosive.trim()))out.erosive=true;
-  const gamma=typeof u.gamma==="number"?u.gamma:num(u.gamma as string|undefined);
-  const gammaSat=typeof u.gammaSat==="number"?u.gammaSat:num(u.gammaSat as string|undefined);
+  const gamma=num(u.gamma);
+  const gammaSat=num(u.gammaSat);
   if(Number.isFinite(gamma))out.gamma=gamma;
   if(Number.isFinite(gammaSat))out.gammaSat=gammaSat;
   if(u.params&&typeof u.params==="object"){
-    const params=Object.fromEntries(Object.entries(u.params as Record<string,unknown>).map(([k,v])=>[propertyKey(k),Number(v)]).filter(([,v])=>Number.isFinite(v)));
+    const params=Object.fromEntries(Object.entries(u.params as Record<string,unknown>).map(([k,v])=>[propertyKey(k),num(v)]).filter(([,v])=>Number.isFinite(v)));
     if(Object.keys(params).length)out.params=params;
   }
   if(typeof u.source==="string"&&u.source.trim())out.source=u.source.trim();
@@ -485,13 +487,14 @@ function readProjectJson(doc:any,file:string):ImportResult{
   for(const b of doc.boreholes??[]){
     const id=String(b.id??"").trim();
     if(!id)continue;
-    const list=(v:unknown,keys:string[])=>Array.isArray(v)?v.filter(o=>o&&keys.every(k=>Number.isFinite(Number(o[k])))):undefined;
-    t.collars.set(id,{x:Number(b.x),y:Number(b.y),z:Number(b.z),depth:b.depth===undefined?undefined:Number(b.depth),...evidenceRef(b.evidenceId),
-      lon:b.lon===undefined?undefined:Number(b.lon),lat:b.lat===undefined?undefined:Number(b.lat),
-      spt:list(b.spt,["depth","blows","penetration"]),water:list(b.water,["depth"])?.map((w:any)=>({depth:Number(w.depth),...(typeof w.date==="string"?{date:w.date}:{}),...evidenceRef(w.evidenceId)})),
-      tests:list(b.tests,["depth","value"])?.filter((o:any)=>typeof o.property==="string"&&o.property.trim())
-        .map((o:any)=>({depth:Number(o.depth),...(Number.isFinite(Number(o.to))&&o.to!==undefined&&o.to!==null?{to:Number(o.to)}:{}),property:propertyKey(o.property),value:Number(o.value)}))});
-    t.intervals.set(id,(b.intervals??[]).map((i:any)=>({from:Number(i.from),to:Number(i.to),unit:String(i.unit??"").trim(),...(typeof i.name==="string"?{name:i.name}:{}),...evidenceRef(i.evidenceId)})));
+    const list=(v:unknown,keys:string[])=>Array.isArray(v)?v.filter(o=>o&&keys.every(k=>Number.isFinite(num(o[k])))):undefined;
+    t.collars.set(id,{x:num(b.x),y:num(b.y),z:num(b.z),depth:num(b.depth),...evidenceRef(b.evidenceId),
+      lon:num(b.lon),lat:num(b.lat),
+      spt:list(b.spt,["depth","blows","penetration"])?.map(o=>({...o,depth:num(o.depth),blows:num(o.blows),penetration:num(o.penetration)})),
+      water:list(b.water,["depth"])?.map(w=>({depth:num(w.depth),...(typeof w.date==="string"?{date:w.date}:{}),...evidenceRef(w.evidenceId)})),
+      tests:list(b.tests,["depth","value"])?.filter(o=>typeof o.property==="string"&&o.property.trim())
+        .map(o=>({depth:num(o.depth),...(Number.isFinite(num(o.to))?{to:num(o.to)}:{}),property:propertyKey(o.property),value:num(o.value)}))});
+    t.intervals.set(id,(b.intervals??[]).map((i:any)=>({from:num(i?.from),to:num(i?.to),unit:String(i?.unit??"").trim(),...(typeof i?.name==="string"?{name:i.name}:{}),...evidenceRef(i?.evidenceId)})));
   }
   const rules:UnitRule[]|undefined=Array.isArray(doc.rules)?doc.rules.filter((r:any)=>r&&typeof r.match==="string"&&typeof r.unit==="string"):undefined;
   const crs=doc.crsProj4?{name:doc.crs||doc.crsCode||"Custom",code:doc.crsCode,proj4:String(doc.crsProj4)}:doc.crsCode?findCrs(String(doc.crsCode)):undefined;
@@ -509,9 +512,9 @@ function readProjectJson(doc:any,file:string):ImportResult{
   if(Array.isArray(doc.alignments)){
     const lines:Alignment[]=[];
     for(const a of doc.alignments){
-      const line:Alignment={name:String(a?.name??`Line ${lines.length+1}`),points:Array.isArray(a?.points)?a.points.map((p:any)=>({x:Number(p?.x),y:Number(p?.y),...(p?.chainage!==undefined&&p?.chainage!==null?{chainage:Number(p.chainage)}:{})})):[],
+      const line:Alignment={name:String(a?.name??`Line ${lines.length+1}`),points:Array.isArray(a?.points)?a.points.map((p:any)=>({x:num(p?.x),y:num(p?.y),...(p?.chainage!==undefined&&p?.chainage!==null?{chainage:num(p.chainage)}:{})})):[],
         ...(Number.isFinite(a?.start)?{start:Number(a.start)}:{}),...(typeof a?.source==="string"?{source:a.source}:{}),
-        ...(Array.isArray(a?.design)&&a.design.length?{design:a.design.map((d:any)=>({chainage:Number(d?.chainage),top:Number(d?.top),...(d?.bottom!==undefined&&d?.bottom!==null?{bottom:Number(d.bottom)}:{})}))}:{})};
+        ...(Array.isArray(a?.design)&&a.design.length?{design:a.design.map((d:any)=>({chainage:num(d?.chainage),top:num(d?.top),...(d?.bottom!==undefined&&d?.bottom!==null?{bottom:num(d.bottom)}:{})}))}:{})};
       const problem=alignmentProblem(line);
       if(problem)result.warnings.push(`${file}: alignment ${line.name} left out: ${problem}`);
       else lines.push(line);
@@ -520,18 +523,23 @@ function readProjectJson(doc:any,file:string):ImportResult{
   }
   // CPTs: readings as lists of one length, null where a reading has no value.
   if(Array.isArray(doc.cpts)){
-    const list=(v:unknown)=>Array.isArray(v)?v.map(x=>x===null||x===undefined||x===""?NaN:Number(x)):undefined;
+    const list=(v:unknown)=>Array.isArray(v)?v.map(num):undefined;
     const cpts:Cpt[]=[];
     for(const c of doc.cpts){
       const id=String(c?.id??"").trim(),depth=list(c?.depth),qc=list(c?.qc);
-      if(!id||!depth?.length||qc?.length!==depth.length||!Number.isFinite(Number(c?.x))||!Number.isFinite(Number(c?.y))){result.warnings.push(`${file}: CPT ${id||"without a name"} is incomplete and was left out`);continue}
-      const same=(k:"fs"|"u2"|"rf"|"qt")=>{const v=list(c[k]);return v&&v.length===depth.length?{[k]:v}:{}};
-      const layers=Array.isArray(c.layers)?c.layers.filter((l:any)=>l&&Number.isFinite(Number(l.from))&&Number.isFinite(Number(l.to))&&Number(l.to)>Number(l.from))
-        .map((l:any)=>({from:Number(l.from),to:Number(l.to),unit:String(l.unit??"").trim(),...(typeof l.name==="string"?{name:l.name}:{}),...evidenceRef(l.evidenceId)})):undefined;
+      const x=num(c?.x),y=num(c?.y);
+      if(!id||!depth?.some(Number.isFinite)||qc?.length!==depth.length||!Number.isFinite(x)||!Number.isFinite(y)){result.warnings.push(`${file}: CPT ${id||"without a name"} is incomplete and was left out`);continue}
+      const missing=depth.reduce((n,d)=>Number.isFinite(d)?n:n+1,0);
+      if(missing)result.warnings.push(`${file}: CPT ${id} skipped ${missing} reading${missing===1?"":"s"} with missing depth`);
+      const atDepths=(v:number[])=>missing?v.filter((_,i)=>Number.isFinite(depth[i])):v;
+      const same=(k:"fs"|"u2"|"rf"|"qt")=>{const v=list(c[k]);return v&&v.length===depth.length?{[k]:atDepths(v)}:{}};
+      const layers=Array.isArray(c.layers)?c.layers.filter((l:any)=>l&&Number.isFinite(num(l.from))&&num(l.to)>num(l.from))
+        .map((l:any)=>({from:num(l.from),to:num(l.to),unit:String(l.unit??"").trim(),...(typeof l.name==="string"?{name:l.name}:{}),...evidenceRef(l.evidenceId)})):undefined;
       if(c.layersSource!==undefined&&c.layersSource!=="automatic"&&c.layersSource!=="reviewed")throw new Error(`${file}: CPT ${id} has an unsupported layersSource`);
-      cpts.push({id,x:Number(c.x),y:Number(c.y),z:c.z===null||c.z===undefined?NaN:Number(c.z),
-        ...(Number.isFinite(c.lon)&&Number.isFinite(c.lat)?{lon:Number(c.lon),lat:Number(c.lat)}:{}),depth,qc,...same("fs"),...same("u2"),...same("rf"),...same("qt"),
-        ...(Number(c.a)>0&&Number(c.a)<=1?{a:Number(c.a)}:{}),...(Number(c.predrill)>0?{predrill:Number(c.predrill)}:{}),...(typeof c.date==="string"?{date:c.date}:{}),
+      const lon=num(c.lon),lat=num(c.lat),a=num(c.a),predrill=num(c.predrill);
+      cpts.push({id,x,y,z:num(c.z),...(Number.isFinite(lon)&&Number.isFinite(lat)?{lon,lat}:{}),
+        depth:atDepths(depth),qc:atDepths(qc),...same("fs"),...same("u2"),...same("rf"),...same("qt"),
+        ...(a>0&&a<=1?{a}:{}),...(predrill>0?{predrill}:{}),...(typeof c.date==="string"?{date:c.date}:{}),
         ...(layers?{layers}:{}),...(c.layersSource?{layersSource:c.layersSource}:{})});
     }
     if(cpts.length)result.project.cpts=cpts;

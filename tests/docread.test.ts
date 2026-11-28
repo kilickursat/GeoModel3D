@@ -58,6 +58,20 @@ describe("reading a drawn log",()=>{
     // Each layer keeps the lines it was read from: its base depth and its description.
     expect(log.layers[1].src.map(e=>e.text)).toEqual(["4.50","CLAY: soft, grey"]);
   });
+  it("reads a dated Japanese water observation in its column without borrowing the adjacent test depth",()=>{
+    const heading=[..."孔内水位"].map((c,i)=>L(c,620,135+13*i,12));
+    const test=L("1.15",632,yAt(1.15),14);
+    const read=(lines:TextLine[])=>readPage(drawnLog([...heading,test,...lines]),1000,800)[0];
+    expect(read([]).water).toBeUndefined();
+    // An observation can have the same numeric depth as a test. Its own dated cell supplies the evidence.
+    const water=L("1.15",615,yAt(1.15),21),date=L("9/05",615,yAt(1.15)-13,21);
+    expect(read([date]).water).toBeUndefined();
+    expect(read([water]).water).toBeUndefined();
+    expect(read([water,L("9/05",615,yAt(6),21)]).water).toBeUndefined();
+    expect(read([water,date])).toMatchObject({water:1.15,src:{water}});
+    const deeper=L("3.20",615,yAt(3.2),21);
+    expect(read([deeper,L("9月5日",615,yAt(3.2)-13,21)])).toMatchObject({water:3.2,src:{water:deeper}});
+  });
   it("reads a scale whose ticks were read as minus signs",()=>{
     const lines=drawnLog().map(e=>/^\d+$/.test(e.text)&&+e.text%2?{...e,text:"-"+e.text}:e);
     expect(readPage(lines,1000,800)[0].layers.map(l=>l.to)).toEqual([1.2,4.5,9.8]);
@@ -250,6 +264,23 @@ describe("the sheets of a log and its rock core log",()=>{
     // The depth written where the log ends is its final depth; an elevation there is not.
     expect([log.final,log.src?.final?.text]).toEqual([16.8,"16.80"]);
   });
+  it("withholds all sheets of a foot-scaled log and retains the other borehole",()=>{
+    const first=sheet("BOREHOLE LOG 7",0,[1.2],[[0.5,"FILL: sand and gravel"],[1.5,"CLAY: soft, grey"]]);
+    const second=sheet("Borehole Log BH-07",10,[12.4,16.8],[[10.2,"CLAY: soft, grey"],[13,"SAND: dense"]],
+      [L("DEPTH",30,140),L("(feet)",30,154)]);
+    const metric=sheet("BOREHOLE LOG 8",0,[2],[[1,"PEAT: black, spongy"]],[L("Depth (m)",30,150)]);
+    const pages=[first,second,metric].map((lines,i)=>({page:i+1,width:1000,height:800,lines}));
+    const result=readDocument(pages);
+    expect(result.logs.map(l=>l.id)).toEqual(["8"]);
+    expect(result.unread.map(u=>u.page)).toEqual([1,2]);
+    expect(result.unread.every(u=>u.log&&u.error.includes("depths in feet"))).toBe(true);
+  });
+  it("explains an empty import when the depth heading is in feet",()=>{
+    const lines=drawnLog([L("Depth (ft)",30,150)]);
+    const result=readDocument([{page:1,width:1000,height:800,lines}]);
+    expect(result.logs).toEqual([]);
+    expect(result.unread).toEqual([expect.objectContaining({page:1,log:true,error:expect.stringContaining("depths in feet")})]);
+  });
   it("reads a final depth only where the log states it",()=>{
     expect(readPage(drawnLog(),1000,800)[0].final).toBeUndefined();
     expect(readPage([...drawnLog(),L("END OF BOREHOLE",300,yAt(9.8)+18)],1000,800)[0].final).toBe(9.8);
@@ -321,9 +352,34 @@ describe("reading a Japanese log form",()=>{
     expect(draftHoles(0,"f.pdf",readDocument([{page:1,width:1000,height:800,lines:japaneseForm()}]).logs)[0].layers.map(l=>l.unit))
       .toEqual(["Fill and topsoil","Clay and silt","Sand"]);
   });
+  it("keeps rock in a gravel layer's remarks out of the unit, including when its name cell is missing",()=>{
+    const lines=japaneseForm().map(e=>({...e,text:e.text==="細砂"?"砂礫":e.text==="(FS)"?"(GS)":e.text==="均質な細砂。含水は高い。"?"固結状の凝灰質粘土にて充填。":e.text}));
+    const draft=(lines:TextLine[])=>draftHoles(0,"log.pdf",readDocument([{page:1,width:1000,height:800,lines}]).logs)[0];
+    expect(draft(lines).layers[2]).toMatchObject({unit:"Gravel",description:"砂礫(GS) 固結状の凝灰質粘土にて充填。"});
+    const missing=draft(lines.filter(e=>e.text!=="砂礫"&&e.text!=="(GS)"));
+    expect(missing.layers[2]).toMatchObject({unit:"",description:"固結状の凝灰質粘土にて充填。"});
+    expect(checkDraft([missing])).toContainEqual(expect.objectContaining({level:"error",layer:2}));
+  });
+  it("uses only the leading material label in an edited Japanese description",()=>{
+    expect(unitFor("砂礫（GS）：礫は安山岩。")).toBe("Gravel");
+    expect(unitFor("盛土（ローム）")).toBe("Fill and topsoil");
+    expect(unitFor("不明 固結状の凝灰質粘土にて充填")).toBe("");
+    expect(unitFor("固結状の凝灰質粘土にて充填")).toBe("");
+    expect(unitFor("風化安山岩 安山岩に割れ目がある")).toBe("Rock and cemented soil");
+  });
 });
 
 describe("penetration tests, drawn boundaries, turned pages and Dutch tables",()=>{
+  it.each([["Blow",30],["(blows/ft)",30.5]] as const)("reads counts below the %s heading", (heading,penetration)=>{
+    const lines=drawnLog([L(heading,650,150,40),L("12",660,yAt(2),20),L("18",660,yAt(4),20)]);
+    const [log]=readDocument([{page:1,width:1000,height:800,lines}]).logs;
+    expect(log.spt?.map(t=>[t.depth,t.blows,t.penetration])).toEqual([[2,12,penetration],[4,18,penetration]]);
+  });
+  it("uses the units on a partial drive even when the column gives blows per foot",()=>{
+    const lines=drawnLog([L("(blows/ft)",650,150,60),L("50/5 cm",650,yAt(2),60),L('50/5"',650,yAt(4),60)]);
+    const [log]=readDocument([{page:1,width:1000,height:800,lines}]).logs;
+    expect(log.spt?.map(t=>t.penetration)).toEqual([5,12.7]);
+  });
   it("reads each test's blows and penetration beside its start and end depths",()=>{
     // The third test stopped at 50 blows over 5 cm (its end depth 3.20 instead of 3.45).
     const [log]=readPage(japaneseForm().map(e=>e.text==="3.45"?{...e,text:"3.20"}:e),1000,800);
@@ -368,6 +424,9 @@ describe("header values",()=>{
   });
   it("reads a Japanese water level below ground, and a table of readings",()=>{
     expect(header([L("孔内水位",40,40,60),L("GL-9.80m",40,60,60)]).water).toBe(9.8);
+    expect(header([L("孔内水位",40,40,12,46),L("1.45",62,61,18)]).water).toBeUndefined();
+    expect(header([L("地下水位: 2.60",40,40)]).water).toBe(2.6);
+    expect(header([L("地下水位",40,40,60),L("2.60 m",40,60,60)]).water).toBe(2.6);
     const table=[L("Date",40,40,40),L("Water Depth (m)",120,40,120),L("Mar 3, 2024",40,60,80),L("2.4",170,60,30),L("Mar 9, 2024",40,80,80),L("2.6",170,80,30)];
     expect(header(table).water).toBe(2.4);
   });
@@ -502,6 +561,10 @@ describe("digital PDFs read with PDF.js",()=>{
     const {logs}=await readPdf("kj-148301107.pdf"),truth=json<Truth>("kj-148301107.truth.json");
     expect(logs).toHaveLength(1);
     expect(score(logs[0],truth)).toEqual({boundaries:15,extra:0,descriptions:15,layers:15});
+    expect(draftHoles(0,"log.pdf",logs)[0].layers.map(l=>l.unit)).toEqual([
+      "Fill and topsoil","Volcanic ash soil","Sand","Clay and silt","Sand","Clay and silt","Sand","Sand",
+      "Clay and silt","Clay and silt","Clay and silt","Sand","Gravel","Sand","Rock and cemented soil"
+    ]);
     expect([logs[0].id,logs[0].ground,logs[0].water,logs[0].final]).toEqual([truth.id,truth.ground,truth.water,48.29]);
   });
   it("reads two logs set out as tables on one page, with vertical depths",async()=>{

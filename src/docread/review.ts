@@ -5,7 +5,7 @@
 // boreholes to the Input data tables, which check them again as typed data.
 import type {Doc} from "./pdftext";
 import {DraftHole,Check,FIELDS,Field,checkDraft,draftTables,captureDraftEvidence,evidenceField,unitFor,pageRanges,num} from "./draft";
-import type {TextLine} from "./reconstruct";
+import {FEET_DEPTH_REASON,type TextLine} from "./reconstruct";
 import {lithologyRules,japaneseLithologyRules} from "../rules";
 import type {EditorTables} from "../tables";
 import {newEvidenceId,changeEvidenceField,acceptEvidenceField,EvidenceSource,EvidenceRecord} from "../evidence";
@@ -131,7 +131,7 @@ export function createReview(host:ReviewHost){
         parts.push(`<li>${esc(name)}${pages.length===1?"Page":"Pages"} ${pageRanges(pages)}: scanned, not read: ${esc(why)}.</li>`);
       }
       for(const u of logs)parts.push(`<li>${esc(name)}${go(u)}${u.id?` (${esc(u.id)})`:""}: looks like a log, but ${esc(u.error)}.${
-        u.text&&rereader?` <button class="dr-ocr-page" data-reread-doc="${i}" data-reread-page="${u.page}">Read by OCR</button>`:""}</li>`);
+        u.text&&rereader&&u.error!==FEET_DEPTH_REASON?` <button class="dr-ocr-page" data-reread-doc="${i}" data-reread-page="${u.page}">Read by OCR</button>`:""}</li>`);
       if(other.length)parts.push(`<li>${esc(name)}${other.length===1?"Page":"Pages"} ${pageRanges(other)}: no borehole log found.</li>`);
     });
     const n=unread.length;
@@ -152,7 +152,7 @@ export function createReview(host:ReviewHost){
     });
     const m=ocrDone.size;
     unreadEl.innerHTML=(read.length?`<details><summary>${plural(m,"page")} read by OCR</summary><ul>${read.join("")}</ul></details>`:"")+
-      (parts.length?`<details${holes.length?"":" open"}><summary>${n?`${plural(n,"page")} not read`:"Not read"}</summary><ul>${parts.join("")}</ul></details>`:"");
+      (parts.length?`<details${!holes.length||unread.some(u=>u.error===FEET_DEPTH_REASON)?" open":""}><summary>${n?`${plural(n,"page")} not read`:"Not read"}</summary><ul>${parts.join("")}</ul></details>`:"");
   }
   function renderAll(){checks=checkDraft(holes);renderChecks();renderTabs();renderHole();renderUnread()}
   // The checks follow the typing, without redrawing the field being typed in.
@@ -179,7 +179,7 @@ export function createReview(host:ReviewHost){
     // How this page was read: by OCR, and why; or from its own text, which can be read by OCR instead.
     const by=ocrDone.get(key(view.doc,view.page));
     readBy.textContent=by?`Read by OCR: ${by}`:"";
-    ocrButton.hidden=!!by||!rereader||d.kind!=="pdf";
+    ocrButton.hidden=!!by||!rereader||d.kind!=="pdf"||unread.some(u=>u.doc===view.doc&&u.page===view.page&&u.error===FEET_DEPTH_REASON);
     ocrButton.disabled=busy;
     const size=sizes.get(key(view.doc,view.page))??{width:1275,height:1650};
     const fit=Math.max(240,scroller.clientWidth-24),css=Math.round(fit*(ZOOMS[view.zoom]??1));
