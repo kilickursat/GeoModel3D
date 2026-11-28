@@ -1,4 +1,5 @@
 import * as THREE from "three/webgpu";
+import {startRenderer} from "./renderBackend";
 import {uniform,positionWorld,dot} from "three/tsl";
 import {OrbitControls} from "three/addons/controls/OrbitControls.js";
 import {CSS2DRenderer,CSS2DObject} from "three/addons/renderers/CSS2DRenderer.js";
@@ -58,16 +59,16 @@ const scene=new THREE.Scene();
 scene.background=new THREE.Color(0xeef1f4);
 const camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,0.1,1e5);
 camera.up.set(0,0,1);
-// WebGPU wherever the browser offers it; the renderer falls back to WebGL 2 by itself, and ?backend=webgl forces it.
-const wantWebGPU=new URLSearchParams(location.search).get("backend")!=="webgl";
-const renderer=new THREE.WebGPURenderer({antialias:true,forceWebGL:!wantWebGPU});
+const requestedBackend=new URLSearchParams(location.search).get("backend");
+const wantWebGPU=requestedBackend!=="webgl";
 // Without WebGPU or WebGL 2, the page keeps the description from index.html and says what is missing instead of
 // staying blank.
-try{await renderer.init()}catch(e){
+const {renderer,softwareWebGPU,softwareQueue}=await startRenderer(requestedBackend,
+  forceWebGL=>new THREE.WebGPURenderer({antialias:true,forceWebGL})).catch(e=>{
   const status=document.querySelector(".intro-status");
   if(status)status.textContent="This browser could not start the 3-D view, which needs WebGL 2 or WebGPU. Try an up-to-date Chrome, Edge, Firefox or Safari, with hardware acceleration turned on.";
   throw e;
-}
+});
 document.querySelector(".intro")?.remove();
 const webgl="WebGL 2";
 let renderingStopped=false;
@@ -909,7 +910,7 @@ toolbar.innerHTML=`${sheetHead("View")}
     <p><a href="https://github.com/kilickursat/GeoModel3D/issues" target="_blank" rel="noopener">Report a problem</a></p>
     <p class="pdf-agreement" hidden></p>
     <p class="reading-model" hidden></p>
-    <p class="backend">GeoModel3D ${pkg.version} · ${backendName}${wantWebGPU&&backendName!=="WebGPU"?"":` · <a href="?backend=${backendName==="WebGPU"?"webgl":"webgpu"}">use ${backendName==="WebGPU"?webgl:"WebGPU"}</a>`}</p>
+    <p class="backend">GeoModel3D ${pkg.version} · ${backendName}${softwareWebGPU?" · software WebGPU adapter":""}${wantWebGPU&&backendName!=="WebGPU"&&!softwareWebGPU?"":` · <a href="?backend=${backendName==="WebGPU"?"webgl":"webgpu"}">use ${backendName==="WebGPU"?webgl:"WebGPU"}</a>`}</p>
   </div></details>
 </div>
 <div class="view-menu">
@@ -2241,7 +2242,11 @@ function stopRendering(){
   const message=document.createElement("p");
   message.textContent=`The ${backendName} view stopped. You can still edit your data or export your project from this tab.`;
   const url=new URL(location.href);
-  if(backendName==="WebGPU")url.searchParams.set("backend","webgl");
+  if(backendName==="WebGPU"){
+    url.searchParams.set("backend","webgl");
+    url.hash="input";
+    message.textContent+=" In the fresh view, choose “Continue the saved case” to reopen a workspace saved in this browser.";
+  }
   const link=document.createElement("a");
   link.href=url.href;
   link.target="_blank";
@@ -2252,6 +2257,9 @@ function stopRendering(){
 }
 const deviceLost=renderer.onDeviceLost.bind(renderer);
 renderer.onDeviceLost=info=>{deviceLost(info);stopRendering()};
+// A lost software instance can reject GPU submissions without throwing from render()
+// or delivering the device-lost callback. Observe the same device that drew this frame.
+let checkingFrame=false;
 renderer.setAnimationLoop(()=>{
   // The 3-D view is not drawn behind the input tab.
   if(document.body.dataset.mode==="input")return;
@@ -2261,7 +2269,13 @@ renderer.setAnimationLoop(()=>{
   if(!dirty)return;
   dirty--;
   faceCpts();
-  try{renderer.render(scene,camera)}
+  try{
+    renderer.render(scene,camera);
+    if(softwareQueue&&!checkingFrame){
+      checkingFrame=true;
+      void softwareQueue.onSubmittedWorkDone().then(()=>{checkingFrame=false},stopRendering);
+    }
+  }
   catch(error){console.error(error);stopRendering();return}
   labelRenderer.render(scene,camera);
 });
