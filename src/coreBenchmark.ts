@@ -1,5 +1,6 @@
 /** Fixed Qwen device experiment. It never changes the application's model selector or reviewed logs. */
 import {CORE_AI_PROMPT_VERSION,coreAiPrompt} from "./coreAi";
+import {softwareWebgpuAdapter} from "./webgpuAdapter";
 import type {CoreBenchmarkProgress,CoreBenchmarkFailure} from "./coreBenchmarkDiagnostics";
 export type {CoreBenchmarkProgress,CoreBenchmarkFailure,CoreBenchmarkStage} from "./coreBenchmarkDiagnostics";
 
@@ -62,8 +63,7 @@ export function coreBenchmarkAdapterMetadata(adapter:unknown):CoreBenchmarkAdapt
   const value=adapter as {features?:Iterable<unknown>;info?:Record<string,unknown>;limits?:Record<string,unknown>};
   const text=(key:string)=>typeof value?.info?.[key]==="string"?String(value.info[key]).slice(0,256):"";
   const vendor=text("vendor"),architecture=text("architecture"),device=text("device"),description=text("description");
-  const identity=[vendor,architecture,device,description].join(" ").toLowerCase();
-  const softwareAdapter=/swiftshader|llvmpipe|software|lavapipe|microsoft basic render/.test(identity)?true:/apple|nvidia|intel|\bamd\b|qualcomm|adreno|mali/.test(identity)?false:null;
+  const softwareAdapter=softwareWebgpuAdapter(adapter);
   const limit=(key:string)=>typeof value?.limits?.[key]==="number"&&Number.isFinite(value.limits[key])&&Number(value.limits[key])>=0?Number(value.limits[key]):null;
   return {vendor,architecture,device,description,features:value?.features?Array.from(value.features).filter((v):v is string=>typeof v==="string").slice(0,128).sort():[],softwareAdapter,
     limits:{maxBufferSize:limit("maxBufferSize"),maxStorageBufferBindingSize:limit("maxStorageBufferBindingSize")}};
