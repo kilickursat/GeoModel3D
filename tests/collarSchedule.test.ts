@@ -125,3 +125,59 @@ it("reads only a positive completed metric depth and withholds along-hole length
   expect(inclined.finalDepth).toBeUndefined();
   expect(inclined.notes.join(" ")).toContain("Verify vertical depth");
 });
+
+function schedule(headings:string[],records:string[][],declaration?:string){
+  const line=(values:string[],y:number)=>values.flatMap((v,i)=>v?[cell(v,10+160*i,y)]:[]);
+  return {page:3,lines:[...(declaration?[cell(declaration,10,15)]:[]),...line(headings,30),
+    ...records.flatMap((values,i)=>line(values,47+15*i))]};
+}
+it("keeps each row’s declared EPSG or MGA zone separate and withholds an unknown or blank reference",()=>{
+  const h=["Borehole ID","Easting (m)","Northing (m)","EPSG code"];
+  const rows=readCollarSchedules([schedule(h,[
+    ["BH-1","310000","6300000","28355"],["BH-2","310000","6300000","EPSG:28356"],
+    ["BH-3","300000","6300000","Historical local grid"],["BH-4","301000","6300000",""],
+    ["BH-5","312000","6300300","EPSG:28355"],
+  ])]);
+  expect(rows.map(r=>r.crsCode)).toEqual(["EPSG:28355","EPSG:28356",undefined,undefined,"EPSG:28355"]);
+  expect(rows[1].fields.x?.value).toBe(310000);
+  for(const i of [2,3]){
+    expect(rows[i].fields).toEqual({});
+    expect(matchCollarSchedules([log(rows[i].id)],rows)[0].status).toBe("conflict");
+    expect(rows[i].notes.join(" ")).toContain("EPSG code");
+  }
+  expect(rows[2].context).toContainEqual(expect.objectContaining({text:"Historical local grid",page:3,x0:490}));
+  const zones=readCollarSchedules([schedule([...h.slice(0,3),"MGA Zone"],[
+    ["BH-1","310000","6300000","55"],["BH-2","310000","6300000","56"],
+    ["BH-3","310000","6300000","Uncertain"],
+  ],"Survey datum GDA94")]);
+  expect(zones.map(r=>r.crsCode)).toEqual(["EPSG:28355","EPSG:28356",undefined]);
+  expect(zones[2].fields.x).toBeUndefined();
+});
+it("withholds a row reference that conflicts with the common EPSG, datum or coordinate type",()=>{
+  const h=["Well ID","Easting (m)","Northing (m)","CRS"];
+  for(const [global,local] of [["Collar survey EPSG:32631","EPSG:32632"],["GDA94 survey","EPSG:32655"],
+    ["WGS84 / UTM zone 55S","EPSG:32655"],["Zone 33N","EPSG:32632"],["Collar survey EPSG 32631","EPSG:32632"],
+    ["EPSG:32631","EPSG:4326"],["WGS84 survey","unspecified grid"],["","EPSG:4326"]]){
+    const [row]=readCollarSchedules([schedule(h,[["W-1","450000","3200000",local]],global)]);
+    expect(row.fields).toEqual({});
+    expect(row.context).toContainEqual(expect.objectContaining({text:local,page:3,x0:490}));
+  }
+  const [geo]=readCollarSchedules([schedule(["Well ID","Latitude","Longitude","CRS"],[["W-1","43.5","-89.1","EPSG:4326"]])]);
+  expect(geo.fields).toMatchObject({lat:{value:43.5},lon:{value:-89.1}});
+});
+it("scopes horizontal and depth unit columns to the printed row and retains withheld values as evidence",()=>{
+  const rows=readCollarSchedules([schedule(["Hole ID","Easting (m)","Northing (m)","Horizontal coordinate units","Final depth (m)","Depth units"],[
+    ["BH-1","300000","5250000","ft","14","m"],
+    ["BH-2","300020","5250010","m","43","ft"],
+    ["BH-3","300040","5250020","","21","m"],
+  ],"Survey EPSG:32632")]);
+  expect(rows[0].fields.x).toBeUndefined();expect(rows[0].finalDepth?.value).toBe(14);
+  expect(rows[0].context).toEqual(expect.arrayContaining([
+    expect.objectContaining({text:"300000",page:3}),expect.objectContaining({text:"ft",x0:490,page:3})]));
+  expect(rows[1].fields.x?.value).toBe(300020);expect(rows[1].finalDepth).toBeUndefined();
+  expect(rows[2].fields.y).toBeUndefined();expect(rows[2].finalDepth?.value).toBe(21);
+  const [row]=readCollarSchedules([schedule(["Hole ID","Easting (m)","Northing (m)","Ground elevation (m)","Vertical datum"],
+    [["BH-1","300000","5250000","75.5","Local assumed"]])]);
+  expect(row.fields.x?.value).toBe(300000);expect(row.fields.ground).toBeUndefined();
+  expect(row.context).toContainEqual(expect.objectContaining({text:"Local assumed",x0:650,page:3}));
+});

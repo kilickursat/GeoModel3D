@@ -35,10 +35,10 @@ const allUnits=/\ball\s+(?:measurements|dimensions|distances|values|units)\s+(?:
 const wgs=/\bWGS\s*[- ]?\s*84\b/i;
 
 function qualifier(text:string):QualifierKind|undefined{
-  const t=text.trim().toLowerCase().replace(/co-ordinate/g,"coordinate");
-  if(/\bunits?$|^u\.?o\.?m\.?$/.test(t))return "units";
-  if(/^(?:vertical|height|elevation) (?:reference|datum|crs)/.test(t))return "verticalDatum";
-  if(/^(?:(?:coordinate|horizontal|survey|map|spatial|geodetic|utm|mga|grid) )*(?:crs|datum|epsg|grid|projection|zone|coordinate system|reference system|reference frame|hemisphere)(?:\b|$)/.test(t))return "frame";
+  const t=text.trim().toLowerCase().replace(/co-ordinate/g,"coordinate").replace(/[_:]/g," ").trim();
+  if(/\bunits?\s*(?:$|\(|\[|of measure(?:ment)?\b)|^u\.?o\.?m\.?$/.test(t))return "units";
+  if(/^(?:vertical|height|elevation) (?:reference|datum|crs)|^datum\s*\((?:vertical|height|elevation)\)/.test(t))return "verticalDatum";
+  if(/^(?:(?:coord(?:inate)?\.?|horizontal|survey|map|spatial|geodetic|gps|utm|mga|grid) )*(?:crs|srs|srid|datum|epsg|grid|projection|zone|coordinate system|ref(?:erence)?(?: system| frame)?|hemisphere)(?:\b|$)/.test(t))return "frame";
 }
 
 function label(text:string):Label|undefined{
@@ -100,7 +100,17 @@ const intended=/\b(?:planned|proposed|pre[ -]drill(?:ing)?|design location|targe
 const verticalId=/^(?:bore\s*hole|hole|boring|well|drill\s*hole)\s+(?:id|no\.?|number|identifier)$/i;
 const mgazone=/\bMGA\s*(?:zone|z)?\s*(\d{2})\s*S?\b/i;
 const gda=/\bGDA\s*(94|2020)\b/i;
-const epsg=/\bEPSG\s*:\s*(\d{4,6})\b/i;
+const epsg=/\bEPSG\s*:?\s*(\d{4,6})\b/i;
+const printedZone=/\b(?:(MGA|UTM)\s*(?:zone|z)?|zone)\s*(\d{1,2})\s*([NS])?\b/gi;
+function matchesGridZone(name:string,context:string){
+  const gridZone=[...name.matchAll(printedZone)][0];
+  return [...context.matchAll(printedZone)].every(([,family,zone,hemisphere])=>{
+    if(!gridZone||Number(zone)!==Number(gridZone[2]))return false;
+    if(family&&family.toUpperCase()!==gridZone[1]?.toUpperCase())return false;
+    const direction=gridZone[3]?.toUpperCase()??(gridZone[1]?.toUpperCase()==="MGA"?"S":undefined);
+    return !hemisphere||hemisphere.toUpperCase()===direction;
+  });
+}
 const allCodes=(text:string,re:RegExp)=>[...new Set([...text.matchAll(new RegExp(re.source,"gi"))].map(m=>m[1]))];
 function roundingStep(text:string){
   const digits=text.match(/\.(\d+)/)?.[1].length??0;
@@ -131,7 +141,7 @@ function drilledDepth(depths:PrintedCell[],orientation:PrintedCell[],context:Tex
 // Interpret row references independently. An unreadable reference must not inherit the table's frame.
 function rowFrame(entries:Qualifier[],declaration:string,notes:string[]){
   const codes:string[]=[],statements:string[]=[],checks:Array<(name:string)=>boolean>=[];
-  let unknown=false;
+  let unknown=false,geographicOnly=false;
   const descriptors=entries.map(e=>e.heading.text+" "+e.cells.map(c=>c.text).join(" ")).join(" ");
   const full=declaration+" "+descriptors;
   const warn=(e:Qualifier)=>{
@@ -143,12 +153,12 @@ function rowFrame(entries:Qualifier[],declaration:string,notes:string[]){
     const v=e.cells[0].text.trim(),h=e.heading.text.trim();
     const code=/^(?:EPSG\s*:?\s*)?(\d{4,6})$/i.exec(v)?.[1];
     const named=crsRegistry.find(c=>c.name.toLowerCase()===v.toLowerCase());
-    if((/EPSG/i.test(v+" "+h)||/crs|system/i.test(h))&&code||named){
-      const c=code??named!.code.slice(5);
-      if(c==="4326")statements.push("WGS84");
-      else if(c==="4283")statements.push("GDA94");
-      else if(c==="7844")statements.push("GDA2020");
-      else if(findCrs(c))codes.push(c);
+    const declaredCode=named?.code.slice(5)??(/epsg|crs|srs|srid|system/i.test(v+" "+h)?code:undefined);
+    if(declaredCode){
+      const geographicDatum:Record<string,string>={"4326":"WGS84","4283":"GDA94","7844":"GDA2020"};
+      const geographic=geographicDatum[declaredCode];
+      if(geographic){geographicOnly=true;statements.push(geographic)}
+      else if(findCrs(declaredCode))codes.push(declaredCode);
       else warn(e);
       continue;
     }
@@ -169,7 +179,7 @@ function rowFrame(entries:Qualifier[],declaration:string,notes:string[]){
     }
     warn(e);
   }
-  return {codes,statements,checks,unknown};
+  return {codes,statements,checks,unknown,geographicOnly};
 }
 
 type Quantity=CollarField|"finalDepth";
@@ -181,7 +191,7 @@ function unitApplies(heading:string,field:Quantity){
   if(/northing/.test(h))return field==="y";
   if(/latitude/.test(h))return field==="lat";
   if(/longitude/.test(h))return field==="lon";
-  if(/coord|horiz|grid/.test(h))return field!=="ground"&&field!=="finalDepth";
+  if(/coord|horiz|grid|x\s*\/\s*y/.test(h))return field!=="ground"&&field!=="finalDepth";
   return true;
 }
 
@@ -199,8 +209,12 @@ function options(idLine:TextLine,items:Measurement[],context:TextLine[],depths:P
   const codes=[...allCodes(reference,epsg),...row.codes];
   if(datums.length===1&&zones.length===1)codes.push(`${(datums[0]==="94"?28300:7800)+Number(zones[0])}`);
   const grid=codes.length?findCrs(codes[0]):undefined;
+  // A row-specific EPSG and a separately printed datum must describe the same frame.
+  const datumNames=refs.length?[...reference.matchAll(/\b(?:GDA\s*(?:94|2020)|WGS\s*[- ]?\s*84|NAD\s*[- ]?\s*(?:27|83))\b/gi)].map(m=>m[0].toUpperCase().replace(/[^A-Z0-9]/g,"")):[];
+  const gridName=grid?.name.toUpperCase().replace(/[^A-Z0-9]/g,"");
   const incompatible=row.unknown||datums.length>1||zones.length>1||new Set(codes).size>1||
-    !!codes.length&&!grid||!!grid&&row.checks.some(check=>!check(grid.name));
+    new Set(datumNames).size>1||!!codes.length&&!grid||!!grid&&(row.geographicOnly||row.checks.some(check=>!check(grid.name))||
+    datumNames.some(name=>!gridName?.startsWith(name))||refs.length>0&&!matchesGridZone(grid.name,reference));
   const angles=items.filter(i=>i.field==="lat"||i.field==="lon").map(i=>i.heading.text).join(" ");
   const geoDatum=angles.match(gda)?.[1]??(!wgs.test(reference)&&datums.length===1?datums[0]:undefined);
   const nativeMga=!!geoDatum&&!!grid?.name.startsWith(`GDA${geoDatum} / MGA zone `);
@@ -227,19 +241,19 @@ function options(idLine:TextLine,items:Measurement[],context:TextLine[],depths:P
       extra.push(heading,cell);continue;
     }
     const value=numeric(cell,field,title);
-    if(value===undefined)continue;
+    if(value===undefined){extra.push(heading,cell);continue}
     if(field!=="ground"&&(incompatible||(field==="x"||field==="y")&&refs.length&&!grid)){
       extra.push(heading,cell);notes.push("Verify the printed coordinate reference for this row before using its position.");continue;
     }
     if(field==="lat"||field==="lon"){
       if(geoDatum?(!nativeMga||wgs.test(angles)):!wgs.test(reference)){
-        notes.push("Verify the geographic datum before using the latitude and longitude.");continue;
+        extra.push(heading,cell);notes.push("Verify the geographic datum before using the latitude and longitude.");continue;
       }
     }else{
       const scope=context.filter(l=>allUnits.test(l.text)||field!=="ground"&&coordinateUnits.test(l.text));
       const units=[title,cell.text,unitsText(field),...scope.map(l=>l.text)].join(" ");
       if(nonMetric.test(units)||!(metre.test(units)||field!=="ground"&&grid)){
-        notes.push(`The units of “${heading.text}” need checking before entry in metres.`);continue;
+        extra.push(heading,cell);notes.push(`The units of “${heading.text}” need checking before entry in metres.`);continue;
       }
     }
     fields[field]={value,line:cell,heading};
@@ -304,7 +318,7 @@ function extractRow(row:TextLine[],columns:Column[],context:TextLine[]){
       if(column.label==="finalDepth"||column.label==="orientation"){
         (column.label==="finalDepth"?depths:orientation).push({heading:column.heading,unit:column.unit,cell});continue;
       }
-      if(numeric(cell,column.label,column.heading.text)!==undefined||/^(?:[−–—-]|N\/?A|unknown|unavailable)$/i.test(cell.text.trim())){
+      if(/^[+−-]?(?:\d|\.\d)|^(?:[−–—-]|N\/?A|unknown|unavailable)$/i.test(cell.text.trim())){
         items.push({field:column.label,heading:column.heading,unit:column.unit,cell});
       }
     }
@@ -367,7 +381,7 @@ export function readCollarSchedules(pages:readonly {page:number;lines:readonly T
       if(!labels.includes("id")||!(labels.includes("x")&&labels.includes("y")||labels.includes("lat")&&labels.includes("lon"))||
         new Set(labels).size!==labels.length)continue;
       const h=Math.max(...headers.map(l=>l.y1-l.y0)),context=rows.slice(Math.max(0,i-4),i).flat().filter(l=>
-        headers[0].cy-l.cy<7*h&&(datum.test(l.text)||coordinateUnits.test(l.text)||allUnits.test(l.text)));
+        headers[0].cy-l.cy<7*h&&(datum.test(l.text)||mgazone.test(l.text)||/^zone\s+\d+\s*[NS]?$/i.test(l.text.trim())||coordinateUnits.test(l.text)||allUnits.test(l.text)));
       let start=i+1;
       // A second heading line often contains only units. Retain its original box for review.
       const second=rows[start];
