@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.31.2 — 2026-11-28
 
 - Select pages before extracting mixed reports. Local Qwen3.5 can suggest log and location pages on request. Borehole logs can be matched to surveyed collar schedules within a PDF, with explicit decisions and source evidence for conflicting positions. Named graphic logs with explicit metric ranges retain their printed intervals.
 
@@ -17,6 +17,7 @@
 - Importing an alignment or CPTs into an open mapped site clears its map selection before requesting tiles for the new data. A graphics-device failure pauses rendering and offers another view while the original tab stays available for editing and export. Dense CPT collections can be drawn in the 3-D view, sections and reports. CPT-only sites use their collar elevations for the flat basemap.
 
 - Automatic renderer selection prefers WebGL 2 when the browser reports a software WebGPU adapter. Explicit WebGPU remains available. If the software device stops completing frames, the app offers recovery and keeps the current data available for editing and export.
+- GitHub Pages checks the current main revision before publishing so an older build finishing later cannot undo a deployed fix.
 
 ## 0.31.1 — 2026-11-26
 
