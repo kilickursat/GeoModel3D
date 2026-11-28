@@ -190,3 +190,16 @@ test("adding a private alignment to a mapped site requires a fresh map choice",a
   await expect(page.locator(".dataset option:checked")).toContainText("Your data");
   await expect(map).not.toBeChecked();
 });
+
+test("a lost graphics context leaves the workspace available for export",async({page})=>{
+  await importFixture(page);
+  await page.getByRole("tab",{name:"3-D model",exact:true}).click();
+  await page.locator("#app > canvas").dispatchEvent("webglcontextlost",{cancelable:true});
+  const status=page.locator(".renderer-status");
+  await expect(status).toBeVisible();
+  await expect(status).toContainText("edit your data or export your project");
+  await expect(status.getByRole("link")).toHaveAttribute("target","_blank");
+  await expect(status.getByRole("link")).toHaveAttribute("href",page.url());
+  await openInput(page);
+  expectComplete(await downloadJson(page,".ws-json"));
+});

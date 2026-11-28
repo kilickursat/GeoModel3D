@@ -69,6 +69,7 @@ try{await renderer.init()}catch(e){
 }
 document.querySelector(".intro")?.remove();
 const webgl="WebGL 2";
+let renderingStopped=false;
 const backendName=(renderer.backend as {isWebGPUBackend?:boolean}).isWebGPUBackend?"WebGPU":webgl;
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.setSize(innerWidth,innerHeight);
@@ -1653,6 +1654,7 @@ async function exportModel(format:"usdz"|"glb",slug:string){
 // The 3-D view as a PNG: rendered on white without the grid or the room kept for the section panel, and cropped
 // to the model. A blank capture, as a renderer may give, is left out.
 function captureView(){
+  if(renderingStopped)return undefined;
   const background=scene.background;
   scene.background=new THREE.Color(0xffffff);
   camera.clearViewOffset();
@@ -2211,6 +2213,30 @@ document.body.dataset.sheet="";
 layoutCompact();
 loadProject(project);
 if(location.hash==="#input")setMode("input");
+// Keep the current project available for editing and export if the GPU driver stops during a frame.
+function stopRendering(){
+  if(renderingStopped)return;
+  renderingStopped=true;
+  void renderer.setAnimationLoop(null);
+  renderer.domElement.style.visibility="hidden";
+  labelRenderer.domElement.style.visibility="hidden";
+  const status=document.createElement("div");
+  status.className="notice error renderer-status";
+  status.setAttribute("role","alert");
+  const message=document.createElement("p");
+  message.textContent=`The ${backendName} view stopped. You can still edit your data or export your project from this tab.`;
+  const url=new URL(location.href);
+  if(backendName==="WebGPU")url.searchParams.set("backend","webgl");
+  const link=document.createElement("a");
+  link.href=url.href;
+  link.target="_blank";
+  link.rel="noopener";
+  link.textContent=backendName==="WebGPU"?"Open a fresh view using WebGL 2":"Open a fresh 3-D view";
+  status.append(message,link);
+  app.appendChild(status);
+}
+const deviceLost=renderer.onDeviceLost.bind(renderer);
+renderer.onDeviceLost=info=>{deviceLost(info);stopRendering()};
 renderer.setAnimationLoop(()=>{
   // The 3-D view is not drawn behind the input tab.
   if(document.body.dataset.mode==="input")return;
@@ -2220,6 +2246,7 @@ renderer.setAnimationLoop(()=>{
   if(!dirty)return;
   dirty--;
   faceCpts();
-  renderer.render(scene,camera);
+  try{renderer.render(scene,camera)}
+  catch(error){console.error(error);stopRendering();return}
   labelRenderer.render(scene,camera);
 });

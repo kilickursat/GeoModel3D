@@ -590,6 +590,8 @@ export function toTestsCsv(p:GeoProject){
 function georeference(t:Tables,declared?:Crs):Crs|undefined{
   const geo=[...t.collars.values()].filter(c=>!(Number.isFinite(c.x)&&Number.isFinite(c.y))&&Number.isFinite(c.lon)&&Number.isFinite(c.lat));
   if(!geo.length)return declared;
+  if(!declared&&[...t.collars.values()].some(c=>Number.isFinite(c.x)&&Number.isFinite(c.y)))
+    throw new Error("These collars mix projected coordinates with latitude/longitude. Specify the coordinate system of the eastings and northings before combining them.");
   const mean=(k:"lon"|"lat")=>geo.reduce((a,c)=>a+c[k]!,0)/geo.length;
   const crs=declared??suggestCrs(mean("lon"),mean("lat"))[0];
   for(const c of geo)Object.assign(c,toProjected(crs,c.lon!,c.lat!));
