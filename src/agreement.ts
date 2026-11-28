@@ -31,6 +31,7 @@ export function askAgreement():Promise<boolean>{
 <li><b>On this device.</b> GeoModel3D reads the PDF or image here, in this browser. The document is not uploaded or sent anywhere.</li>
 <li><b>You check every value.</b> Reading is automatic and can be wrong. Before you use a borehole, compare its depths, descriptions, levels and position with the document. The review shows where each value was read, and marks the values to check.</li>
 <li><b>Scanned pages and images</b> are read by a text-reading model, PP-OCRv6 small by PaddlePaddle. The first time it is needed, the model (about 60 MB) is downloaded from GeoModel3D's own site and kept in this browser. It runs on your device, on the graphics processor where the browser allows. Help (?) can remove it.</li>
+<li><b>Optional Qwen page suggestions.</b> Choosing this in the page picker downloads Qwen model files from Hugging Face on first use. The model processes page excerpts in this browser.</li>
 </ul>
 <p>If you disagree, the document is not read, and everything else works as before. Your answer is kept in this browser; you can withdraw it under Help (?).</p>
 <div class="agree-actions"><button value="no">Disagree</button><button value="yes" class="agree-yes">Agree</button></div>`;

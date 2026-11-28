@@ -1,14 +1,16 @@
 // Borehole logs read from documents on this device, loaded only when one is dropped or picked (and the user has agreed):
-// each PDF is opened with PDF.js and the text of each page read. The reading model (OCR) reads instead: pages without
+// PDF.js indexes each page's native text, then reads the selected pages in detail. The reading model (OCR) reads pages without
 // text (scans), pages whose text is unusable (fonts without a map to characters give text that is not text), log pages
 // whose text gives no depth scale (a typed header over a scanned log), and images. A page whose text is doubtful is read
-// by both, and its own text kept where OCR confirms it. All pages of a document then go through the reconstruction
+// by both, and its own text kept where OCR confirms it. The selected pages then go through reconstruction
 // together (reconstruct.ts), so a log can run on over pages, and the review opens on the logs. What is being read shows
 // as it goes; Cancel stops it, the reading model too. In the review, any page read from its text can be read again by
 // OCR on request: the document's logs are then read again.
 import {openPdf,openImage,pageText,PageText,Doc} from "./pdftext";
 import {scanReason} from "./pdfpage";
 import {readDocument} from "./reconstruct";
+import {selectReportPages} from "./pageSelection";
+import {readCollarSchedules,matchCollarSchedules} from "./collarSchedule";
 import {draftHoles,DraftHole} from "./draft";
 import {createReview,ReviewHost,Unread,OcrRead} from "./review";
 import {createOcr,readPageImage,Ocr} from "./ocrclient";
@@ -23,7 +25,7 @@ const pct=(v:number)=>`${Math.round(100*v)} %`;
 const CONFIRMED=0.6;
 
 // What the reader keeps of each document for reading pages again: the pages as read, which were read by OCR and why.
-interface DocState { d:Doc; file:string; pages:PageText[]; read:Set<number>; why:Map<number,string> }
+interface DocState { d:Doc; file:string; pages:PageText[]; selected:Set<number>; read:Set<number>; why:Map<number,string> }
 
 export async function readPdfs(files:File[],host:ReviewHost){
   const review=createReview(host);
@@ -64,8 +66,9 @@ export async function readPdfs(files:File[],host:ReviewHost){
   const result=(doc:number,s:DocState)=>{
     s.pages.sort((a,b)=>a.page-b.page);
     const r=readDocument(s.pages);
-    return {holes:draftHoles(doc,s.file,r.logs,s.read,s.why),
-      unread:r.unread.map(u=>({doc,page:u.page,id:u.id,error:u.error,log:u.log,text:!s.read.has(u.page)&&s.d.kind==="pdf"})) as Unread[],
+    const rows=readCollarSchedules(s.pages),schedulePages=new Set(rows.map(row=>row.page));
+    return {holes:draftHoles(doc,s.file,r.logs,s.read,s.why,matchCollarSchedules(r.logs,rows)),
+      unread:r.unread.filter(u=>u.log||!schedulePages.has(u.page)).map(u=>({doc,page:u.page,id:u.id,error:u.error,log:u.log,text:!s.read.has(u.page)&&s.d.kind==="pdf"})) as Unread[],
       ocr:[...s.why].filter(([n])=>s.read.has(n)).map(([page,why])=>({doc,page,why})) as OcrRead[]};
   };
   for(const f of files){
@@ -83,13 +86,18 @@ export async function readPdfs(files:File[],host:ReviewHost){
     }
     catch(err){problems.push(`${f.name}: not read, as ${(err as Error).message}.`);continue}
     if(review.closed){void d.close();return}
-    const doc=review.addDoc(d,source),s:DocState={d,file:f.name,pages:[],read:new Set(),why:new Map()};
+    const doc=review.addDoc(d,source);
+    const selected=pdf?await selectReportPages(pdf,review):new Set([1]);
+    if(!selected||review.closed)return;
+    review.selectedPages(doc,selected);
+    const s:DocState={d,file:f.name,pages:[],selected,read:new Set(),why:new Map()};
     states[doc]=s;
     // The pages to read by OCR, and those whose text OCR should confirm.
     const scan:number[]=[],doubt:number[]=[];
     if(image){review.size(doc,1,image.width,image.height);scan.push(1);s.why.set(1,"an image")}
     else if(pdf)for(let n=1;n<=pdf.pages;n++){
       if(review.closed)return;
+      if(!selected.has(n))continue;
       review.progress(`Reading ${f.name}: page ${n} of ${pdf.pages}`);
       try{
         const t=await pageText(pdf,n);
@@ -102,7 +110,8 @@ export async function readPdfs(files:File[],host:ReviewHost){
     // A log page whose text gives no depth scale may carry the log as an image (a typed header over a scanned log): it is
     // read by OCR too, unless its text is prose (five lines or more of eight words or more), as a page of a report is.
     const prose=(n:number)=>(s.pages.find(p=>p.page===n)?.lines??[]).filter(l=>l.text.trim().split(/\s+/).length>=8).length>=5;
-    for(const u of readDocument(s.pages).unread)if(u.log&&u.error==="no depth scale found"&&!scan.includes(u.page)&&!doubt.includes(u.page)&&!prose(u.page)){
+    const schedulePages=new Set(readCollarSchedules(s.pages).map(row=>row.page));
+    for(const u of readDocument(s.pages).unread)if(u.log&&u.error==="no depth scale found"&&!schedulePages.has(u.page)&&!scan.includes(u.page)&&!doubt.includes(u.page)&&!prose(u.page)){
       scan.push(u.page);s.why.set(u.page,"a log page whose text gives no depth scale");
     }
     scan.sort((a,b)=>a-b);
@@ -150,6 +159,7 @@ export async function readPdfs(files:File[],host:ReviewHost){
   review.onReread(async(doc,page)=>{
     const s=states[doc];
     if(!s)throw new Error("this document is no longer open");
+    if(!s.selected.has(page))throw new Error("This page was excluded from extraction.");
     try{
       put(s,await ocrPage(doc,s,page));
       s.read.add(page);s.why.set(page,"read by OCR on request");

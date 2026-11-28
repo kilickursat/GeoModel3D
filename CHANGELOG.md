@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Select pages before extracting mixed reports. Local Qwen3.5 can suggest log and location pages on request. Borehole logs can be matched to surveyed collar schedules within a PDF, with explicit decisions and source evidence for conflicting positions. Named graphic logs with explicit metric ranges retain their printed intervals.
+
 - Correlation review compares the modelled beds at each contributing collar with its logged intervals. Reviewers can identify separate occurrences of the same material or record why they accept a discrepancy. Pending intervals mark volumes as provisional in the viewer and the printable report.
 
 - Dutch DOV reports retain their printed borehole identifiers and skip separate stratigraphic appendices. A leading “idem” requires material review. Dutch and French descriptions of made ground map to the same group.

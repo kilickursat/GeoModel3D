@@ -303,3 +303,153 @@ test("a page read from its own text can be read again by OCR, which says so on t
   await expect(review.locator(".dr-unread")).toContainText("1 page read by OCR");
   await expect(review.locator(".dr-say")).toContainText(/Page 1 read by OCR/);
 });
+
+async function openMixedReportPicker(page:Page){
+  // Generate a self-contained original report: two text pages and an image-only page.
+  const sheet=await page.context().newPage();
+  await sheet.setContent(`<style>@page{size:A4}article{break-after:page}article:last-child{break-after:auto}</style>
+    <article><h1>Executive summary</h1><p>The site investigation considered a proposed foundation in the north field.</p></article>
+    <article><h1>Borehole locations</h1><table><tr><th>Borehole ID</th><th>Easting</th><th>Northing</th></tr>
+    <tr><td>BH-01</td><td>530000</td><td>185000</td></tr><tr><td>BH-02</td><td>531000</td><td>186000</td></tr></table></article>
+    <article><canvas id="scan" width="500" height="500"></canvas></article>`);
+  await sheet.locator("canvas").evaluate((canvas:HTMLCanvasElement)=>{
+    const ctx=canvas.getContext("2d")!;ctx.fillStyle="black";ctx.fillRect(20,20,80,80);
+  });
+  const pdf=await sheet.pdf({preferCSSPageSize:true,printBackground:true});
+  await sheet.close();await prepare(page);await page.goto("/?backend=webgl#input");await openInput(page);
+  await page.locator(".pdf-file").setInputFiles({name:"mixed-pages.pdf",mimeType:"application/pdf",buffer:pdf});
+  await page.getByRole("button",{name:"Agree",exact:true}).click();
+  const review=page.getByRole("dialog",{name:"Borehole logs read from documents"});
+  const picker=review.getByRole("region",{name:"Report page selection"});
+  await expect(picker).toBeVisible();
+  return {review,picker};
+}
+
+test("mixed report pages can be previewed and excluded before OCR and Qwen",async({page})=>{
+  const expensive:string[]=[];
+  page.on("request",req=>{if(/ocr\.worker-|reportQwen[^/]*worker-|huggingface\.co/.test(req.url()))expensive.push(req.url())});
+  const {review,picker}=await openMixedReportPicker(page);
+  await expect(picker.getByRole("checkbox",{name:"Read page 1"})).not.toBeChecked();
+  await expect(picker.getByRole("checkbox",{name:"Read page 2"})).toBeChecked();
+  const scan=picker.getByRole("checkbox",{name:"Read page 3"});
+  await expect(scan).toBeChecked();
+  await picker.getByRole("button",{name:"Preview page 3"}).click();
+  await expect(picker.getByRole("heading",{name:"Source · page 3"})).toBeVisible();
+  await picker.getByRole("button",{name:"Select log and location pages"}).click();
+  await expect(scan).not.toBeChecked();
+  await expect(picker).toContainText("1 of 3 pages selected · 1 excluded page has no usable indexed text");
+  expect(expensive).toEqual([]);
+
+  // Hold the optional module so cancellation is exercised without needing a physical GPU or model download.
+  let release!:()=>void;
+  const held=new Promise<void>(r=>{release=r});
+  await page.route(/\/assets\/reportQwen-[^/]*\.js$/,async route=>{await held;await route.fallback().catch(()=>{})});
+  try{
+    await picker.getByText("Local Qwen page suggestions",{exact:true}).click();
+    await picker.getByLabel("Analyze").selectOption("checked");
+    await picker.getByRole("button",{name:"Get Qwen suggestions"}).click();
+    await picker.getByRole("button",{name:"Stop Qwen"}).click();
+    await expect(picker).toContainText("Qwen stopped.");
+    await expect(scan).not.toBeChecked();
+    await picker.getByRole("button",{name:"Read selected pages"}).click();
+    await expect(picker).toHaveCount(0);
+    await expect(review.locator(".dr-checks")).toContainText("No borehole log was read");
+    expect(expensive).toEqual([]);
+  }finally{release()}
+});
+
+test("Qwen page proposals can be applied during a run and survive stopping and a scoped rerun",async({page})=>{
+  const {picker}=await openMixedReportPicker(page);
+  // Hold inference at one completed page on the first run. Later callbacks exercise stale and out-of-scope delivery.
+  await page.route(/\/assets\/reportQwen-[^/]*\.js$/,route=>route.fulfill({contentType:"application/javascript",body:`
+    let run=0;
+    export async function suggestReportPages(pages,{signal,onPage}){
+      if(++run===1){
+        onPage(1,"log");
+        await new Promise(resolve=>signal.addEventListener("abort",()=>{onPage(2,"log");resolve()},{once:true}));
+      }else if(run===2){
+        onPage(1,"other");onPage(2,"schedule");
+      }else{onPage(1,"other")}
+      return {logs:[],schedules:[],unreadable:[]};
+    }`}));
+  const first=picker.getByRole("checkbox",{name:"Read page 1"}),second=picker.getByRole("checkbox",{name:"Read page 2"});
+  const third=picker.getByRole("checkbox",{name:"Read page 3"});
+  const status=picker.locator(".dr-qwen-status");
+  const run=picker.getByRole("button",{name:"Get Qwen suggestions"});
+  await picker.getByText("Local Qwen page suggestions",{exact:true}).click();
+  await picker.getByLabel("Analyze").selectOption("all");
+  await run.click();
+  await expect(status).toContainText("1 of 2 readable pages classified");
+  await expect(picker.getByText("Qwen suggests borehole log",{exact:true})).toHaveCount(1);
+  await expect(first).not.toBeChecked();
+  await picker.getByRole("button",{name:"Include 1 suggested page"}).click();
+  await expect(first).toBeChecked();
+  await picker.getByRole("button",{name:"Stop Qwen"}).click();
+  await expect(status).toContainText("Qwen stopped. 1 of 2");
+  await expect(picker.getByText("Qwen suggests borehole log",{exact:true})).toHaveCount(1);
+  await first.uncheck();await third.uncheck();
+  await picker.getByLabel("Analyze").selectOption("checked");
+  await run.click();
+  await expect(status).toContainText("1 of 1 readable page classified");
+  await expect(picker.getByText("Qwen suggests borehole log",{exact:true})).toHaveCount(1);
+  await expect(picker.getByText("Qwen suggests location schedule",{exact:true})).toHaveCount(1);
+  await expect(first).not.toBeChecked();
+  await picker.getByRole("button",{name:"Include 1 suggested page"}).click();
+  await second.uncheck();
+  await run.click();
+  await expect(picker.getByText("Qwen did not suggest this page",{exact:true})).toHaveCount(1);
+  await expect(picker.getByText("Qwen suggests location schedule",{exact:true})).toHaveCount(1);
+  await expect(first).toBeChecked();
+  await expect(second).not.toBeChecked();
+});
+
+test("Qwen searches for a chosen ground-model input and shows the source passage used for each question",async({page})=>{
+  // Keep the actual page index, client and worker request. Substitute two deterministic worker replies.
+  await page.addInitScript(()=>{
+    type Request={question:"log"|"schedule";excerpt:string}[][];
+    const requests:Request[]=[];
+    Object.assign(window,{testQwenRequests:requests});
+    window.Worker=new Proxy(window.Worker,{construct(original,args){
+      if(!String(args[0]).includes("reportQwen.worker"))return Reflect.construct(original,args);
+      return {
+        onmessage:null as ((event:{data:unknown})=>void)|null,
+        postMessage(this:{onmessage:((event:{data:unknown})=>void)|null},request:Request){
+          requests.push(request);
+          const role=request[0][0].question;
+          this.onmessage?.({data:{index:0,role}});
+          if(requests.length===1)this.onmessage?.({data:{roles:[role]}});
+        },terminate(){}
+      };
+    }});
+  });
+  const {picker}=await openMixedReportPicker(page);
+  await picker.getByText("Local Qwen page suggestions",{exact:true}).click();
+  const goal=picker.getByLabel("Find evidence for"),scope=picker.getByLabel("Analyze");
+  const run=picker.getByRole("button",{name:"Get Qwen suggestions"}),second=picker.getByRole("checkbox",{name:"Read page 2"});
+  await expect(goal).toHaveValue("both");await expect(scope).toHaveValue("likely");
+  await goal.selectOption("schedule");await second.uncheck();
+  await expect(picker.locator(".dr-qwen-scope-note")).toContainText("1 of 3 pages will be searched");
+  await run.click();
+  await expect(picker.locator(".dr-qwen-missing")).toContainText("completed collar locations");
+  await expect(second).not.toBeChecked();
+  await picker.getByRole("button",{name:"Inspect Qwen text for page 2"}).click();
+  const passages=picker.getByRole("region",{name:"Text Qwen evaluated"});
+  await expect(picker.getByRole("heading",{name:"Source · page 2"})).toBeVisible();
+  await expect(passages.getByRole("heading",{name:"Completed collar locations"})).toBeVisible();
+  const request=()=>page.evaluate(()=>(window as unknown as {testQwenRequests:{question:string;excerpt:string}[][][]}).testQwenRequests);
+  const first=(await request())[0];
+  expect(first).toHaveLength(1);expect(first[0].map(q=>q.question)).toEqual(["schedule"]);
+  expect(first[0][0].excerpt).toContain("530000");
+  expect(await passages.locator("pre").allTextContents()).toEqual([first[0][0].excerpt]);
+  await picker.getByRole("button",{name:"Include 1 suggested page"}).click();
+  await expect(picker.locator(".dr-qwen-missing")).toBeEmpty();
+  await goal.selectOption("log");await expect(run).toBeDisabled();
+  await scope.selectOption("checked");await run.click();
+  await expect(picker).toContainText("Qwen suggests borehole log and location schedule");
+  await picker.getByRole("button",{name:"Stop Qwen"}).click();
+  await expect(picker).toContainText("Qwen stopped.");
+  await expect(second).toBeChecked();
+  const secondRun=(await request())[1];
+  expect(secondRun).toHaveLength(1);expect(secondRun[0].map(q=>q.question)).toEqual(["log"]);
+  expect(await passages.locator("pre").allTextContents()).toEqual([first[0][0].excerpt,secondRun[0][0].excerpt]);
+});

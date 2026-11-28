@@ -1,0 +1,38 @@
+{
+  "authoring": "Research transcription checked visually against the original PDF pages before reader evaluation. Requires independent engineer review.",
+  "source": {
+    "title": "GSQ Eulo 2 borehole completion record: Southern Thomson Project",
+    "attribution": "Roach, I. C. et al. (2017). Geoscience Australia Record 2017/08 and Queensland Geological Record 2017/04. Commonwealth of Australia (Geoscience Australia) and State of Queensland (Department of Natural Resources and Mines).",
+    "doi": "10.11636/Record.2017.008",
+    "url": "https://www.ga.gov.au/corporate_data/104421/Rec2017_008.pdf",
+    "sha256": "625c3031b19c1c5bba2a5f08a7f4d66761376e17062a2ef4b99a889318ade9f1",
+    "licence": "CC BY 4.0, except Commonwealth Coat of Arms and where otherwise noted (PDF page 3). Numeric/depth records and our descriptions only.",
+    "pages": 53
+  },
+  "target": "Extract actual completed borehole location and lithologic log only. Page labels are original PDF one-based. Other page roles do not require OCR for this question.",
+  "requiredPages": [7, 13],
+  "id": "GSQ Eulo 2",
+  "location": {
+    "page": 7, "printedPage": 2, "table": "2.1",
+    "horizontalDatum": "GDA94", "longitude": 145.102530, "latitude": -28.310158,
+    "projectedCRS": "GDA94 / MGA zone 55 (EPSG:28355)", "easting": 314026, "northing": 6866950,
+    "elevation_m": 162, "verticalDatum": "ellipsoidal", "drilledLength_m": 135.5, "verticalBorehole": true,
+    "review": "Location conflict. Reported geographic position projects to approximately 313954.02, 6866977.74 (MGA55), about 77.1 m from stated grid position. Do not claim an authoritative position or assume AHD for the collar."
+  },
+  "layers": {
+    "page": 13, "printedPage": 8, "figure": "3.2", "depthUnits": "m",
+    "observed": [
+      {"from": 0, "to": 2, "material": "Regolith, red-brown quartzose silt"},
+      {"from": 2, "to": 23, "material": "Winton Formation, weathered mudstone transitioning to siltstone"},
+      {"from": 23, "to": 51, "material": "Wallumbilla Formation, siltstone"},
+      {"from": 51, "to": 72.6, "material": "Waihora Volcanics, volcaniclastic conglomerate"},
+      {"from": 72.6, "to": 135.5, "material": "Waihora Volcanics, dacitic ignimbrite"}
+    ]
+  },
+  "otherPages": [
+    {"page": 16, "reason": "Table 3.1 compares expected and actual stratigraphic tops; supplementary interpretation only."},
+    {"page": 31, "reason": "Groundwater, optional separate analysis; does not supply collar or full lithologic log."},
+    {"page": 47, "reason": "Appendix D.7 is original drilling instructions, same hole ID but planned position, not an independent actual survey."},
+    {"page": 48, "reason": "Table D.6 describes a neighbouring waterbore and D.7 lists pre-drilling estimates."}
+  ]
+}

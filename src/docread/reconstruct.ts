@@ -1182,6 +1182,12 @@ function hasFeetDepth(lines:TextLine[]){
   }));
 }
 
+// DOV interpretation tables also use Van / Tot / Beschrijving for formations or geologic ages.
+export function isDovInterpretationPage(lines:readonly string[]):boolean{
+  return lines.some(s=>/^DOV Boorrapport$/i.test(s.trim()))&&
+    lines.some(s=>/^(?:in)?formele stratigrafie\b/i.test(s.trim()))&&
+    !lines.some(s=>/^(?:lithologische beschrijving\b|boring$|proefnummer\s*:)/i.test(s.trim()));
+}
 export function readPage(els:TextLine[],width:number,height:number,rules:Rule[]=[],continuing=false):PageLog[]{
   const starts:number[]=[];
   for(const e of els.filter(e=>LOG_TITLE.test(e.text)).sort((p,q)=>p.cy-q.cy))if(!starts.length||e.cy-starts[starts.length-1]>0.3*height)starts.push(e.cy);
@@ -1198,9 +1204,7 @@ export function readPage(els:TextLine[],width:number,height:number,rules:Rule[]=
     const y1=k<cuts.length-1?cuts[k+1]:Infinity,part=els.filter(e=>e.cy>=y0&&e.cy<y1);
     // A DOV interpretation appendix also has Van/Tot/Beschrijving columns, but its rows are
     // formations or ages. They neither describe new samples nor warrant an OCR retry.
-    if(part.some(e=>/^DOV Boorrapport$/i.test(e.text.trim()))&&
-      part.some(e=>/^(?:in)?formele stratigrafie\b/i.test(e.text.trim()))&&
-      !part.some(e=>/^(?:lithologische beschrijving\b|boring$|proefnummer\s*:)/i.test(e.text.trim()))){
+    if(isDovInterpretationPage(part.map(e=>e.text))){
       return {kind:"table",layers:[],used:new Set<TextLine>(),flagged:[],bounds:[],texts:[],error:"a stratigraphic interpretation",evidence:false};
     }
     const log=graphicRangeLog(part)??(headingPairs(part,width).length?rebuildTable(part,width):rebuild(part,width,height,rules,continuing&&k===0));
