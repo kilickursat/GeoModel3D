@@ -20,7 +20,7 @@ import {formatValue,propertyDef} from "./properties";
 import {Crs,crsRegistry,projectCrs,findCrs,customCrs,searchCrs,suggestCrs,toProjected,toGeographic} from "./crs";
 import {fetchTerrain,elevationSources,mapSources,covers,tileUrl,parseGsiTile,decodeTerrarium,mapTiles,tileXY,ElevationSource,TileSource} from "./tiles";
 import {applyUnitRules} from "./rules";
-import {reportHtml} from "./report";
+import {reportHtml,loggedIntervalsTable} from "./report";
 import {createInputWorkspace,InputModelContext} from "./input";
 import {parseWorkspace} from "./workspace";
 import {showEvidence} from "./evidenceView";
@@ -166,6 +166,7 @@ function buildContent(){
   extent=Math.max(b.maxX-b.minX,b.maxY-b.minY,(b.maxZ-b.minZ)/2,1);
 
   model.units.forEach((u,k)=>{
+    if(!model.triangles.length)return;
     const g=volumeGeometry(unitVolume(model,k),origin);
     if(!g.indices.length)return;
     const geo=new THREE.BufferGeometry();
@@ -203,7 +204,7 @@ function buildContent(){
   });
   buildTerrain();
 
-  const radius=extent*0.0045,segments:Array<{hole:number;interval:number;top:number;bottom:number;color:string}>=[];
+  const radius=extent*(model.logOnlyReason?0.04:0.0045),segments:Array<{hole:number;interval:number;top:number;bottom:number;color:string}>=[];
   model.boreholes.forEach((bh,hole)=>{
     bh.intervals.forEach((iv,interval)=>segments.push({hole,interval,top:bh.z-iv.from,bottom:bh.z-iv.to,color:model.units.find(u=>u.id===iv.unit)?.color??"#7b8790"}));
     const logged=Math.max(...bh.intervals.map(i=>i.to)),depth=boreholeDepth(bh);
@@ -1101,7 +1102,8 @@ function renderPanel(){
   more.hidden=(project.description??"").length<160;
   more.textContent="More";
   const count=(n:number,what:string)=>`${n} ${what}${n===1?"":"s"}`;
-  const stats=[count(model.boreholes.length,"borehole"),...(model.cpts.length?[count(model.cpts.length,"CPT")]:[]),count(model.units.length,"unit"),count(model.horizons.length,"horizon")];
+  const stats=[count(model.boreholes.length,"borehole"),...(model.cpts.length?[count(model.cpts.length,"CPT")]:[]),count(model.units.length,"unit"),...(model.logOnlyReason?["Logged intervals only"]:[count(model.horizons.length,"horizon")])];
+  if(model.simplifiedIntervals)stats.push(`${count(model.simplifiedIntervals,"logged interval")} assigned a different unit in the model`);
   if(model.triangles.length)stats.push(`footprint ${fmtArea(footprintArea(model))}`);
   if(project.terrain)stats.push(`terrain ${fmt(project.terrain.dx,1)} m grid`);
   ui.querySelector(".stats")!.innerHTML=stats.join(" · ");
@@ -1299,6 +1301,12 @@ function syncControls(){
 function renderSectionPanel(){
   // Behind the input tab the panel has no size; it is drawn when the model tab is shown again.
   if(!view.panel||!section||document.body.dataset.mode==="input")return;
+  sectionBody.classList.toggle("log-only",!!model.logOnlyReason);
+  if(model.logOnlyReason){
+    sectionView.querySelector(".section-name")!.textContent="Logged intervals";
+    sectionBody.innerHTML=loggedIntervalsTable(model);
+    return;
+  }
   sectionView.querySelector(".section-name")!.textContent=section.alignment?sectionTitle(section):`Section A–A′ · ${String(view.azimuth).padStart(3,"0")}° · ${view.offset>=0?"+":""}${Math.round(view.offset)} m`;
   sectionBody.innerHTML=sectionSvg(model,section,{width:sectionBody.clientWidth,height:sectionBody.clientHeight,theme:"light",title:false,buffer:sectionBuffer,hidden:view.hidden,field:field??undefined,marker:section.alignment?view.chainage:undefined,crossings});
 }

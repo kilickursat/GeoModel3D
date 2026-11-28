@@ -20,7 +20,7 @@ GeoModel3D builds a layered ground model from borehole logs and cone penetration
 
 ## What it does
 
-- Builds the model from boreholes, CPTs or both: horizons between the boreholes and a closed volume for each unit. One borehole is enough to start.
+- Builds the model from boreholes, CPTs or both: horizons between the boreholes and a closed volume for each unit. One borehole is enough to start. If a single log contradicts the chosen stratigraphic order, the viewer and report show its measured intervals and withhold the continuous model. For multiple boreholes the summary counts intervals assigned a different unit in the model.
 - Reads borehole logs from PDF reports and images on your device, logs drawn with a depth scale, set out as tables or described sample by sample, over all their sheets, scanned pages included. You check each value beside the page it was read from before it is used. Logs with recognized depth headings in feet are held for manual conversion to metres.
 - Registers core-box photographs to depth, assists piece and lithology logging, and calculates reviewed photo-derived RQD. Accepted intervals link back to their highlighted photographs in the model; drafts and review history travel with the workspace ([workflow](docs/guide.md#core-photographs-to-a-ground-model)). Works locally and in the standalone HTML.
 - Compares registered core pieces and gaps with the current borehole log on a shared depth axis. Select an interval to highlight its exact photograph region, inspect differing unit labels, and export a source-linked interval CSV. Works locally and offline.

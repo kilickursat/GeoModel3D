@@ -58,6 +58,7 @@ export function skin(m:GeoModel,visible:boolean[]){
 // metres across (30 cm by default), with the viewer's vertical exaggeration; a mesh per visible unit, and the pins.
 export function arModel(project:GeoProject,o:ArOptions):ArModel{
   const m=buildGeologicalModel(project,{triangles:o.triangles??6000}),K=m.units.length;
+  if(m.logOnlyReason)throw new Error(m.logOnlyReason);
   const visible=m.units.map(u=>!o.hidden?.has(u.id));
   let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
   for(const p of m.nodes){x0=Math.min(x0,p.x);x1=Math.max(x1,p.x);y0=Math.min(y0,p.y);y1=Math.max(y1,p.y)}

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Dutch DOV reports retain their printed borehole identifiers and skip separate stratigraphic appendices. A leading “idem” requires material review. Dutch and French descriptions of made ground map to the same group.
+- When a single borehole contradicts the project’s stratigraphic order, the viewer and report show its logged intervals and omit estimated solid volumes. Multi-hole model summaries flag intervals reassigned during correlation.
+- The source preview appears while local OCR is running.
+
 - The report reader checks Japanese water-level columns against measurement dates and uses the logged soil-name column for material grouping. The reader aligns descriptions to the ruled cells when multiple printed boundary depths confirm a shift in the depth scale. Missing or conflicting soil names are left for review. Scans with invisible text over an image go through local OCR, and ruled boundaries are extracted before the page pixels move to the OCR worker.
 - The reader recognizes split SPT blow-count headings and explicit penetration units. It identifies logs with recognized depth headings in feet for manual conversion before import.
 - Model builds retain the coordinate system used to convert geographic report collars. Mixed projected and geographic positions require a declared projection.

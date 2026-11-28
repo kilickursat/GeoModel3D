@@ -1,7 +1,9 @@
 import {describe,it,expect} from "vitest";
-import {buildGeologicalModel,boreholeContacts,unitCubicMetres,footprintArea,GeoModel} from "../src/model";
+import {buildGeologicalModel,boreholeContacts,unitCubicMetres,footprintArea,sampleModel,modelBounds,GeoModel} from "../src/model";
 import {referenceProject,valleyProject,boreholeDepth,GeoProject,UnitDef} from "../src/geology";
 import {triangleArea} from "../src/tin";
+import {computeSection} from "../src/section";
+import {reportHtml} from "../src/report";
 
 const ordered=(m:GeoModel)=>m.horizons.every((h,k)=>k===0||h.z.every((z,i)=>z<=m.horizons[k-1].z[i]+1e-9));
 
@@ -129,6 +131,35 @@ describe("reading a log",()=>{
     // Logged from 1 m in B: the base of A is at most 1 m deep there.
     expect(m.horizons[1].z[later]).toBeCloseTo(99,9);
     expect(m.warnings.some(w=>/no log between/.test(w))).toBe(false);
+  });
+});
+
+describe("a log that revisits an earlier unit",()=>{
+  const units=["Clay","Peat","Sand"].map(id=>({id,name:id,color:"#888888"}));
+  const hole={id:"B1",x:12345,y:54321,z:30,intervals:[
+    {from:0,to:1,unit:"Clay"},{from:1,to:3,unit:"Peat"},{from:3,to:8,unit:"Sand"},{from:8,to:22,unit:"Clay"}
+  ]};
+  const p:GeoProject={name:"Single log",units,boreholes:[hole],margin:25};
+
+  it("keeps the complete log and withholds the extrapolation, including for an explicit margin",()=>{
+    const m=buildGeologicalModel(p);
+    expect(m.logOnlyReason).toContain("stratigraphic order");
+    expect(m.boreholes[0].intervals).toEqual(hole.intervals);
+    expect(m.triangles).toHaveLength(0);
+    expect(footprintArea(m)).toBe(0);
+    expect(sampleModel(m,hole.x,hole.y)).toBeNull();
+    expect(modelBounds(m)).toMatchObject({minZ:8,maxZ:30,minX:12345,minY:54321});
+    expect(m.horizons[1].z[0]).toBeNaN();
+    const report=reportHtml(m,computeSection(m,{azimuth:0,offset:0}),{paper:"A4",date:"2026-11-28",version:"test",credits:[],notes:[],sectionBuffer:5,ve:1});
+    expect(report).toContain(m.logOnlyReason);
+    for(const i of hole.intervals)expect(report).toContain(`<tr><td>${i.from}</td><td>${i.to}</td><td>${i.unit}</td></tr>`);
+    expect(report).not.toContain("0 m³");
+  });
+  it("counts the intervals simplified when corroborating logs support a continuous model",()=>{
+    const m=buildGeologicalModel({...p,boreholes:[hole,{...hole,id:"B2",x:12370,intervals:hole.intervals.slice(0,3)}]});
+    expect(m.logOnlyReason).toBeUndefined();
+    expect(m.simplifiedIntervals).toBe(1);
+    expect(m.triangles.length).toBeGreaterThan(0);
   });
 });
 

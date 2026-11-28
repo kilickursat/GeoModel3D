@@ -66,7 +66,7 @@ export function sectionSvg(model:GeoModel,s:Section,o:SectionSvgOptions){
   const frame=out.length-2;
   if(title)out.push(`<text x="${m.l}" y="18" font-size="13" font-weight="600" fill="${t.text}">${esc(model.project.name)} — ${esc(sectionTitle(s))}</text>`);
   if(s.s.length<2){
-    out.push(`<text x="${W/2}" y="${H/2}" text-anchor="middle" font-size="13" fill="${t.muted}">The ${s.alignment?"line":"section line"} does not cross the model footprint</text></svg>`);
+    out.push(`<text x="${W/2}" y="${H/2}" text-anchor="middle" font-size="13" fill="${t.muted}">${model.logOnlyReason?"Logged intervals only. No continuous section is available.":`The ${s.alignment?"line":"section line"} does not cross the model footprint`}</text></svg>`);
     return out.join("");
   }
   const holes=s.boreholes.map(p=>({p,b:model.boreholes[p.index]})),cpts=s.cpts.map(p=>({p,c:model.cpts[p.index]}));
