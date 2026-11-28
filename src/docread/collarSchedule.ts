@@ -38,7 +38,10 @@ function qualifier(text:string):QualifierKind|undefined{
   const t=text.trim().toLowerCase().replace(/co-ordinate/g,"coordinate").replace(/[_:]/g," ").trim();
   if(/\bunits?\s*(?:$|\(|\[|of measure(?:ment)?\b)|^u\.?o\.?m\.?$/.test(t))return "units";
   if(/^(?:vertical|height|elevation) (?:reference|datum|crs)|^datum\s*\((?:vertical|height|elevation)\)/.test(t))return "verticalDatum";
-  if(/^(?:(?:coord(?:inate)?\.?|horizontal|survey|map|spatial|geodetic|gps|utm|mga|grid) )*(?:crs|srs|srid|datum|epsg|grid|projection|zone|coordinate system|ref(?:erence)?(?: system| frame)?|hemisphere)(?:\b|$)/.test(t))return "frame";
+  const prefix=/^(?:(?:coord(?:inate)?\.?|horizontal|survey|map|spatial|geodetic|gps|utm|mga|grid) )+/;
+  const core=t.replace(prefix,"");
+  if(/^(?:crs|srs|srid|datum|epsg|grid|projection|zone|coordinate system|reference (?:system|frame)|hemisphere)\b/.test(t)||
+     core!==t&&/^(?:crs|srs|srid|datum|epsg|grid|projection|zone|system|ref(?:erence)?|hemisphere)\b/.test(core))return "frame";
 }
 
 function label(text:string):Label|undefined{
