@@ -39,6 +39,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       pages: write
       id-token: write
     concurrency:
@@ -48,5 +49,22 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      # Builds can finish out of order. Recheck main after acquiring the Pages deployment lock.
+      - name: Check the current main commit
+        id: main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          main_sha=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')
+          if [[ ! $main_sha =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::Could not resolve the main branch commit"
+            exit 1
+          fi
+          echo "sha=$main_sha" >> "$GITHUB_OUTPUT"
+          if [[ $GITHUB_SHA != "$main_sha" ]]; then
+            echo "::notice::Skipping Pages publication of $GITHUB_SHA because main is now $main_sha"
+          fi
       - id: deployment
+        if: steps.main.outputs.sha == github.sha
         uses: actions/deploy-pages@v5
