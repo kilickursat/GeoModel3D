@@ -60,3 +60,9 @@ Before the modeling fix, that single reviewed borehole generated an assumed 25 m
 | Release a new browser build | Replay the public cases through import, review, model, export and reopen. Verify known geometry in actual rendered pixels on physical WebGPU adapters and WebGL 2, and watch network traffic from private import onward. Record app, browser, driver and reference versions with the measurements. |
 
 The checked examples include strong transcription results and metre-scale geometric errors on the same project. The repository’s benchmark reference labels remain drafts. Professional review of independent ground truth and intended-use tolerances is still required for an engineering validation claim.
+
+## Software WebGPU rendering
+
+Chromium 156 reported Google SwiftShader as a fallback adapter on this host. The deployed app at `edf820c` loaded the four Tochigi originals, displayed WebGPU and computed the 2-D section. Its 3-D canvas showed labels over the background for 36 seconds. Inside the same 637 × 269 pixel region, a colour check found 26,730 geological-model pixels in WebGL 2 and zero in four WebGPU captures. A raw WebGPU triangle and a minimal Three.js triangle also failed on that adapter. Chromium rejected GPU operations after losing the instance.
+
+With the renderer selection change, automatic mode on this machine used WebGL 2 and reproduced the 26,730 pixels. Explicit WebGPU displayed a recovery link when the software device stopped completing submissions. The check used a software adapter. Physical WebGPU rendering remains to be verified.

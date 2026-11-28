@@ -12,6 +12,8 @@
 - Project JSON imports preserve missing coordinates and readings. Only logs admitted to the model contribute units to its horizons. Cross-validation withholds all logs at the tested collar.
 - Importing an alignment or CPTs into an open mapped site clears its map selection before requesting tiles for the new data. A graphics-device failure pauses rendering and offers another view while the original tab stays available for editing and export. Dense CPT collections can be drawn in the 3-D view, sections and reports. CPT-only sites use their collar elevations for the flat basemap.
 
+- Automatic renderer selection prefers WebGL 2 when the browser reports a software WebGPU adapter. Explicit WebGPU remains available. If the software device stops completing frames, the app offers recovery and keeps the current data available for editing and export.
+
 ## 0.31.1 — 2026-11-26
 
 ### Fixed
