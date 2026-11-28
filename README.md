@@ -22,6 +22,7 @@ GeoModel3D builds a layered ground model from borehole logs and cone penetration
 
 - Builds the model from boreholes, CPTs or both: horizons between the boreholes and a closed volume for each unit. One borehole is enough to start. If a single log contradicts the chosen stratigraphic order, the viewer and report show its measured intervals and withhold the continuous model. For multiple boreholes the summary counts intervals assigned a different unit in the model.
 - Reads borehole logs from PDF reports and images on your device, logs drawn with a depth scale, set out as tables or described sample by sample, over all their sheets, scanned pages included. You check each value beside the page it was read from before it is used. Logs with recognized depth headings in feet are held for manual conversion to metres.
+- Correlate repeated materials across boreholes using explicit, source-linked bed assignments in a local CSV worksheet. [Bed review and worksheet preparation](docs/guide.md#reviewing-a-bed-correlation)
 - For mixed reports, choose the pages to extract. Optional local Qwen3.5 can look for completed collar locations and measured layers. Inspect the original passages and review conflicting measurements before use. [Mixed-report trials](bench/results/mixed-report-review/README.md)
 - Registers core-box photographs to depth, assists piece and lithology logging, and calculates reviewed photo-derived RQD. Accepted intervals link back to their highlighted photographs in the model; drafts and review history travel with the workspace ([workflow](docs/guide.md#core-photographs-to-a-ground-model)). Works locally and in the standalone HTML.
 - Compares registered core pieces and gaps with the current borehole log on a shared depth axis. Select an interval to highlight its exact photograph region, inspect differing unit labels, and export a source-linked interval CSV. Works locally and offline.
@@ -120,7 +121,7 @@ GitHub's **Cite this repository** gives the reference from [CITATION.cff](CITATI
   author  = {Kilic, Kursat},
   title   = {GeoModel3D: 3D geological models from borehole logs and CPTs, in the browser},
   url     = {https://github.com/kilickursat/GeoModel3D},
-  version = {0.31.2},
+  version = {0.31.3},
   year    = {2026},
   license = {Apache-2.0}
 }

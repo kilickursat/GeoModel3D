@@ -22,3 +22,16 @@ The separate five-PDF project excluded the held-out log and its unit order. We t
 ## Transfer to other Tochigi logs
 
 A second comparison used 26 other original files from the same licensed archive. The ordered base depths, checked against printed thickness and elevation, matched the full extraction on 22 files. The other four still had extra or missing interpreted depths on their first sheet. The reader flags those intervals for source review. A three-page log retained its 20 printed bases and existing descriptions. These are development checks from one publisher. [Per-file source comparison](transfer-checks.json)
+
+## Reviewed-bed backend replay
+
+The five-PDF export contains 38 measured intervals over 87.54 m. Before a geotechnical reviewer assigns distinct beds, the five-hole interpretation still substitutes another material over 7.85 m in ten intervals. On the separate six-PDF export the corresponding results are 80.59 m in 20 of 47 intervals. The blank worksheet leaves these observations and the project unchanged. A decision with an intentionally incorrect PDF hash was rejected. Saving and reopening retained each interval, its evidence record and its source boxes. [Source-only five-hole worksheet](blind/training-bed-assignments.csv) · [Replay results](bed-review-replay.json)
+
+The replay freezes a model from the five-PDF project at the published collar coordinates before reading the six-hole export. It scores the withheld log using that fixed training unit order. The grade at the collar is eligible for a ground-elevation comparison. Repeated Gravel intervals leave the bed identity ambiguous, so the new validation omits its top from contact-error statistics. The underlying provisional surface still produces the earlier numerical prediction. The reported material overlap agrees with an independent intersection of predicted elevation bands and measured intervals. These checks validate the handling of incomplete correlation decisions in this development survey. Human review of bed continuity and design tolerances remains pending.
+
+To repeat from the repository root, save the separate five-PDF and six-PDF projects described above using the original source files, before completing any bed assignments. The following command reads the projects in that order. It prints counts and checks without printing the held-out geology or prediction values. Fresh browser exports may have different JSON hashes because evidence records get new IDs; the runner verifies each original PDF hash in both projects.
+
+```sh
+node_modules/.bin/esbuild bench/runner/tochigi-bed-review.ts --bundle --platform=node --format=esm --outfile=.cache/tochigi-bed-review.mjs
+node .cache/tochigi-bed-review.mjs five-pdf-project.json six-pdf-project.json
+```

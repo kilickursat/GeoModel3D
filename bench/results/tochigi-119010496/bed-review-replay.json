@@ -1,0 +1,26 @@
+{
+  "trainingExport": "a448abf8e99d6395d87908f38fe6a88353a57db47066b300b159f90eb4bfd745",
+  "sixHoleExport": "221d8b3cd8dfbf4b86d62a331553a831672c01062c180b062eb5385abe3f5844",
+  "fiveHoleAudit": {
+    "intervals": 38,
+    "substituted": 10,
+    "logged_m": 87.54,
+    "mismatched_m": 7.85
+  },
+  "sixHoleAudit": {
+    "intervals": 47,
+    "substituted": 20,
+    "logged_m": 104.59,
+    "mismatched_m": 80.59
+  },
+  "holdout": {
+    "insideHull": true,
+    "groundPredictionReproduced": true,
+    "provisionalGravelPredictionReproduced": true,
+    "ambiguousGravelContactOmitted": true,
+    "materialOverlapIndependentlyReproduced": true
+  },
+  "sourceIntervalsAndEvidenceRoundTrip": true,
+  "blankWorksheetAppliedDecisions": 0,
+  "wrongPdfHashRejected": true
+}

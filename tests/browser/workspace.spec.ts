@@ -88,6 +88,31 @@ test("bed review from the displayed model stages against the matching live scena
   expect(unchanged.scenarios).toEqual(alternative.scenarios);
 });
 
+test("dropping a bed review on a separately opened model updates that model and preserves the saved case",async({page})=>{
+  await importFixture(page);
+  await rename(page,"Saved field investigation");
+  const before=await downloadJson(page);
+  await page.getByRole("tab",{name:"3-D model",exact:true}).click();
+  await importJson(page,{...before.draft.base,name:"Separate investigation"},"separate.json");
+  await expect(page.locator(".site-name")).toHaveText("Separate investigation");
+  const review=reviewFile("BH-01,0,2,fill,fill,,,Upper fill,1,Shallow contact confirmed");
+  await page.evaluate(text=>{
+    const dataTransfer=new DataTransfer();
+    dataTransfer.items.add(new File([text],"review.csv",{type:"text/csv"}));
+    window.dispatchEvent(new DragEvent("drop",{dataTransfer,bubbles:true}));
+  },review.buffer.toString());
+  await expect(page.locator(".notice")).toContainText("Applied the reviewed bed assignments");
+  await page.locator("details.export > summary").click();
+  const exported=await downloadJson<GeoProject>(page,'[data-export="project"]');
+  expect(exported.boreholes[0].intervals[0].unit).toBe("Upper fill");
+  expect(exported.bedAssignments?.[0].rationale).toBe("Shallow contact confirmed");
+  await openInput(page);
+  const after=await downloadJson(page);
+  expect(after.id).toBe(before.id);
+  expect(after.draft).toEqual(before.draft);
+  expect(after.revisions).toEqual(before.revisions);
+});
+
 test("reload preserves the full project and the latest draft edit",async({page})=>{
   await importFixture(page);
   const original=await downloadJson(page);

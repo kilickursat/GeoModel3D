@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.31.3 — 2026-11-28
+
+- A reviewer can assign interpreted beds to individual borehole intervals through the existing file importer using a CSV worksheet. Source hashes or evidence references, original materials, measured depths and engineering reasons travel with the reviewed case. Blank decision fields leave an interval open for review.
+- Leave-one-out contact errors use directly observed bed tops. The check records omissions for unresolved repeated beds, gaps, missing training support and beds that pinch out at the prediction point. The validation result includes separate depth agreement for interpreted beds and original materials.
+- Multi-case holdout checks and calibrated contact envelopes apply the same training evidence and thickness checks. An unresolved bed can no longer count as a zero-error prediction or as demonstrated coverage at an audit collar.
+
 ## 0.31.2 — 2026-11-28
 
 - Select pages before extracting mixed reports. Local Qwen3.5 can suggest log and location pages on request. Borehole logs can be matched to surveyed collar schedules within a PDF, with explicit decisions and source evidence for conflicting positions. Named graphic logs with explicit metric ranges retain their printed intervals.
