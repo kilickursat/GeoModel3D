@@ -190,7 +190,7 @@ describe("reviewing a surveyed collar",()=>{
 
   it("exports the source page and reasons for leaving an incompatible pair unresolved",()=>{
     const [h]=draftHoles(0,"report.pdf",[{...log,x:undefined,y:undefined,ground:undefined,src:{id:line("BH-4",3)}}],new Set(),new Map(),[
-      {status:"conflict",candidates:[projected,geographic],notes:["The two positions differ by 77.14 m. Ground elevation needs a vertical datum."]}]);
+      {status:"conflict",candidates:[projected,geographic],notes:["The two positions differ by 18.25 m. Ground elevation needs a vertical datum."]}]);
     captureDraftEvidence([h],docs,size);
     decideSchedule(h,"keep",size);
     const t=draftTables([h],["report.pdf"],docs);
@@ -198,13 +198,13 @@ describe("reviewing a surveyed collar",()=>{
     const saved=projectFromTables(t).project,restored=importFiles([{name:"saved.json",text:toProjectJson(saved)}]).project;
     const fields=restored.evidence!.records.find(r=>r.id===restored.boreholes[0].evidenceId)!.fields;
     expect(fields.x.current).toBe("");
-    expect(fields["Collar schedule review"]).toMatchObject({status:"accepted",current:expect.stringContaining("Kept"),note:expect.stringContaining("77.14 m")});
+    expect(fields["Collar schedule review"]).toMatchObject({status:"accepted",current:expect.stringContaining("Kept"),note:expect.stringContaining("18.25 m")});
     expect(fields["Collar schedule review"].boxes.map(b=>b.text)).toEqual(expect.arrayContaining(["GDA94 / MGA zone 55","300000","6800000","-28.5","145"]));
     expect(t.project.description).toContain("2–3");
   });
 
   it.each([true,false])("can retain a verified drilled length independently of the collar decision (depth first %s)",depthFirst=>{
-    const length=field(135.5,"Drilled length (m)"),rows=[projected,geographic].map(r=>({...r,finalDepth:length}));
+    const length=field(48.75,"Drilled length (m)"),rows=[projected,geographic].map(r=>({...r,finalDepth:length}));
     const [h]=draftHoles(0,"report.pdf",[{...log,final:8}],new Set(),new Map(),[{status:"conflict",candidates:rows,notes:[]}]);
     captureDraftEvidence([h],docs,size);
     if(depthFirst){
@@ -217,14 +217,14 @@ describe("reviewing a surveyed collar",()=>{
       useDrilledLength(h,size);
     }
     expect(hasPendingSchedule(h)).toBe(false);
-    expect(h.values).toMatchObject({x:"301",y:"402",final:"135.5"});
+    expect(h.values).toMatchObject({x:"301",y:"402",final:"48.75"});
     const project=projectFromTables(draftTables([h],["report.pdf"],docs)).project;
     const restored=importFiles([{name:"saved.json",text:toProjectJson(project)}]).project;
-    expect(restored.boreholes[0].depth).toBe(135.5);
+    expect(restored.boreholes[0].depth).toBe(48.75);
     expect(restored.boreholes[0].intervals.at(-1)?.to).toBe(8);
     const f=restored.evidence!.records.find(r=>r.id===h.evidence?.id)!.fields.depth;
-    expect(f).toMatchObject({original:"8",current:"135.5",status:"accepted"});
-    expect(f.boxes.map(b=>[b.page,b.text])).toEqual([[2,"135.5"],[2,"Drilled length (m)"],[2,"BH-4"]]);
+    expect(f).toMatchObject({original:"8",current:"48.75",status:"accepted"});
+    expect(f.boxes.map(b=>[b.page,b.text])).toEqual([[2,"48.75"],[2,"Drilled length (m)"],[2,"BH-4"]]);
     h.values.id="BH-40";
     expect(checkDraft([h]).some(c=>c.level==="error"&&c.field==="final")).toBe(true);
   });

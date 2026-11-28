@@ -39,6 +39,9 @@ jobs:
           ref: ${{ env.RELEASE_TAG }}
           path: source
           persist-credentials: false
+      - name: Check release source for retained report files
+        run: python3 -I ../release-tools/scripts/check-report-files.py
+        working-directory: source
       - uses: actions/setup-node@v7
         with:
           node-version: 22

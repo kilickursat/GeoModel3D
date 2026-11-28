@@ -9,29 +9,24 @@ function hole(id:string,x:number,y:number,z:number,bases:Array<[number,string]>)
 const units=(ids:string[])=>ids.map(id=>({id,name:id,color:"#884402"}));
 
 describe("collar agreement",()=>{
-  it("reproduces the six reassignments in the three reviewed Antwerp DOV reports",()=>{
-    // Databank Ondergrond Vlaanderen, Flemish Government, consulted 28 Nov 2026. Boring records
-    // 1931-084105, 1948-120680 and 2016-147736. Depths and interpreted units from the PDF review
-    // documented in bench/results/public-report-review/README.md.
-    const sand="Sand",clay="Clay",fill="Made ground",gravel="Gravel",pyrite="Couche de pyrite";
-    const project:GeoProject={name:"Antwerp",units:units([fill,sand,clay,pyrite,gravel]),boreholes:[
-      hole("B187",151745,212969,6.31,[[15.5,sand],[16.5,sand],[18.5,sand],[24.5,sand],[24.55,clay],[26.25,clay],[27.75,clay],
-        [28.05,clay],[29.95,clay],[30.55,clay],[31.15,clay],[31.45,clay],[39.3,clay]]),
-      hole("B292",152026,212719,7,[[5.5,fill],[7.5,sand],[9.5,sand],[10,sand],[10.5,sand],[12,sand],[16.5,sand],[20,sand]]),
-      hole("B100",151850,211858,2,[[2.6,fill],[3.9,sand],[5.4,sand],[5.55,sand],[7.45,sand],[8.35,sand],[24.59,sand],
-        [25.08,gravel],[32.7,clay],[32.75,pyrite],[48.25,clay],[48.42,gravel],[55.1,clay],[55.46,gravel],[84,clay],[92,sand]])
+  it("reports the original row for each deeper recurrence that the ordered model collapses",()=>{
+    const project:GeoProject={name:"Synthetic triangular site",units:units(["A","B","C"]),boreholes:[
+      hole("North",0,30,40,[[2,"A"],[7,"B"],[12,"C"]]),
+      hole("West",-18,0,38,[[3,"A"],[6,"B"],[12,"C"]]),
+      hole("East",21,-4,43,[[2,"A"],[4,"B"],[5,"C"],[6,"B"],[7,"C"],[9,"A"],[10,"B"],[12,"C"]])
     ]};
     const audit=auditCollarAgreement(buildGeologicalModel(project));
     expect(audit.status).toBe("modelled");
-    expect(audit.intervals).toHaveLength(37);
-    expect(audit.loggedMetres).toBeCloseTo(151.3,9);
-    expect(audit.mismatchedMetres).toBeCloseTo(66.39,9);
-    expect(audit.matchedMetres).toBeCloseTo(84.91,9);
+    expect(audit.intervals).toHaveLength(14);
+    expect(audit.loggedMetres).toBe(36);
+    expect(audit.mismatchedMetres).toBe(4);
+    expect(audit.matchedMetres).toBe(32);
     expect(audit.unknownMetres).toBe(0);
-    expect(audit.discrepancies.map(d=>[d.holeId,d.intervalIndex,d.modelledUnit])).toEqual(
-      [8,9,10,12,14,15].map(index=>["B100",index,gravel]));
-    expect(audit.discrepancies.at(-2)).toEqual({holeId:"B100",kind:"borehole",intervalIndex:14,unit:clay,from:55.46,to:84,
-      mismatchFrom:55.46,mismatchTo:84,modelledUnit:gravel,reason:"different-unit"});
+    expect(audit.discrepancies.map(d=>[d.holeId,d.intervalIndex,d.modelledUnit])).toEqual([
+      ["East",3,"C"],["East",5,"C"],["East",6,"C"]
+    ]);
+    expect(audit.discrepancies[1]).toEqual({holeId:"East",kind:"borehole",intervalIndex:5,unit:"A",from:7,to:9,
+      mismatchFrom:7,mismatchTo:9,modelledUnit:"C",reason:"different-unit"});
   });
 
   it("counts partial mismatches, missing coverage and only logged depths",()=>{

@@ -9,14 +9,12 @@
 with failure categories, processing time, and the human correction effort (edits needed to turn the reader's
 output into the ground truth).
 
-    python3 -I bench/scripts/score.py RUN_DIR [--split dev|validation|test|all] [--out DIR]
+    python3 -I bench/scripts/score.py ANNOTATION_JSON PREDICTION_JSON
 
-RUN_DIR holds predictions/<report id>.json in the benchmark's prediction format (bench/runner/read.ts writes it).
-Reports without an annotation are skipped and listed. Scores on draft annotations are marked draft.
+Writes a JSON score to standard output.
 """
 import argparse, collections, json, math, pathlib, re, sys, unicodedata
 
-BENCH = pathlib.Path(__file__).resolve().parent.parent
 FT = 0.3048
 # Tolerances in the log's own unit: values are compared as printed.
 TOL = {"m": {"value": 0.015, "boundary": 0.05, "spt": 0.05}, "ft": {"value": 0.05, "boundary": 0.2, "spt": 0.2}}
@@ -356,96 +354,24 @@ def score_report(ann, pred):
     return res
 
 
-def aggregate(rs):
-    out = {"reports": len(rs), "draft": sum(r["status"] != "verified" for r in rs)}
-    d = collections.Counter()
-    for r in rs:
-        for k in ("log_pages", "detected", "true_positive"):
-            d[k] += r["document"][k]
-        d["read"] += round((r["document"]["read_rate"] or 0) * r["document"]["log_pages"])
-    out["document"] = {"log_pages": d["log_pages"], "recall": round(d["true_positive"] / d["log_pages"], 4) if d["log_pages"] else None,
-                       "precision": round(d["true_positive"] / d["detected"], 4) if d["detected"] else None,
-                       "read_rate": round(d["read"] / d["log_pages"], 4) if d["log_pages"] else None}
-    a = collections.Counter()
-    for r in rs:
-        for k in ("boreholes", "predicted", "matched", "id_correct", "pages_exact", "splits", "merges"):
-            a[k] += r["assembly"][k]
-    out["assembly"] = dict(a, recall=round(a["matched"] / a["boreholes"], 4) if a["boreholes"] else None,
-                           precision=round(a["matched"] / a["predicted"], 4) if a["predicted"] else None)
-    F = collections.defaultdict(Tally)
-    lith = [0, 0]
-    for r in rs:
-        for k, v in r["fields"].items():
-            if k == "lithology_depth_weighted":
-                lith[0] += v["right"]; lith[1] += v["total"]
-                continue
-            t = Tally()
-            t.c.update({x: v[x] for x in ("correct", "wrong", "missed", "spurious")})
-            F[k].merge(t)
-    out["fields"] = {k: v.summary() for k, v in sorted(F.items())}
-    out["fields"]["lithology_depth_weighted"] = {"accuracy": round(lith[0] / lith[1], 4) if lith[1] else None}
-    out["readiness"] = {"correct": sum(r["readiness"]["correct"] for r in rs), "of": len(rs),
-                        "unsafe_builds": sum(r["readiness"]["unsafe_build"] for r in rs),
-                        "abstention_cases": sum(r["readiness"]["expected"] == "abstain" for r in rs),
-                        "abstained_correctly": sum(r["readiness"]["expected"] == "abstain" and r["readiness"]["correct"] for r in rs)}
-    e = collections.Counter()
-    for r in rs:
-        e["values"] += r["effort"]["values_in_truth"]
-        e["edits"] += r["effort"]["edits"]
-    out["effort"] = {"values_in_truth": e["values"], "edits": e["edits"],
-                     "automation": round(1 - min(e["edits"], e["values"]) / e["values"], 4) if e["values"] else None}
-    tm = collections.Counter()
-    for r in rs:
-        for k in ("pages", "text_and_reconstruction_ms", "ocr_ms", "ocr_pages"):
-            tm[k] += r["time"][k]
-    out["time"] = dict(tm)
-    fl = collections.Counter()
-    for r in rs:
-        fl.update(r["failures"])
-    out["failures"] = dict(fl.most_common())
-    return out
-
-
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("run")
-    ap.add_argument("--split", default="all")
-    ap.add_argument("--out")
-    a = ap.parse_args()
-    run = pathlib.Path(a.run)
-    manifest = {r["id"]: r for r in json.loads((BENCH / "manifest" / "sources.json").read_text())["reports"]}
-    dev_families = {r["layout_family"] for r in manifest.values() if r["split"] == "dev"}
-    results, skipped = [], []
-    for rid, rep in manifest.items():
-        if a.split != "all" and rep["split"] != a.split:
-            continue
-        ap_, pp = BENCH / "annotations" / f"{rid}.json", run / "predictions" / f"{rid}.json"
-        if not ap_.exists() or not pp.exists():
-            skipped.append((rid, "no annotation" if not ap_.exists() else "no prediction"))
-            continue
-        r = score_report(json.loads(ap_.read_text()), json.loads(pp.read_text()))
-        r["split"], r["family"], r["country"] = rep["split"], rep["layout_family"], rep["country"]
-        r["family_seen_in_dev"] = rep["layout_family"] in dev_families
-        results.append(r)
-    summary = {"run": run.name, "per_report": results, "skipped": skipped, "by_split": {}}
-    for s in ("dev", "validation", "test"):
-        rs = [r for r in results if r["split"] == s]
-        if rs:
-            summary["by_split"][s] = aggregate(rs)
-    test = [r for r in results if r["split"] == "test"]
-    if test:
-        summary["test_by_family"] = {"seen_in_dev": aggregate([r for r in test if r["family_seen_in_dev"]]) if any(r["family_seen_in_dev"] for r in test) else None,
-                                     "unseen_in_dev": aggregate([r for r in test if not r["family_seen_in_dev"]]) if any(not r["family_seen_in_dev"] for r in test) else None}
-    summary["all"] = aggregate(results) if results else None
-    out = pathlib.Path(a.out) if a.out else run
-    out.mkdir(parents=True, exist_ok=True)
-    (out / "scores.json").write_text(json.dumps(summary, ensure_ascii=False, indent=1) + "\n")
-    for r in results:
-        d, s, f, rd = r["document"], r["assembly"], r["fields"], r["readiness"]
-        print(f"{r['report_id']:<32} {r['split']:<10} log pages {d['recall']}/{d['precision']}  boreholes {s['matched']}/{s['boreholes']} (pred {s['predicted']})  "
-              f"readiness {rd['predicted']} vs {rd['expected']}{' UNSAFE' if rd['unsafe_build'] else ''}  automation {r['effort']['automation']}")
-    for rid, why in skipped:
-        print(f"{rid:<32} skipped: {why}")
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("annotation", type=pathlib.Path)
+    ap.add_argument("prediction", type=pathlib.Path)
+    args = ap.parse_args()
+    annotation = json.loads(args.annotation.read_text())
+    prediction = json.loads(args.prediction.read_text())
+    if annotation["report_id"] != prediction["report_id"]:
+        ap.error("annotation and prediction identify different cases")
+
+    def sources(report):
+        if any(not re.fullmatch(r"[0-9a-f]{64}", d.get("sha256", "")) for d in report["documents"]):
+            ap.error("every input document needs its source SHA-256")
+        return [(d["file"], d["sha256"], d["pages"]) for d in report["documents"]]
+
+    if sources(annotation) != sources(prediction):
+        ap.error("annotation and prediction must refer to the same source files, hashes and page counts, in order")
+    print(json.dumps(score_report(annotation, prediction), indent=2, ensure_ascii=False))
     return 0
 
 

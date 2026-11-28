@@ -1,5 +1,5 @@
 import {test,expect,Page} from "@playwright/test";
-import {fileURLToPath} from "node:url";
+import {makePdf,print,stackedTables,stripSheet} from "../fixtures/synthetic-log-pdf";
 import {readFile} from "node:fs/promises";
 import {build,downloadJson,importJson,openInput,prepare,resume,saved} from "./helpers";
 import {evidenceProject} from "./fixtures/evidence-project";
@@ -197,26 +197,26 @@ test("unit rule changes show the actual model value and require renewed acceptan
 test("PDF review carries corrected values, source snapshots and highlights into the saved workspace",async({page},testInfo)=>{
   test.setTimeout(90_000);
   await prepare(page);await page.goto("/?backend=webgl#input");await openInput(page);
-  const pdf=fileURLToPath(new URL("../fixtures/docread/bro-tables.pdf",import.meta.url));
+  const pdf={name:"constructed-tables.pdf",mimeType:"application/pdf",buffer:Buffer.from(makePdf([stackedTables()]))};
   await page.locator(".pdf-file").setInputFiles(pdf);
   await page.getByRole("button",{name:"Agree",exact:true}).click();
   const review=page.getByRole("dialog",{name:"Borehole logs read from documents"});
-  await expect(review.locator("#dr-f-id")).toHaveValue("BHR000000470162",{timeout:60_000});
-  await expect(review.locator("#dr-f-ground")).toHaveValue("3.64");
-  await review.locator("#dr-f-ground").fill("3.7");
+  await expect(review.locator("#dr-f-id")).toHaveValue("SYN-81",{timeout:60_000});
+  await expect(review.locator("#dr-f-ground")).toHaveValue("64.75");
+  await review.locator("#dr-f-ground").fill("64.9");
   await review.locator(".dr-use").click();
   await expect(review).toHaveCount(0,{timeout:30_000});
   await saved(page);
   const exported:any=await unpackWorkspace(page,await downloadJson(page));
   const tables=exported.draft.tables,id=tables.evidenceRows.boreholes[0],source= tables.evidence.sources[0];
-  expect(source.name).toBe("bro-tables.pdf");
+  expect(source.name).toBe("constructed-tables.pdf");
   expect(source.pages[0].image).toMatch(/^data:image\/png;base64,/);
-  expect(record(exported,id).fields.z).toMatchObject({original:"3.64",current:"3.7",status:"corrected"});
+  expect(record(exported,id).fields.z).toMatchObject({original:"64.75",current:"64.9",status:"corrected"});
   expect(record(exported,id).fields.z.boxes.length).toBeGreaterThan(0);
   await page.locator(".ed-evidence").first().click();
   await page.locator('.ev-dialog [data-evidence-field="z"]').click();
-  await expect(page.locator(".ev-original")).toHaveText("3.64");
-  await expect(page.locator(".ev-current")).toHaveText("3.7");
+  await expect(page.locator(".ev-original")).toHaveText("64.75");
+  await expect(page.locator(".ev-current")).toHaveText("64.9");
   await expect(page.locator(".ev-page-image")).toBeVisible();
   expect(await page.locator(".ev-box").count()).toBeGreaterThan(0);
   await page.screenshot({path:testInfo.outputPath("evidence-pdf-review.png"),fullPage:true});
@@ -289,14 +289,15 @@ test("shows the source image before OCR finishes and closes it on cancel",async(
 test("a page read from its own text can be read again by OCR, which says so on the page",async({page})=>{
   test.setTimeout(240_000);
   await prepare(page);await page.goto("/?backend=webgl#input");await openInput(page);
-  await page.locator(".pdf-file").setInputFiles(fileURLToPath(new URL("../fixtures/docread/bro-470162-strip.pdf",import.meta.url)));
+  const pages=[stripSheet(),[print("Executive summary",50,50),print("This practice exercise uses invented observations.",50,80)]];
+  await page.locator(".pdf-file").setInputFiles({name:"constructed-strip.pdf",mimeType:"application/pdf",buffer:Buffer.from(makePdf(pages))});
   await page.getByRole("button",{name:"Agree",exact:true}).click();
   const review=page.getByRole("dialog",{name:"Borehole logs read from documents"});
-  // The fixture contains the printed strip log on page 1 and a separate attribution page.
+  // Only the first page contains a log. The second carries a narrative heading.
   await review.getByRole("button",{name:"Clear selection"}).click();
   await review.getByLabel("Read page 1",{exact:true}).check();
   await review.getByRole("button",{name:"Read selected pages"}).click();
-  await expect(review.locator("#dr-f-id")).not.toHaveValue("",{timeout:60_000});
+  await expect(review.locator("#dr-f-id")).toHaveValue("SYN-41",{timeout:60_000});
   // Read from the PDF's own text: no OCR label, and the override is offered.
   await expect(review.locator(".dr-readby")).toHaveText("");
   const ocr=review.locator(".dr-ocr");

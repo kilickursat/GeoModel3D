@@ -58,33 +58,31 @@ it("reads decimal latitude and longitude with a declared WGS84 datum and an expl
   expect(row.fields).toMatchObject({lat:{value:40.215},lon:{value:-96.548}});
 });
 
-it("presents the two printed positions in GSQ Eulo 2 Table 2.1 separately and leaves the ellipsoidal height out of ground level",()=>{
-  // Geoscience Australia & Geological Survey of Queensland, GSQ Eulo 2 borehole completion record,
-  // Table 2.1, PDF p.7. Printed source values, with compacted page geometry for this regression.
+it("presents two conflicting coordinate pairs from a synthetic schedule separately and leaves the ellipsoidal height out of ground level",()=>{
   const fields=(a:string,b:string,y:number)=>[cell(a,115,y),cell(b,300,y)];
-  const details={page:7,lines:[cell("Hole ID",10,30),cell("GSQ Eulo 2",115,30),
-    cell("Site ID",10,45),cell("Overshot",115,45),cell("Location",10,60),
-    ...fields("Longitude (GDA94)","145.102530°",60),...fields("Latitude (GDA94)","-28.310158°",75),
-    ...fields("Easting (MGAZ55S)","314026",90),...fields("Northing (MGAZ55S)","6866950",105),
-    ...fields("Elevation (ellipsoidal)","162 m",120),cell("Drilled length",10,135),cell("135.5 m",115,135),
-    cell("Casing",10,150),cell("Steel",115,150),cell("Deviation",10,165),cell("None – vertical borehole",115,165)]};
-  const planned={...details,page:47,lines:[cell("Proposed coordinates for drilling",10,12),...details.lines]};
+  const details={page:3,lines:[cell("Hole ID",10,30),cell("DEMO-7",115,30),
+    cell("Site ID",10,45),cell("Test grid",115,45),cell("Location",10,60),
+    ...fields("Longitude (GDA94)","147.000000°",60),...fields("Latitude (GDA94)","-30.000000°",75),
+    ...fields("Easting (MGAZ55S)","500030",90),...fields("Northing (MGAZ55S)","6681254.65",105),
+    ...fields("Elevation (ellipsoidal)","98 m",120),cell("Drilled length",10,135),cell("42.8 m",115,135),
+    cell("Casing",10,150),cell("Steel",115,150),cell("Deviation",10,165),cell("Vertical",115,165)]};
+  const planned={...details,page:8,lines:[cell("Proposed coordinates for drilling",10,12),...details.lines]};
   const options=readCollarSchedules([details,planned]);
   expect(options).toHaveLength(2);
   const [grid,geo]=options;
-  expect(grid).toMatchObject({id:"GSQ Eulo 2",page:7,coordinateKind:"projected",coordinateConflict:true,crsCode:"EPSG:28355",
-    fields:{x:{value:314026},y:{value:6866950}}});
-  expect(geo).toMatchObject({id:"GSQ Eulo 2",page:7,coordinateKind:"geographic",coordinateConflict:true,crsCode:"EPSG:28355",
-    fields:{lat:{value:-28.310158},lon:{value:145.10253}}});
-  expect(geo.projectedFromGeographic!.x).toBeCloseTo(313954.02,2);
-  expect(geo.projectedFromGeographic!.y).toBeCloseTo(6866977.74,2);
+  expect(grid).toMatchObject({id:"DEMO-7",page:3,coordinateKind:"projected",coordinateConflict:true,crsCode:"EPSG:28355",
+    fields:{x:{value:500030},y:{value:6681254.65}}});
+  expect(geo).toMatchObject({id:"DEMO-7",page:3,coordinateKind:"geographic",coordinateConflict:true,crsCode:"EPSG:28355",
+    fields:{lat:{value:-30},lon:{value:147}}});
+  expect(geo.projectedFromGeographic!.x).toBeCloseTo(500000,2);
+  expect(geo.projectedFromGeographic!.y).toBeCloseTo(6681214.65,2);
   expect(geo.fields.x).toBeUndefined();expect(grid.fields.lon).toBeUndefined();
   expect(grid.fields.ground).toBeUndefined();expect(geo.fields.ground).toBeUndefined();
-  expect(geo.context?.map(l=>l.text)).toEqual(expect.arrayContaining(["162 m","None – vertical borehole","135.5 m"]));
-  expect(geo.finalDepth).toMatchObject({value:135.5,line:{text:"135.5 m",page:7},heading:{text:"Drilled length",page:7}});
+  expect(geo.context?.map(l=>l.text)).toEqual(expect.arrayContaining(["98 m","Vertical","42.8 m"]));
+  expect(geo.finalDepth).toMatchObject({value:42.8,line:{text:"42.8 m",page:3},heading:{text:"Drilled length",page:3}});
   expect(grid.finalDepth).toBe(geo.finalDepth);
-  expect(matchCollarSchedules([log("GSQ Eulo 2")],options)[0]).toMatchObject({status:"conflict"});
-  expect(grid.notes.join(" ")).toContain("77.14 m");
+  expect(matchCollarSchedules([log("DEMO-7")],options)[0]).toMatchObject({status:"conflict"});
+  expect(grid.notes.join(" ")).toContain("50.00 m");
 });
 it("does not discard a second row bearing the same ID when its coordinate cells are marked missing",()=>{
   const [result]=matchCollarSchedules([log("BH-04")],readCollarSchedules([{page:3,

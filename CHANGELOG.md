@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.31.4 — 2026-11-28
+
+- Document-reader regression tests now use invented logs. Removed source reports, report-derived fixtures and published report evaluation files. CI checks tracked files before builds and releases.
+
 ## 0.31.3 — 2026-11-28
 
 - A reviewer can assign interpreted beds to individual borehole intervals through the existing file importer using a CSV worksheet. Source hashes or evidence references, original materials, measured depths and engineering reasons travel with the reviewed case. Blank decision fields leave an interval open for review.

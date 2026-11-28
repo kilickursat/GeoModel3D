@@ -1,35 +1,17 @@
 import {describe,it,expect} from "vitest";
-import {readFileSync} from "node:fs";
+import {makePdf,print,stripSheet,stackedTables} from "./fixtures/synthetic-log-pdf";
 import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
-import {TextLine,textLine,readDocument,readPage,header,ReadLog,sameId,ligatures} from "../src/docread/reconstruct";
+import {TextLine,textLine,readDocument,readPage,header,sameId,ligatures} from "../src/docread/reconstruct";
 import {linesFromItems,PdfTextItem,judgeText,wordShare,agreement} from "../src/docread/textlines";
 import {draftHoles,checkDraft,draftTables,pageRanges,DraftHole,unitFor} from "../src/docread/draft";
 import {projectFromTables} from "../src/tables";
 import {applyUnitRules,lithologyRules} from "../src/rules";
 
-const DIR="tests/fixtures/docread/";
-interface Truth { id:string; ground:number; x:number; y:number; water?:number; final?:number; layers:Array<{from:number;to:number;description:string}> }
-const json=<T>(f:string):T=>JSON.parse(readFileSync(DIR+f,"utf8"));
-const norm=(s:string)=>s.toLowerCase().replace(/\s+/g," ").replace(/\s*([,.:;()])\s*/g,"$1").trim();
-// Boundaries within 5 cm, boundaries the truth hasn't (beyond 15 cm), and layers with the same depths and description.
-function score(log:ReadLog,truth:Truth){
-  const have=log.layers.map(l=>l.to),want=truth.layers.map(l=>l.to);
-  return {
-    boundaries:want.filter(v=>have.some(w=>Math.abs(w-v)<=0.05)).length,
-    extra:have.filter(v=>!want.some(w=>Math.abs(w-v)<=0.15)).length,
-    descriptions:truth.layers.filter(t=>log.layers.some(l=>Math.abs(l.from-t.from)<0.05&&Math.abs(l.to-t.to)<0.05&&norm(l.description)===norm(t.description))).length,
-    layers:truth.layers.length
-  };
-}
-const ocrPage=(name:string)=>{
-  const j=json<{width:number;height:number;lines:Array<{text:string;x0:number;y0:number;x1:number;y1:number}>}>(`ocr/${name}.lines.json`);
-  return {page:1,width:j.width,height:j.height,lines:j.lines.map(l=>textLine(l.text,l.x0,l.y0,l.x1,l.y1))};
-};
 // PDF.js 6 uses Promise.withResolvers (Node 22 has it; CI runs Node 22).
 const P=Promise as unknown as {withResolvers?:()=>unknown};
 P.withResolvers??=()=>{let resolve,reject;const promise=new Promise((r,j)=>{resolve=r;reject=j});return {promise,resolve,reject}};
-async function readPdf(file:string){
-  const task=pdfjs.getDocument({data:new Uint8Array(readFileSync(DIR+file)),
+async function readPdf(data:Uint8Array){
+  const task=pdfjs.getDocument({data,
     cMapUrl:"node_modules/pdfjs-dist/cmaps/",cMapPacked:true,standardFontDataUrl:"node_modules/pdfjs-dist/standard_fonts/"});
   const doc=await task.promise,pages=[];
   for(let n=1;n<=doc.numPages;n++){
@@ -581,57 +563,74 @@ describe("the review's draft, its checks and the Input data tables",()=>{
   });
 });
 
-describe("digital PDFs read with PDF.js",()=>{
-  it("reads a strip log exactly",async()=>{
-    const {logs}=await readPdf("bro-470162-strip.pdf"),truth=json<Truth>("bro-470162-strip.truth.json");
+describe("digitally printed synthetic PDFs read with PDF.js",()=>{
+  it("recovers strip-log boundaries, descriptions, position and water level",async()=>{
+    const {logs}=await readPdf(makePdf([stripSheet()]));
     expect(logs).toHaveLength(1);
-    expect(score(logs[0],truth)).toEqual({boundaries:11,extra:0,descriptions:11,layers:11});
-    expect([logs[0].id,logs[0].ground,logs[0].water,logs[0].x,logs[0].y]).toEqual([truth.id,truth.ground,truth.water,+truth.x.toFixed(2),+truth.y.toFixed(2)]);
-  });
-  it("reads a Japanese log (柱状図) with its header",async()=>{
-    const {logs}=await readPdf("kj-148301107.pdf"),truth=json<Truth>("kj-148301107.truth.json");
-    expect(logs).toHaveLength(1);
-    expect(score(logs[0],truth)).toEqual({boundaries:15,extra:0,descriptions:15,layers:15});
-    expect(draftHoles(0,"log.pdf",logs)[0].layers.map(l=>l.unit)).toEqual([
-      "Fill and topsoil","Volcanic ash soil","Sand","Clay and silt","Sand","Clay and silt","Sand","Sand",
-      "Clay and silt","Clay and silt","Clay and silt","Sand","Gravel","Sand","Rock and cemented soil"
+    expect(logs[0]).toMatchObject({id:"SYN-41",ground:77.4,water:2.45,x:430100,y:5680100,pages:[1]});
+    expect(logs[0].layers.map(l=>[l.from,l.to,l.description])).toEqual([
+      [0,2.65,"GRAVEL with smooth pebbles"],[2.65,6.25,"SILT with sand pockets"],[6.25,10.75,"CLAY with gypsum grains"]
     ]);
-    expect([logs[0].id,logs[0].ground,logs[0].water,logs[0].final]).toEqual([truth.id,truth.ground,truth.water,48.29]);
   });
-  it("reads two logs set out as tables on one page, with vertical depths",async()=>{
-    const {logs}=await readPdf("bro-tables.pdf"),truths=json<Truth[]>("bro-tables.truth.json");
-    expect(logs.map(l=>l.id)).toEqual(truths.map(t=>t.id));
-    logs.forEach((log,k)=>{
-      expect(log.kind).toBe("table");
-      expect(score(log,truths[k])).toEqual({boundaries:truths[k].layers.length,extra:0,descriptions:truths[k].layers.length,layers:truths[k].layers.length});
-      // The water level is the cell after "Water level", not the Y coordinate in the cell before it.
-      expect([log.ground,log.final,log.x,log.y,log.water]).toEqual([truths[k].ground,truths[k].final,+truths[k].x.toFixed(2),+truths[k].y.toFixed(2),truths[k].water]);
-    });
+  it("decodes Japanese characters from a PDF and retains the material name and header",async()=>{
+    const sheet=japaneseForm().map(l=>print(l.text,l.x0,l.cy+4));
+    sheet.push(print("ボーリング名",40,60),print("SYN-52",180,60),print("地盤高",400,60),print("51.35 m",500,60),
+      print("地下水位",400,90),print("2.80 m",500,90),print("総掘進長",40,90),print("6.00 m",180,90));
+    const {logs}=await readPdf(makePdf([sheet]));
+    expect(logs).toHaveLength(1);
+    expect(logs[0]).toMatchObject({id:"SYN-52",ground:51.35,water:2.8,final:6});
+    expect(logs[0].layers.map(l=>[l.from,l.to,l.description])).toEqual([
+      [0,0.8,"盛土(B) 砕石を混入する。"],[0.8,3.4,"礫混じり粘性土(C-G) 含水は中位。粘性は強い。"],[3.4,6,"細砂(FS) 均質な細砂。含水は高い。"]
+    ]);
+    expect(draftHoles(0,"constructed.pdf",logs)[0].layers.map(l=>l.unit)).toEqual(["Fill and topsoil","Clay and silt","Sand"]);
+  });
+  it("separates stacked log tables and pairs each vertical depth with its description",async()=>{
+    const {logs}=await readPdf(makePdf([stackedTables()]));
+    expect(logs.map(l=>[l.kind,l.id,l.ground,l.final,l.x,l.y,l.water])).toEqual([
+      ["table","SYN-81",64.75,7.25,435210,5671200,1.65],["table","SYN-83",66.82,8.95,435380,5671340,2.35]
+    ]);
+    expect(logs.map(l=>l.layers.map(row=>[row.from,row.to,row.description]))).toEqual([
+      [[0,1.85,"Amber fine sand"],[1.85,4.35,"Clay with chalk flecks"],[4.35,7.25,"Gravel in pale sand"]],
+      [[0,2.15,"Silt with sandy seams"],[2.15,5.65,"Loose sand with mica"],[5.65,8.95,"Dense pale gravel"]]
+    ]);
   });
 });
 
-describe("page images read by OCR (recorded PP-OCRv6 small output)",()=>{
-  // The results the reader reached on these pages; a change that reads fewer is a regression.
-  // On the clean Japanese page two depth labels 0.35 m apart (13.85, 14.20) print over each other and OCR misreads them.
-  const cases:Array<[string,string,number,number]>=[
-    ["bro-470162-150dpi","bro-470162",11,11],["bro-470162-scan","bro-470162",11,11],
-    ["kj-148301107-150dpi","kj-148301107",13,12],["kj-148301107-scan","kj-148301107",14,12]
-  ];
-  for(const [page,truthFile,boundaries,descriptions] of cases)it(page,()=>{
-    const {logs}=readDocument([ocrPage(page)]),s=score(logs[0],json<Truth>(`ocr/${truthFile}.truth.json`));
-    expect(s.boundaries).toBeGreaterThanOrEqual(boundaries);
-    expect(s.descriptions).toBeGreaterThanOrEqual(descriptions);
-    expect(s.extra).toBe(0);
+describe("reconstructing synthetic OCR line boxes",()=>{
+  // Deterministic detector displacement and shuffled line order model imperfect OCR geometry.
+  function scan(lines:TextLine[],shift:number){
+    return lines.map((l,k)=>{
+      const x=(k%3-1)*shift,y=(k%5-2)*shift;
+      return textLine(l.text,l.x0+x,l.y0+y,l.x1+x,l.y1+y);
+    }).reverse();
+  }
+  it.each([0,1.25])("keeps Japanese remarks with their intervals with %s px of displacement",shift=>{
+    const {logs}=readDocument([{page:1,width:1000,height:800,lines:scan(japaneseForm(),shift)}]);
+    expect(logs).toHaveLength(1);
+    expect(logs[0].layers.map(l=>[l.to,l.description])).toEqual([
+      [0.8,"盛土(B) 砕石を混入する。"],[3.4,"礫混じり粘性土(C-G) 含水は中位。粘性は強い。"],[6,"細砂(FS) 均質な細砂。含水は高い。"]
+    ]);
   });
-  it("six scan-like logs of one site",()=>{
-    let b=0,d=0,n=0;
-    for(const id of ["BHR000000470122","BHR000000470187","BHR000000470168","BHR000000364999","BHR000000470165","BHR000000470162"]){
-      const {logs}=readDocument([ocrPage(`${id}-scan`)]),s=score(logs[0],json<Truth>(`ocr/${id}.truth.json`));
-      b+=s.boundaries;d+=s.descriptions;n+=s.layers;
-    }
-    expect(n).toBe(72);
-    expect(b).toBeGreaterThanOrEqual(66);
-    expect(d).toBeGreaterThanOrEqual(61);
+  it("associates a different sequence of printed boundaries with each of six logs",()=>{
+    const contacts:number[][]=[];
+    const pages=Array.from({length:6},(_,k)=>{
+      const ends=[1.16+0.24*k,4.87+0.27*k,8.63+0.22*k].map(v=>+v.toFixed(2));
+      contacts.push(ends);
+      const lines=[L("BOREHOLE LOG SYN-"+(61+k),40,40),L("DESCRIPTION",300,150),
+        ...Array.from({length:11},(_,d)=>L(String(d),40,yAt(d),10)),
+        ...ends.map(d=>L(d.toFixed(2),900,yAt(d)+8,40)),
+        L("SILT with mica",300,yAt(0.54)),L("CLAY with coarse grains",300,yAt(3.12)),L("SAND with gravel",300,yAt(7.48))];
+      return {page:k+1,width:1000,height:800,lines:scan(lines,0.65+0.11*k)};
+    });
+    const {logs}=readDocument(pages);
+    expect(logs).toHaveLength(6);
+    logs.forEach((log,k)=>{
+      expect(log.id).toBe("SYN-"+(61+k));
+      expect(log.pages).toEqual([k+1]);
+      expect(log.layers.map(l=>[l.from,l.to,l.description])).toEqual([
+        [0,contacts[k][0],"SILT with mica"],[contacts[k][0],contacts[k][1],"CLAY with coarse grains"],[contacts[k][1],contacts[k][2],"SAND with gravel"]
+      ]);
+    });
   });
 });
 

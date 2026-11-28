@@ -3,7 +3,7 @@ import {requestDocumentGpuAdapter} from "../src/webgpuAdapter";
 
 describe("OCR and report Qwen adapter selection",()=>{
   it.each([
-    {info:{vendor:"google",architecture:"swiftshader",isFallbackAdapter:true}}, // Chromium reading SARFIIP K7
+    {info:{vendor:"google",architecture:"swiftshader",isFallbackAdapter:true}}, // Chromium software adapter
     {info:{vendor:"google",architecture:"swiftshader"}},
     {info:{description:"",isFallbackAdapter:true}},
     {isFallbackAdapter:true,info:{vendor:"NVIDIA"}},

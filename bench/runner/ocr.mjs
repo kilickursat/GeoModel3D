@@ -4,23 +4,27 @@
 // can be stopped and resumed. Requests are answered by routing, as in the UI tests: no server is started and nothing
 // is fetched from the network.
 //
-//   node bench/runner/ocr.mjs bench/.cache/runs/<run> [report ids]
+//   node bench/runner/ocr.mjs TEMP_DIR
 //
 // Needs the production build (npm run build) for the worker and the model files.
+import {createHash} from "node:crypto";
 import {chromium} from "@playwright/test";
-import {readFileSync,writeFileSync,readdirSync,existsSync,mkdirSync} from "node:fs";
+import {readFileSync,writeFileSync,readdirSync,existsSync,mkdirSync,realpathSync} from "node:fs";
+import {sep} from "node:path";
 import {createUiResponder} from "../../tests/browser/serve.mjs";
 
-const [runDir,...only]=process.argv.slice(2);
+const [runDir]=process.argv.slice(2);
+if(process.argv.length!==3){console.error("usage: node bench/runner/ocr.mjs TEMP_DIR");process.exit(2)}
+const scratch=realpathSync(runDir),checkout=realpathSync(".");
+if(scratch===checkout||scratch.startsWith(checkout+sep))throw new Error("Choose a temporary run directory outside this checkout.");
 const ORIGIN="https://geomodel3d.invalid";
 const plan=JSON.parse(readFileSync(`${runDir}/ocr-plan.json`,"utf8"));
 const jobs=[];
 for(const [id,docs] of Object.entries(plan.reports)){
-  if(only.length&&!only.includes(id))continue;
   for(const d of docs){
     const out=`${runDir}/ocr/${id}/${d.doc}`,pages=d.pages.filter(n=>!existsSync(`${out}/p${n}.json`));
     const rules=(d.rules??[]).filter(n=>!existsSync(`${out}/p${n}.rules.json`));
-    if(pages.length||rules.length)jobs.push({id,doc:d.doc,file:d.file,out,pages,rules});
+    if(pages.length||rules.length)jobs.push({id,doc:d.doc,file:d.file,sha256:d.sha256,out,pages,rules});
   }
 }
 const total=jobs.reduce((s,j)=>s+j.pages.length+j.rules.length,0);
@@ -45,6 +49,7 @@ let done=0;
 for(const job of jobs){
   mkdirSync(job.out,{recursive:true});
   current=readFileSync(job.file);
+  if(createHash("sha256").update(current).digest("hex")!==job.sha256)throw new Error("The source changed after planning. Start a fresh run.");
   const t0=Date.now();
   const backend=await page.evaluate(async ({pages,rules,worker,out})=>{
     const {openPdf}=await import("/src/docread/pdftext.ts");

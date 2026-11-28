@@ -10,4 +10,6 @@ labels: bug
 
 **What you expected, and what happened instead:**
 
-**A file that shows it,** if you can share one (remove anything confidential first), **a screenshot, or the notes the app shows:**
+**Steps or an invented example that reproduces the problem**
+
+Use fictional data for attachments and screenshots. Keep geotechnical reports and their contents out of public issues.

@@ -1,15 +1,6 @@
-// The benchmark's run of GeoModel3D's own reader on the public reports, outside the browser. It does what
-// src/docread/index.ts does when files are dropped on the app: each PDF's pages are judged by their text layer
-// (pdftext.ts), the pages the app would read by OCR are listed, and all pages of a document go through the same
-// reconstruction (reconstruct.ts) and drafting (draft.ts). OCR itself runs in the browser, with the app's built
-// worker (ocr.mjs): this script first lists the pages it needs (PLAN), then reads with the lines OCR gave (READ).
-//
-//   node .cache/bench-read.mjs plan  bench/.cache/runs/<run>        # pages to read by OCR, per report and document
-//   node .cache/bench-read.mjs read  bench/.cache/runs/<run> [ids]  # predictions/<id>.json, in the benchmark's format
-//
-// Built with esbuild (see bench/README.md); node_modules stay external. Nothing here changes the reader.
-import {readFileSync,writeFileSync,existsSync,mkdirSync} from "node:fs";
+import {readFileSync,writeFileSync,existsSync,mkdirSync,readdirSync,realpathSync} from "node:fs";
 import {createHash} from "node:crypto";
+import {basename,resolve,sep} from "node:path";
 import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
 import {extractPageText,scanReason} from "../../src/docread/pdfpage";
 import {agreement} from "../../src/docread/textlines";
@@ -19,10 +10,19 @@ import {draftHoles,checkDraft,DraftHole} from "../../src/docread/draft";
 
 const CONFIRMED=0.6;
 const pct=(v:number)=>`${Math.round(100*v)} %`;
-const [mode,runDir,...only]=process.argv.slice(2);
-if(!["plan","read"].includes(mode)||!runDir){console.error("usage: plan|read <run dir> [report ids]");process.exit(2)}
-const manifest=JSON.parse(readFileSync("bench/manifest/sources.json","utf8"));
-const reports=(manifest.reports as any[]).filter(r=>!only.length||only.includes(r.id));
+// The caller supplies a fresh temporary run directory and the input files. No report catalogue or downloads.
+const [mode,runDir,caseId,...inputFiles]=process.argv.slice(2);
+if(!["plan","read"].includes(mode)||!runDir||!caseId||!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(caseId)||!inputFiles.length){
+  console.error("usage: plan|read TEMP_DIR CASE_ID PDF [PDF ...]");process.exit(2);
+}
+mkdirSync(runDir,{recursive:true});
+const scratch=realpathSync(runDir),checkout=realpathSync(".");
+if(scratch===checkout||scratch.startsWith(checkout+sep))throw new Error("Choose a temporary run directory outside this checkout.");
+if(mode==="plan"&&readdirSync(scratch).length)throw new Error("Use an empty temporary directory for each benchmark run.");
+const documents=inputFiles.map(input=>({name:basename(input),file:resolve(input)}));
+const planFile=resolve(runDir,"ocr-plan.json");
+const planned=mode==="read"?JSON.parse(readFileSync(planFile,"utf8")).reports[caseId]:undefined;
+if(mode==="read"&&planned?.length!==documents.length)throw new Error("The selected case or document count differs from the plan.");
 
 // The pages of one document as the app judges them before any OCR.
 async function judge(file:string){
@@ -88,65 +88,62 @@ function readiness(holes:any[]){
 
 const sha=(f:string)=>createHash("sha256").update(readFileSync(f)).digest("hex");
 mkdirSync(`${runDir}/predictions`,{recursive:true});
-const plan:any={reports:{}};
-for(const rep of reports){
-  const docs:any[]=[],holes:any[]=[],timing={judge_ms:0,read_ms:0,ocr_ms:0,ocr_pages:0,ocr_backend:new Set<string>()};
-  let missing=0;
-  for(const [k,f] of (rep.files as any[]).entries()){
-    const file=`bench/.cache/reports/${rep.id}/${f.name}`;
-    if(!existsSync(file)){console.error(`${rep.id}: ${f.name} not fetched (bench/scripts/fetch.py)`);process.exit(1)}
-    // (A document generated on request carries its date: fetch.py checks it by its text instead.)
-    if(f.sha256&&!f.volatile&&sha(file)!==f.sha256){console.error(`${rep.id}: ${f.name} differs from the manifest`);process.exit(1)}
-    const j=await judge(file);
-    timing.judge_ms+=j.judgeMs;
-    const ocrPages=[...j.scan,...j.doubt];
-    if(mode==="plan"){(plan.reports[rep.id]??=[]).push({doc:k,file,pages:ocrPages,rules:[...ocrPages,...j.drawn]});continue}
-    const t0=performance.now(),pages=j.pages,read=new Set<number>(),why=j.why,lost:number[]=[],kept:number[]=[];
-    for(const n of ocrPages){
-      const c=cached(rep.id,k,n);
-      if(!c){lost.push(n);continue}
-      timing.ocr_ms+=c.ms;timing.ocr_pages++;timing.ocr_backend.add(c.backend);
-      const r=cachedRules(rep.id,k,n);
-      if(!r)lost.push(n);
-      const ocr={page:n,width:c.width,height:c.height,lines:c.lines.map((l:any)=>({...textLine(l.text,l.x0,l.y0,l.x1,l.y1),page:n})),...(r?{rules:r.rules}:{})};
-      const text=pages.find((p:any)=>p.page===n);
-      if(j.doubt.includes(n)&&text){
-        const a=agreement(text.lines.map((l:any)=>l.text),ocr.lines.map((l:any)=>l.text));
-        if(a>=CONFIRMED){kept.push(n);continue}
-        why.set(n,`PDF text that OCR did not confirm (${pct(a)} of its words read the same)`);
-      }
-      const at=pages.findIndex((p:any)=>p.page===n);if(at>=0)pages.splice(at,1);
-      pages.push(ocr);read.add(n);
+const plan:Array<{doc:number;file:string;sha256:string;pages:number[];rules:number[]}>=[];
+const docs:any[]=[],holes:any[]=[],timing={judge_ms:0,read_ms:0,ocr_ms:0,ocr_pages:0,ocr_backend:new Set<string>()};
+let missing=0;
+for(const [k,f] of documents.entries()){
+  const file=f.file,sha256=sha(file);
+  if(mode==="read"&&(file!==planned[k].file||sha256!==planned[k].sha256))throw new Error("A source file changed after planning. Start a fresh run.");
+  const j=await judge(file);
+  timing.judge_ms+=j.judgeMs;
+  const ocrPages=[...j.scan,...j.doubt];
+  if(mode==="plan"){plan.push({doc:k,file,sha256,pages:ocrPages,rules:[...ocrPages,...j.drawn]});continue}
+  const t0=performance.now(),pages=j.pages,read=new Set<number>(),why=j.why,lost:number[]=[],kept:number[]=[];
+  for(const n of ocrPages){
+    const c=cached(caseId,k,n);
+    if(!c){lost.push(n);continue}
+    timing.ocr_ms+=c.ms;timing.ocr_pages++;timing.ocr_backend.add(c.backend);
+    const r=cachedRules(caseId,k,n);
+    if(!r)lost.push(n);
+    const ocr={page:n,width:c.width,height:c.height,lines:c.lines.map((l:any)=>({...textLine(l.text,l.x0,l.y0,l.x1,l.y1),page:n})),...(r?{rules:r.rules}:{})};
+    const text=pages.find((p:any)=>p.page===n);
+    if(j.doubt.includes(n)&&text){
+      const a=agreement(text.lines.map((l:any)=>l.text),ocr.lines.map((l:any)=>l.text));
+      if(a>=CONFIRMED){kept.push(n);continue}
+      why.set(n,`PDF text that OCR did not confirm (${pct(a)} of its words read the same)`);
     }
-    for(const n of j.drawn){
-      const t=pages.find((p:any)=>p.page===n),r=cachedRules(rep.id,k,n);
-      if(!r){lost.push(n);continue}
-      if(t)t.rules=joinRules([...(t.rules??[]),...scaleRules(r.rules,t.width/r.width)]);
-    }
-    missing+=lost.length;
-    pages.sort((a:any,b:any)=>a.page-b.page);
-    for(const p of pages)for(const l of p.lines)l.page=p.page;
-    const r=readDocument(pages),drafts=draftHoles(k,f.name,r.logs,read,why),checks=checkDraft(drafts);
-    timing.read_ms+=performance.now()-t0;
-    const out=drafts.map(holeOut);
-    holes.push(...out);
-    docs.push({doc:k,file:f.name,pages:j.count,
-      routes:{ocr:[...read].sort((a,b)=>a-b),ocr_why:Object.fromEntries([...read].map(n=>[n,why.get(n)])),doubtful_kept:kept,ocr_missing:lost},
-      log_pages:[...new Set(out.flatMap(h=>h.pages))].sort((a,b)=>a-b),
-      core_pages:[...new Set(out.flatMap(h=>h.core_pages))].sort((a,b)=>a-b),
-      unread_log_pages:r.unread.filter(u=>u.log).map(u=>({page:u.page,id:u.id??null,error:u.error})),
-      checks:checks.map(c=>({hole:c.hole,level:c.level,text:c.text}))});
+    const at=pages.findIndex((p:any)=>p.page===n);if(at>=0)pages.splice(at,1);
+    pages.push(ocr);read.add(n);
   }
-  if(mode==="plan")continue;
-  const pred={schema:"geomodel3d-bench-prediction/1.0.0",report_id:rep.id,
+  for(const n of j.drawn){
+    const t=pages.find((p:any)=>p.page===n),r=cachedRules(caseId,k,n);
+    if(!r){lost.push(n);continue}
+    if(t)t.rules=joinRules([...(t.rules??[]),...scaleRules(r.rules,t.width/r.width)]);
+  }
+  missing+=lost.length;
+  pages.sort((a:any,b:any)=>a.page-b.page);
+  for(const p of pages)for(const l of p.lines)l.page=p.page;
+  const r=readDocument(pages),drafts=draftHoles(k,f.name,r.logs,read,why),checks=checkDraft(drafts);
+  timing.read_ms+=performance.now()-t0;
+  const out=drafts.map(holeOut);
+  holes.push(...out);
+  docs.push({doc:k,file:f.name,sha256,pages:j.count,
+    routes:{ocr:[...read].sort((a,b)=>a-b),ocr_why:Object.fromEntries([...read].map(n=>[n,why.get(n)])),doubtful_kept:kept,ocr_missing:lost},
+    log_pages:[...new Set(out.flatMap(h=>h.pages))].sort((a,b)=>a-b),
+    core_pages:[...new Set(out.flatMap(h=>h.core_pages))].sort((a,b)=>a-b),
+    unread_log_pages:r.unread.filter(u=>u.log).map(u=>({page:u.page,id:u.id??null,error:u.error})),
+    checks:checks.map(c=>({hole:c.hole,level:c.level,text:c.text}))});
+}
+if(mode==="read"){
+  const pred={schema:"geomodel3d-bench-prediction/1.0.0",report_id:caseId,
     reader:{name:"GeoModel3D",version:process.env.READER_VERSION??"",commit:process.env.READER_COMMIT??"",ocr:"PP-OCRv6 small (app worker, headless Chromium)"},
     complete:missing===0,documents:docs,boreholes:holes,readiness:readiness(holes),
     timing:{judge_ms:Math.round(timing.judge_ms),read_ms:Math.round(timing.read_ms),ocr_ms:Math.round(timing.ocr_ms),ocr_pages:timing.ocr_pages,ocr_backend:[...timing.ocr_backend]}};
-  writeFileSync(`${runDir}/predictions/${rep.id}.json`,JSON.stringify(pred,null,1)+"\n");
-  console.log(`${rep.id}: ${holes.length} boreholes, OCR ${timing.ocr_pages} pages${missing?`, ${missing} pages not yet read by OCR`:""}`);
+  writeFileSync(`${runDir}/predictions/${caseId}.json`,JSON.stringify(pred,null,1)+"\n");
+  console.log(`${caseId}: ${holes.length} boreholes, OCR ${timing.ocr_pages} pages${missing?`, ${missing} pages not yet read by OCR`:""}`);
 }
 if(mode==="plan"){
-  writeFileSync(`${runDir}/ocr-plan.json`,JSON.stringify(plan,null,1)+"\n");
-  for(const [id,ds] of Object.entries<any[]>(plan.reports))console.log(`${id}: ${ds.reduce((s,d)=>s+d.pages.length,0)} pages to read by OCR`);
+  writeFileSync(`${runDir}/ocr-plan.json`,JSON.stringify({reports:{[caseId]:plan}},null,1)+"\n");
+  console.log(`${caseId}: ${plan.reduce((sum,doc)=>sum+doc.pages.length,0)} pages to read by OCR`);
 }
 process.exit(0);

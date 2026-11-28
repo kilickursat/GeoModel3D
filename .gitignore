@@ -3,6 +3,11 @@ dist/
 *.tsbuildinfo
 .DS_Store
 .cache/
+*.[pP][dD][fF]
+bench/annotations/
+bench/results/
+bench/reports/
+bench/runs/
 public/ocr/
 playwright-report/
 test-results/

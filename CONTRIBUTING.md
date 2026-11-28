@@ -4,7 +4,7 @@ Thank you for helping. GeoModel3D is open source under the [Apache-2.0 licence](
 
 ## Ways to contribute
 
-- **Report a bug.** [Open an issue](https://github.com/kilickursat/GeoModel3D/issues/new/choose) with the version shown next to the title in the app, your browser and system, what you did, what you expected and what happened. A small file that shows the problem helps most; remove anything confidential from it first.
+- **Report a bug.** [Open an issue](https://github.com/kilickursat/GeoModel3D/issues/new/choose) with the version shown next to the title in the app, your browser and system, what you did, what you expected and what happened. Use a small invented example to reproduce an import issue.
 - **Ask for a feature.** Describe the task it serves (for example "earth pressures on an embedded wall") and, for a calculation, the method and a reference: a standard, a textbook or a paper.
 - **Improve the documentation:** the README, the CSV templates in [`docs/templates/`](docs/templates/) and the help texts in the app.
 - **Contribute code.** For anything larger than a small fix, open an issue first, so that the approach is agreed before you spend time on it. [Planned](docs/methods.md#planned) lists what is planned.
@@ -67,6 +67,8 @@ To repair missing files on an older release, manually run **Release assets** wit
 - **Text in the app** is short, plain English, with the symbols and units used elsewhere in the app (σ′v, kPa, m).
 
 ## Data, sites and test fixtures
+
+Use invented borehole records for document-reader tests, screenshots, issue attachments and benchmark examples. Keep geotechnical reports, scans, OCR text, extracted projects and report archives out of the repository, releases and CI artifacts, including material from public sources. For a private evaluation, keep inputs and source-bearing outputs outside the checkout and discard temporary copies after testing.
 
 GeoModel3D includes real data only when there is no doubt that it may be shared. For any data added to the repository, as a reference site or as a test fixture:
 

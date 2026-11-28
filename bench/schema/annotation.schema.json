@@ -129,7 +129,7 @@
       }
     },
     "documents": {
-      "description": "The files of the report, in the order the manifest lists them; doc numbers count from 0.",
+      "description": "The documents in the order supplied to the reader. Document numbers start at 0.",
       "type": "array",
       "minItems": 1,
       "items": {

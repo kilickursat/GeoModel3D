@@ -49,7 +49,7 @@ labelled draft wherever they are reported.
 
 ## Documents and pages
 
-- `documents` lists the report's files in manifest order; `doc` numbers count from 0 and pages from 1, as a PDF
+- `documents` lists the report's files in the order supplied to the runner; `doc` numbers count from 0 and pages from 1, as a PDF
   viewer shows them (not the page numbers printed on the sheets).
 - Each page in scope gets one `type`:
 
@@ -74,7 +74,7 @@ labelled draft wherever they are reported.
   Where a page carries two things (a log beside a location plan), it takes the type that carries borehole data, in the
   order of the table, and the other is named in `note`.
 - `boreholes` on a page lists the IDs of the holes whose log, core sheet or summary entry is on it.
-- `scan_quality` is given per page where it differs from the report's (manifest) value.
+- `scan_quality` can describe the legibility of each page.
 
 ## Boreholes
 
@@ -137,9 +137,9 @@ misread is wrong, and is counted separately as an **unsafe build**.
 ## Checking a file
 
 ```
-python3 -I bench/scripts/validate.py
+python3 -I bench/scripts/validate.py /path/to/annotation.json
 ```
 
-checks the schema, page and document numbers against the files, that layers are ordered and do not overlap, that
+checks the schema, page and document numbers against the declared page counts, that layers are ordered and do not overlap, that
 every `source` page belongs to the hole or a summary page, that IDs are unique, and that no field looks like personal
 data.

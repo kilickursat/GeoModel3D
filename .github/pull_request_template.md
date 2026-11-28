@@ -4,7 +4,7 @@
 
 ## How it was checked
 
-<!-- For anything visible: the browser, the dataset, and a screenshot. -->
+<!-- For anything visible: the browser and an invented case. Use fictional data for attachments. -->
 
 - [ ] `npm test` passes
 - [ ] `npm run build` passes

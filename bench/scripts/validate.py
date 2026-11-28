@@ -1,19 +1,8 @@
 #!/usr/bin/env python3
-"""Check the benchmark: the manifest, the splits and every annotation, and say whether the benchmark may be called
-complete.
-
-    python3 -I bench/scripts/validate.py            # errors make the exit status 1
-    python3 -I bench/scripts/validate.py --strict   # warnings too
-
-Errors are things that are wrong (a schema violation, a page that does not exist, a related document in two splits).
-Warnings are things to look at (a field that may hold personal data, a final depth above the last layer's base).
-The completeness check at the end never fails the run: it reports what is still missing before the benchmark can be
-called complete (licences confirmed, every annotation verified by a person, coverage of each split).
-"""
+"""Validate an explicitly supplied benchmark annotation and its source references."""
 import argparse, collections, json, pathlib, re, sys, unicodedata
 
 BENCH = pathlib.Path(__file__).resolve().parent.parent
-SPLITS = ("dev", "validation", "test")
 errors, warnings = [], []
 
 
@@ -50,62 +39,13 @@ def strings(x):
             yield from strings(v)
 
 
-def check_manifest(m):
-    ids, groups = set(), collections.defaultdict(set)
-    for r in m["reports"]:
-        w = r.get("id", "?")
-        for k in ("id", "title", "publisher", "country", "languages", "landing_url", "licence", "files", "layout_family",
-                  "layout", "scan_quality", "related_group", "split"):
-            if k not in r:
-                err(w, f"manifest entry lacks {k}")
-        if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", w):
-            err(w, "report id must be lower-case words joined by hyphens")
-        if w in ids:
-            err(w, "report id used twice")
-        ids.add(w)
-        if r.get("split") not in SPLITS:
-            err(w, f"split must be one of {SPLITS}")
-        groups[r.get("related_group")].add(r.get("split"))
-        lic = r.get("licence", {})
-        for k in ("id", "name", "url", "evidence", "checked_on", "attribution"):
-            if not lic.get(k):
-                err(w, f"licence lacks {k}")
-        for f in r.get("files", []):
-            if not f.get("url", "").startswith("https://"):
-                err(w, f"{f.get('name')}: source URL must be https")
-            if not re.fullmatch(r"[0-9a-f]{64}", f.get("sha256", "")):
-                err(w, f"{f.get('name')}: no SHA-256 recorded (run fetch.py --record)")
-            if not isinstance(f.get("pages"), int):
-                err(w, f"{f.get('name')}: page count not recorded")
-    for g, splits in groups.items():
-        if len(splits) > 1:
-            err(f"related group {g}", f"reports in more than one split: {sorted(splits)}")
-    for x in m.get("excluded", []):
-        if not x.get("source") or not x.get("reason"):
-            err("excluded", f"entry without source or reason: {x}")
-    return {r["id"]: r for r in m["reports"]}
-
-
-def check_annotation(path, rep, validator):
+def check_annotation(path, validator):
     w = path.stem
     a = json.loads(path.read_text())
     for e in validator.iter_errors(a):
         err(w, f"schema: {'/'.join(map(str, e.absolute_path))}: {e.message[:200]}")
     if errors and errors[-1].startswith(f"{w}: schema"):
         return a
-    if a["report_id"] != w:
-        err(w, "report_id differs from the file name")
-    if rep is None:
-        err(w, "no manifest entry")
-        return a
-    files = rep["files"]
-    if [d["file"] for d in a["documents"]] != [f["name"] for f in files]:
-        err(w, "documents differ from the manifest's files (names or order)")
-    for d, f in zip(a["documents"], files):
-        if d["sha256"] != f.get("sha256"):
-            err(w, f"{d['file']}: SHA-256 differs from the manifest: the annotation is of another version")
-        if d["pages"] != f.get("pages"):
-            err(w, f"{d['file']}: page count differs from the manifest")
     npages = {i: d["pages"] for i, d in enumerate(a["documents"])}
 
     def page_ok(where, doc, page):
@@ -208,6 +148,7 @@ def check_annotation(path, rep, validator):
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("annotation", type=pathlib.Path)
     ap.add_argument("--strict", action="store_true")
     args = ap.parse_args()
     try:
@@ -215,51 +156,14 @@ def main():
     except ImportError:
         print("needs the jsonschema package (pip install jsonschema)")
         return 2
-    m = json.loads((BENCH / "manifest" / "sources.json").read_text())
-    reps = check_manifest(m)
     schema = json.loads((BENCH / "schema" / "annotation.schema.json").read_text())
     validator = jsonschema.Draft202012Validator(schema)
-    anns = {}
-    for p in sorted((BENCH / "annotations").glob("*.json")):
-        anns[p.stem] = check_annotation(p, reps.get(p.stem), validator)
-
+    check_annotation(args.annotation, validator)
     for e in errors:
         print("ERROR  ", e)
     for x in warnings:
         print("warning", x)
-    print(f"\n{len(reps)} reports in the manifest, {len(anns)} annotated; {len(errors)} errors, {len(warnings)} warnings\n")
-
-    # Completeness: what must be true before the benchmark is called complete.
-    missing = []
-    for rid, r in reps.items():
-        if not r["licence"].get("version_stated", True):
-            missing.append(f"{rid}: licence version to be confirmed with the publisher")
-        if rid not in anns:
-            missing.append(f"{rid}: not annotated")
-        elif anns[rid].get("status") != "verified":
-            missing.append(f"{rid}: annotation is a draft, not verified by a person")
-    by = collections.defaultdict(list)
-    for rid, r in reps.items():
-        by[r["split"]].append(r)
-    print("split       reports  JP  other  abstain  families unseen in dev")
-    dev_fam = {r["layout_family"] for r in by["dev"]}
-    for s in SPLITS:
-        rs = by[s]
-        jp = sum(r["country"] == "JP" for r in rs)
-        ab = sum(1 for r in rs if r["id"] in anns and anns[r["id"]].get("readiness", {}).get("expected") == "abstain")
-        unseen = len({r["layout_family"] for r in rs} - dev_fam) if s != "dev" else "-"
-        print(f"{s:<11} {len(rs):>7} {jp:>3} {len(rs) - jp:>6} {ab:>8}  {unseen}")
-        if not rs:
-            missing.append(f"split {s} is empty")
-        elif s != "dev" and ab == 0:
-            missing.append(f"split {s} has no annotated abstention case")
-    print()
-    if missing:
-        print(f"COMPLETE: no ({len(missing)} items open)")
-        for x in missing:
-            print("  -", x)
-    else:
-        print("COMPLETE: yes")
+    print(f"{len(errors)} errors, {len(warnings)} warnings")
     return 1 if errors or (args.strict and warnings) else 0
 
 

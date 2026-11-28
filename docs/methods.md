@@ -35,7 +35,7 @@ Two length-weighted scores compare the measured depth intervals with the predict
 
 When several interpretations are checked together, each training model must contain an observed top for the selected bed, have a consistent identity for that bed across its logs, and predict positive thickness at the sampled location. Split-conformal calibration applies those criteria to its fixed training models at calibration and audit collars and along its reported maps and sections. An unsupported calibration prediction contributes an unbounded score. The full-data disagreement map still shows the range of the selected geological interpretations.
 
-These checks keep the project's declared stratigraphic order. For an independent engineering trial, select and freeze that order and any bed assignments from the training logs before inspecting the withheld geology. [Five-hole trial protocol](../bench/results/tochigi-119010496/blind/README.md)
+These checks keep the project's declared stratigraphic order. For an independent engineering trial, select and freeze that order and any bed assignments from the training logs before inspecting the withheld geology.
 
 ## Coordinate systems, terrain and maps
 

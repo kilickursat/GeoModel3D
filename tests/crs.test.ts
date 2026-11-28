@@ -1,12 +1,11 @@
 import {describe,it,expect} from "vitest";
 import proj4 from "proj4";
-import {readFileSync} from "node:fs";
 import {crsRegistry,findCrs,toProjected,toGeographic,suggestCrs,searchCrs,customCrs,projectCrs} from "../src/crs";
 
 describe("coordinate reference systems",()=>{
   // GSI survey calculator (https://vldb.gsi.go.jp/sokuchi/surveycalc/), JGD2011: X is the northing, Y the easting.
   const gsi:Array<[number,number,number,number,number]>=[
-    [9,35.373472,139.520028,-69463.2814,-28467.7100],
+    [9,36,139+50/60,0,0],
     [9,35.681236,139.767125,-35363.2377,-5992.9196],
     [6,34.702485,135.495951,-143825.4140,-46175.2301],
     [12,43.068661,141.350755,-103071.8787,-73236.4925],
@@ -84,21 +83,19 @@ describe("coordinate reference systems",()=>{
   });
 });
 
-// Positions published with national data in two systems: the BRO gives RD New coordinates with their ETRS89 position
-// (RDNAPTRANS2018), DOV gives Belgian Lambert 72 with Lambert 2008 (ETRS89).
-describe("datum shifts against published positions",()=>{
-  const read=(dir:string,file:string)=>readFileSync(new URL(`./fixtures/${dir}/${file}`,import.meta.url),"utf8");
+// Independently calculated with PROJ 9.6 and its EPSG database, using invented grid coordinates.
+// Source and destination axis orders here are normalized to easting/northing or longitude/latitude.
+describe("datum shifts at independent control points",()=>{
   const metres=(a:{lon:number;lat:number},b:{lon:number;lat:number})=>Math.hypot((a.lon-b.lon)*111320*Math.cos(a.lat*Math.PI/180),(a.lat-b.lat)*110574);
-  it("places RD New within a decimetre of RDNAPTRANS2018",()=>{
-    for(const f of ["BHR000000361914.xml","BHR000000470183.xml"]){
-      const s=read("bro",f),rd=s.match(/EPSG::28992"[^>]*>\s*<gml:pos>([\d.]+) ([\d.]+)/)!,etrs=s.match(/EPSG::4258"[^>]*>\s*<gml:pos>([\d.]+) ([\d.]+)/)!;
-      expect(metres(toGeographic(findCrs("EPSG:28992")!,+rd[1],+rd[2]),{lat:+etrs[1],lon:+etrs[2]})).toBeLessThan(0.15);
+  it("compares RD New with independent ETRS89 coordinates",()=>{
+    for(const [x,y,lon,lat] of [[155000,463000,5.387203505,52.155172294],[120000,460000,4.876081616,52.127101324]]){
+      expect(metres(toGeographic(findCrs("EPSG:28992")!,x,y),{lat,lon})).toBeLessThan(0.15);
     }
   });
-  it("places Belgian Lambert 72 within a decimetre of Lambert 2008",()=>{
-    for(const f of ["boring-1931-084105.xml","boring-1948-120680.xml","boring-2016-147736.xml"]){
-      const s=read("dov",f),a=s.match(/EPSG::6190"[^>]*>\s*<gml:pos>([\d.]+) ([\d.]+)/)!,b=s.match(/EPSG::8370"[^>]*>\s*<gml:pos>([\d.]+) ([\d.]+)/)!;
-      expect(metres(toGeographic(findCrs("EPSG:31370")!,+a[1],+a[2]),toGeographic(findCrs("EPSG:3812")!,+b[1],+b[2]))).toBeLessThan(0.15);
+  it("places Belgian Lambert 72 within 15 cm of Lambert 2008 controls",()=>{
+    const from=findCrs("EPSG:31370")!,to=findCrs("EPSG:3812")!;
+    for(const [x,y,e,n] of [[150000,150000,650002.070,650000.573],[165000,190000,664997.183,690002.037],[135000,175000,634999.212,674998.584]]){
+      expect(metres(toGeographic(from,x,y),toGeographic(to,e,n))).toBeLessThan(0.15);
     }
   });
 });

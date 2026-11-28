@@ -4,7 +4,7 @@ import {unitFor} from "../src/docread/draft";
 const line=(text:string,x:number,y:number)=>textLine(text,x,y,x+text.length*6,y+10);
 
 it("keeps the printed DOV test number and its evidence",()=>{
-  const value=line("GEO-74/026-B",150,20);
+  const value=line("DEMO-08/A",150,20);
   const h=header([line("Proefnummer:",40,20),value]);
   expect(h.id).toBe(value.text);
   expect(h.src?.id).toBe(value);
