@@ -4,6 +4,9 @@
 
 - Select pages before extracting mixed reports. Local Qwen3.5 can suggest log and location pages on request. Borehole logs can be matched to surveyed collar schedules within a PDF, with explicit decisions and source evidence for conflicting positions. Named graphic logs with explicit metric ranges retain their printed intervals.
 
+- Short Japanese metric continuation sheets can contribute beds when the printed page sequence, labelled columns, thicknesses, elevations and depth boundaries agree. The reader flags a gap between the deepest interval and the drilled length. The model uses the deepest logged material to constrain inferred contacts in that gap.
+- The OCR and document-Qwen workers use WebAssembly when the browser exposes a software or unidentifiable GPU. The standalone HTML offers the file types it can open locally, including saved projects.
+
 - Correlation review compares the modelled beds at each contributing collar with its logged intervals. Reviewers can identify separate occurrences of the same material or record why they accept a discrepancy. Pending intervals mark volumes as provisional in the viewer and the printable report.
 
 - Dutch DOV reports retain their printed borehole identifiers and skip separate stratigraphic appendices. A leading “idem” requires material review. Dutch and French descriptions of made ground map to the same group.
