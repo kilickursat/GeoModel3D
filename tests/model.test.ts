@@ -111,6 +111,19 @@ describe("reading a log",()=>{
     expect(boreholeContacts(hole([[0,9,"A"]],15),units).eoh).toBe(15);
   });
 
+  it.each([[8,8],[2,4]])("uses adjacent contacts at %i m and the logged endpoint to infer a contact at %i m",(adjacent,expected)=>{
+    const incomplete=hole([[0,4,"A"]],20);
+    const full=hole([[0,adjacent,"A"],[adjacent,12,"B"]]);
+    const m=buildGeologicalModel({name:"Partially logged",units:units.slice(0,2),boreholes:[
+      incomplete,{...full,id:"east",x:20},{...full,id:"north",y:20}
+    ]});
+    expect(m.horizons[1].z[0]).toBeCloseTo(100-expected,9);
+    expect(Array.from(m.horizons[1].observed)).toEqual([0,1,1]);
+    expect(m.base).toBe(80);
+    expect(m.boreholes[0]).toMatchObject({depth:20,intervals:[{from:0,to:4,unit:"A"}]});
+    expect(m.warnings.join("\n")).toMatch(/H: .*4.*20 m.*inferred/);
+  });
+
   it("leaves the contacts above a log that begins below the collar unknown",()=>{
     const c=boreholeContacts(hole([[8,10,"B"],[10,14,"C"]]),units);
     expect(c.depth).toEqual([0,null,10,null]);

@@ -39,7 +39,7 @@ export interface GeoModel {
   cptLogs:Borehole[];
 }
 // `start` is the depth where a log begins, when it begins below the collar.
-export interface BoreholeContacts { depth:Array<number|null>; eroded:Array<number|null>; deepest:number; eoh:number; notes:string[]; outOfOrder:number; start?:number }
+export interface BoreholeContacts { depth:Array<number|null>; eroded:Array<number|null>; deepest:number; loggedTo:number; eoh:number; notes:string[]; outOfOrder:number; start?:number }
 
 const fmt=(v:number)=>String(Math.round(v*100)/100);
 
@@ -47,7 +47,7 @@ const fmt=(v:number)=>String(Math.round(v*100)/100);
 export function collarKey(p:XY){return Math.round(p.x*1000)+","+Math.round(p.y*1000)}
 
 // Reads one log as a layer-cake: depth[k] is the depth of horizon k where the log shows it, `deepest` the last
-// unit the hole entered (its base is not seen), `eoh` the final depth. Units skipped by the log have zero
+// unit the hole entered (its base is not seen), `loggedTo` the deepest interval used and `eoh` the final depth. Units skipped by the log have zero
 // thickness, unless the unit above the contact is erosive: then the skipped units were eroded, and eroded[k] is
 // the depth of the erosion surface, above which their original surfaces lay. A log that begins below the collar says
 // nothing about the units above its first one: those contacts are left unknown (null) and `start` records the depth.
@@ -85,7 +85,9 @@ export function boreholeContacts(b:Borehole,units:UnitDef[]):BoreholeContacts{
     }
     prevTo=Math.max(prevTo,i.to);
   }
-  return {depth,eroded,deepest,outOfOrder,eoh:Math.max(boreholeDepth(b),prevTo),notes,...(start!==undefined?{start}:{})};
+  const eoh=Math.max(boreholeDepth(b),prevTo);
+  if(deepest>=0&&eoh>prevTo+1e-6)notes.push(`the deepest interval used ends at ${fmt(prevTo)} m. Material down to the final depth of ${fmt(eoh)} m is inferred`);
+  return {depth,eroded,deepest,outOfOrder,loggedTo:prevTo,eoh,notes,...(start!==undefined?{start}:{})};
 }
 
 function idw(samples:Array<{x:number;y:number;v:number}>,p:XY){
@@ -373,11 +375,11 @@ export function buildGeologicalModel(project:GeoProject,options:{probe?:XY;trian
     for(let i=0;i<N;i++)if(observed[u][i]&&observed[u+1][i])s.push({x:nodes[i].x,y:nodes[i].y,v:raw[u][i]-raw[u+1][i]});
     return s;
   });
-  // Below the deepest unit a hole entered, stack inverse-distance-weighted thicknesses; that unit's base must lie below the end of the hole.
+  // The last measured material extends at least to its logged endpoint. Its inferred base can lie in the unlogged tail.
   for(let i=0;i<NB;i++){
     for(let k=contacts[i].deepest+1;k<=K;k++){
       let v=k===K?base:raw[k-1][i]-idw(thickness[k-1],nodes[i]);
-      if(k===contacts[i].deepest+1)v=Math.min(v,eohZ[i]);
+      if(k===contacts[i].deepest+1)v=Math.min(v,boreholes[i].z-contacts[i].loggedTo);
       raw[k][i]=Math.max(v,base);
     }
   }
