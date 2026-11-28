@@ -1,0 +1,2807 @@
+{
+ "run": "v0.31.0",
+ "per_report": [
+  {
+   "report_id": "jp-tochigi-117100033",
+   "status": "draft",
+   "complete_prediction": true,
+   "document": {
+    "pages_in_scope": 9,
+    "log_pages": 9,
+    "detected": 9,
+    "true_positive": 9,
+    "recall": 1.0,
+    "precision": 1.0,
+    "read_rate": 1.0,
+    "page_types": null
+   },
+   "assembly": {
+    "boreholes": 9,
+    "predicted": 9,
+    "matched": 9,
+    "recall": 1.0,
+    "precision": 1.0,
+    "id_correct": 9,
+    "pages_exact": 9,
+    "splits": 0,
+    "merges": 0
+   },
+   "fields": {
+    "final_depth": {
+     "gt": 9,
+     "predicted": 9,
+     "correct": 9,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "ground_elevation": {
+     "gt": 9,
+     "predicted": 9,
+     "correct": 9,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "groundwater": {
+     "gt": 2,
+     "predicted": 1,
+     "correct": 1,
+     "wrong": 0,
+     "missed": 1,
+     "spurious": 0,
+     "recall": 0.5,
+     "precision": 1.0
+    },
+    "layer_boundaries": {
+     "gt": 42,
+     "predicted": 40,
+     "correct": 38,
+     "wrong": 0,
+     "missed": 4,
+     "spurious": 2,
+     "recall": 0.9048,
+     "precision": 0.95
+    },
+    "position": {
+     "gt": 9,
+     "predicted": 9,
+     "correct": 9,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "rqd": {
+     "gt": 6,
+     "predicted": 0,
+     "correct": 0,
+     "wrong": 0,
+     "missed": 6,
+     "spurious": 0,
+     "recall": 0.0,
+     "precision": null
+    },
+    "spt": {
+     "gt": 53,
+     "predicted": 48,
+     "correct": 47,
+     "wrong": 1,
+     "missed": 5,
+     "spurious": 0,
+     "recall": 0.8868,
+     "precision": 0.9792
+    },
+    "lithology_depth_weighted": {
+     "right": 5333,
+     "total": 5568,
+     "accuracy": 0.9578
+    }
+   },
+   "readiness": {
+    "expected": "spatial_model",
+    "expected_reasons": [],
+    "predicted": "spatial_model",
+    "predicted_reasons": [],
+    "correct": true,
+    "unsafe_build": false
+   },
+   "effort": {
+    "values_in_truth": 163,
+    "edits": 21,
+    "edits_per_borehole": 2.33,
+    "automation": 0.8712
+   },
+   "time": {
+    "pages": 9,
+    "text_and_reconstruction_ms": 2099,
+    "ocr_ms": 0,
+    "ocr_pages": 0,
+    "ocr_backend": []
+   },
+   "failures": {
+    "boundary_missed": 4,
+    "boundary_spurious": 2,
+    "lithology_relabel": 2,
+    "rqd_missed": 6,
+    "spt_missed": 5,
+    "spt_wrong": 1,
+    "water_missed": 1
+   },
+   "split": "dev",
+   "family": "jp-denshi-chujozu",
+   "country": "JP",
+   "family_seen_in_dev": true
+  },
+  {
+   "report_id": "jp-tochigi-118050690",
+   "status": "draft",
+   "complete_prediction": true,
+   "document": {
+    "pages_in_scope": 7,
+    "log_pages": 7,
+    "detected": 7,
+    "true_positive": 7,
+    "recall": 1.0,
+    "precision": 1.0,
+    "read_rate": 1.0,
+    "page_types": null
+   },
+   "assembly": {
+    "boreholes": 7,
+    "predicted": 7,
+    "matched": 7,
+    "recall": 1.0,
+    "precision": 1.0,
+    "id_correct": 7,
+    "pages_exact": 7,
+    "splits": 0,
+    "merges": 0
+   },
+   "fields": {
+    "final_depth": {
+     "gt": 7,
+     "predicted": 7,
+     "correct": 7,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "ground_elevation": {
+     "gt": 7,
+     "predicted": 7,
+     "correct": 7,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "groundwater": {
+     "gt": 7,
+     "predicted": 7,
+     "correct": 7,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "layer_boundaries": {
+     "gt": 53,
+     "predicted": 53,
+     "correct": 53,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "position": {
+     "gt": 7,
+     "predicted": 7,
+     "correct": 7,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "rqd": {
+     "gt": 0,
+     "predicted": 0,
+     "correct": 0,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": null,
+     "precision": null
+    },
+    "spt": {
+     "gt": 53,
+     "predicted": 53,
+     "correct": 50,
+     "wrong": 3,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 0.9434,
+     "precision": 0.9434
+    },
+    "lithology_depth_weighted": {
+     "right": 4985,
+     "total": 5715,
+     "accuracy": 0.8723
+    }
+   },
+   "readiness": {
+    "expected": "spatial_model",
+    "expected_reasons": [],
+    "predicted": "spatial_model",
+    "predicted_reasons": [],
+    "correct": true,
+    "unsafe_build": false
+   },
+   "effort": {
+    "values_in_truth": 180,
+    "edits": 8,
+    "edits_per_borehole": 1.14,
+    "automation": 0.9556
+   },
+   "time": {
+    "pages": 7,
+    "text_and_reconstruction_ms": 2028,
+    "ocr_ms": 0,
+    "ocr_pages": 0,
+    "ocr_backend": []
+   },
+   "failures": {
+    "lithology_relabel": 5,
+    "spt_wrong": 3
+   },
+   "split": "dev",
+   "family": "jp-denshi-chujozu",
+   "country": "JP",
+   "family_seen_in_dev": true
+  },
+  {
+   "report_id": "jp-tochigi-119070445",
+   "status": "draft",
+   "complete_prediction": true,
+   "document": {
+    "pages_in_scope": 9,
+    "log_pages": 9,
+    "detected": 9,
+    "true_positive": 9,
+    "recall": 1.0,
+    "precision": 1.0,
+    "read_rate": 1.0,
+    "page_types": null
+   },
+   "assembly": {
+    "boreholes": 7,
+    "predicted": 7,
+    "matched": 7,
+    "recall": 1.0,
+    "precision": 1.0,
+    "id_correct": 7,
+    "pages_exact": 7,
+    "splits": 0,
+    "merges": 0
+   },
+   "fields": {
+    "final_depth": {
+     "gt": 7,
+     "predicted": 7,
+     "correct": 7,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "ground_elevation": {
+     "gt": 7,
+     "predicted": 7,
+     "correct": 7,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "groundwater": {
+     "gt": 7,
+     "predicted": 7,
+     "correct": 7,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "layer_boundaries": {
+     "gt": 51,
+     "predicted": 51,
+     "correct": 51,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "position": {
+     "gt": 7,
+     "predicted": 7,
+     "correct": 7,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "rqd": {
+     "gt": 0,
+     "predicted": 0,
+     "correct": 0,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": null,
+     "precision": null
+    },
+    "spt": {
+     "gt": 116,
+     "predicted": 116,
+     "correct": 112,
+     "wrong": 4,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 0.9655,
+     "precision": 0.9655
+    },
+    "lithology_depth_weighted": {
+     "right": 11855,
+     "total": 11855,
+     "accuracy": 1.0
+    }
+   },
+   "readiness": {
+    "expected": "spatial_model",
+    "expected_reasons": [],
+    "predicted": "spatial_model",
+    "predicted_reasons": [],
+    "correct": true,
+    "unsafe_build": false
+   },
+   "effort": {
+    "values_in_truth": 239,
+    "edits": 4,
+    "edits_per_borehole": 0.57,
+    "automation": 0.9833
+   },
+   "time": {
+    "pages": 9,
+    "text_and_reconstruction_ms": 4646,
+    "ocr_ms": 0,
+    "ocr_pages": 0,
+    "ocr_backend": []
+   },
+   "failures": {
+    "spt_wrong": 4
+   },
+   "split": "dev",
+   "family": "jp-denshi-chujozu",
+   "country": "JP",
+   "family_seen_in_dev": true
+  },
+  {
+   "report_id": "jp-tochigi-120080167",
+   "status": "draft",
+   "complete_prediction": true,
+   "document": {
+    "pages_in_scope": 8,
+    "log_pages": 8,
+    "detected": 8,
+    "true_positive": 8,
+    "recall": 1.0,
+    "precision": 1.0,
+    "read_rate": 1.0,
+    "page_types": null
+   },
+   "assembly": {
+    "boreholes": 8,
+    "predicted": 8,
+    "matched": 8,
+    "recall": 1.0,
+    "precision": 1.0,
+    "id_correct": 8,
+    "pages_exact": 8,
+    "splits": 0,
+    "merges": 0
+   },
+   "fields": {
+    "final_depth": {
+     "gt": 8,
+     "predicted": 8,
+     "correct": 8,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "ground_elevation": {
+     "gt": 8,
+     "predicted": 8,
+     "correct": 8,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "groundwater": {
+     "gt": 8,
+     "predicted": 8,
+     "correct": 8,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "layer_boundaries": {
+     "gt": 44,
+     "predicted": 44,
+     "correct": 44,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "position": {
+     "gt": 8,
+     "predicted": 8,
+     "correct": 8,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "rqd": {
+     "gt": 0,
+     "predicted": 0,
+     "correct": 0,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": null,
+     "precision": null
+    },
+    "spt": {
+     "gt": 76,
+     "predicted": 76,
+     "correct": 76,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "lithology_depth_weighted": {
+     "right": 3648,
+     "total": 7827,
+     "accuracy": 0.4661
+    }
+   },
+   "readiness": {
+    "expected": "spatial_model",
+    "expected_reasons": [],
+    "predicted": "spatial_model",
+    "predicted_reasons": [],
+    "correct": true,
+    "unsafe_build": false
+   },
+   "effort": {
+    "values_in_truth": 191,
+    "edits": 20,
+    "edits_per_borehole": 2.5,
+    "automation": 0.8953
+   },
+   "time": {
+    "pages": 8,
+    "text_and_reconstruction_ms": 1710,
+    "ocr_ms": 0,
+    "ocr_pages": 0,
+    "ocr_backend": []
+   },
+   "failures": {
+    "lithology_relabel": 20
+   },
+   "split": "validation",
+   "family": "jp-denshi-chujozu",
+   "country": "JP",
+   "family_seen_in_dev": true
+  },
+  {
+   "report_id": "jp-tochigi-121050413",
+   "status": "draft",
+   "complete_prediction": true,
+   "document": {
+    "pages_in_scope": 7,
+    "log_pages": 7,
+    "detected": 6,
+    "true_positive": 6,
+    "recall": 0.8571,
+    "precision": 1.0,
+    "read_rate": 0.8571,
+    "page_types": null
+   },
+   "assembly": {
+    "boreholes": 6,
+    "predicted": 6,
+    "matched": 6,
+    "recall": 1.0,
+    "precision": 1.0,
+    "id_correct": 6,
+    "pages_exact": 5,
+    "splits": 0,
+    "merges": 0
+   },
+   "fields": {
+    "final_depth": {
+     "gt": 6,
+     "predicted": 6,
+     "correct": 6,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "ground_elevation": {
+     "gt": 6,
+     "predicted": 6,
+     "correct": 6,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "groundwater": {
+     "gt": 6,
+     "predicted": 6,
+     "correct": 6,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "layer_boundaries": {
+     "gt": 91,
+     "predicted": 86,
+     "correct": 86,
+     "wrong": 0,
+     "missed": 5,
+     "spurious": 0,
+     "recall": 0.9451,
+     "precision": 1.0
+    },
+    "position": {
+     "gt": 6,
+     "predicted": 6,
+     "correct": 6,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "rqd": {
+     "gt": 0,
+     "predicted": 0,
+     "correct": 0,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": null,
+     "precision": null
+    },
+    "spt": {
+     "gt": 90,
+     "predicted": 88,
+     "correct": 87,
+     "wrong": 1,
+     "missed": 2,
+     "spurious": 0,
+     "recall": 0.9667,
+     "precision": 0.9886
+    },
+    "lithology_depth_weighted": {
+     "right": 8420,
+     "total": 9270,
+     "accuracy": 0.9083
+    }
+   },
+   "readiness": {
+    "expected": "spatial_model",
+    "expected_reasons": [],
+    "predicted": "spatial_model",
+    "predicted_reasons": [],
+    "correct": true,
+    "unsafe_build": false
+   },
+   "effort": {
+    "values_in_truth": 292,
+    "edits": 18,
+    "edits_per_borehole": 3.0,
+    "automation": 0.9384
+   },
+   "time": {
+    "pages": 7,
+    "text_and_reconstruction_ms": 2768,
+    "ocr_ms": 0,
+    "ocr_pages": 0,
+    "ocr_backend": []
+   },
+   "failures": {
+    "boundary_missed": 5,
+    "lithology_relabel": 10,
+    "log_page_missed": 1,
+    "spt_missed": 2,
+    "spt_wrong": 1
+   },
+   "split": "test",
+   "family": "jp-denshi-chujozu",
+   "country": "JP",
+   "family_seen_in_dev": true
+  },
+  {
+   "report_id": "jp-noshiro-r3-yorozumachi",
+   "status": "draft",
+   "complete_prediction": true,
+   "document": {
+    "pages_in_scope": 12,
+    "log_pages": 8,
+    "detected": 8,
+    "true_positive": 8,
+    "recall": 1.0,
+    "precision": 1.0,
+    "read_rate": 1.0,
+    "page_types": null
+   },
+   "assembly": {
+    "boreholes": 4,
+    "predicted": 4,
+    "matched": 4,
+    "recall": 1.0,
+    "precision": 1.0,
+    "id_correct": 4,
+    "pages_exact": 4,
+    "splits": 0,
+    "merges": 0
+   },
+   "fields": {
+    "final_depth": {
+     "gt": 4,
+     "predicted": 4,
+     "correct": 4,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "ground_elevation": {
+     "gt": 4,
+     "predicted": 4,
+     "correct": 4,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "groundwater": {
+     "gt": 4,
+     "predicted": 4,
+     "correct": 4,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "layer_boundaries": {
+     "gt": 58,
+     "predicted": 58,
+     "correct": 58,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "position": {
+     "gt": 4,
+     "predicted": 4,
+     "correct": 4,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "rqd": {
+     "gt": 0,
+     "predicted": 0,
+     "correct": 0,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": null,
+     "precision": null
+    },
+    "spt": {
+     "gt": 153,
+     "predicted": 153,
+     "correct": 153,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "lithology_depth_weighted": {
+     "right": 14244,
+     "total": 15439,
+     "accuracy": 0.9226
+    }
+   },
+   "readiness": {
+    "expected": "spatial_model",
+    "expected_reasons": [],
+    "predicted": "spatial_model",
+    "predicted_reasons": [],
+    "correct": true,
+    "unsafe_build": false
+   },
+   "effort": {
+    "values_in_truth": 281,
+    "edits": 4,
+    "edits_per_borehole": 1.0,
+    "automation": 0.9858
+   },
+   "time": {
+    "pages": 12,
+    "text_and_reconstruction_ms": 6658,
+    "ocr_ms": 116267,
+    "ocr_pages": 3,
+    "ocr_backend": [
+     "wasm"
+    ]
+   },
+   "failures": {
+    "lithology_relabel": 4
+   },
+   "split": "dev",
+   "family": "jp-chujozu-consultant",
+   "country": "JP",
+   "family_seen_in_dev": true
+  },
+  {
+   "report_id": "jp-hirosaki-schools-h26-miwa",
+   "status": "draft",
+   "complete_prediction": true,
+   "document": {
+    "pages_in_scope": 20,
+    "log_pages": 2,
+    "detected": 3,
+    "true_positive": 2,
+    "recall": 1.0,
+    "precision": 0.6667,
+    "read_rate": 1.0,
+    "page_types": null
+   },
+   "assembly": {
+    "boreholes": 2,
+    "predicted": 2,
+    "matched": 2,
+    "recall": 1.0,
+    "precision": 1.0,
+    "id_correct": 2,
+    "pages_exact": 2,
+    "splits": 0,
+    "merges": 0
+   },
+   "fields": {
+    "final_depth": {
+     "gt": 2,
+     "predicted": 2,
+     "correct": 2,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "ground_elevation": {
+     "gt": 2,
+     "predicted": 2,
+     "correct": 2,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "groundwater": {
+     "gt": 2,
+     "predicted": 1,
+     "correct": 0,
+     "wrong": 1,
+     "missed": 1,
+     "spurious": 0,
+     "recall": 0.0,
+     "precision": 0.0
+    },
+    "layer_boundaries": {
+     "gt": 22,
+     "predicted": 21,
+     "correct": 21,
+     "wrong": 0,
+     "missed": 1,
+     "spurious": 0,
+     "recall": 0.9545,
+     "precision": 1.0
+    },
+    "rqd": {
+     "gt": 0,
+     "predicted": 0,
+     "correct": 0,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": null,
+     "precision": null
+    },
+    "spt": {
+     "gt": 36,
+     "predicted": 21,
+     "correct": 10,
+     "wrong": 8,
+     "missed": 18,
+     "spurious": 3,
+     "recall": 0.2778,
+     "precision": 0.4762
+    },
+    "lithology_depth_weighted": {
+     "right": 2050,
+     "total": 3700,
+     "accuracy": 0.5541
+    }
+   },
+   "readiness": {
+    "expected": "abstain",
+    "expected_reasons": [
+     "no_positions"
+    ],
+    "predicted": "abstain",
+    "predicted_reasons": [
+     "no_positions"
+    ],
+    "correct": true,
+    "unsafe_build": false
+   },
+   "effort": {
+    "values_in_truth": 84,
+    "edits": 41,
+    "edits_per_borehole": 20.5,
+    "automation": 0.5119
+   },
+   "time": {
+    "pages": 20,
+    "text_and_reconstruction_ms": 286,
+    "ocr_ms": 459488,
+    "ocr_pages": 20,
+    "ocr_backend": [
+     "wasm"
+    ]
+   },
+   "failures": {
+    "boundary_missed": 1,
+    "lithology_relabel": 9,
+    "log_page_false": 1,
+    "spt_missed": 18,
+    "spt_spurious": 3,
+    "spt_wrong": 8,
+    "water_missed": 1,
+    "water_wrong": 1
+   },
+   "split": "dev",
+   "family": "jp-scanned-report",
+   "country": "JP",
+   "family_seen_in_dev": true
+  },
+  {
+   "report_id": "jp-hirosaki-schools-h26-jitoku",
+   "status": "draft",
+   "complete_prediction": true,
+   "document": {
+    "pages_in_scope": 22,
+    "log_pages": 2,
+    "detected": 3,
+    "true_positive": 2,
+    "recall": 1.0,
+    "precision": 0.6667,
+    "read_rate": 1.0,
+    "page_types": null
+   },
+   "assembly": {
+    "boreholes": 2,
+    "predicted": 2,
+    "matched": 2,
+    "recall": 1.0,
+    "precision": 1.0,
+    "id_correct": 2,
+    "pages_exact": 2,
+    "splits": 0,
+    "merges": 0
+   },
+   "fields": {
+    "final_depth": {
+     "gt": 2,
+     "predicted": 2,
+     "correct": 2,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "ground_elevation": {
+     "gt": 2,
+     "predicted": 2,
+     "correct": 2,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "groundwater": {
+     "gt": 2,
+     "predicted": 2,
+     "correct": 0,
+     "wrong": 2,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 0.0,
+     "precision": 0.0
+    },
+    "layer_boundaries": {
+     "gt": 28,
+     "predicted": 24,
+     "correct": 24,
+     "wrong": 0,
+     "missed": 4,
+     "spurious": 0,
+     "recall": 0.8571,
+     "precision": 1.0
+    },
+    "rqd": {
+     "gt": 0,
+     "predicted": 0,
+     "correct": 0,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": null,
+     "precision": null
+    },
+    "spt": {
+     "gt": 60,
+     "predicted": 48,
+     "correct": 33,
+     "wrong": 12,
+     "missed": 15,
+     "spurious": 3,
+     "recall": 0.55,
+     "precision": 0.6875
+    },
+    "lithology_depth_weighted": {
+     "right": 795,
+     "total": 6090,
+     "accuracy": 0.1305
+    }
+   },
+   "readiness": {
+    "expected": "abstain",
+    "expected_reasons": [
+     "no_positions"
+    ],
+    "predicted": "abstain",
+    "predicted_reasons": [
+     "no_positions"
+    ],
+    "correct": true,
+    "unsafe_build": false
+   },
+   "effort": {
+    "values_in_truth": 120,
+    "edits": 56,
+    "edits_per_borehole": 28.0,
+    "automation": 0.5333
+   },
+   "time": {
+    "pages": 22,
+    "text_and_reconstruction_ms": 723,
+    "ocr_ms": 576812,
+    "ocr_pages": 22,
+    "ocr_backend": [
+     "wasm"
+    ]
+   },
+   "failures": {
+    "boundary_missed": 4,
+    "lithology_relabel": 20,
+    "log_page_false": 1,
+    "spt_missed": 15,
+    "spt_spurious": 3,
+    "spt_wrong": 12,
+    "water_wrong": 2
+   },
+   "split": "dev",
+   "family": "jp-scanned-report",
+   "country": "JP",
+   "family_seen_in_dev": true
+  },
+  {
+   "report_id": "jp-hirosaki-yoshino-brick",
+   "status": "draft",
+   "complete_prediction": true,
+   "document": {
+    "pages_in_scope": 59,
+    "log_pages": 3,
+    "detected": 14,
+    "true_positive": 3,
+    "recall": 1.0,
+    "precision": 0.2143,
+    "read_rate": 1.0,
+    "page_types": null
+   },
+   "assembly": {
+    "boreholes": 3,
+    "predicted": 3,
+    "matched": 3,
+    "recall": 1.0,
+    "precision": 1.0,
+    "id_correct": 3,
+    "pages_exact": 3,
+    "splits": 0,
+    "merges": 0
+   },
+   "fields": {
+    "final_depth": {
+     "gt": 3,
+     "predicted": 3,
+     "correct": 3,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "ground_elevation": {
+     "gt": 3,
+     "predicted": 3,
+     "correct": 3,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "groundwater": {
+     "gt": 3,
+     "predicted": 3,
+     "correct": 0,
+     "wrong": 3,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 0.0,
+     "precision": 0.0
+    },
+    "layer_boundaries": {
+     "gt": 31,
+     "predicted": 31,
+     "correct": 31,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "position": {
+     "gt": 3,
+     "predicted": 3,
+     "correct": 3,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "rqd": {
+     "gt": 0,
+     "predicted": 0,
+     "correct": 0,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": null,
+     "precision": null
+    },
+    "spt": {
+     "gt": 85,
+     "predicted": 38,
+     "correct": 34,
+     "wrong": 2,
+     "missed": 49,
+     "spurious": 2,
+     "recall": 0.4,
+     "precision": 0.8947
+    },
+    "lithology_depth_weighted": {
+     "right": 4180,
+     "total": 8614,
+     "accuracy": 0.4853
+    }
+   },
+   "readiness": {
+    "expected": "spatial_model",
+    "expected_reasons": [],
+    "predicted": "spatial_model",
+    "predicted_reasons": [],
+    "correct": true,
+    "unsafe_build": false
+   },
+   "effort": {
+    "values_in_truth": 156,
+    "edits": 72,
+    "edits_per_borehole": 24.0,
+    "automation": 0.5385
+   },
+   "time": {
+    "pages": 59,
+    "text_and_reconstruction_ms": 4764,
+    "ocr_ms": 650489,
+    "ocr_pages": 24,
+    "ocr_backend": [
+     "wasm"
+    ]
+   },
+   "failures": {
+    "lithology_relabel": 16,
+    "log_page_false": 11,
+    "spt_missed": 49,
+    "spt_spurious": 2,
+    "spt_wrong": 2,
+    "water_wrong": 3
+   },
+   "split": "validation",
+   "family": "jp-mixed-report",
+   "country": "JP",
+   "family_seen_in_dev": false
+  },
+  {
+   "report_id": "jp-hirosaki-honmaru-wall",
+   "status": "draft",
+   "complete_prediction": true,
+   "document": {
+    "pages_in_scope": 100,
+    "log_pages": 0,
+    "detected": 12,
+    "true_positive": 0,
+    "recall": null,
+    "precision": 0.0,
+    "read_rate": null,
+    "page_types": null
+   },
+   "assembly": {
+    "boreholes": 0,
+    "predicted": 0,
+    "matched": 0,
+    "recall": null,
+    "precision": null,
+    "id_correct": 0,
+    "pages_exact": 0,
+    "splits": 0,
+    "merges": 0
+   },
+   "fields": {
+    "lithology_depth_weighted": {
+     "right": 0,
+     "total": 0,
+     "accuracy": null
+    }
+   },
+   "readiness": {
+    "expected": "abstain",
+    "expected_reasons": [
+     "no_logs"
+    ],
+    "predicted": "abstain",
+    "predicted_reasons": [
+     "no_logs"
+    ],
+    "correct": true,
+    "unsafe_build": false
+   },
+   "effort": {
+    "values_in_truth": 0,
+    "edits": 0,
+    "edits_per_borehole": null,
+    "automation": null
+   },
+   "time": {
+    "pages": 100,
+    "text_and_reconstruction_ms": 19267,
+    "ocr_ms": 239894,
+    "ocr_pages": 17,
+    "ocr_backend": [
+     "wasm"
+    ]
+   },
+   "failures": {
+    "log_page_false": 12
+   },
+   "split": "test",
+   "family": "jp-lab-report",
+   "country": "JP",
+   "family_seen_in_dev": false
+  },
+  {
+   "report_id": "jp-hirosaki-ringo",
+   "status": "draft",
+   "complete_prediction": true,
+   "document": {
+    "pages_in_scope": 8,
+    "log_pages": 4,
+    "detected": 4,
+    "true_positive": 4,
+    "recall": 1.0,
+    "precision": 1.0,
+    "read_rate": 1.0,
+    "page_types": null
+   },
+   "assembly": {
+    "boreholes": 4,
+    "predicted": 4,
+    "matched": 4,
+    "recall": 1.0,
+    "precision": 1.0,
+    "id_correct": 4,
+    "pages_exact": 4,
+    "splits": 0,
+    "merges": 0
+   },
+   "fields": {
+    "final_depth": {
+     "gt": 4,
+     "predicted": 4,
+     "correct": 4,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "ground_elevation": {
+     "gt": 4,
+     "predicted": 4,
+     "correct": 4,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "groundwater": {
+     "gt": 4,
+     "predicted": 4,
+     "correct": 0,
+     "wrong": 4,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 0.0,
+     "precision": 0.0
+    },
+    "layer_boundaries": {
+     "gt": 31,
+     "predicted": 28,
+     "correct": 28,
+     "wrong": 0,
+     "missed": 3,
+     "spurious": 0,
+     "recall": 0.9032,
+     "precision": 1.0
+    },
+    "rqd": {
+     "gt": 0,
+     "predicted": 0,
+     "correct": 0,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": null,
+     "precision": null
+    },
+    "spt": {
+     "gt": 67,
+     "predicted": 59,
+     "correct": 54,
+     "wrong": 5,
+     "missed": 8,
+     "spurious": 0,
+     "recall": 0.806,
+     "precision": 0.9153
+    },
+    "lithology_depth_weighted": {
+     "right": 2310,
+     "total": 6750,
+     "accuracy": 0.3422
+    }
+   },
+   "readiness": {
+    "expected": "abstain",
+    "expected_reasons": [
+     "no_positions"
+    ],
+    "predicted": "abstain",
+    "predicted_reasons": [
+     "no_positions"
+    ],
+    "correct": true,
+    "unsafe_build": false
+   },
+   "effort": {
+    "values_in_truth": 137,
+    "edits": 38,
+    "edits_per_borehole": 9.5,
+    "automation": 0.7226
+   },
+   "time": {
+    "pages": 8,
+    "text_and_reconstruction_ms": 946,
+    "ocr_ms": 619150,
+    "ocr_pages": 8,
+    "ocr_backend": [
+     "wasm"
+    ]
+   },
+   "failures": {
+    "boundary_missed": 3,
+    "lithology_relabel": 18,
+    "spt_missed": 8,
+    "spt_wrong": 5,
+    "water_wrong": 4
+   },
+   "split": "dev",
+   "family": "jp-scanned-sheets",
+   "country": "JP",
+   "family_seen_in_dev": true
+  },
+  {
+   "report_id": "jp-hirosaki-cityhall-well",
+   "status": "draft",
+   "complete_prediction": true,
+   "document": {
+    "pages_in_scope": 4,
+    "log_pages": 3,
+    "detected": 2,
+    "true_positive": 1,
+    "recall": 0.3333,
+    "precision": 0.5,
+    "read_rate": 0.3333,
+    "page_types": null
+   },
+   "assembly": {
+    "boreholes": 1,
+    "predicted": 1,
+    "matched": 0,
+    "recall": 0.0,
+    "precision": 0.0,
+    "id_correct": 0,
+    "pages_exact": 0,
+    "splits": 0,
+    "merges": 0
+   },
+   "fields": {
+    "lithology_depth_weighted": {
+     "right": 0,
+     "total": 0,
+     "accuracy": null
+    }
+   },
+   "readiness": {
+    "expected": "column_only",
+    "expected_reasons": [
+     "single_borehole"
+    ],
+    "predicted": "column_only",
+    "predicted_reasons": [
+     "single_borehole"
+    ],
+    "correct": true,
+    "unsafe_build": false
+   },
+   "effort": {
+    "values_in_truth": 37,
+    "edits": 38,
+    "edits_per_borehole": 38.0,
+    "automation": 0.0
+   },
+   "time": {
+    "pages": 4,
+    "text_and_reconstruction_ms": 30,
+    "ocr_ms": 80416,
+    "ocr_pages": 4,
+    "ocr_backend": [
+     "wasm"
+    ]
+   },
+   "failures": {
+    "borehole_missed": 1,
+    "borehole_spurious": 1,
+    "log_page_false": 1,
+    "log_page_missed": 2
+   },
+   "split": "test",
+   "family": "jp-well-log",
+   "country": "JP",
+   "family_seen_in_dev": false
+  },
+  {
+   "report_id": "jp-hirosaki-ryugataira",
+   "status": "draft",
+   "complete_prediction": true,
+   "document": {
+    "pages_in_scope": 6,
+    "log_pages": 3,
+    "detected": 3,
+    "true_positive": 3,
+    "recall": 1.0,
+    "precision": 1.0,
+    "read_rate": 1.0,
+    "page_types": null
+   },
+   "assembly": {
+    "boreholes": 3,
+    "predicted": 3,
+    "matched": 3,
+    "recall": 1.0,
+    "precision": 1.0,
+    "id_correct": 0,
+    "pages_exact": 3,
+    "splits": 0,
+    "merges": 0
+   },
+   "fields": {
+    "final_depth": {
+     "gt": 3,
+     "predicted": 3,
+     "correct": 3,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "ground_elevation": {
+     "gt": 3,
+     "predicted": 3,
+     "correct": 3,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "groundwater": {
+     "gt": 3,
+     "predicted": 3,
+     "correct": 0,
+     "wrong": 3,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 0.0,
+     "precision": 0.0
+    },
+    "layer_boundaries": {
+     "gt": 14,
+     "predicted": 14,
+     "correct": 14,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "position": {
+     "gt": 3,
+     "predicted": 3,
+     "correct": 3,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "rqd": {
+     "gt": 0,
+     "predicted": 0,
+     "correct": 0,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": null,
+     "precision": null
+    },
+    "spt": {
+     "gt": 30,
+     "predicted": 28,
+     "correct": 26,
+     "wrong": 2,
+     "missed": 2,
+     "spurious": 0,
+     "recall": 0.8667,
+     "precision": 0.9286
+    },
+    "lithology_depth_weighted": {
+     "right": 1870,
+     "total": 3090,
+     "accuracy": 0.6052
+    }
+   },
+   "readiness": {
+    "expected": "spatial_model",
+    "expected_reasons": [],
+    "predicted": "spatial_model",
+    "predicted_reasons": [],
+    "correct": true,
+    "unsafe_build": false
+   },
+   "effort": {
+    "values_in_truth": 67,
+    "edits": 15,
+    "edits_per_borehole": 5.0,
+    "automation": 0.7761
+   },
+   "time": {
+    "pages": 6,
+    "text_and_reconstruction_ms": 358,
+    "ocr_ms": 270839,
+    "ocr_pages": 6,
+    "ocr_backend": [
+     "wasm"
+    ]
+   },
+   "failures": {
+    "id_wrong": 3,
+    "lithology_relabel": 5,
+    "spt_missed": 2,
+    "spt_wrong": 2,
+    "water_wrong": 3
+   },
+   "split": "validation",
+   "family": "jp-scanned-sheets",
+   "country": "JP",
+   "family_seen_in_dev": true
+  },
+  {
+   "report_id": "jp-ehime-compilation",
+   "status": "draft",
+   "complete_prediction": true,
+   "document": {
+    "pages_in_scope": 1201,
+    "log_pages": 1201,
+    "detected": 1095,
+    "true_positive": 1095,
+    "recall": 0.9117,
+    "precision": 1.0,
+    "read_rate": 0.9101,
+    "page_types": null
+   },
+   "assembly": {
+    "boreholes": 13,
+    "predicted": 13,
+    "matched": 13,
+    "recall": 1.0,
+    "precision": 1.0,
+    "id_correct": 13,
+    "pages_exact": 10,
+    "splits": 0,
+    "merges": 0
+   },
+   "fields": {
+    "final_depth": {
+     "gt": 13,
+     "predicted": 13,
+     "correct": 13,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "ground_elevation": {
+     "gt": 13,
+     "predicted": 13,
+     "correct": 13,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "groundwater": {
+     "gt": 8,
+     "predicted": 8,
+     "correct": 8,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "layer_boundaries": {
+     "gt": 108,
+     "predicted": 103,
+     "correct": 103,
+     "wrong": 0,
+     "missed": 5,
+     "spurious": 0,
+     "recall": 0.9537,
+     "precision": 1.0
+    },
+    "position": {
+     "gt": 13,
+     "predicted": 13,
+     "correct": 13,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "rqd": {
+     "gt": 0,
+     "predicted": 0,
+     "correct": 0,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": null,
+     "precision": null
+    },
+    "spt": {
+     "gt": 205,
+     "predicted": 201,
+     "correct": 200,
+     "wrong": 1,
+     "missed": 4,
+     "spurious": 0,
+     "recall": 0.9756,
+     "precision": 0.995
+    },
+    "lithology_depth_weighted": {
+     "right": 17712,
+     "total": 22865,
+     "accuracy": 0.7746
+    }
+   },
+   "readiness": {
+    "expected": "spatial_model",
+    "expected_reasons": [],
+    "predicted": "spatial_model",
+    "predicted_reasons": [],
+    "correct": true,
+    "unsafe_build": false
+   },
+   "effort": {
+    "values_in_truth": 455,
+    "edits": 23,
+    "edits_per_borehole": 1.77,
+    "automation": 0.9495
+   },
+   "time": {
+    "pages": 1201,
+    "text_and_reconstruction_ms": 153078,
+    "ocr_ms": 5323,
+    "ocr_pages": 1,
+    "ocr_backend": [
+     "wasm"
+    ]
+   },
+   "failures": {
+    "boundary_missed": 5,
+    "lithology_relabel": 13,
+    "log_page_missed": 106,
+    "log_page_unread": 2,
+    "spt_missed": 4,
+    "spt_wrong": 1
+   },
+   "split": "test",
+   "family": "jp-denshi-chujozu",
+   "country": "JP",
+   "family_seen_in_dev": true
+  },
+  {
+   "report_id": "us-usgs-ofr90-90",
+   "status": "draft",
+   "complete_prediction": true,
+   "document": {
+    "pages_in_scope": 145,
+    "log_pages": 135,
+    "detected": 116,
+    "true_positive": 115,
+    "recall": 0.8519,
+    "precision": 0.9914,
+    "read_rate": 0.763,
+    "page_types": null
+   },
+   "assembly": {
+    "boreholes": 9,
+    "predicted": 8,
+    "matched": 8,
+    "recall": 0.8889,
+    "precision": 1.0,
+    "id_correct": 8,
+    "pages_exact": 6,
+    "splits": 2,
+    "merges": 3
+   },
+   "fields": {
+    "final_depth": {
+     "gt": 8,
+     "predicted": 6,
+     "correct": 5,
+     "wrong": 1,
+     "missed": 2,
+     "spurious": 0,
+     "recall": 0.625,
+     "precision": 0.8333
+    },
+    "ground_elevation": {
+     "gt": 8,
+     "predicted": 8,
+     "correct": 7,
+     "wrong": 1,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 0.875,
+     "precision": 0.875
+    },
+    "groundwater": {
+     "gt": 3,
+     "predicted": 0,
+     "correct": 0,
+     "wrong": 0,
+     "missed": 3,
+     "spurious": 0,
+     "recall": 0.0,
+     "precision": null
+    },
+    "layer_boundaries": {
+     "gt": 65,
+     "predicted": 51,
+     "correct": 48,
+     "wrong": 0,
+     "missed": 17,
+     "spurious": 3,
+     "recall": 0.7385,
+     "precision": 0.9412
+    },
+    "rqd": {
+     "gt": 0,
+     "predicted": 0,
+     "correct": 0,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": null,
+     "precision": null
+    },
+    "spt": {
+     "gt": 126,
+     "predicted": 0,
+     "correct": 0,
+     "wrong": 0,
+     "missed": 126,
+     "spurious": 0,
+     "recall": 0.0,
+     "precision": null
+    },
+    "lithology_depth_weighted": {
+     "right": 5940,
+     "total": 12610,
+     "accuracy": 0.4711
+    }
+   },
+   "readiness": {
+    "expected": "abstain",
+    "expected_reasons": [
+     "no_positions"
+    ],
+    "predicted": "abstain",
+    "predicted_reasons": [
+     "no_positions"
+    ],
+    "correct": true,
+    "unsafe_build": false
+   },
+   "effort": {
+    "values_in_truth": 279,
+    "edits": 190,
+    "edits_per_borehole": 21.11,
+    "automation": 0.319
+   },
+   "time": {
+    "pages": 145,
+    "text_and_reconstruction_ms": 7816,
+    "ocr_ms": 88141,
+    "ocr_pages": 4,
+    "ocr_backend": [
+     "wasm"
+    ]
+   },
+   "failures": {
+    "borehole_merged": 3,
+    "borehole_missed": 1,
+    "borehole_split": 2,
+    "boundary_missed": 17,
+    "boundary_spurious": 3,
+    "elevation_wrong": 1,
+    "final_depth_missed": 2,
+    "final_depth_wrong": 1,
+    "lithology_relabel": 25,
+    "log_page_false": 1,
+    "log_page_missed": 20,
+    "log_page_unread": 12,
+    "spt_missed": 126,
+    "water_missed": 3
+   },
+   "split": "dev",
+   "family": "us-usgs-1990-drill-hole-logs",
+   "country": "US",
+   "family_seen_in_dev": true
+  },
+  {
+   "report_id": "be-dov-1969-010172",
+   "status": "draft",
+   "complete_prediction": true,
+   "document": {
+    "pages_in_scope": 2,
+    "log_pages": 1,
+    "detected": 2,
+    "true_positive": 1,
+    "recall": 1.0,
+    "precision": 0.5,
+    "read_rate": 1.0,
+    "page_types": null
+   },
+   "assembly": {
+    "boreholes": 1,
+    "predicted": 1,
+    "matched": 1,
+    "recall": 1.0,
+    "precision": 1.0,
+    "id_correct": 0,
+    "pages_exact": 1,
+    "splits": 0,
+    "merges": 0
+   },
+   "fields": {
+    "final_depth": {
+     "gt": 1,
+     "predicted": 1,
+     "correct": 1,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "ground_elevation": {
+     "gt": 1,
+     "predicted": 1,
+     "correct": 1,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "groundwater": {
+     "gt": 1,
+     "predicted": 1,
+     "correct": 1,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "layer_boundaries": {
+     "gt": 13,
+     "predicted": 13,
+     "correct": 13,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "position": {
+     "gt": 1,
+     "predicted": 1,
+     "correct": 1,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "rqd": {
+     "gt": 0,
+     "predicted": 0,
+     "correct": 0,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": null,
+     "precision": null
+    },
+    "spt": {
+     "gt": 0,
+     "predicted": 0,
+     "correct": 0,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": null,
+     "precision": null
+    },
+    "lithology_depth_weighted": {
+     "right": 2300,
+     "total": 2400,
+     "accuracy": 0.9583
+    }
+   },
+   "readiness": {
+    "expected": "column_only",
+    "expected_reasons": [
+     "single_borehole"
+    ],
+    "predicted": "column_only",
+    "predicted_reasons": [
+     "single_borehole"
+    ],
+    "correct": true,
+    "unsafe_build": false
+   },
+   "effort": {
+    "values_in_truth": 29,
+    "edits": 3,
+    "edits_per_borehole": 3.0,
+    "automation": 0.8966
+   },
+   "time": {
+    "pages": 2,
+    "text_and_reconstruction_ms": 50,
+    "ocr_ms": 10314,
+    "ocr_pages": 1,
+    "ocr_backend": [
+     "wasm"
+    ]
+   },
+   "failures": {
+    "id_wrong": 1,
+    "lithology_relabel": 2,
+    "log_page_false": 1
+   },
+   "split": "dev",
+   "family": "be-dov-boorrapport",
+   "country": "BE",
+   "family_seen_in_dev": true
+  },
+  {
+   "report_id": "au-nsw-tahmoor-reactivity",
+   "status": "draft",
+   "complete_prediction": true,
+   "document": {
+    "pages_in_scope": 20,
+    "log_pages": 0,
+    "detected": 0,
+    "true_positive": 0,
+    "recall": null,
+    "precision": null,
+    "read_rate": null,
+    "page_types": null
+   },
+   "assembly": {
+    "boreholes": 0,
+    "predicted": 0,
+    "matched": 0,
+    "recall": null,
+    "precision": null,
+    "id_correct": 0,
+    "pages_exact": 0,
+    "splits": 0,
+    "merges": 0
+   },
+   "fields": {
+    "lithology_depth_weighted": {
+     "right": 0,
+     "total": 0,
+     "accuracy": null
+    }
+   },
+   "readiness": {
+    "expected": "abstain",
+    "expected_reasons": [
+     "no_logs"
+    ],
+    "predicted": "abstain",
+    "predicted_reasons": [
+     "no_logs"
+    ],
+    "correct": true,
+    "unsafe_build": false
+   },
+   "effort": {
+    "values_in_truth": 0,
+    "edits": 0,
+    "edits_per_borehole": null,
+    "automation": null
+   },
+   "time": {
+    "pages": 20,
+    "text_and_reconstruction_ms": 872,
+    "ocr_ms": 0,
+    "ocr_pages": 0,
+    "ocr_backend": []
+   },
+   "failures": {},
+   "split": "dev",
+   "family": "au-report-no-logs",
+   "country": "AU",
+   "family_seen_in_dev": true
+  }
+ ],
+ "skipped": [
+  [
+   "jp-neyagawa-clean-center",
+   "no annotation"
+  ],
+  [
+   "us-usgs-ofr94-706",
+   "no annotation"
+  ],
+  [
+   "us-usgs-ofr2011-1281",
+   "no annotation"
+  ],
+  [
+   "us-usgs-ds660",
+   "no annotation"
+  ]
+ ],
+ "by_split": {
+  "dev": {
+   "reports": 10,
+   "draft": 10,
+   "document": {
+    "log_pages": 177,
+    "recall": 0.887,
+    "precision": 0.9752,
+    "read_rate": 0.8192
+   },
+   "assembly": {
+    "boreholes": 45,
+    "predicted": 44,
+    "matched": 44,
+    "id_correct": 43,
+    "pages_exact": 42,
+    "splits": 2,
+    "merges": 3,
+    "recall": 0.9778,
+    "precision": 1.0
+   },
+   "fields": {
+    "final_depth": {
+     "gt": 44,
+     "predicted": 42,
+     "correct": 41,
+     "wrong": 1,
+     "missed": 2,
+     "spurious": 0,
+     "recall": 0.9318,
+     "precision": 0.9762
+    },
+    "ground_elevation": {
+     "gt": 44,
+     "predicted": 44,
+     "correct": 43,
+     "wrong": 1,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 0.9773,
+     "precision": 0.9773
+    },
+    "groundwater": {
+     "gt": 32,
+     "predicted": 27,
+     "correct": 20,
+     "wrong": 7,
+     "missed": 5,
+     "spurious": 0,
+     "recall": 0.625,
+     "precision": 0.7407
+    },
+    "layer_boundaries": {
+     "gt": 363,
+     "predicted": 339,
+     "correct": 334,
+     "wrong": 0,
+     "missed": 29,
+     "spurious": 5,
+     "recall": 0.9201,
+     "precision": 0.9853
+    },
+    "position": {
+     "gt": 28,
+     "predicted": 28,
+     "correct": 28,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "rqd": {
+     "gt": 6,
+     "predicted": 0,
+     "correct": 0,
+     "wrong": 0,
+     "missed": 6,
+     "spurious": 0,
+     "recall": 0.0,
+     "precision": null
+    },
+    "spt": {
+     "gt": 664,
+     "predicted": 498,
+     "correct": 459,
+     "wrong": 33,
+     "missed": 172,
+     "spurious": 6,
+     "recall": 0.6913,
+     "precision": 0.9217
+    },
+    "lithology_depth_weighted": {
+     "accuracy": 0.7103
+    }
+   },
+   "readiness": {
+    "correct": 10,
+    "of": 10,
+    "unsafe_builds": 0,
+    "abstention_cases": 5,
+    "abstained_correctly": 5
+   },
+   "effort": {
+    "values_in_truth": 1512,
+    "edits": 365,
+    "automation": 0.7586
+   },
+   "time": {
+    "pages": 254,
+    "text_and_reconstruction_ms": 26124,
+    "ocr_ms": 1870172,
+    "ocr_pages": 58
+   },
+   "failures": {
+    "spt_missed": 172,
+    "lithology_relabel": 85,
+    "spt_wrong": 33,
+    "boundary_missed": 29,
+    "log_page_missed": 20,
+    "log_page_unread": 12,
+    "water_wrong": 7,
+    "rqd_missed": 6,
+    "spt_spurious": 6,
+    "boundary_spurious": 5,
+    "water_missed": 5,
+    "log_page_false": 4,
+    "borehole_merged": 3,
+    "borehole_split": 2,
+    "final_depth_missed": 2,
+    "borehole_missed": 1,
+    "elevation_wrong": 1,
+    "final_depth_wrong": 1,
+    "id_wrong": 1
+   }
+  },
+  "validation": {
+   "reports": 3,
+   "draft": 3,
+   "document": {
+    "log_pages": 14,
+    "recall": 1.0,
+    "precision": 0.56,
+    "read_rate": 1.0
+   },
+   "assembly": {
+    "boreholes": 14,
+    "predicted": 14,
+    "matched": 14,
+    "id_correct": 11,
+    "pages_exact": 14,
+    "splits": 0,
+    "merges": 0,
+    "recall": 1.0,
+    "precision": 1.0
+   },
+   "fields": {
+    "final_depth": {
+     "gt": 14,
+     "predicted": 14,
+     "correct": 14,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "ground_elevation": {
+     "gt": 14,
+     "predicted": 14,
+     "correct": 14,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "groundwater": {
+     "gt": 14,
+     "predicted": 14,
+     "correct": 8,
+     "wrong": 6,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 0.5714,
+     "precision": 0.5714
+    },
+    "layer_boundaries": {
+     "gt": 89,
+     "predicted": 89,
+     "correct": 89,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "position": {
+     "gt": 14,
+     "predicted": 14,
+     "correct": 14,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "rqd": {
+     "gt": 0,
+     "predicted": 0,
+     "correct": 0,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": null,
+     "precision": null
+    },
+    "spt": {
+     "gt": 191,
+     "predicted": 142,
+     "correct": 136,
+     "wrong": 4,
+     "missed": 51,
+     "spurious": 2,
+     "recall": 0.712,
+     "precision": 0.9577
+    },
+    "lithology_depth_weighted": {
+     "accuracy": 0.4965
+    }
+   },
+   "readiness": {
+    "correct": 3,
+    "of": 3,
+    "unsafe_builds": 0,
+    "abstention_cases": 0,
+    "abstained_correctly": 0
+   },
+   "effort": {
+    "values_in_truth": 414,
+    "edits": 107,
+    "automation": 0.7415
+   },
+   "time": {
+    "pages": 73,
+    "text_and_reconstruction_ms": 6832,
+    "ocr_ms": 921328,
+    "ocr_pages": 30
+   },
+   "failures": {
+    "spt_missed": 51,
+    "lithology_relabel": 41,
+    "log_page_false": 11,
+    "water_wrong": 6,
+    "spt_wrong": 4,
+    "id_wrong": 3,
+    "spt_spurious": 2
+   }
+  },
+  "test": {
+   "reports": 4,
+   "draft": 4,
+   "document": {
+    "log_pages": 1211,
+    "recall": 0.91,
+    "precision": 0.9883,
+    "read_rate": 0.9083
+   },
+   "assembly": {
+    "boreholes": 20,
+    "predicted": 20,
+    "matched": 19,
+    "id_correct": 19,
+    "pages_exact": 15,
+    "splits": 0,
+    "merges": 0,
+    "recall": 0.95,
+    "precision": 0.95
+   },
+   "fields": {
+    "final_depth": {
+     "gt": 19,
+     "predicted": 19,
+     "correct": 19,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "ground_elevation": {
+     "gt": 19,
+     "predicted": 19,
+     "correct": 19,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "groundwater": {
+     "gt": 14,
+     "predicted": 14,
+     "correct": 14,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "layer_boundaries": {
+     "gt": 199,
+     "predicted": 189,
+     "correct": 189,
+     "wrong": 0,
+     "missed": 10,
+     "spurious": 0,
+     "recall": 0.9497,
+     "precision": 1.0
+    },
+    "position": {
+     "gt": 19,
+     "predicted": 19,
+     "correct": 19,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "rqd": {
+     "gt": 0,
+     "predicted": 0,
+     "correct": 0,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": null,
+     "precision": null
+    },
+    "spt": {
+     "gt": 295,
+     "predicted": 289,
+     "correct": 287,
+     "wrong": 2,
+     "missed": 6,
+     "spurious": 0,
+     "recall": 0.9729,
+     "precision": 0.9931
+    },
+    "lithology_depth_weighted": {
+     "accuracy": 0.8132
+    }
+   },
+   "readiness": {
+    "correct": 4,
+    "of": 4,
+    "unsafe_builds": 0,
+    "abstention_cases": 1,
+    "abstained_correctly": 1
+   },
+   "effort": {
+    "values_in_truth": 784,
+    "edits": 79,
+    "automation": 0.8992
+   },
+   "time": {
+    "pages": 1312,
+    "text_and_reconstruction_ms": 175143,
+    "ocr_ms": 325633,
+    "ocr_pages": 22
+   },
+   "failures": {
+    "log_page_missed": 109,
+    "lithology_relabel": 23,
+    "log_page_false": 13,
+    "boundary_missed": 10,
+    "spt_missed": 6,
+    "spt_wrong": 2,
+    "log_page_unread": 2,
+    "borehole_missed": 1,
+    "borehole_spurious": 1
+   }
+  }
+ },
+ "test_by_family": {
+  "seen_in_dev": {
+   "reports": 2,
+   "draft": 2,
+   "document": {
+    "log_pages": 1208,
+    "recall": 0.9114,
+    "precision": 1.0,
+    "read_rate": 0.9098
+   },
+   "assembly": {
+    "boreholes": 19,
+    "predicted": 19,
+    "matched": 19,
+    "id_correct": 19,
+    "pages_exact": 15,
+    "splits": 0,
+    "merges": 0,
+    "recall": 1.0,
+    "precision": 1.0
+   },
+   "fields": {
+    "final_depth": {
+     "gt": 19,
+     "predicted": 19,
+     "correct": 19,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "ground_elevation": {
+     "gt": 19,
+     "predicted": 19,
+     "correct": 19,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "groundwater": {
+     "gt": 14,
+     "predicted": 14,
+     "correct": 14,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "layer_boundaries": {
+     "gt": 199,
+     "predicted": 189,
+     "correct": 189,
+     "wrong": 0,
+     "missed": 10,
+     "spurious": 0,
+     "recall": 0.9497,
+     "precision": 1.0
+    },
+    "position": {
+     "gt": 19,
+     "predicted": 19,
+     "correct": 19,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": 1.0,
+     "precision": 1.0
+    },
+    "rqd": {
+     "gt": 0,
+     "predicted": 0,
+     "correct": 0,
+     "wrong": 0,
+     "missed": 0,
+     "spurious": 0,
+     "recall": null,
+     "precision": null
+    },
+    "spt": {
+     "gt": 295,
+     "predicted": 289,
+     "correct": 287,
+     "wrong": 2,
+     "missed": 6,
+     "spurious": 0,
+     "recall": 0.9729,
+     "precision": 0.9931
+    },
+    "lithology_depth_weighted": {
+     "accuracy": 0.8132
+    }
+   },
+   "readiness": {
+    "correct": 2,
+    "of": 2,
+    "unsafe_builds": 0,
+    "abstention_cases": 0,
+    "abstained_correctly": 0
+   },
+   "effort": {
+    "values_in_truth": 747,
+    "edits": 41,
+    "automation": 0.9451
+   },
+   "time": {
+    "pages": 1208,
+    "text_and_reconstruction_ms": 155846,
+    "ocr_ms": 5323,
+    "ocr_pages": 1
+   },
+   "failures": {
+    "log_page_missed": 107,
+    "lithology_relabel": 23,
+    "boundary_missed": 10,
+    "spt_missed": 6,
+    "spt_wrong": 2,
+    "log_page_unread": 2
+   }
+  },
+  "unseen_in_dev": {
+   "reports": 2,
+   "draft": 2,
+   "document": {
+    "log_pages": 3,
+    "recall": 0.3333,
+    "precision": 0.0714,
+    "read_rate": 0.3333
+   },
+   "assembly": {
+    "boreholes": 1,
+    "predicted": 1,
+    "matched": 0,
+    "id_correct": 0,
+    "pages_exact": 0,
+    "splits": 0,
+    "merges": 0,
+    "recall": 0.0,
+    "precision": 0.0
+   },
+   "fields": {
+    "lithology_depth_weighted": {
+     "accuracy": null
+    }
+   },
+   "readiness": {
+    "correct": 2,
+    "of": 2,
+    "unsafe_builds": 0,
+    "abstention_cases": 1,
+    "abstained_correctly": 1
+   },
+   "effort": {
+    "values_in_truth": 37,
+    "edits": 38,
+    "automation": 0.0
+   },
+   "time": {
+    "pages": 104,
+    "text_and_reconstruction_ms": 19297,
+    "ocr_ms": 320310,
+    "ocr_pages": 21
+   },
+   "failures": {
+    "log_page_false": 13,
+    "log_page_missed": 2,
+    "borehole_missed": 1,
+    "borehole_spurious": 1
+   }
+  }
+ },
+ "all": {
+  "reports": 17,
+  "draft": 17,
+  "document": {
+   "log_pages": 1402,
+   "recall": 0.908,
+   "precision": 0.9785,
+   "read_rate": 0.898
+  },
+  "assembly": {
+   "boreholes": 79,
+   "predicted": 78,
+   "matched": 77,
+   "id_correct": 73,
+   "pages_exact": 71,
+   "splits": 2,
+   "merges": 3,
+   "recall": 0.9747,
+   "precision": 0.9872
+  },
+  "fields": {
+   "final_depth": {
+    "gt": 77,
+    "predicted": 75,
+    "correct": 74,
+    "wrong": 1,
+    "missed": 2,
+    "spurious": 0,
+    "recall": 0.961,
+    "precision": 0.9867
+   },
+   "ground_elevation": {
+    "gt": 77,
+    "predicted": 77,
+    "correct": 76,
+    "wrong": 1,
+    "missed": 0,
+    "spurious": 0,
+    "recall": 0.987,
+    "precision": 0.987
+   },
+   "groundwater": {
+    "gt": 60,
+    "predicted": 55,
+    "correct": 42,
+    "wrong": 13,
+    "missed": 5,
+    "spurious": 0,
+    "recall": 0.7,
+    "precision": 0.7636
+   },
+   "layer_boundaries": {
+    "gt": 651,
+    "predicted": 617,
+    "correct": 612,
+    "wrong": 0,
+    "missed": 39,
+    "spurious": 5,
+    "recall": 0.9401,
+    "precision": 0.9919
+   },
+   "position": {
+    "gt": 61,
+    "predicted": 61,
+    "correct": 61,
+    "wrong": 0,
+    "missed": 0,
+    "spurious": 0,
+    "recall": 1.0,
+    "precision": 1.0
+   },
+   "rqd": {
+    "gt": 6,
+    "predicted": 0,
+    "correct": 0,
+    "wrong": 0,
+    "missed": 6,
+    "spurious": 0,
+    "recall": 0.0,
+    "precision": null
+   },
+   "spt": {
+    "gt": 1150,
+    "predicted": 929,
+    "correct": 882,
+    "wrong": 39,
+    "missed": 229,
+    "spurious": 8,
+    "recall": 0.767,
+    "precision": 0.9494
+   },
+   "lithology_depth_weighted": {
+    "accuracy": 0.7032
+   }
+  },
+  "readiness": {
+   "correct": 17,
+   "of": 17,
+   "unsafe_builds": 0,
+   "abstention_cases": 6,
+   "abstained_correctly": 6
+  },
+  "effort": {
+   "values_in_truth": 2710,
+   "edits": 551,
+   "automation": 0.7967
+  },
+  "time": {
+   "pages": 1639,
+   "text_and_reconstruction_ms": 208099,
+   "ocr_ms": 3117133,
+   "ocr_pages": 110
+  },
+  "failures": {
+   "spt_missed": 229,
+   "lithology_relabel": 149,
+   "log_page_missed": 129,
+   "boundary_missed": 39,
+   "spt_wrong": 39,
+   "log_page_false": 28,
+   "log_page_unread": 14,
+   "water_wrong": 13,
+   "spt_spurious": 8,
+   "rqd_missed": 6,
+   "boundary_spurious": 5,
+   "water_missed": 5,
+   "id_wrong": 4,
+   "borehole_merged": 3,
+   "borehole_missed": 2,
+   "borehole_split": 2,
+   "final_depth_missed": 2,
+   "borehole_spurious": 1,
+   "elevation_wrong": 1,
+   "final_depth_wrong": 1
+  }
+ }
+}

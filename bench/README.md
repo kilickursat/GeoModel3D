@@ -18,6 +18,7 @@ at a time. **It is not complete.** `scripts/validate.py` lists what is still ope
 | `scripts/score.py` | Scores predictions at four independent levels, with failure categories, timing and correction effort. |
 | `tools/` | Annotation aids that copy a text layer into a draft. The annotator checks every value against the page. They never read the reader's output. |
 | `results/baseline-v0.30.0/` | Scores of the frozen v0.30.0 reader. See [BASELINE.md](BASELINE.md). |
+| `results/v0.31.0/` | Scores of the 0.31.0 reader, with every page read. What they show, and the fixes planned from them: [docs/releases/0.32.0-plan.md](../docs/releases/0.32.0-plan.md). |
 
 ## Running it
 
@@ -36,6 +37,15 @@ python3 -I bench/scripts/score.py $RUN                # scores.json
 The runner calls the reader's own functions, so it goes with the app's code. From the second commit of this
 benchmark, it also reads the lines drawn on each page (`src/docread/ruling.ts`, from #50) and the penetration tests,
 and needs that code. The 0.30.0 baseline was run with the runner of the first commit.
+
+Run `plan` and `ocr.mjs` again whenever the reader changes: which pages need OCR, or the lines on their image,
+depends on the reader. `read` names the pages it found no OCR for ("pages not yet read by OCR"); a run with any is
+incomplete.
+
+`scripts/fetch.py` and `tools/assist_jp_denshi.py` need [PyMuPDF](https://pymupdf.readthedocs.io/), installed
+separately (`pip install pymupdf`; AGPL-3.0). They use it to wrap reports published as images into PDFs, for the text
+check of the DOV report, for page counts and for the annotation aid. The app itself does not use it: it reads PDFs
+with PDF.js, in the browser.
 
 ## Rules
 
