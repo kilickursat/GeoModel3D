@@ -5,11 +5,30 @@ import {computeSection} from "../src/section";
 import {sakaeProject,valleyProject,GeoProject} from "../src/geology";
 import {sectionField} from "../src/fields";
 import {crossValidate} from "../src/validation";
+import {readCollarReview} from "../src/correlationSummary";
+import {setCorrelationAcceptance} from "../src/correlationDecisions";
+import {tablesFromProject,projectFromTables} from "../src/tables";
 
 const options={paper:"A3" as const,date:"2026-10-07",version:"0.6.1",credits:["Data KuniJiban"],notes:["A note <with> markup"],sectionBuffer:300,ve:5};
 
 describe("printable report",()=>{
   const m=buildGeologicalModel(sakaeProject),s=computeSection(m,{azimuth:170,offset:0},300);
+  it("marks unresolved quantities and prints the reason against its precise extent after review",()=>{
+    const p:GeoProject={name:"Lenses",units:["clay","sand"].map(id=>({id,name:id,color:"#555555"})),
+      boreholes:[[0,0],[10,0],[0,10]].map(([x,y],i)=>({id:`B${i+1}`,x,y,z:10,
+        intervals:i?[{from:0,to:1,unit:"clay"},{from:1,to:5,unit:"sand"}]:
+          [{from:0,to:1,unit:"clay"},{from:1,to:3,unit:"sand"},{from:3,to:5,unit:"clay"}]}))};
+    const initial=buildGeologicalModel(p),section=computeSection(initial,{azimuth:90,offset:0});
+    const pending=reportHtml(initial,section,options);
+    expect(pending).toContain("<th>Provisional volume in the model</th>");
+    expect(pending).toContain("<td>B1</td><td>3–5 m</td><td>clay</td><td>3–5 m</td><td>sand</td><td>Pending</td>");
+    const tables=tablesFromProject(p),review=readCollarReview(initial);
+    setCorrelationAcceptance(tables,initial,review.rows[0].interval,"Local lens <5 m & uncertain>");
+    const accepted=buildGeologicalModel(projectFromTables(tables,p).project),printed=reportHtml(accepted,section,options);
+    expect(printed).toContain("<th>Volume in the model</th>");
+    expect(printed).toContain("0 pending · 1 accepted with a reason");
+    expect(printed).toContain("Accepted · Local lens &lt;5 m &amp; uncertain&gt;");
+  });
   it("carries the title block, units, interpretation rules, section, boreholes and notes",()=>{
     const html=reportHtml(m,s,{...options,image:"data:image/png;base64,AAAA"});
     expect(html).toContain("@page{size:A3 landscape");
