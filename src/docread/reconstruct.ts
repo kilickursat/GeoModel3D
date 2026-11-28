@@ -1,3 +1,4 @@
+import {DMS,SOIL_CODE,SOIL_NAME} from "./nativeLogFields";
 import {Rule,isVertical,xAt,yAt} from "./ruling";
 import {graphicRangeLog} from "./graphicLog";
 // Borehole logs from the text of a page: lines of text with their boxes, from a PDF's own text layer or from OCR of a
@@ -198,9 +199,6 @@ const stripDatum=(t:string)=>{const eq=/[=＝]\s*([+\-−]?\s*\d)/.exec(t);retur
 const levelNum=(t:string|undefined)=>t===undefined?undefined:firstNum(stripDatum(t).replace(/^\+\s*/,""));
 // A thickness ("80mm ASPHALT", under "GROUND SURFACE") is no level.
 const isLevel=(t:string)=>{const s=stripDatum(t);return isNum(s)&&!/^\D{0,3}\d+(?:[.,]\d+)?\s?(?:mm|cm)\b/i.test(s)};
-// Latitude or longitude in degrees, minutes and seconds ("36° 20’ 27.6574”", "40°12′52.9″", "140度21分49.38秒"); the
-// degree sign may be read as "゚" or "゜". Minutes and seconds under 60.
-const DMS=String.raw`(\d{1,3})\s*[°゚゜º度]\s*(\d{1,2})\s*['’′‘分]\s*(\d{1,2}(?:[.,]\d+)?)\s*(?:["”″“]|''|′′|’’|秒)?`;
 const dms=(m:RegExpExecArray|null|undefined,at:number)=>{
   if(!m)return undefined;
   const d=+m[at],mi=+m[at+1],s=+m[at+2].replace(",",".");
@@ -348,8 +346,6 @@ export function header(lines:TextLine[]):LogHeader&{mark?:number}{
 
 // A column of Japanese soil names: short lines (a name is cut over two or three lines), most of them naming a soil or
 // rock, or the code of one in brackets.
-const SOIL_NAME=/砂|礫|粘土|粘性土|シルト|ローム|火山灰|岩|盛土|埋土|表土|腐植|泥炭|玉石|有機質|チャート|互層|[(（][A-Z][A-Za-z\-\/]*[)）]/;
-const SOIL_CODE=/^[(（][A-Z][A-Za-z\-\/]*[)）]$/;
 const median=(v:number[])=>{const s=[...v].sort((a,b)=>a-b);return s.length?s[s.length>>1]:0};
 // Names set one character to a line, stacked ("盛" over "土"), are judged on the column's text read down it.
 function soilNames(c:{els:TextLine[]}){

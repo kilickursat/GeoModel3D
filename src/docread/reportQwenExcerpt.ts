@@ -1,3 +1,4 @@
+import {nativeReportFieldRows} from "./nativeLogFields";
 // Select literal page text for the two local evidence questions. Omission marks keep separated rows distinct.
 const MAX_CHARS=960;
 const MAX_LINE_CHARS=220;
@@ -47,6 +48,9 @@ function pack(source:readonly string[],goal:ReportQuestion|"both",limit:number):
   const score=(i:number,value:number)=>{
     if(i>=0&&i<scores.length&&lines[i]!=="…")scores[i]=Math.max(scores[i],value);
   };
+  const fields=nativeReportFieldRows(lines);
+  if(goal!=="log")for(const i of fields.location)score(i,13);
+  if(goal!=="schedule")for(const i of fields.layers)score(i,12);
   let coordinateHeader=false,sampleRows=0;
   for(let i=0;i<lines.length;i++){
     const line=lines[i];
