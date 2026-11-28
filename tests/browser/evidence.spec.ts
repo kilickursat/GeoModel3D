@@ -292,6 +292,10 @@ test("a page read from its own text can be read again by OCR, which says so on t
   await page.locator(".pdf-file").setInputFiles(fileURLToPath(new URL("../fixtures/docread/bro-470162-strip.pdf",import.meta.url)));
   await page.getByRole("button",{name:"Agree",exact:true}).click();
   const review=page.getByRole("dialog",{name:"Borehole logs read from documents"});
+  // The fixture contains the printed strip log on page 1 and a separate attribution page.
+  await review.getByRole("button",{name:"Clear selection"}).click();
+  await review.getByLabel("Read page 1",{exact:true}).check();
+  await review.getByRole("button",{name:"Read selected pages"}).click();
   await expect(review.locator("#dr-f-id")).not.toHaveValue("",{timeout:60_000});
   // Read from the PDF's own text: no OCR label, and the override is offered.
   await expect(review.locator(".dr-readby")).toHaveText("");
