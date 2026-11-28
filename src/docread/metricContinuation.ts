@@ -1,13 +1,13 @@
-import type {PageLines,PageLog,ReadLayer,TextLine} from "./reconstruct";
+import type {PageLines,PageLog,ReadLayer,ReadLog,TextLine} from "./reconstruct";
 import {SOIL_NAME} from "./nativeLogFields";
 
 type Part=PageLog&{page:number};
 interface Strip { filename:string; from:number; to:number; number:number; total:number; bottom:number }
-interface Axes { elevation:number; thickness:number; depth:number; radius:number; soilLeft:number; soilRight:number }
+interface Axes { elevation:number; thickness:number; depth:number; radius:number; soilLeft:number; soilRight:number; headingBottom:number }
 
 // Short terminal strips can have one ruler mark and many SPT numbers. Identify the
 // series by its own printed filename, sheet count and metric depth windows.
-function strip(page:PageLines):Strip|undefined{
+export function metricStrip(page:PageLines):Strip|undefined{
   const labels=page.lines.flatMap(line=>{
     const match=/^(.+\.pdf)\s*\(\s*(\d+(?:\.\d+)?)\s*[-–]\s*(\d+(?:\.\d+)?)\s*m\s*\)$/i.exec(line.text.trim());
     return match?[{line,match}]:[];
@@ -41,7 +41,7 @@ function axes(page:PageLines):Axes|undefined{
     if(!(z<t&&t<d&&d<graphic&&graphic<soil&&soil<colour))continue;
     const radius=Math.min(t-z,d-t)/2;
     if(![z,t,d].every(x=>units.some(e=>Math.abs(e.cy-unit.cy)<h/2&&Math.abs(e.cx-x)<radius)))continue;
-    return {elevation:z,thickness:t,depth:d,radius,soilLeft:(graphic+soil)/2,soilRight:(soil+colour)/2};
+    return {elevation:z,thickness:t,depth:d,radius,headingBottom:unit.y1,soilLeft:(graphic+soil)/2,soilRight:(soil+colour)/2};
   }
 }
 
@@ -90,8 +90,12 @@ function beds(page:PageLines,meta:Strip,cols:Axes,ground:number,final:number,fro
   return layers;
 }
 
-export function recoverMetricStrips(pages:PageLines[],parts:Part[][]){
-  const strips=pages.map(strip);
+export function adjacentMetricStrips(before:PageLines,after:PageLines,previous:Strip|undefined,next:Strip){
+  return !!previous&&after.page===before.page+1&&next.filename===previous.filename&&next.total===previous.total&&
+    next.number===previous.number+1&&next.from===previous.to&&after.width===before.width&&after.height===before.height;
+}
+
+export function recoverMetricStrips(pages:PageLines[],parts:Part[][],strips:Array<Strip|undefined>){
   for(let i=0;i<pages.length;i++){
     const head=parts[i][0],first=strips[i];
     if(!first||first.number!==1||first.total<2||first.from!==0||parts[i].length!==1||
@@ -109,9 +113,18 @@ export function recoverMetricStrips(pages:PageLines[],parts:Part[][]){
     let previous=first,from=last.to;
     for(let j=i+1;j<pages.length&&previous.number<first.total;j++){
       const page=pages[j],meta=strips[j],part=parts[j][0];
-      if(!meta||page.page!==pages[j-1].page+1||meta.filename!==first.filename||meta.total!==first.total||
-          meta.number!==previous.number+1||meta.from!==previous.to||page.width!==pages[i].width||page.height!==pages[i].height||
-          parts[j].length!==1||part.layers.length||part.id||part.depthInFeet||part.core)break;
+      if(!meta||!adjacentMetricStrips(pages[j-1],page,previous,meta)||parts[j].length!==1||
+          (part.id&&part.id!==head.id)||part.depthInFeet||part.core)break;
+      if(part.layers.length){
+        // The ordinary ruler reader already read this longer strip. Carry its
+        // end forward only if its printed rows confirm the complete depth chain.
+        const colsHere=measuredColumns(page.lines.filter(e=>e.cy>meta.bottom),cols);
+        if(colsHere.bases.length!==part.bounds.length||!colsHere.bases.every((base,k)=>
+          printedValue(base)===part.bounds[k]&&measuredRow(base,colsHere,head.ground!,k?part.bounds[k-1]:from)))break;
+        from=part.bounds[part.bounds.length-1];
+        previous=meta;
+        continue;
+      }
       const layers=beds(page,meta,cols,head.ground,head.final,from);
       if(!layers)break;
       const sources=layers.flatMap(l=>l.src);
@@ -130,5 +143,47 @@ export function recoverMetricStrips(pages:PageLines[],parts:Part[][]){
       part.error="printed continuation sheet: borehole, depth window or layer measurements could not be verified";
       part.evidence=true;
     }
+  }
+}
+
+// A headed strip can contain inferred lines that contradict the printed contacts.
+// Flag the affected intervals only when every printed measurement row reconciles
+// independently from the collar. Keep the original interpretation editable and
+// attach the disagreeing source rows to its review.
+export function checkMetricHead(page:PageLines,meta:Strip|undefined,part:Part,log:ReadLog){
+  if(!meta||meta.number!==1||meta.from!==0||part.kind!=="scale"||part.core||part.samples||
+      part.depthInFeet||!part.src?.ground||part.ground===undefined||!part.layers.length)return;
+  const cols=axes(page);
+  if(!cols)return;
+  const columns=measuredColumns(page.lines.filter(e=>e.cy>cols.headingBottom),cols);
+  const {bases,elevations,thicknesses}=columns;
+  if(!bases.length||bases.length!==elevations.length||bases.length!==thicknesses.length)return;
+  const printed:Array<{to:number;src:TextLine[]}>=[];
+  let from=0;
+  for(const base of bases){
+    const to=printedValue(base),src=measuredRow(base,columns,part.ground,from);
+    if(!src||to<=from||to>meta.to||part.final!==undefined&&to>part.final)return;
+    printed.push({to,src});
+    from=to;
+  }
+  if(meta.total===1&&part.final!==undefined&&!agrees(from,part.final))return;
+  const missing=printed.filter(p=>!part.layers.some(l=>agrees(l.to,p.to)));
+  const extra=part.layers.filter(l=>!printed.some(p=>agrees(l.to,p.to))).map(l=>l.to);
+  if(!missing.length&&!extra.length)return;
+  const message=[
+    missing.length?`printed layer bases missing from this reading: ${missing.map(p=>p.to).join(", ")} m`:"",
+    extra.length?`read bases without a matching printed row: ${extra.join(", ")} m`:""
+  ].filter(Boolean).join(". ");
+  const affected=new Set(log.layers.filter(l=>extra.some(d=>agrees(d,l.to)||agrees(d,l.from))));
+  for(const row of missing){
+    const layer=log.layers.find(l=>l.to>=row.to)??log.layers.at(-1);
+    if(layer)affected.add(layer);
+  }
+  for(const layer of affected){
+    layer.flagged=true;
+    layer.why=[layer.why,`compare page ${page.page} and the material names. ${message}`].filter(Boolean).join(". ");
+    if(!log.flagged.includes(layer.to))log.flagged.push(layer.to);
+    const rows=printed.filter((p,k)=>p.to>=layer.from&&(k===0||printed[k-1].to<=layer.to));
+    for(const source of [...rows,...missing].flatMap(p=>p.src))if(!layer.src.includes(source))layer.src.push(source);
   }
 }

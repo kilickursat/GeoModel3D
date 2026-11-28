@@ -5,15 +5,17 @@ import {extractPageText} from "../src/docread/pdfpage";
 import {readDocument,type PageLines} from "../src/docread/reconstruct";
 
 let head:PageLines,tail:PageLines;
-beforeAll(async()=>{
-  const task=pdfjs.getDocument({data:new Uint8Array(readFileSync("tests/fixtures/tochigi/11901049606.pdf")),
+async function original(name:string){
+  const task=pdfjs.getDocument({data:new Uint8Array(readFileSync("tests/fixtures/tochigi/"+name)),
     cMapUrl:"node_modules/pdfjs-dist/cmaps/",cMapPacked:true,standardFontDataUrl:"node_modules/pdfjs-dist/standard_fonts/"});
   try{
     const pdf=await task.promise;
-    head=await extractPageText(await pdf.getPage(1),pdfjs.OPS);
-    tail=await extractPageText(await pdf.getPage(2),pdfjs.OPS);
+    const pages:PageLines[]=[];
+    for(let n=1;n<=pdf.numPages;n++)pages.push(await extractPageText(await pdf.getPage(n),pdfjs.OPS));
+    return pages;
   }finally{await task.destroy()}
-});
+}
+beforeAll(async()=>{[head,tail]=await original("11901049606.pdf")});
 
 const replaceText=(page:PageLines,before:string,after:string):PageLines=>({...page,
   lines:page.lines.map(line=>line.text===before?{...line,text:after}:line)});
@@ -66,4 +68,26 @@ it("requires an independently confirmed contact before borrowing the heading geo
   const wrongAnchor=replaceText(head,"43.73","43.74"),{logs,unread}=readDocument([wrongAnchor,tail]);
   expect(logs[0].layers.map(l=>l.to)).toEqual(firstSheetBases);
   expect(unread).toMatchObject([{page:2,log:true}]);
+});
+
+it("preserves the longer rulers on all three sheets of B-3(P-6)",async()=>{
+  const pages=await original("11905045102.pdf");
+  const {logs,unread}=readDocument(pages);
+  expect(unread).toEqual([]);
+  expect(logs).toHaveLength(1);
+  expect(logs[0].pages).toEqual([1,2,3]);
+  expect(logs[0].layers.map(l=>l.to)).toEqual([3.95,5.35,5.90,6.70,8.90,10.95,12.00,
+    16.90,18.10,22.00,22.35,33.00,34.15,35.10,35.50,40.80,41.70,42.80,49.80,50.29]);
+  const other=replaceText(pages[1],"11905045102.pdf (16 - 40 m)","unrelated.pdf (16 - 40 m)");
+  expect(readDocument([pages[0],other,pages[2]]).logs[0].pages).toEqual([1]);
+});
+
+it("points to disagreeing first-sheet depths and source boxes on B-4(A-2)",async()=>{
+  const {logs}=readDocument(await original("11905045103.pdf"));
+  const first=logs[0].layers[0];
+  expect(first.flagged).toBe(true);
+  expect(first.why).toContain("printed layer bases missing from this reading: 5.9 m");
+  expect(first.why).toContain("read bases without a matching printed row: 7.3, 9.3 m");
+  expect(first.src.some(e=>e.page===1&&e.text==="5.90")).toBe(true);
+  expect(logs[0].layers.at(-1)?.to).toBe(17.42);
 });

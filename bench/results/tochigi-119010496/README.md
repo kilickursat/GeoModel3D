@@ -16,3 +16,7 @@ The original fields and target were frozen before the first app run. The referen
 The reviewed six-hole project contained all 47 printed bases. The seven recovered endpoints retained boxes on the original second pages. The reviewed identifiers, coordinates, collar elevations and drilled lengths matched the frozen fields at printed precision. In the deliberately incomplete last PDF, the review preserved the drilled length of 18.20 m and flagged the unlogged interval below 12.40 m. No external requests occurred during the measured import and build. The built-in example attempted map tiles on startup.
 
 The separate five-PDF project excluded the held-out log and its unit order. We transformed the held-out coordinates independently with GDAL and sampled both the model probe and the rendered mesh inside the training hull. Open the numerical result after recording your source interpretations and acceptance criteria. [Spatial comparison](holdout.json)
+
+## Transfer to other Tochigi logs
+
+A second comparison used 26 other original files from the same licensed archive. The ordered base depths, checked against printed thickness and elevation, matched the full extraction on 22 files. The other four still had extra or missing interpreted depths on their first sheet. The reader flags those intervals for source review. A three-page log retained its 20 printed bases and existing descriptions. These are development checks from one publisher. [Per-file source comparison](transfer-checks.json)
