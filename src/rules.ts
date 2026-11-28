@@ -60,7 +60,7 @@ const METAMORPHIC="gneiss|schist|phyllite|slate|quartzite|marble|hornfels|amphib
   "mylonite|cataclasite|greenstone|metabasalt|metagabbro|skarn|serpentinised peridotite";
 export const lithologyRules:UnitRule[]=[
   // Road layers are made ground too: aggregate, granular base and subbase, base course.
-  {match:"made ground|\\b(?:back)?fill\\b|top\\s?soil|concrete|asphalt|tarmac|rubble|hardcore|\\bbrick|\\bslag\\b|\\baggregate\\b|granular (?:base|sub-?base)|base course|\\bsub-?base\\b|antropogeen|ophoging|\\bpuin\\b|\\bbeton\\b|remblai|terrain rapporté|terre végétale|auff[üu]llung|mutterboden|relleno|aterro|riporto",unit:"Made ground"},
+  {match:"made ground|\\b(?:back)?fill\\b|top\\s?soil|concrete|asphalt|tarmac|rubble|hardcore|\\bbrick|\\bslag\\b|\\baggregate\\b|granular (?:base|sub-?base)|base course|\\bsub-?base\\b|antropogeen|ophoging|^\\s*aangevulde\\s+grond\\b|\\bpuin\\b|\\bbeton\\b|remblai|terrain rapporté|terre végétale|auff[üu]llung|mutterboden|relleno|aterro|riporto",unit:"Made ground"},
   {match:firstNoun("peat"),unit:"Peat"},
   {match:rockFirst(words("mudstone|siltstone|claystone|shale|marl|argillite|mudrock")),unit:"Mudstone and siltstone"},
   {match:rockFirst(words("sandstone|conglomerate|(?<!volcanic )breccia|greywacke|graywacke|arkose|wacke|arenite|gritstone")),unit:"Sandstone"},

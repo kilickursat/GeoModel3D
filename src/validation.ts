@@ -5,7 +5,7 @@
 // a probe node at the collar instead of a refined mesh: the horizons there are the refined model's, a few milliseconds
 // per borehole instead of seconds.
 import {GeoProject,Borehole,UnitDef} from "./schema";
-import {buildGeologicalModel,boreholeContacts,sampleModel,GeoModel} from "./model";
+import {buildGeologicalModel,boreholeContacts,collarKey,sampleModel,GeoModel} from "./model";
 import {convexHull} from "./terrain";
 import {XY} from "./tin";
 
@@ -58,11 +58,11 @@ function distanceToPolygon(poly:XY[],p:XY){
   return d;
 }
 
-// One log against the model built from the others: undefined if no model of the others reaches it. A borehole is left
-// out of the boreholes, a CPT's layers out of the CPTs.
-function check(project:GeoProject,holes:Borehole[],b:Borehole,units:UnitDef[],cpt:boolean):BoreholeCheck|undefined{
+// Hold out the whole collar so a coincident log discarded from the full model cannot take its place.
+function check(project:GeoProject,holes:Borehole[],b:Borehole,units:UnitDef[]):BoreholeCheck|undefined{
   const others=holes.filter(o=>o!==b),hull=convexHull(others.map(o=>({x:o.x,y:o.y})));
-  const without:GeoProject=cpt?{...project,cpts:(project.cpts??[]).filter(c=>c.id!==b.id)}:{...project,boreholes:project.boreholes.filter(o=>o.id!==b.id)};
+  const key=collarKey(b),atOtherSite=(p:XY)=>collarKey(p)!==key;
+  const without:GeoProject={...project,boreholes:project.boreholes.filter(atOtherSite),cpts:project.cpts?.filter(atOtherSite)};
   const distance=hull.length>2&&insidePolygon(hull,b)?0:distanceToPolygon(hull,b);
   const outside=distance>1e-6;
   // Outside the others, the model is extended to reach the borehole, as a model extent would extend it (the frame of
@@ -120,7 +120,7 @@ export function* crossValidation(project:GeoProject,full=buildGeologicalModel(pr
   if(holes.length<2)notes.push("Cross-validation needs at least two logs in the model");
   else for(let i=0;i<holes.length;i++){
     yield {done:i,total:holes.length};
-    const r=check(project,holes,holes[i],units,i>=first);
+    const r=check(project,holes,holes[i],units);
     if(r)boreholes.push(i>=first?{...r,cpt:true}:r);else notes.push(`${holes[i].id}: no model of the other logs reaches it; left out`);
   }
   if(full.cptLogs.length)notes.push(`${full.cptLogs.length} of the logs are CPT layers: each is left out in turn as a borehole is`);

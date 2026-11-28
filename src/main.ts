@@ -10,7 +10,7 @@ import {terrainOutside,convexHull,TerrainGrid} from "./terrain";
 import {computeSection,offsetRange,offsetThrough,principalAzimuth,Section,sectionRuns,joined,alongOf} from "./section";
 import {sectionSvg,sectionCsv,sectionFieldCsv,sectionTitle,chainageCsv,cptTraceWidths} from "./sectionSvg";
 import {importFiles,toProjectJson,toBoreholeCsv,toTestsCsv,toCsv,decodeText,assignColors,toAlignmentCsv,toCptCsv} from "./io";
-import {cptAt,thinned,cptScale} from "./cpt";
+import {cptAt,thinned,cptPlotScale} from "./cpt";
 import {cptBehaviour,layerUnits,sbtZone} from "./sbt";
 import {cptLogSvg,CptBand} from "./cptSvg";
 import {alignmentSection,chainages,pointAt,designAt,crossSectionAt,lineCrossings,Crossing} from "./alignment";
@@ -20,7 +20,7 @@ import {formatValue,propertyDef} from "./properties";
 import {Crs,crsRegistry,projectCrs,findCrs,customCrs,searchCrs,suggestCrs,toProjected,toGeographic} from "./crs";
 import {fetchTerrain,elevationSources,mapSources,covers,tileUrl,parseGsiTile,decodeTerrarium,mapTiles,tileXY,ElevationSource,TileSource} from "./tiles";
 import {applyUnitRules} from "./rules";
-import {reportHtml} from "./report";
+import {reportHtml,loggedIntervalsTable} from "./report";
 import {createInputWorkspace,InputModelContext} from "./input";
 import {parseWorkspace} from "./workspace";
 import {showEvidence} from "./evidenceView";
@@ -69,6 +69,7 @@ try{await renderer.init()}catch(e){
 }
 document.querySelector(".intro")?.remove();
 const webgl="WebGL 2";
+let renderingStopped=false;
 const backendName=(renderer.backend as {isWebGPUBackend?:boolean}).isWebGPUBackend?"WebGPU":webgl;
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.setSize(innerWidth,innerHeight);
@@ -165,6 +166,7 @@ function buildContent(){
   extent=Math.max(b.maxX-b.minX,b.maxY-b.minY,(b.maxZ-b.minZ)/2,1);
 
   model.units.forEach((u,k)=>{
+    if(!model.triangles.length)return;
     const g=volumeGeometry(unitVolume(model,k),origin);
     if(!g.indices.length)return;
     const geo=new THREE.BufferGeometry();
@@ -202,7 +204,7 @@ function buildContent(){
   });
   buildTerrain();
 
-  const radius=extent*0.0045,segments:Array<{hole:number;interval:number;top:number;bottom:number;color:string}>=[];
+  const radius=extent*(model.logOnlyReason?0.04:0.0045),segments:Array<{hole:number;interval:number;top:number;bottom:number;color:string}>=[];
   model.boreholes.forEach((bh,hole)=>{
     bh.intervals.forEach((iv,interval)=>segments.push({hole,interval,top:bh.z-iv.from,bottom:bh.z-iv.to,color:model.units.find(u=>u.id===iv.unit)?.color??"#7b8790"}));
     const logged=Math.max(...bh.intervals.map(i=>i.to)),depth=boreholeDepth(bh);
@@ -247,7 +249,7 @@ function niceCeil(v:number){const p=10**Math.floor(Math.log10(v));return Math.ce
 function buildCpts(radius:number){
   const cpts=model.cpts;
   if(!cpts.length)return;
-  const qcMax=cptScale(Math.max(...cpts.flatMap(c=>c.qc.filter(Number.isFinite)),1)),k=extent*0.035/qcMax;
+  const qcMax=cptPlotScale(cpts),k=extent*0.035/qcMax;
   const height=Math.max(...cpts.map(c=>cptDepth(c)),1),step=Math.max(0.05,height/800);
   const fill=new THREE.MeshBasicNodeMaterial({color:0x9fb0bd,side:THREE.DoubleSide});
   const edge=new THREE.LineBasicNodeMaterial({color:0x1b2229});
@@ -339,7 +341,7 @@ function buildTerrain(){
   let flat=false,surface:{positions:number[];index:number[]};
   if(t&&at)surface=terrainOutside(t,at,hull,extent*0.25);
   else if(projectCrs(model.project)){
-    const zs=model.boreholes.map(b=>b.z).sort((p,q)=>p-q),z=zs[Math.floor(zs.length/2)];
+    const z=groundLevel();
     const b=modelBounds(model),m=extent*0.25,n=96;
     const grid:TerrainGrid={x0:b.minX-m,y0:b.minY-m,dx:(b.maxX-b.minX+2*m)/n,dy:(b.maxY-b.minY+2*m)/n,ncols:n+1,nrows:n+1,z:[]};
     surface=terrainOutside(grid,()=>z,hull,m);
@@ -1100,7 +1102,8 @@ function renderPanel(){
   more.hidden=(project.description??"").length<160;
   more.textContent="More";
   const count=(n:number,what:string)=>`${n} ${what}${n===1?"":"s"}`;
-  const stats=[count(model.boreholes.length,"borehole"),...(model.cpts.length?[count(model.cpts.length,"CPT")]:[]),count(model.units.length,"unit"),count(model.horizons.length,"horizon")];
+  const stats=[count(model.boreholes.length,"borehole"),...(model.cpts.length?[count(model.cpts.length,"CPT")]:[]),count(model.units.length,"unit"),...(model.logOnlyReason?["Logged intervals only"]:[count(model.horizons.length,"horizon")])];
+  if(model.simplifiedIntervals)stats.push(`${count(model.simplifiedIntervals,"logged interval")} assigned a different unit in the model`);
   if(model.triangles.length)stats.push(`footprint ${fmtArea(footprintArea(model))}`);
   if(project.terrain)stats.push(`terrain ${fmt(project.terrain.dx,1)} m grid`);
   ui.querySelector(".stats")!.innerHTML=stats.join(" · ");
@@ -1298,6 +1301,12 @@ function syncControls(){
 function renderSectionPanel(){
   // Behind the input tab the panel has no size; it is drawn when the model tab is shown again.
   if(!view.panel||!section||document.body.dataset.mode==="input")return;
+  sectionBody.classList.toggle("log-only",!!model.logOnlyReason);
+  if(model.logOnlyReason){
+    sectionView.querySelector(".section-name")!.textContent="Logged intervals";
+    sectionBody.innerHTML=loggedIntervalsTable(model);
+    return;
+  }
   sectionView.querySelector(".section-name")!.textContent=section.alignment?sectionTitle(section):`Section A–A′ · ${String(view.azimuth).padStart(3,"0")}° · ${view.offset>=0?"+":""}${Math.round(view.offset)} m`;
   sectionBody.innerHTML=sectionSvg(model,section,{width:sectionBody.clientWidth,height:sectionBody.clientHeight,theme:"light",title:false,buffer:sectionBuffer,hidden:view.hidden,field:field??undefined,marker:section.alignment?view.chainage:undefined,crossings});
 }
@@ -1483,9 +1492,11 @@ function renderNotes(){
   box.querySelector("ul")!.innerHTML=currentNotes.map(n=>`<li>${esc(n)}</li>`).join("");
 }
 // keepView rebuilds the same site (new terrain or rules) without moving the camera or resetting the controls.
-function loadProject(p:GeoProject,importWarnings:string[]=[],keepView=false,context:InputModelContext|null=workspaceContext??null){
+function loadProject(p:GeoProject,importWarnings:string[]=[],keepView:boolean|"import"=false,context:InputModelContext|null=workspaceContext??null){
   // Validate/rebuild before changing the displayed project or its scenario identity.
   const nextModel=buildGeologicalModel(p),before={...origin};
+  // A private addition may expand the mapped area. Keep its camera, but require a fresh map choice.
+  if(keepView==="import")view.map=false;
   model=nextModel;project=model.project;workspaceContext=context??undefined;
   if(!sampleProjects.includes(p))imported=project;
   weights=unitWeights(model);
@@ -1556,7 +1567,7 @@ async function importFileList(list:FileList|File[]){
     }
     // Lines or CPTs added to the site shown keep the view, and the first line is shown.
     const added=(!!result.alignments||!!result.cpts)&&result.project.boreholes===project.boreholes;
-    loadProject(result.project,result.warnings,added,null);
+    loadProject(result.project,result.warnings,added?"import":false,null);
     const first=result.alignments?.[0],index=first===undefined?-1:result.project.alignments?.findIndex(a=>a.name===first)??-1;
     if(index>=0&&document.body.dataset.mode!=="input")showLine(index);
   }catch(err){
@@ -1651,6 +1662,7 @@ async function exportModel(format:"usdz"|"glb",slug:string){
 // The 3-D view as a PNG: rendered on white without the grid or the room kept for the section panel, and cropped
 // to the model. A blank capture, as a renderer may give, is left out.
 function captureView(){
+  if(renderingStopped)return undefined;
   const background=scene.background;
   scene.background=new THREE.Color(0xffffff);
   camera.clearViewOffset();
@@ -1909,7 +1921,11 @@ drawPoints.count=0;
 drawPreview.frustumCulled=drawPoints.frustumCulled=false;
 world.add(drawPreview,drawPoints);
 sizes.observe(drawBar);
-const groundLevel=()=>{const z=model.boreholes.map(b=>b.z).sort((a,b)=>a-b);return z.length?z[Math.floor(z.length/2)]:0};
+function groundLevel(){
+  const logs=model.boreholes.length?model.boreholes:model.cptLogs;
+  const levels=logs.map(b=>b.z).sort((a,b)=>a-b);
+  return levels.length?levels[Math.floor(levels.length/2)]:0;
+}
 const groundAt=(x:number,y:number)=>sampleModel(model,x,y)?.[0]??groundLevel();
 function startDraw(){
   drawing={points:[],holes:[]};
@@ -2205,6 +2221,30 @@ document.body.dataset.sheet="";
 layoutCompact();
 loadProject(project);
 if(location.hash==="#input")setMode("input");
+// Keep the current project available for editing and export if the GPU driver stops during a frame.
+function stopRendering(){
+  if(renderingStopped)return;
+  renderingStopped=true;
+  void renderer.setAnimationLoop(null);
+  renderer.domElement.style.visibility="hidden";
+  labelRenderer.domElement.style.visibility="hidden";
+  const status=document.createElement("div");
+  status.className="notice error renderer-status";
+  status.setAttribute("role","alert");
+  const message=document.createElement("p");
+  message.textContent=`The ${backendName} view stopped. You can still edit your data or export your project from this tab.`;
+  const url=new URL(location.href);
+  if(backendName==="WebGPU")url.searchParams.set("backend","webgl");
+  const link=document.createElement("a");
+  link.href=url.href;
+  link.target="_blank";
+  link.rel="noopener";
+  link.textContent=backendName==="WebGPU"?"Open a fresh view using WebGL 2":"Open a fresh 3-D view";
+  status.append(message,link);
+  app.appendChild(status);
+}
+const deviceLost=renderer.onDeviceLost.bind(renderer);
+renderer.onDeviceLost=info=>{deviceLost(info);stopRendering()};
 renderer.setAnimationLoop(()=>{
   // The 3-D view is not drawn behind the input tab.
   if(document.body.dataset.mode==="input")return;
@@ -2214,6 +2254,7 @@ renderer.setAnimationLoop(()=>{
   if(!dirty)return;
   dirty--;
   faceCpts();
-  renderer.render(scene,camera);
+  try{renderer.render(scene,camera)}
+  catch(error){console.error(error);stopRendering();return}
   labelRenderer.render(scene,camera);
 });

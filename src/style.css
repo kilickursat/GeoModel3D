@@ -183,6 +183,9 @@ body[data-panel="open"] .section-control{bottom:var(--pane-h);border-bottom:1px 
 .section-head{display:none}
 .section-body{flex:1;min-height:0;touch-action:none}
 .section-body svg{display:block}
+.section-body.log-only{overflow:auto;touch-action:pan-y;padding:0 12px 8px}
+.logged-intervals{border-collapse:collapse;font-variant-numeric:tabular-nums}
+.logged-intervals :is(th,td){padding:2px 10px 2px 0;text-align:left}
 
 /* Over the model: the colour key of the section, the credits, notes, read-outs */
 .field-legend{position:fixed;left:calc(var(--side-w) + 12px);bottom:calc(var(--bar-h) + 12px);width:270px;padding:8px 11px;font-size:12px;color:var(--text-2);background:rgba(255,255,255,.94);border:1px solid var(--border);border-radius:8px;pointer-events:none;z-index:1}

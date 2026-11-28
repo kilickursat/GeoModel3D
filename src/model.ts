@@ -19,6 +19,8 @@ export interface GeoModel {
   horizons:Horizon[];
   base:number;
   warnings:string[];
+  logOnlyReason?:string;
+  simplifiedIntervals?:number;
   // Node chains along the edges of the borehole triangulation; the spacing it was refined to (0 = not refined); and
   // the number of nodes of the refined triangulation, before the nodes on pinch-out lines.
   edgeChains:number[][];
@@ -37,9 +39,12 @@ export interface GeoModel {
   cptLogs:Borehole[];
 }
 // `start` is the depth where a log begins, when it begins below the collar.
-export interface BoreholeContacts { depth:Array<number|null>; eroded:Array<number|null>; deepest:number; eoh:number; notes:string[]; start?:number }
+export interface BoreholeContacts { depth:Array<number|null>; eroded:Array<number|null>; deepest:number; eoh:number; notes:string[]; outOfOrder:number; start?:number }
 
 const fmt=(v:number)=>String(Math.round(v*100)/100);
+
+// Positions that round to the same millimetre share a collar in the model and its validation.
+export function collarKey(p:XY){return Math.round(p.x*1000)+","+Math.round(p.y*1000)}
 
 // Reads one log as a layer-cake: depth[k] is the depth of horizon k where the log shows it, `deepest` the last
 // unit the hole entered (its base is not seen), `eoh` the final depth. Units skipped by the log have zero
@@ -53,7 +58,7 @@ export function boreholeContacts(b:Borehole,units:UnitDef[]):BoreholeContacts{
   depth[0]=0;
   const notes:string[]=[];
   const intervals=b.intervals.filter(i=>index.has(i.unit)).sort((p,q)=>p.from-q.from||p.to-q.to);
-  let deepest=-1,prevTo=0,start:number|undefined;
+  let deepest=-1,prevTo=0,outOfOrder=0,start:number|undefined;
   for(const i of intervals){
     const u=index.get(i.unit)!;
     if(i.from<prevTo-1e-6)notes.push(`interval ${fmt(i.from)}–${fmt(i.to)} m overlaps the one above`);
@@ -62,6 +67,7 @@ export function boreholeContacts(b:Borehole,units:UnitDef[]):BoreholeContacts{
       notes.push(`not logged above ${fmt(i.from)} m; the contacts above are inferred from the neighbouring boreholes`);
       deepest=u;
     }else if(u<deepest){
+      outOfOrder++;
       notes.push(`${units[u].name} at ${fmt(i.from)}–${fmt(i.to)} m lies below ${units[deepest].name}, out of stratigraphic order; modelled as ${units[deepest].name}`);
     }else if(u>deepest){
       const first=Math.max(deepest+1,1);
@@ -79,7 +85,7 @@ export function boreholeContacts(b:Borehole,units:UnitDef[]):BoreholeContacts{
     }
     prevTo=Math.max(prevTo,i.to);
   }
-  return {depth,eroded,deepest,eoh:Math.max(boreholeDepth(b),prevTo),notes,...(start!==undefined?{start}:{})};
+  return {depth,eroded,deepest,outOfOrder,eoh:Math.max(boreholeDepth(b),prevTo),notes,...(start!==undefined?{start}:{})};
 }
 
 function idw(samples:Array<{x:number;y:number;v:number}>,p:XY){
@@ -283,35 +289,40 @@ export function buildGeologicalModel(project:GeoProject,options:{probe?:XY;trian
   // The logs: the boreholes', then, where the project builds the model with them, the CPTs' layers that have units.
   const layered=project.cptLayers?modelCptLogs(project,warnings):[];
   const declared=new Set(project.units.map(u=>u.id)),used=new Set<string>(),unknown=new Set<string>();
-  for(const b of [...project.boreholes,...layered])for(const i of b.intervals)(declared.has(i.unit)?used:unknown).add(i.unit);
-  if(unknown.size)warnings.push(`Intervals in units missing from the unit list were ignored: ${[...unknown].join(", ")}`);
-  const units=project.units.filter(u=>used.has(u.id));
-  // Units only the CPT layers have are not modelled while the model is built from the boreholes alone.
-  const inLayers=new Set((project.cpts??[]).flatMap(c=>(c.layers??[]).map(l=>l.unit)));
-  const unobserved=project.units.filter(u=>!used.has(u.id)&&(project.cptLayers||!inLayers.has(u.id)));
-  if(unobserved.length)warnings.push(`Units with no logged intervals are not modelled: ${unobserved.map(u=>u.name).join(", ")}`);
-  const K=units.length;
-
-  const boreholes:Borehole[]=[],nodes:XY[]=[],contacts:BoreholeContacts[]=[];
+  const boreholes:Borehole[]=[],nodes:XY[]=[];
   const positions=new Map<string,string>();
   let fromBoreholes=0;
   for(const b of [...project.boreholes,...layered]){
     const cpt=layered.includes(b),what=cpt?"CPT":"borehole";
+    for(const i of b.intervals)if(!declared.has(i.unit))unknown.add(i.unit);
     if(![b.x,b.y,b.z].every(Number.isFinite)){warnings.push(`${b.id}: ${cpt?"position or start level":"collar position or elevation"} missing; ${what} not used`);continue}
-    const c=boreholeContacts(b,units);
-    if(c.deepest<0){warnings.push(`${b.id}: no ${cpt?"layers":"intervals"} in the modelled units; ${what} not used`);continue}
-    const key=Math.round(b.x*1000)+","+Math.round(b.y*1000);
+    if(!b.intervals.some(i=>declared.has(i.unit))){warnings.push(`${b.id}: no ${cpt?"layers":"intervals"} in the modelled units; ${what} not used`);continue}
+    const key=collarKey(b);
     if(positions.has(key)){warnings.push(`${b.id}: same ${cpt?"position":"collar position"} as ${positions.get(key)}; ${what} not used${cpt?" in the model":""}`);continue}
     positions.set(key,b.id);
-    for(const n of c.notes)warnings.push(`${b.id}: ${n}`);
-    boreholes.push(b);nodes.push({x:b.x,y:b.y});contacts.push(c);
+    for(const i of b.intervals)if(declared.has(i.unit))used.add(i.unit);
+    boreholes.push(b);nodes.push({x:b.x,y:b.y});
     if(!cpt)fromBoreholes++;
   }
+  if(unknown.size)warnings.push(`Intervals in units missing from the unit list were ignored: ${[...unknown].join(", ")}`);
+  // Pick horizons after admitting logs: a rejected hole cannot introduce a layer beneath the others.
+  const units=project.units.filter(u=>used.has(u.id));
+  const inLayers=new Set((project.cpts??[]).flatMap(c=>(c.layers??[]).map(l=>l.unit)));
+  const unobserved=project.units.filter(u=>!used.has(u.id)&&(project.cptLayers||!inLayers.has(u.id)));
+  if(unobserved.length)warnings.push(`Units with no logged intervals at modelled positions are not modelled: ${unobserved.map(u=>u.name).join(", ")}`);
+  const K=units.length;
+  const contacts=boreholes.map(b=>boreholeContacts(b,units));
+  const outOfOrder=contacts.reduce((sum,c)=>sum+c.outOfOrder,0);
+  const logOnlyReason=boreholes.length===1&&outOfOrder
+    ?`${boreholes[0].id}: this log departs from the project's stratigraphic order. Only the logged intervals are shown. Continuous horizons and volumes require a supported layer sequence.`:undefined;
+  if(logOnlyReason)warnings.push(logOnlyReason);
+  else contacts.forEach((c,i)=>{for(const n of c.notes)warnings.push(`${boreholes[i].id}: ${n}`)});
   // The model covers the outline of the logs, or extends beyond it on a frame of nodes. Logs that enclose no area are
   // given an extent, so that one or two boreholes still make a model.
   const NB=nodes.length;
   let margin=project.margin!==undefined&&Number.isFinite(project.margin)&&project.margin>0?project.margin:0;
   if(!NB)warnings.push(layered.length||project.cpts?.length&&!project.boreholes.length?"No log could be placed: a model needs boreholes with collar coordinates and logged intervals, or CPT layers with units":"No borehole could be placed: a model needs boreholes with collar coordinates and logged intervals");
+  else if(logOnlyReason)margin=0;
   else if(!margin&&(NB<3||!delaunay(nodes).length)){
     margin=defaultMargin(boreholes);
     const [one,many]=fromBoreholes===NB?["borehole","boreholes"]:fromBoreholes?["log","logs"]:["CPT","CPTs"];
@@ -479,9 +490,10 @@ export function buildGeologicalModel(project:GeoProject,options:{probe?:XY;trian
   const horizons:Horizon[]=Z.map((zk,k)=>({
     id:k===0?"ground":k===K?"base":"base:"+units[k-1].id,
     name:k===0?"Ground surface":k===K?"Model base":"Base of "+units[k-1].name,
-    z:Float64Array.from(zk),observed:Uint8Array.from(known01[k])
+    z:logOnlyReason&&k>0&&k<K?new Float64Array(zk.length).fill(NaN):Float64Array.from(zk),
+    observed:logOnlyReason&&k>0?new Uint8Array(zk.length):Uint8Array.from(known01[k])
   }));
-  const model:GeoModel={project,units,boreholes:boreholes.slice(0,fromBoreholes),nodes:cut.mesh.nodes,triangles:cut.mesh.triangles,horizons,base,warnings,edgeChains:cut.mesh.chains,spacing,meshNodes:M,residuals,terrainAt,
+  const model:GeoModel={project,units,...(logOnlyReason?{logOnlyReason}:outOfOrder?{simplifiedIntervals:outOfOrder}:{}),boreholes:boreholes.slice(0,fromBoreholes),nodes:cut.mesh.nodes,triangles:cut.mesh.triangles,horizons,base,warnings,edgeChains:cut.mesh.chains,spacing,meshNodes:M,residuals,terrainAt,
     ...(W?{water:{z:Float64Array.from(W),source:waterSource}}:{}),cpts:[],cptLogs:boreholes.slice(fromBoreholes)};
   model.cpts=modelCpts(model,warnings);
   return model;
@@ -534,7 +546,7 @@ export function footprintArea(model:GeoModel){return model.triangles.reduce((s,t
 // The footprint's extent (the boreholes' when there is no model) and the elevations from the deepest end of hole or the
 // base up to the highest ground.
 export function modelBounds(model:GeoModel){
-  const points:XY[]=model.triangles.length?model.nodes:model.boreholes;
+  const points:XY[]=model.nodes.length?model.nodes:model.boreholes;
   if(!points.length)return {minX:0,maxX:1,minY:0,maxY:1,minZ:0,maxZ:1};
   let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity,maxZ=-Infinity,minZ=model.base;
   for(const p of points){minX=Math.min(minX,p.x);maxX=Math.max(maxX,p.x);minY=Math.min(minY,p.y);maxY=Math.max(maxY,p.y)}

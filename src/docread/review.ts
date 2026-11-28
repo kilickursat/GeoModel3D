@@ -5,7 +5,7 @@
 // boreholes to the Input data tables, which check them again as typed data.
 import type {Doc} from "./pdftext";
 import {DraftHole,Check,FIELDS,Field,checkDraft,draftTables,captureDraftEvidence,evidenceField,unitFor,pageRanges,num} from "./draft";
-import type {TextLine} from "./reconstruct";
+import {FEET_DEPTH_REASON,type TextLine} from "./reconstruct";
 import {lithologyRules,japaneseLithologyRules} from "../rules";
 import type {EditorTables} from "../tables";
 import {newEvidenceId,changeEvidenceField,acceptEvidenceField,EvidenceSource,EvidenceRecord} from "../evidence";
@@ -29,7 +29,7 @@ export function createReview(host:ReviewHost){
   let holes:DraftHole[]=[],checks:Check[]=[],unread:Unread[]=[],problems:string[]=[];
   let current=0,active="",edited=false,closed=false,ready=false,timer:ReturnType<typeof setTimeout>|undefined;
   const view={doc:0,page:1,zoom:0};
-  let job:{cancel():void}|null=null,shown="",saving=false,busy=false;
+  let job:{cancel():void}|null=null,shown="",renderKey="",saving=false,busy=false;
   let rereader:Rereader|null=null;
   // The pages read by OCR, by `doc#page`, and why.
   const ocrDone=new Map<string,string>();
@@ -131,7 +131,7 @@ export function createReview(host:ReviewHost){
         parts.push(`<li>${esc(name)}${pages.length===1?"Page":"Pages"} ${pageRanges(pages)}: scanned, not read: ${esc(why)}.</li>`);
       }
       for(const u of logs)parts.push(`<li>${esc(name)}${go(u)}${u.id?` (${esc(u.id)})`:""}: looks like a log, but ${esc(u.error)}.${
-        u.text&&rereader?` <button class="dr-ocr-page" data-reread-doc="${i}" data-reread-page="${u.page}">Read by OCR</button>`:""}</li>`);
+        u.text&&rereader&&u.error!==FEET_DEPTH_REASON?` <button class="dr-ocr-page" data-reread-doc="${i}" data-reread-page="${u.page}">Read by OCR</button>`:""}</li>`);
       if(other.length)parts.push(`<li>${esc(name)}${other.length===1?"Page":"Pages"} ${pageRanges(other)}: no borehole log found.</li>`);
     });
     const n=unread.length;
@@ -152,7 +152,7 @@ export function createReview(host:ReviewHost){
     });
     const m=ocrDone.size;
     unreadEl.innerHTML=(read.length?`<details><summary>${plural(m,"page")} read by OCR</summary><ul>${read.join("")}</ul></details>`:"")+
-      (parts.length?`<details${holes.length?"":" open"}><summary>${n?`${plural(n,"page")} not read`:"Not read"}</summary><ul>${parts.join("")}</ul></details>`:"");
+      (parts.length?`<details${!holes.length||unread.some(u=>u.error===FEET_DEPTH_REASON)?" open":""}><summary>${n?`${plural(n,"page")} not read`:"Not read"}</summary><ul>${parts.join("")}</ul></details>`:"");
   }
   function renderAll(){checks=checkDraft(holes);renderChecks();renderTabs();renderHole();renderUnread()}
   // The checks follow the typing, without redrawing the field being typed in.
@@ -171,7 +171,7 @@ export function createReview(host:ReviewHost){
   }
   function showPage(){
     const d=docs[view.doc];
-    if(!d)return;
+    if(!d||closed)return;
     view.page=Math.min(Math.max(1,view.page),d.pages);
     pageNo.textContent=`Page ${view.page} of ${d.pages}${docs.length>1?` · ${d.name}`:""}`;
     $<HTMLButtonElement>(".dr-prev").disabled=view.page<=1;
@@ -179,21 +179,26 @@ export function createReview(host:ReviewHost){
     // How this page was read: by OCR, and why; or from its own text, which can be read by OCR instead.
     const by=ocrDone.get(key(view.doc,view.page));
     readBy.textContent=by?`Read by OCR: ${by}`:"";
-    ocrButton.hidden=!!by||!rereader||d.kind!=="pdf";
+    ocrButton.hidden=!!by||!rereader||d.kind!=="pdf"||unread.some(u=>u.doc===view.doc&&u.page===view.page&&u.error===FEET_DEPTH_REASON);
     ocrButton.disabled=busy;
     const size=sizes.get(key(view.doc,view.page))??{width:1275,height:1650};
     const fit=Math.max(240,scroller.clientWidth-24),css=Math.round(fit*(ZOOMS[view.zoom]??1));
     sheet.style.width=`${css}px`;
     sheet.style.aspectRatio=`${size.width} / ${size.height}`;
-    const now=key(view.doc,view.page),canvas=document.createElement("canvas");
+    const now=key(view.doc,view.page),target=`${now}/${css}/${window.devicePixelRatio}`;
+    drawBoxes();
+    if(renderKey===target)return;
+    renderKey=target;
+    const canvas=document.createElement("canvas");
     // Another page clears at once; the same page, zoomed, stays until it is drawn again.
     if(now!==shown)sheet.querySelector("canvas")!.replaceWith(document.createElement("canvas"));
     shown=now;
     job?.cancel();
     const j=d.render(view.page,canvas,css);
     job=j;
-    j.done.then(()=>{if(job===j&&!closed)sheet.querySelector("canvas")!.replaceWith(canvas)},err=>{if(job===j)pageNote.textContent=`This page could not be drawn: ${(err as Error).message}`});
-    drawBoxes();
+    j.done.then(()=>{if(job===j&&!closed)sheet.querySelector("canvas")!.replaceWith(canvas)},err=>{
+      if(job===j&&!closed){renderKey="";pageNote.textContent=`This page could not be drawn: ${(err as Error).message}`}
+    });
   }
   function drawBoxes(){
     const h=holes[current],size=sizes.get(key(view.doc,view.page));
@@ -242,7 +247,7 @@ export function createReview(host:ReviewHost){
     target?.focus();
     setActive(k,true);
   }
-  new ResizeObserver(()=>{if(ready&&scroller.clientWidth)showPage()}).observe(scroller);
+  new ResizeObserver(()=>{if((ready||shown)&&scroller.clientWidth)showPage()}).observe(scroller);
 
   // ---------- editing ----------
 
@@ -439,7 +444,11 @@ export function createReview(host:ReviewHost){
     // What to stop when the review closes (the reading model in the middle of a page).
     onClose(f:()=>void){closing.push(f)},
     addDoc(d:Doc,source?:EvidenceSource){docs.push(d);sources.push(source??{id:newEvidenceId(),name:d.name,pages:[]});return docs.length-1},
-    size(doc:number,page:number,width:number,height:number){sizes.set(key(doc,page),{width,height})},
+    size(doc:number,page:number,width:number,height:number){
+      sizes.set(key(doc,page),{width,height});
+      // A scan's dimensions are known before its text. Let the reader inspect the source while OCR runs.
+      if(!ready&&doc===view.doc&&page===view.page)showPage();
+    },
     // The pages of a document read by OCR, and why.
     ocrRead(read:OcrRead[]){for(const o of read)ocrDone.set(key(o.doc,o.page),o.why)},
     // How to read a page again by OCR, once all documents are read.

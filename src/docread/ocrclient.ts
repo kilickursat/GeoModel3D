@@ -1,5 +1,7 @@
 // The reading model's worker (ocr.worker.ts) from the page's side: started when a scanned page is to be read, it
 // downloads or opens the model, then reads pages one at a time. close() stops it at once, in the middle of a page too.
+import {imageRules} from "./ruling";
+import {textLine} from "./reconstruct";
 import type {OcrLine} from "./ocr";
 
 export type OcrProgress =
@@ -8,6 +10,13 @@ export type OcrProgress =
   | {stage:"backend";backend:"webgpu"|"wasm";reason?:string};
 // `ready` gives where the model runs, and the maker of the GPU where the browser says it.
 export interface Ocr { ready:Promise<{backend:"webgpu"|"wasm";gpu:string}>; read(img:ImageData):Promise<OcrLine[]>; close():void }
+
+// read() transfers the pixels to the worker. Capture dimensions and ruling while the buffer is attached.
+export async function readPageImage(ocr:Pick<Ocr,"read">,img:ImageData){
+  const {width,height}=img,rules=imageRules(img);
+  const lines=await ocr.read(img);
+  return {width,height,rules,lines:lines.map(l=>textLine(l.text,l.x0,l.y0,l.x1,l.y1))};
+}
 
 export function createOcr(onProgress:(p:OcrProgress)=>void):Ocr{
   const worker=new Worker(new URL("./ocr.worker.ts",import.meta.url),{type:"module"});

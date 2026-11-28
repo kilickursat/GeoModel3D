@@ -8,7 +8,7 @@
 [![XERJ Corpus Hub contributor](https://hub.xerj.org/contributors/kilickursat/badge.svg)](https://hub.xerj.org/contributors/kilickursat)
 [![Mentioned in Awesome Mining](https://awesome.re/mentioned-badge.svg)](https://github.com/XploraHub/awesome-mining)
 
-GeoModel3D builds a layered ground model from borehole logs and cone penetration tests and puts it on a map in the site's own coordinate system. You can cut sections through it at any angle or along a tunnel or road alignment. It runs in the browser on a computer, tablet or phone. There is nothing to install, and your data are not uploaded anywhere.
+GeoModel3D builds a layered ground model from borehole logs and cone penetration tests and puts it on a map in the site's own coordinate system. You can cut sections through it at any angle or along a tunnel or road alignment. It runs in the browser on a computer, tablet or phone. Imported files stay in your browser. Adding private CPTs or an alignment to a mapped site turns the map off. Turning it back on requests tiles for the updated site from the selected provider.
 
 **Watch the 38-second introduction** ([docs/promo.mp4](docs/promo.mp4)): a scanned borehole log read on the device, checked against its page, built into a model, then the whole Maasvlakte 2 site cut and coloured by effective stress. Every screen is the app itself; the data are public BRO records.
 
@@ -20,8 +20,8 @@ GeoModel3D builds a layered ground model from borehole logs and cone penetration
 
 ## What it does
 
-- Builds the model from boreholes, CPTs or both: horizons between the boreholes and a closed volume for each unit. One borehole is enough to start.
-- Reads borehole logs from PDF reports and images on your device, logs drawn with a depth scale, set out as tables or described sample by sample, over all their sheets, scanned pages included. You check each value beside the page it was read from before it is used.
+- Builds the model from boreholes, CPTs or both: horizons between the boreholes and a closed volume for each unit. One borehole is enough to start. If a single log contradicts the chosen stratigraphic order, the viewer and report show its measured intervals and withhold the continuous model. For multiple boreholes the summary counts intervals assigned a different unit in the model.
+- Reads borehole logs from PDF reports and images on your device, logs drawn with a depth scale, set out as tables or described sample by sample, over all their sheets, scanned pages included. You check each value beside the page it was read from before it is used. Logs with recognized depth headings in feet are held for manual conversion to metres.
 - Registers core-box photographs to depth, assists piece and lithology logging, and calculates reviewed photo-derived RQD. Accepted intervals link back to their highlighted photographs in the model; drafts and review history travel with the workspace ([workflow](docs/guide.md#core-photographs-to-a-ground-model)). Works locally and in the standalone HTML.
 - Compares registered core pieces and gaps with the current borehole log on a shared depth axis. Select an interval to highlight its exact photograph region, inspect differing unit labels, and export a source-linked interval CSV. Works locally and offline.
 - Has an opt-in lab (`?labs=core-ai`) that describes a registered row or core piece with local Hugging Face SmolVLM models. It is hidden by default: no model has passed a geologist's review, and in the pilot below SmolVLM 500M gave no useful answer on eight images ([lab](docs/guide.md#local-ai-for-core-intervals)).
@@ -32,7 +32,7 @@ GeoModel3D builds a layered ground model from borehole logs and cone penetration
 - Shows groundwater, σv, u, σ′v and σ′h on sections, and interpolates laboratory and in-situ results within each unit.
 - Classifies CPTs by Robertson's soil behaviour type (2009). Their layers can build the model alongside the boreholes.
 - Gives active, at-rest and passive earth pressures (Rankine) down a borehole of your own case.
-- Checks the model by leaving each borehole out and predicting it from the others, so you can see how far to trust it between boreholes.
+- Checks the model by withholding all logs at one collar and predicting its contacts from the other locations. The resulting errors are shown in metres.
 - Maps contact disagreement between selected saved interpretations and shows their min–max section ranges. Held-out location checks report observed range coverage and errors; ranges are not calibrated confidence intervals.
 - Separately calibrates training-only contact envelopes with split conformal prediction, recording independent training/calibration/audit groups and the finite-sample correction. Requested coverage assumes exchangeable locations and fixed interpretations; spatial geology can violate that assumption.
 - Plans contact-reaching investigations under a monetary budget using expected scenario discrimination per estimated cost. Prior weights and contact-observation resolution define this finite-case calculation; it does not model measurement noise or promise geological accuracy.

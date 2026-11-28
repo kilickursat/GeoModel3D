@@ -3,7 +3,7 @@ import {Section,sectionRuns,joined} from "./section";
 import {toCsv} from "./io";
 import {SectionField,columnAt,withTheme,scaleLabel} from "./fields";
 import {chainageTable,unitLabel,Crossing} from "./alignment";
-import {frictionRatio,thinned,cptScale,RF_SCALE} from "./cpt";
+import {frictionRatio,thinned,cptPlotScale,RF_SCALE} from "./cpt";
 import {cptDepth} from "./schema";
 import {selectedGroundwater} from "./groundwater";
 
@@ -66,7 +66,7 @@ export function sectionSvg(model:GeoModel,s:Section,o:SectionSvgOptions){
   const frame=out.length-2;
   if(title)out.push(`<text x="${m.l}" y="18" font-size="13" font-weight="600" fill="${t.text}">${esc(model.project.name)} — ${esc(sectionTitle(s))}</text>`);
   if(s.s.length<2){
-    out.push(`<text x="${W/2}" y="${H/2}" text-anchor="middle" font-size="13" fill="${t.muted}">The ${s.alignment?"line":"section line"} does not cross the model footprint</text></svg>`);
+    out.push(`<text x="${W/2}" y="${H/2}" text-anchor="middle" font-size="13" fill="${t.muted}">${model.logOnlyReason?"Logged intervals only. No continuous section is available.":`The ${s.alignment?"line":"section line"} does not cross the model footprint`}</text></svg>`);
     return out.join("");
   }
   const holes=s.boreholes.map(p=>({p,b:model.boreholes[p.index]})),cpts=s.cpts.map(p=>({p,c:model.cpts[p.index]}));
@@ -203,7 +203,7 @@ export function sectionSvg(model:GeoModel,s:Section,o:SectionSvgOptions){
   // CPTs: the axis from the start to the deepest reading, qc to the right and Rf to the left, each over a halo in the
   // background colour so that it reads on any fill; about one point a pixel.
   if(cpts.length){
-    const w=cptTraceWidths(pw),qcMax=cptScale(Math.max(...cpts.flatMap(({c})=>c.qc.filter(Number.isFinite)),1));
+    const w=cptTraceWidths(pw),qcMax=cptPlotScale(cpts.map(({c})=>c));
     const step=Math.max(0.02,0.8*(z1-z0)/ph);
     const path=(xs:number[],ys:number[])=>{let d="",pen=false;xs.forEach((x,i)=>{if(!Number.isFinite(x)){pen=false;return}d+=`${pen?"L":"M"}${x.toFixed(1)},${ys[i].toFixed(1)}`;pen=true});return d};
     const line=(d:string,stroke:string,width:number)=>d?`<path d="${d}" fill="none" stroke="${t.bg}" stroke-opacity="0.6" stroke-width="${width+1.8}" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${stroke}" stroke-width="${width}" stroke-linejoin="round"/>`:"";

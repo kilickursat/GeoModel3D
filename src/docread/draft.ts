@@ -36,20 +36,26 @@ export const num=(s:string)=>{const t=s.trim().replace(/^−/,"-").replace(",","
 const CJK=/[぀-ヿ㐀-鿿]/;
 const fmt=(v:number)=>String(+v.toFixed(3));
 
-// A unit for a description, by the app's first grouping of soil and rock names (Japanese names by their own rules).
-// A description no rule assigns stays its own unit, as in imports, and is reported.
-// A Japanese description read from a log form starts with the soil name, its code in brackets after it
-// ("礫混じり粘性土(C-G) 含水は低い…"): the name gives the unit, as the name of an imported log does.
-export function unitFor(description:string){
+// A Japanese form has a separate soil-name column. An empty or unreadable name leaves the unit
+// open for review. Remarks often name a rock in the matrix of a gravel layer.
+export function unitFor(description:string,soilName?:string){
   const d=description.trim();
-  if(!d)return "";
-  const rules=CJK.test(d)?japaneseLithologyRules:lithologyRules;
-  const unit=(name:string)=>applyUnitRules([{id:"",x:0,y:0,z:0,intervals:[{from:0,to:1,unit:"",name}]}],rules).boreholes[0].intervals[0];
-  if(CJK.test(d)){
-    const name=d.split(/\s+/)[0].replace(/(?:[(（][^)）]*[)）])+$/,"");
-    if(name&&name!==d){const u=unit(name);if(u.unit!==name)return u.unit}
+  // “Idem” refers back to a prior row; material mentioned afterwards can describe
+  // inclusions or a transition. Keep the source text and ask for a reviewed unit.
+  if(!d||/^idem\b/i.test(d))return "";
+  const japanese=soilName!==undefined||CJK.test(d);
+  let name=d;
+  if(japanese){
+    // Hand-edited descriptions and tables without a separate name column can start with a
+    // soil name, followed by its bracketed classification code, a space, or a colon.
+    const label=soilName??d.split(/[\s:：]/u,1)[0];
+    name=label.normalize("NFKC").replace(/(?:\([^()]*\))+$/,"");
+    if(!name)return "";
+    if(soilName===undefined&&!/(?:土|砂|礫|石|岩|シルト|ローム|火山灰|黒ボク|コンクリート|アスファルト|舗装|廃棄物|ピート|チャート|ホルンフェルス)$/.test(name))return "";
   }
-  return unit(d).unit;
+  const rules=japanese?japaneseLithologyRules:lithologyRules;
+  const result=applyUnitRules([{id:"",x:0,y:0,z:0,intervals:[{from:0,to:1,unit:"",name}]}],rules);
+  return japanese&&result.unmatched.size?"":result.boreholes[0].intervals[0].unit;
 }
 
 // The logs of one document as drafts. A log whose ID was not read is named after its first page, and flagged.
@@ -67,7 +73,7 @@ export function draftHoles(doc:number,file:string,logs:ReadLog[],scanned:Readonl
       values:{id:log.src?.id?log.id??"":`Page ${log.pages[0]}`,x:text(log.x),y:text(log.y),lat:text(log.lat),lon:text(log.lon),
         ground:text(log.ground),final:text(log.final),water:text(log.water)},
       flags,src:{...log.src},
-      layers:log.layers.map(l=>({from:text(l.from),to:text(l.to),unit:unitFor(l.description),description:l.description,
+      layers:log.layers.map(l=>({from:text(l.from),to:text(l.to),unit:unitFor(l.description,l.soilName),description:l.description,
         ...(l.flagged?{flag:l.why??"check this depth against the page"}:{}),...(l.gap?{gap:l.gap}:{}),autoUnit:true,src:l.src})),
       // Penetration in mm, as the SPT table takes it; left empty where the log does not give it ("50+").
       ...(log.spt?.length?{spt:log.spt.map(t=>({depth:text(t.depth),blows:text(t.blows),penetration:t.penetration===undefined?"":text(Math.round(t.penetration*10)),src:t.src}))}:{})};
@@ -167,7 +173,7 @@ export function checkDraft(holes:DraftHole[]):Check[]{
       if(prev&&q.from>prev.to+0.005)add("warn",`A gap from ${fmt(prev.to)} to ${fmt(q.from)} m: no layer is there.`,{layer:q.k});
       if(prev&&q.from<prev.to-0.005)add("warn",`Layers overlap from ${fmt(q.from)} to ${fmt(Math.min(prev.to,q.to))} m.`,{layer:q.k});
       if(q.l.flag&&!grouped.includes(q))add("warn",`${fmt(q.to)} m: ${q.l.flag}${q.l.gap&&between.length>=2?`; a wider gap than this log's usual ${fmt(usual)} m`:""}.`,{layer:q.k});
-      if(!q.l.unit.trim())add("error",`Layer ${fmt(q.from)}–${fmt(q.to)} m: no unit. Type one, or a description.`,{layer:q.k});
+      if(!q.l.unit.trim())add("error",`Layer ${fmt(q.from)}–${fmt(q.to)} m: no unit. Check the logged material and enter its unit.`,{layer:q.k});
       else if(q.l.autoUnit&&q.l.unit===q.l.description.trim()&&q.l.unit.length>24)add("note",`Layer ${fmt(q.from)}–${fmt(q.to)} m: no rule gives its description a unit, so the description is its unit. Type a shorter one.`,{layer:q.k});
     });
     const base=Math.max(...valid.map(q=>q.to));

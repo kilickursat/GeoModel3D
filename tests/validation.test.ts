@@ -40,6 +40,22 @@ describe("cross-validation",()=>{
     expect(c.at).toBe("H11");
   });
 
+  it("withholds coincident borehole and CPT logs together when checking a site",()=>{
+    const p=grid((x,y)=>x===50&&y===50?2:0);
+    const centre=p.boreholes[4];
+    const duplicate={...centre,id:"duplicate",x:centre.x+0.0001};
+    const cpt={id:"coincident CPT",x:centre.x,y:centre.y,z:centre.z,depth:[0,30],qc:[1,1],layers:centre.intervals};
+    for(const project of [
+      {...p,boreholes:[...p.boreholes,duplicate]},
+      {...p,cptLayers:true,cpts:[cpt]}
+    ]){
+      const v=crossValidate(project);
+      expect(v.boreholes).toHaveLength(9);
+      const check=v.boreholes.find(b=>b.id===centre.id)!;
+      expect(check.contacts.find(c=>c.k===2)!.error).toBeCloseTo(2,9);
+    }
+  });
+
   it("counts the logged metres predicted in the unit logged",()=>{
     // B pinches out in the middle borehole, logged 2 m thick in the four around it: the others predict 2 m of B where
     // the middle borehole logged C.

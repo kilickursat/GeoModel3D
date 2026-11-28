@@ -4,6 +4,7 @@
 // the log of one borehole with the stresses down it, and what the importer and the model report. The tables become CSV
 // and go through the importer, so typed data are checked exactly as imported files are.
 import {GeoProject} from "./schema";
+import {loggedIntervalsTable} from "./report";
 import {WorkspaceDocument,createWorkspace,updateDraft,checkpoint,restoreRevision,toWorkspaceJson,createScenario,switchScenario,renameScenario} from "./workspace";
 import {chooseImageExport,exportImages,projectWithoutPagePreviews,workspaceWithoutPagePreviews} from "./exportImages";
 import {createWorkspaceStore} from "./storage";
@@ -322,7 +323,7 @@ ${field("margin","Model extent beyond the boreholes (m)","The model reaches this
     plan.innerHTML=planSvg(m,selected);
     holeSelect.innerHTML=ids.map(id=>`<option${id===selected?" selected":""}>${esc(id)}</option>`).join("");
     holeSelect.disabled=!ids.length;
-    el.querySelector(".ws-column-title")!.textContent=view==="stress"?"Log and stresses":"Log and earth pressure";
+    el.querySelector(".ws-column-title")!.textContent=m?.logOnlyReason?"Logged intervals":view==="stress"?"Log and stresses":"Log and earth pressure";
     for(const b of el.querySelectorAll<HTMLButtonElement>(".ws-view button"))b.setAttribute("aria-pressed",String(b.dataset.view===view));
     column.innerHTML=m&&selected?columnView(m,ids.indexOf(selected)):`<p class="ws-empty">${t?"No borehole placed yet.":"Start a case to see its boreholes here."}</p>`;
     checks.innerHTML=checksView();
@@ -333,7 +334,7 @@ ${field("margin","Model extent beyond the boreholes (m)","The model reaches this
     // The notes of the files the case was imported from stay while it is open: the tables no longer show what they
     // were converted from.
     const m=preview.model,notes=[...new Set([...imported,...(preview.result?.warnings??[]),...(m?.warnings??[])])];
-    const summary=m?`${m.boreholes.length} borehole${m.boreholes.length===1?"":"s"} and ${m.units.length} unit${m.units.length===1?"":"s"} modelled${m.water?", with a water table":""}.`:"No borehole placed yet.";
+    const summary=m?.logOnlyReason?"Showing the logged intervals.":m?`${m.boreholes.length} borehole${m.boreholes.length===1?"":"s"} and ${m.units.length} unit${m.units.length===1?"":"s"} modelled${m.water?", with a water table":""}.`:"No borehole placed yet.";
     if(!notes.length)return `<p class="ws-ok"><span aria-hidden="true">✓</span> ${summary} No problems found.</p>`;
     const list=(a:string[])=>`<ul>${a.map(w=>`<li>${esc(w)}</li>`).join("")}</ul>`;
     return `<p>${summary} ${notes.length} note${notes.length===1?"":"s"}:</p>${list(notes.slice(0,6))}${notes.length>6?`<details><summary>${notes.length-6} more</summary>${list(notes.slice(6))}</details>`:""}`;
@@ -359,6 +360,7 @@ ${holes.map(b=>{const on=b.id===sel,x=X(b.x),y=Y(b.y);return `<g class="ws-pt" d
 
   // The log of one borehole as the model has it there, and the stresses or the earth pressures down it.
   function columnView(m:GeoModel,i:number){
+    if(m.logOnlyReason){profile=null;return loggedIntervalsTable(m)}
     if(m.project.groundwater?.mode==="as-of"&&!m.water)return '<p class="ws-empty">No groundwater observation qualifies for this date. Water-dependent stresses and earth pressures are unavailable; choose a different policy or add eligible observations.</p>';
 
     const K=m.units.length,z=m.horizons.map(h=>h.z[i]),top=z[0],bottom=z[K],depth=Math.max(top-bottom,1e-6);

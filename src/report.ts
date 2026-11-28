@@ -7,7 +7,7 @@ import {sectionSvg,sectionTitle} from "./sectionSvg";
 import {chainageTable,outsideStretches,unitLabel,lineCrossings} from "./alignment";
 import {projectCrs} from "./crs";
 import {boreholeDepth,sptN,cptDepth} from "./schema";
-import {frictionRatio,cptScale} from "./cpt";
+import {frictionRatio,cptPlotScale} from "./cpt";
 import {cptLogSvg} from "./cptSvg";
 import {cptBehaviour,SBT_ZONES} from "./sbt";
 import {SectionField,unitWeights,unitOfReading} from "./fields";
@@ -36,6 +36,14 @@ const fmt=(v:number,d=0)=>Number.isFinite(v)?v.toLocaleString("en-US",{maximumFr
 const volume=(v:number)=>v>=1e6?`${fmt(v/1e6,2)} M m³`:`${fmt(v)} m³`;
 const range=(lo?:number,hi?:number,unit="")=>lo===undefined&&hi===undefined?"":`${lo===undefined?"":`≥ ${lo}${unit}`}${lo!==undefined&&hi!==undefined?", ":""}${hi===undefined?"":`< ${hi}${unit}`}`;
 
+// The measured column in a log-only view, including every recurrence of a unit.
+export function loggedIntervalsTable(model:GeoModel){
+  const log=model.boreholes[0]??model.cptLogs[0];
+  const rows=[...log.intervals].sort((a,b)=>a.from-b.from||a.to-b.to).map(i=>
+    `<tr><td>${i.from}</td><td>${i.to}</td><td>${esc(model.units.find(u=>u.id===i.unit)?.name??i.unit)}</td></tr>`);
+  return `<p>${esc(model.logOnlyReason??"")}</p><table class="logged-intervals"><thead><tr><th>From (m)</th><th>To (m)</th><th>Logged unit</th></tr></thead><tbody>${rows.join("")}</tbody></table>`;
+}
+
 export function reportHtml(model:GeoModel,section:Section,o:ReportOptions){
   const p=model.project,crs=projectCrs(p);
   const [w,h]=o.paper==="A3"?[420,297]:[297,210];
@@ -46,8 +54,9 @@ export function reportHtml(model:GeoModel,section:Section,o:ReportOptions){
     ["Coordinate system",crs?`${crs.name}${crs.code?` (${crs.code})`:""}`:p.crs?`${p.crs} (not georeferenced)`:"Local, not georeferenced"],
     ["Boreholes",String(model.boreholes.length)],
     ...(model.cpts.length?[["CPTs",`${model.cpts.length}${model.cptLogs.length?`, ${model.cptLogs.length} with their layers in the model`:""}`] as [string,string]]:[]),
+    ...(model.simplifiedIntervals?[["Correlation",`${model.simplifiedIntervals} logged interval(s) assigned a different unit in the model. See model notes for depths.`]] as [string,string][]:[]),
     ["Footprint",model.triangles.length?`${fmt(footprintArea(model)/1e4,2)} ha`:"—"],
-    ["Ground",p.terrain?`Terrain: ${p.terrain.source??"terrain grid"}, ${fmt(p.terrain.dx,1)} m cells`:"Surface through the collars"],
+    ["Ground",model.logOnlyReason?"Surveyed start elevation":p.terrain?`Terrain: ${p.terrain.source??"terrain grid"}, ${fmt(p.terrain.dx,1)} m cells`:"Surface through the collars"],
     ["Data",p.source??"—"],
     ["Groundwater",model.water?model.water.source.replace(/^./,c=>c.toUpperCase()):p.groundwater?.mode==="as-of"?groundwaterSummary({...p,boreholes:model.boreholes}):"Not given"],
     ["3-D view","Vertical exaggeration ×"+fmt(o.ve,1)],
@@ -127,10 +136,10 @@ table.chainage td,table.chainage th{padding:0.5mm 1.4mm}
 <table class="block"><tbody>${block.map(([k,v])=>`<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join("")}</tbody></table></header>
 <div class="main"><div class="view">${o.image?`<img src="${o.image}" alt="3-D view of the model">`:`<div class="missing">The 3-D view could not be captured with this renderer. Open the page with ?backend=webgl to include it.</div>`}
 <div class="credits">${o.credits.map(esc).join(" · ")}</div></div>
-<div><h3>Units</h3><table><thead><tr><th>Unit (top to bottom)</th><th>Volume in the model</th><th>Properties</th></tr></thead><tbody>${legend}</tbody></table>${rules?`<p class="muted">The units are assigned to the logged descriptions by rules; they are listed with the boreholes.</p>`:""}</div></div>
+<div><h3>Units</h3><table><thead><tr><th>${model.logOnlyReason?"Logged unit":"Unit (top to bottom)"}</th><th>Volume in the model</th><th>Properties</th></tr></thead><tbody>${legend}</tbody></table>${rules?`<p class="muted">The units are assigned to the logged descriptions by rules; they are listed with the boreholes.</p>`:""}</div></div>
 ${foot("Overview")}</section>
-<section class="page"><h2>${esc(sectionName)}</h2><div class="section">${svg}</div>
-${line?`<p class="muted">Along ${esc(line.name)}, ${line.s.length} points from (${fmt(line.x[0],1)}, ${fmt(line.y[0],1)}) to (${fmt(line.x[line.x.length-1],1)}, ${fmt(line.y[line.y.length-1],1)}) in ${esc(crs?.name??p.crs??"project coordinates")}; boreholes within ${fmt(o.sectionBuffer)} m of the line are projected onto it at their nearest point.${outsideStretches(section).map(([a,b])=>` Chainage ${fmt(a)}–${fmt(b)} m lies outside the model.`).join("")}</p>`
+<section class="page"><h2>${model.logOnlyReason?"Logged intervals":esc(sectionName)}</h2><div class="section">${model.logOnlyReason?loggedIntervalsTable(model):svg}</div>
+${model.logOnlyReason?"":line?`<p class="muted">Along ${esc(line.name)}, ${line.s.length} points from (${fmt(line.x[0],1)}, ${fmt(line.y[0],1)}) to (${fmt(line.x[line.x.length-1],1)}, ${fmt(line.y[line.y.length-1],1)}) in ${esc(crs?.name??p.crs??"project coordinates")}; boreholes within ${fmt(o.sectionBuffer)} m of the line are projected onto it at their nearest point.${outsideStretches(section).map(([a,b])=>` Chainage ${fmt(a)}–${fmt(b)} m lies outside the model.`).join("")}</p>`
   :`<p class="muted">From A (${fmt(section.x[0]??NaN,1)}, ${fmt(section.y[0]??NaN,1)}) to A′ (${fmt(section.x[section.x.length-1]??NaN,1)}, ${fmt(section.y[section.y.length-1]??NaN,1)}) in ${esc(crs?.name??p.crs??"project coordinates")}; boreholes within ${fmt(o.sectionBuffer)} m are projected onto it.</p>`}
 ${foot(line?"Longitudinal profile":"Section")}</section>
 ${line?chainagePage(model,section,o.chainageStep??10,foot):""}
@@ -213,7 +222,7 @@ function cptPage(model:GeoModel,section:Section,buffer:number,foot:(part:string)
   let logs="";
   if(shown.length){
     const top=Math.max(...shown.map(({c})=>c.z)),bottom=Math.min(...shown.map(({c})=>c.z-cptDepth(c))),pad=Math.max(0.3,(top-bottom)*0.02);
-    const qcMax=cptScale(Math.max(...shown.flatMap(({c})=>c.qc.filter(Number.isFinite)),1));
+    const qcMax=cptPlotScale(shown.map(({c})=>c));
     logs=`<div class="cpt-logs">${shown.map(({p,c})=>{
       const z=sampleModel(model,c.x,c.y),units=z?model.units.map((u,k)=>({top:z[k],bottom:z[k+1],color:u.color,name:u.name})).filter(b=>b.top-b.bottom>1e-6):[];
       const behaviour=cptBehaviour(model.project,c),unavailable=behaviour.notes.find(n=>n.startsWith("No eligible groundwater"));
@@ -222,7 +231,12 @@ function cptPage(model:GeoModel,section:Section,buffer:number,foot:(part:string)
 <p class="muted">Soil behaviour type (SBT) by Robertson (2009): the index Ic of the normalised cone resistance and friction ratio, with the unit weight from the CPT (Robertson &amp; Cabal 2010) and the water table of the project. Cone resistance qc and friction ratio Rf (fs/qc where the data give no ratio) against elevation in metres; behind them the units of the model where each CPT stands${model.cptLogs.length?", built with the CPT layers":", which the CPTs did not log"}.${section.cpts.length>shown.length?` The first ${shown.length} of the ${section.cpts.length} CPTs on the section.`:""}</p>`;
   }else logs=`<p class="muted">No CPT lies within ${fmt(buffer)} m of the section.</p>`;
   // Readings by the unit of the model at their elevation; CPTs outside the model are left out.
-  const acc=model.units.map(()=>({cpts:new Set<string>(),qc:[] as number[],fs:[] as number[],rf:[] as number[]}));
+  const totals=()=>({sum:0,count:0,min:Infinity,max:-Infinity});
+  const add=(t:ReturnType<typeof totals>,v:number|undefined)=>{
+    if(v===undefined||!Number.isFinite(v))return;
+    t.count++;t.sum+=v;t.min=Math.min(t.min,v);t.max=Math.max(t.max,v);
+  };
+  const acc=model.units.map(()=>({cpts:new Set<string>(),qc:totals(),fs:totals(),rf:totals()}));
   for(const c of model.cpts){
     const z=sampleModel(model,c.x,c.y);
     if(!z)continue;
@@ -232,12 +246,10 @@ function cptPage(model:GeoModel,section:Section,buffer:number,foot:(part:string)
       if(k<0)return;
       const a=acc[k];
       a.cpts.add(c.id);
-      if(Number.isFinite(c.qc[i]))a.qc.push(c.qc[i]);
-      if(Number.isFinite(c.fs?.[i]??NaN))a.fs.push(c.fs![i]);
-      if(Number.isFinite(rf[i]))a.rf.push(rf[i]);
+      add(a.qc,c.qc[i]);add(a.fs,c.fs?.[i]);add(a.rf,rf[i]);
     });
   }
-  const stat=(v:number[],d:number)=>v.length?`${fmt(v.reduce((x,y)=>x+y,0)/v.length,d)} <span class="muted">(${fmt(Math.min(...v),d)}–${fmt(Math.max(...v),d)})</span>`:"";
+  const stat=(t:ReturnType<typeof totals>,d:number)=>t.count?`${fmt(t.sum/t.count,d)} <span class="muted">(${fmt(t.min,d)}–${fmt(t.max,d)})</span>`:"";
   const byUnit=acc.some(a=>a.cpts.size)?`<h3>Readings by unit of the model</h3><table><thead><tr><th>Unit</th><th>CPTs</th><th>qc (MPa)</th><th>fs (kPa)</th><th>Rf (%)</th></tr></thead><tbody>${
     model.units.map((u,k)=>acc[k].cpts.size?`<tr><td><i class="swatch" style="background:${esc(u.color)}"></i>${esc(u.name)}</td><td class="num">${acc[k].cpts.size}</td><td class="num">${stat(acc[k].qc,2)}</td><td class="num">${stat(acc[k].fs,0)}</td><td class="num">${stat(acc[k].rf,1)}</td></tr>`:"").join("")
   }</tbody></table><p class="muted">Mean (range) of every reading, by the unit of the model at its elevation: the units come from the boreholes, not from the CPTs.</p>`:"";

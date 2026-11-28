@@ -11,12 +11,13 @@
 import {readFileSync,writeFileSync,existsSync,mkdirSync} from "node:fs";
 import {createHash} from "node:crypto";
 import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
-import {linesFromItems,textChars,judgeText,agreement} from "../../src/docread/textlines";
-import {readDocument,textLine,logEvidence} from "../../src/docread/reconstruct";
-import {pdfRules,joinRules,scaleRules} from "../../src/docread/ruling";
+import {extractPageText,scanReason} from "../../src/docread/pdfpage";
+import {agreement} from "../../src/docread/textlines";
+import {readDocument,textLine} from "../../src/docread/reconstruct";
+import {joinRules,scaleRules} from "../../src/docread/ruling";
 import {draftHoles,checkDraft,DraftHole} from "../../src/docread/draft";
 
-const READ_SCALE=150/72,MIN_CHARS=30,CONFIRMED=0.6;
+const CONFIRMED=0.6;
 const pct=(v:number)=>`${Math.round(100*v)} %`;
 const [mode,runDir,...only]=process.argv.slice(2);
 if(!["plan","read"].includes(mode)||!runDir){console.error("usage: plan|read <run dir> [report ids]");process.exit(2)}
@@ -31,18 +32,9 @@ async function judge(file:string){
     standardFontDataUrl:"node_modules/pdfjs-dist/standard_fonts/",verbosity:0}),doc=await task.promise;
   const pages:any[]=[],scan:number[]=[],doubt:number[]=[],why=new Map<number,string>();
   for(let n=1;n<=doc.numPages;n++){
-    const page=await doc.getPage(n),vp=page.getViewport({scale:READ_SCALE}),items=(await page.getTextContent()).items as any[];
-    const j=judgeText(items.map(i=>i.str??""),textChars(items),MIN_CHARS);
-    const t:any={page:n,width:vp.width,height:vp.height,lines:linesFromItems(items,vp.transform)};
-    // As pdftext.ts: the drawing is read on a page that looks like a log.
-    if(j.layer!=="none"&&logEvidence(t.lines)){
-      const ops=await page.getOperatorList(),rules=pdfRules(ops.fnArray,ops.argsArray,(pdfjs as any).OPS,vp.transform);
-      if(rules.length){t.rules=rules;t.lines=linesFromItems(items,vp.transform,rules)}
-    }
-    if(j.layer==="none"){scan.push(n);why.set(n,"a scanned page")}
-    else if(j.layer==="garbled"){scan.push(n);why.set(n,`unusable PDF text (${pct(j.share)} of it reads as words)`)}
-    else{pages.push(t);if(j.layer==="doubtful")doubt.push(n)}
-    page.cleanup();
+    const t=await extractPageText(await doc.getPage(n),pdfjs.OPS),reason=scanReason(t);
+    if(reason){scan.push(n);why.set(n,reason)}
+    else{pages.push(t);if(t.layer==="doubtful")doubt.push(n)}
   }
   // As index.ts: a log page whose text gives no depth scale is read by OCR too, unless its text is prose.
   const prose=(n:number)=>(pages.find(p=>p.page===n)?.lines??[]).filter((l:any)=>l.text.trim().split(/\s+/).length>=8).length>=5;

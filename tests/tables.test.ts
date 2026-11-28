@@ -36,6 +36,25 @@ describe("data editor tables",()=>{
     expect(warnings.join(" ")).toMatch(/3 collar positions converted from latitude and longitude to WGS 84 \/ UTM zone 54N/);
   });
 
+  it("retains the projection used for geographic report collars through model build and table round-trip",()=>{
+    const t=emptyTables();
+    t.rows.boreholes=[["B-2","","","36.6163889","139.8008333","200.64","9.07"]];
+    t.rows.logs=[["B-2","0","9.07","gravel",""]];
+    const {project}=projectFromTables(t);
+    expect(project.crsCode).toBe("EPSG:6677");
+    const rebuilt=projectFromTables(tablesFromProject(project),project).project;
+    expect(rebuilt.crsCode).toBe(project.crsCode);
+    expect(rebuilt.boreholes[0]).toEqual(project.boreholes[0]);
+    t.project.crs="Unknown survey grid";
+    expect(()=>projectFromTables(t)).toThrow(/Cannot convert geographic positions/);
+    t.project.crs="";
+    t.rows.boreholes.push(["B-3","300","400","","","201","10"]);
+    t.rows.logs.push(["B-3","0","10","gravel",""]);
+    expect(()=>projectFromTables(t)).toThrow(/mix projected coordinates/);
+    t.project.crs="EPSG:6677";
+    expect(projectFromTables(t).project.boreholes).toHaveLength(2);
+  });
+
   it("reads coordinate systems by code, name or PROJ definition, and keeps other names as local grids",()=>{
     expect(crsFromText("Belgian Lambert 72")!.code).toBe("EPSG:31370");
     expect(crsFromText("28992")!.code).toBe("EPSG:28992");

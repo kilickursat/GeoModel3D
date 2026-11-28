@@ -7,10 +7,11 @@
 // as it goes; Cancel stops it, the reading model too. In the review, any page read from its text can be read again by
 // OCR on request: the document's logs are then read again.
 import {openPdf,openImage,pageText,PageText,Doc} from "./pdftext";
-import {readDocument,textLine} from "./reconstruct";
+import {scanReason} from "./pdfpage";
+import {readDocument} from "./reconstruct";
 import {draftHoles,DraftHole} from "./draft";
 import {createReview,ReviewHost,Unread,OcrRead} from "./review";
-import {createOcr,Ocr} from "./ocrclient";
+import {createOcr,readPageImage,Ocr} from "./ocrclient";
 import {agreement} from "./textlines";
 import {imageRules,joinRules,scaleRules} from "./ruling";
 import {newEvidenceId,EvidenceSource} from "../evidence";
@@ -53,10 +54,10 @@ export async function readPdfs(files:File[],host:ReviewHost){
     const ocr=await startOcr();
     reader.status=`Reading ${s.file}${s.d.pages>1?`: page ${n} of ${s.d.pages}`:""} by OCR${reader.backend?` (${reader.backend})`:""}`;
     review.progress(reader.status+"…");
-    const img=await s.d.image(n),lines=await ocr.read(img);
+    const page=await readPageImage(ocr,await s.d.image(n));
     // The boxes on the review's page are in the pixels the page was read in. The ruled lines are found on the same image.
-    review.size(doc,n,img.width,img.height);
-    return {page:n,width:img.width,height:img.height,scanned:true,lines:lines.map(l=>textLine(l.text,l.x0,l.y0,l.x1,l.y1)),rules:imageRules(img)};
+    review.size(doc,n,page.width,page.height);
+    return {page:n,scanned:true,...page};
   };
   const put=(s:DocState,t:PageText)=>{const at=s.pages.findIndex(p=>p.page===t.page);if(at>=0)s.pages.splice(at,1);s.pages.push(t)};
   // The logs of a document as read so far, for the review.
@@ -93,8 +94,8 @@ export async function readPdfs(files:File[],host:ReviewHost){
       try{
         const t=await pageText(pdf,n);
         review.size(doc,n,t.width,t.height);
-        if(t.layer==="none"){scan.push(n);s.why.set(n,"a scanned page")}
-        else if(t.layer==="garbled"){scan.push(n);s.why.set(n,`unusable PDF text (${pct(t.share??0)} of it reads as words)`)}
+        const reason=scanReason(t);
+        if(reason){scan.push(n);s.why.set(n,reason)}
         else{s.pages.push(t);if(t.layer==="doubtful")doubt.push(n)}
       }catch(err){unread.push({doc,page:n,error:`it could not be read (${(err as Error).message})`})}
     }

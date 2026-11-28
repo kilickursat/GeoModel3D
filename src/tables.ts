@@ -170,14 +170,15 @@ function projectFromEditorTables(t:EditorTables,base:GeoProject|undefined,forCor
   if(margin!==undefined&&Number.isFinite(margin)&&margin>0)p.margin=margin;
   for(const [label,v] of [["Assumed groundwater depth",gw],["Model base",bottom],["Model extent",margin]] as Array<[string,number|undefined]>)
     if(v!==undefined&&!Number.isFinite(v))result.warnings.push(`${label}: “${label==="Model base"?f.base:label==="Model extent"?f.margin:f.groundwaterDepth}” is not a number and was ignored`);
-  if(!crs){
-    delete p.crsCode;delete p.crsProj4;p.crs=f.crs.trim()||undefined;
-    if(p.crs)result.warnings.push(`Coordinate system “${p.crs}” is not a known one: the model is not georeferenced (no terrain or map). Type an EPSG code or paste a PROJ definition to place it`);
+  if(!crs&&f.crs.trim()){
+    if(projectCrs(p))throw new Error(`Cannot convert geographic positions to “${f.crs.trim()}”. Enter its EPSG code or PROJ definition, or clear the field to use the suggested projection.`);
+    p.crs=f.crs.trim();
+    result.warnings.push(`Coordinate system “${p.crs}” is not a known one: the model is not georeferenced (no terrain or map). Type an EPSG code or paste a PROJ definition to place it`);
   }
   if(base){
     if(base.groundwater)p.groundwater=structuredClone(base.groundwater);
     if(base.rules)p.rules=base.rules;
-    if(projectCrs(base)?.proj4===crs?.proj4){
+    if(projectCrs(base)?.proj4===projectCrs(p)?.proj4){
       if(base.terrain)p.terrain=base.terrain;
       if(base.alignments?.length)p.alignments=base.alignments;
       if(base.cpts?.length){

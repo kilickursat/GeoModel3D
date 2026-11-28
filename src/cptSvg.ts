@@ -1,7 +1,7 @@
 // A CPT's log: its soil behaviour type, and the cone resistance and the friction ratio against elevation, side by side,
 // over the units of the model where the CPT stands; for the read-out in the app and the report.
 import {Cpt,cptDepth} from "./schema";
-import {frictionRatio,thinned,cptScale,RF_SCALE} from "./cpt";
+import {frictionRatio,thinned,cptPlotScale,RF_SCALE} from "./cpt";
 import {sbtZone} from "./sbt";
 
 // `units`: the model's units at the CPT, as elevation bands; `zones`: the soil behaviour type zone of each reading;
@@ -26,7 +26,7 @@ export function cptLogSvg(c:Cpt,o:CptLogOptions){
   // A column of the soil behaviour type, then the panels of qc and Rf.
   const zw=o.zones?10:0,m={l:36+(zw?zw+4:0),r:6,t:o.title?34:22,b:8},gap=8,pw=W-m.l-m.r-gap,qw=Math.round(pw*0.66),rw=pw-qw,ph=H-m.t-m.b;
   const pad=Math.max(0.3,(c.z-bottom)*0.02),[top,low]=o.zRange??[c.z+pad,bottom-pad];
-  const Y=(e:number)=>m.t+(top-e)/(top-low)*ph,qcMax=o.qcMax??cptScale(Math.max(...c.qc.filter(Number.isFinite),1));
+  const Y=(e:number)=>m.t+(top-e)/(top-low)*ph,qcMax=o.qcMax??cptPlotScale([c]);
   const qx=m.l,rx=m.l+qw+gap,out:string[]=[];
   out.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic UI', Meiryo, sans-serif">`);
   if(o.title)out.push(`<text x="${m.l}" y="12" font-size="11" font-weight="600" fill="${t.text}">${esc(c.id)}</text>`);

@@ -262,6 +262,30 @@ test("exports with page images say so, can leave the previews out, and cancel ex
   expect(exported.evidence.records.map((r:any)=>r.id)).toContain("collar-bh1");
 });
 
+test("shows the source image before OCR finishes and closes it on cancel",async({page})=>{
+  await prepare(page);
+  await page.goto("/?backend=webgl#input");await openInput(page);
+  // Hold the worker download so the assertion covers the reading phase, even with a fast GPU.
+  let release!:()=>void;
+  const held=new Promise<void>(resolve=>{release=resolve});
+  await page.route("**/assets/ocr.worker-*.js",async route=>{await held;await route.abort().catch(()=>{})});
+  const image=Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAgAAAAECAIAAAA8r+mnAAAAFElEQVR4nGNUdmhgwAaYsIqSJQEAWH0A65PCMHQAAAAASUVORK5CYII=","base64");
+  try{
+    await page.locator(".pdf-file").setInputFiles({name:"source.png",mimeType:"image/png",buffer:image});
+    await page.getByRole("button",{name:"Agree",exact:true}).click();
+    const review=page.getByRole("dialog",{name:"Borehole logs read from documents"});
+    await expect(review.locator(".dr-pageno")).toContainText("Page 1 of 1");
+    await expect.poll(()=>review.locator(".dr-sheet canvas").evaluate((canvas:HTMLCanvasElement)=>
+      [...canvas.getContext("2d")!.getImageData(1,1,1,1).data])).toEqual([35,64,128,255]);
+    const original=await review.locator(".dr-sheet canvas").elementHandle();
+    await review.getByRole("button",{name:"Fit width"}).click();
+    expect(await original!.evaluate(canvas=>canvas.isConnected)).toBe(true);
+    await expect(review.locator(".dr-use")).toBeDisabled();
+    await review.locator(".dr-cancel").click();
+    await expect(review).toHaveCount(0);
+  }finally{release()}
+});
+
 test("a page read from its own text can be read again by OCR, which says so on the page",async({page})=>{
   test.setTimeout(240_000);
   await prepare(page);await page.goto("/?backend=webgl#input");await openInput(page);
