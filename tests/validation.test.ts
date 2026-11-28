@@ -64,7 +64,105 @@ describe("cross-validation",()=>{
     const m=v.boreholes.find(b=>b.id==="M")!;
     expect(m.outside).toBe(false);
     expect([m.logged,m.right]).toEqual([10,8]);
-    expect(m.contacts.map(q=>[q.k,Number(q.error.toFixed(9))])).toEqual([[0,0],[1,0],[2,-2]]);
+    expect(m.contacts.map(q=>[q.k,Number(q.error.toFixed(9))])).toEqual([[0,0],[2,-2]]);
+  });
+
+  it("scores observed contacts separately from kernel estimates at a gap or an erosion surface",()=>{
+    const p=grid(),held=p.boreholes[4];
+    held.intervals=[{from:0,to:2,unit:"A"},{from:4,to:10,unit:"C"}];
+    p.units=p.units.map(u=>u.id==="A"?{...u,erosive:true}:u);
+    const v=crossValidate(p),mid=v.boreholes.find(b=>b.id===held.id)!;
+    expect(mid.contacts.map(c=>c.k)).toEqual([0]);
+    expect(mid.omittedTops).toEqual([{unit:"C",reason:"reference"}]);
+    expect(mid.logged).toBe(8);
+    expect(v.notes.some(n=>n.includes("Excluded 1 bed-top comparison"))).toBe(true);
+  });
+
+  it("withholds the top of a bed ID repeated at the held collar or anywhere in the contributing training logs",()=>{
+    const p=grid(),held=p.boreholes[4];
+    held.intervals=[{from:0,to:2,unit:"A"},{from:2,to:4,unit:"B"},{from:4,to:7,unit:"C"},{from:7,to:9,unit:"B"}];
+    const v=crossValidate(p),mid=v.boreholes.find(b=>b.id===held.id)!,other=v.boreholes.find(b=>b.id==="H01")!;
+    expect(mid.omittedTops).toContainEqual({unit:"B",reason:"reference"});
+    expect(other.omittedTops).toContainEqual({unit:"B",reason:"ambiguity"});
+    expect(v.boreholes.every(b=>b.contacts.every(c=>c.k!==1))).toBe(true);
+    expect(mid.logged).toBe(9);
+    expect(v.notes).toContain("Excluded 8 bed-top comparisons from contact errors (training logs contain conflicting or repeated bed IDs).");
+    expect(v.boreholes.every(b=>b.contacts.some(c=>c.k===0))).toBe(true);
+  });
+
+  it("distinguishes contiguous samples from disconnected occurrences of the same bed ID",()=>{
+    const p=grid(),held=p.boreholes[4];
+    held.intervals=[{from:0,to:2,unit:"A"},{from:2,to:3,unit:"B"},{from:3,to:5,unit:"B"},{from:5,to:7,unit:"C"}];
+    const atCentre=()=>crossValidate(p).boreholes.find(b=>b.id===held.id)!;
+    expect(atCentre().contacts.filter(c=>c.k===1).map(c=>c.logged)).toEqual([held.z-2]);
+    held.intervals[2].from=3.5;
+    expect(atCentre().omittedTops).toContainEqual({unit:"B",reason:"reference"});
+    held.intervals[2].unit="lower B";
+    held.intervals[2].from=3;
+    p.units=[units[0],units[1],{...units[1],id:"lower B",materialId:"B"},units[2]];
+    for(const b of p.boreholes)if(b!==held){
+      const upper=b.intervals[1],base=upper.to;upper.to=(upper.from+base)/2;
+      b.intervals.splice(2,0,{from:upper.to,to:base,unit:"lower B"});
+    }
+    expect(atCentre().contacts.map(c=>c.k)).toEqual([0,1,2,3]);
+  });
+
+  it("records training-only gaps separately from measured targets and ignores rejected source collars",()=>{
+    const p=grid(),held=p.boreholes[4];
+    for(const b of p.boreholes)if(b!==held)b.intervals[1].from+=0.5;
+    p.boreholes.push({...p.boreholes[0],id:"ignored",intervals:held.intervals});
+    const mid=crossValidate(p).boreholes.find(b=>b.id===held.id)!;
+    expect(mid.omittedTops).toContainEqual({unit:"B",reason:"training"});
+    expect(mid.contacts.map(c=>c.k)).toEqual([0,2]);
+  });
+
+  it("does not count a contact for a bed that pinches out at the predicted location",()=>{
+    const p=grid();
+    for(const b of p.boreholes){
+      b.intervals=b.id==="H11"||b.id==="H22"
+        ?[{from:0,to:2,unit:"A"},{from:2,to:3,unit:"B"},{from:3,to:8,unit:"C"}]
+        :[{from:0,to:2,unit:"A"},{from:2,to:8,unit:"C"}];
+    }
+    const mid=crossValidate(p).boreholes.find(b=>b.id==="H11")!;
+    expect(mid.contacts.map(c=>c.k)).toEqual([0,2]);
+    expect(mid.omittedTops).toContainEqual({unit:"B",reason:"prediction"});
+    expect(mid.logged-mid.right).toBeCloseTo(1);
+  });
+
+  it("withholds depth-agreement totals for an overlapping log while scoring its surveyed ground",()=>{
+    const p=grid(),held=p.boreholes[4];
+    for(const b of p.boreholes)b.intervals=[{from:0,to:2,unit:"A"},{from:2,to:4,unit:"B"},{from:4,to:7,unit:"C"}];
+    held.intervals[0].to=3;
+    const v=crossValidate(p),mid=v.boreholes.find(b=>b.id===held.id)!;
+    expect([mid.logged,mid.right,mid.materialRight]).toEqual([0,0,0]);
+    expect(mid.depthScoreUnavailable).toBe(true);
+    expect(mid.contacts.map(c=>c.k)).toEqual([0]);
+    expect(v.boreholes.reduce((n,b)=>n+b.logged,0)).toBe(8*7);
+    expect(v.notes.some(s=>s.includes("H11")&&s.includes("excluded from the bed and material agreement totals"))).toBe(true);
+  });
+
+  it("counts a shared rounding sliver only once in exact bed and material depth totals",()=>{
+    const p=grid(),held=p.boreholes[4];
+    for(const b of p.boreholes)b.intervals=[{from:0,to:2,unit:"A"},{from:2,to:4,unit:"B"},{from:4,to:7,unit:"C"}];
+    held.intervals[1].from-=1e-9;
+    const v=crossValidate(p),mid=v.boreholes.find(b=>b.id===held.id)!;
+    expect(mid.depthScoreUnavailable).toBeUndefined();
+    expect(mid.logged).toBe(7);
+    expect(mid.right).toBeLessThanOrEqual(mid.logged);
+    expect(mid.materialRight).toBeLessThanOrEqual(mid.logged);
+  });
+
+  it("counts source-material overlap across interpreted beds independently from bed identity",()=>{
+    const p=grid();
+    p.units=[{...units[0],materialId:"sand"},{...units[1],materialId:"sand"},units[2]];
+    for(const b of p.boreholes){
+      const boundary=b.id==="H11"?3:5;
+      b.intervals=[{from:0,to:boundary,unit:"A"},{from:boundary,to:8,unit:"B"},{from:8,to:10,unit:"C"}];
+    }
+    const v=crossValidate(p),mid=v.boreholes.find(b=>b.id==="H11")!;
+    expect([mid.logged,mid.materialRight,mid.right]).toEqual([10,10,8]);
+    expect(v.materialShare.inside).toBeCloseTo(1,9);
+    expect(v.share.inside).toBeLessThan(v.materialShare.inside);
   });
 
   it("names the units that only one borehole logs",()=>{

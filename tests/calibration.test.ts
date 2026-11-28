@@ -2,6 +2,7 @@ import {describe,it,expect} from "vitest";
 import {calibrateDisagreement,calibrationCsv,conformalExpansion} from "../src/calibration";
 import type {CalibrationOptions} from "../src/calibration";
 import type {DisagreementCase} from "../src/disagreement";
+import {buildDisagreement} from "../src/disagreement";
 import type {GeoProject} from "../src/schema";
 import {parseCsv} from "../src/io";
 
@@ -123,6 +124,35 @@ describe("group-separated contact calibration",()=>{
     expect(unavailable).toBe(1);expect(result.audit.all.nUnavailable).toBe(1);
     expect(result.audit.all.empiricalCoverage).toBe(result.audit.all.nCovered/result.audit.all.nTotal);
     expect(result.audit.interior.nTotal+result.audit.extrapolation.nTotal).toBe(result.audit.all.nTotal);
+  });
+
+  it("keeps unsupported training bed tops out of calibration, audit and the training-only map and path",()=>{
+    const repeated=project();
+    for(const b of repeated.boreholes)b.intervals=[{from:0,to:4,unit:"fill"},{from:4,to:7,unit:"sand"},
+      {from:7,to:8,unit:"fill"},{from:8,to:30,unit:"sand"}];
+    const censored=project();
+    for(const b of censored.boreholes)b.intervals=[{from:4,to:30,unit:"sand"}];
+    const pinched=project();pinched.base=16;
+    for(const alternative of [repeated,censored,pinched]){
+      const input=cases(project(),alternative),result=calibrateDisagreement(input,settings);
+      expect(result.finiteCalibration).toBe(0);expect(result.quantile).toBeUndefined();
+      expect(result.rows.every(row=>row.scoreUnbounded&&row.missingCaseIds.includes("alternative")&&row.covered===undefined)).toBe(true);
+      expect(result.audit.all).toMatchObject({nTotal:8,nScored:0,nUnavailable:8});
+      expect(result.report?.summary).toMatchObject({completeGridCount:0,completePathCount:0});
+      expect([...result.intervals.grid,...result.intervals.path].every(p=>p.baseMin===undefined&&p.lower===undefined)).toBe(true);
+      expect(buildDisagreement(input,settings).summary.completeGridCount).toBeGreaterThan(0);
+    }
+  });
+
+  it("applies a finite expansion only where the bed has positive local thickness",()=>{
+    const alternative=project();alternative.base=16;
+    for(const b of alternative.boreholes)setContact(alternative,b.id,b.x>=80?6:3);
+    const result=calibrateDisagreement(cases(project(),alternative),{...settings,gridSize:11,coverage:.5});
+    expect(result.quantile).toBeDefined();
+    const interior=result.intervals.grid.filter(point=>!point.extrapolated);
+    expect(interior.some(point=>point.complete&&point.lower!==undefined)).toBe(true);
+    expect(interior.some(point=>!point.complete&&point.baseMin===undefined&&point.lower===undefined)).toBe(true);
+    expect(result.rows.some(row=>row.missingCaseIds.includes("alternative")&&row.scoreUnbounded)).toBe(true);
   });
 
   it("does not infer validation truth from missing or ambiguous contact tops",()=>{

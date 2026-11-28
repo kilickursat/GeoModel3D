@@ -50,6 +50,16 @@ Open **Input data → Correlation review** to check the current draft against th
 
 If the same material occurs in distinct beds, select **Assign an interpreted bed**, enter a new bed ID and choose its position in the unit order. For example, a sand bed below a clay layer can have a different ID from the sand above it. The new bed inherits the source unit's properties. To correlate it across boreholes, choose **All logged intervals**, select the corresponding interval at the next hole, and choose the existing bed ID. The original material, description, depths and linked evidence remain available after the assignment.
 
+**Review several intervals in a worksheet.** Use a saved case JSON to generate a CSV on your computer. From a checkout of this release with dependencies installed, run the following command. The CSV includes one row per borehole interval, its original material, the current interpreted bed and the available source identifier. It leaves all engineering decisions blank.
+
+```sh
+npm run --silent bed-review-template -- site.geomodel3d.json > site-bed-review.csv
+```
+
+Fill `reviewed_bed`, `bed_rank` and `review_reason` together for each interval you have interpreted. Give two occurrences the same bed ID only when you have evidence for that correlation. `bed_rank` is the bed's 1-based position in the resulting project Units table, including unused definitions. For example, in a project ordered `Sand, Clay`, a new `Lower sand` can take rank 3 while retaining `Sand` as its original material. Other beds keep their relative order. To defer an interval, leave its three decision fields blank. Keep the source columns intact. A PDF hash lets a review identify the same original through a fresh import. An evidence ID alone ties it to the saved case that supplied it.
+
+Open the source case or its active draft, then import the completed worksheet as a single CSV using the usual file picker. Review the resulting intervals and choose **Build model** in the input workspace. A conflicting rank, stale source or ambiguous interval stops the whole worksheet. An identical replay keeps the existing decisions. Save the case or workspace to retain the interpretations. When testing a withheld borehole, prepare the worksheet and freeze the unit order on the training logs alone. [Source-only five-hole example](../bench/results/tochigi-119010496/blind/training-bed-assignments.csv)
+
 If a difference represents a deliberate engineering interpretation, enter a **Reason for acceptance** and select **Accept interval differences**. The review records the reason for the modelled subranges shown. Changing their geometry or the source interval requires another review. A gap in model coverage remains open. **Save case (JSON)** preserves decisions for this project, and **Save workspace** preserves them with their scenarios and revisions.
 
 ## Scenarios and comparisons

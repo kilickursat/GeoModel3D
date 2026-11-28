@@ -1,7 +1,7 @@
 // Split conformal calibration of a fixed training-only interpretation envelope. Calibration and audit locations
 // never enter any fitted interpretation. Missing calibration predictions retain an unbounded score.
 import type {Borehole,GeoProject} from "./schema";
-import {buildDisagreement,prepareDisagreementModels,sampleDisagreement} from "./disagreement";
+import {buildPreparedDisagreement,prepareDisagreementModels,sampleDisagreement} from "./disagreement";
 import type {DisagreementCase,DisagreementOptions,DisagreementReport,PreparedDisagreementCase} from "./disagreement";
 import {groupRadius,location,locationGroups,observedTop,withinTrainingHull} from "./disagreementValidation";
 import {compatibleCrs} from "./comparison";
@@ -120,6 +120,7 @@ export function calibrateDisagreement(cases:DisagreementCase[],options:Calibrati
     `Whole physical groups are split before fitting. Logs within ${radius} m of each other in plan (chaining), rounded 1 mm positions and matching borehole/CPT IDs link observations across every selected interpretation, including moved collars.`+" One observed reference top per group is selected by stable ID order. The seeded shuffle uses no elevations or residuals. Renamed and relocated observations without a shared identity or position cannot be linked automatically.",
     "All calibration and audit groups, including their linked records, are removed from every fitted interpretation together. Audit observations never set the expansion. Groundwater-dependent automatic CPT interpretations and terrain collar corrections are recomputed from remaining inputs; unit rules, definitions and the external terrain remain fixed assumptions.",
     "The map, path, calibration predictions and audit predictions use the same fixed, fully built training-only models. These are different models from the full-data disagreement map. The fitted models are not extended to reach removed locations. Missing calibration predictions retain unbounded scores rather than disappearing from n.",
+    "Each training interpretation must include a directly observed top for the selected bed and no unresolved repeated or out-of-order run of that bed. The bed must have positive modelled thickness at the sampled location.",
     "The nominal coverage property is marginal for a future exchangeable physical group, conditional on fixed training and interpretation assumptions. Spatially dependent or adaptively investigated geology need not be exchangeable. No site-specific, simultaneous path, or unconditional spatial coverage guarantee is asserted. Repeated seed, case or coverage selection after inspecting results can invalidate the interpretation.",
     "Calibration targets are directly observed, unambiguous tops of this unit. Coverage does not address unit absence, unlogged contacts, uncertain unit definitions, terrain derived from withheld observations, or information already embedded in chosen interpretations.",
     "Audit coverage uses all audit groups in its denominator when a finite expansion exists; unavailable audit intervals are not counted as demonstrated coverage. Coverage among finite audit intervals is reported separately. Interior and extrapolated counts are descriptive strata, not separately calibrated guarantees.",
@@ -127,14 +128,14 @@ export function calibrateDisagreement(cases:DisagreementCase[],options:Calibrati
   let models:PreparedDisagreementCase[]|undefined,report:DisagreementReport|undefined,fitFailure:string|undefined,reportUnavailableReason:string|undefined;
   if(trainingCount<1)fitFailure="There are no observed reference groups in the training partition.";
   else try{models=prepareDisagreementModels(trainingCases)}catch(error){fitFailure=`The training-only models could not build: ${message(error)}`}
-  if(models)try{report=buildDisagreement(trainingCases,options)}catch(error){reportUnavailableReason=`The training-only map or path is unavailable: ${message(error)}`;notes.push(reportUnavailableReason)}
+  if(models)try{report=buildPreparedDisagreement(models,options,"logged")}catch(error){reportUnavailableReason=`The training-only map or path is unavailable: ${message(error)}`;notes.push(reportUnavailableReason)}
   const rows:CalibrationRow[]=groups.filter(group=>group.role!=="training").map(group=>{
     const target=representatives.get(group.id)!,row:CalibrationRow={groupId:group.id,id:group.referenceId,role:group.role as "calibration"|"audit",x:group.x,y:group.y,logged:target.logged,
       predictions:[],missingCaseIds:cases.map(c=>c.id),scoreUnbounded:true,extrapolated:true};
     if(!models){row.unavailableReason=fitFailure??"No training models are available.";return row}
-    const sample=sampleDisagreement(models,group.x,group.y,options.unitId);
+    const sample=sampleDisagreement(models,group.x,group.y,options.unitId,"logged");
     row.predictions=sample.values;row.missingCaseIds=sample.missingCaseIds;row.extrapolated=models.some(c=>!withinTrainingHull(c.model,group));
-    if(!sample.complete||!finite(sample.min)||!finite(sample.max)){row.unavailableReason="At least one training interpretation lacks a finite contact prediction at this removed location.";return row}
+    if(!sample.complete||!finite(sample.min)||!finite(sample.max)){row.unavailableReason="At least one training interpretation lacks a supported bed top at this removed location.";return row}
     const score=Math.max(sample.min-target.logged,target.logged-sample.max,0);
     if(!finite(score)){row.unavailableReason="The contact residual is not finite.";return row}
     row.min=sample.min;row.max=sample.max;row.score=score;row.scoreUnbounded=false;return row;
@@ -156,7 +157,7 @@ export function calibrateDisagreement(cases:DisagreementCase[],options:Calibrati
     return {x:point.x,y:point.y,...("distance" in point?{distance:point.distance as number}:{}),complete:!!bounds,
       extrapolated:models?.some(c=>!withinTrainingHull(c.model,point))??true,
       ...(point.min===undefined?{}:{baseMin:point.min}),...(point.max===undefined?{}:{baseMax:point.max}),
-      ...(bounds??{unavailableReason:unavailableReason??"At least one training interpretation lacks a finite prediction here."})};
+      ...(bounds??{unavailableReason:unavailableReason??"At least one training interpretation lacks a supported bed top here."})};
   });
   const audit=rows.filter(row=>row.role==="audit");
   if(fitFailure)notes.push(fitFailure);

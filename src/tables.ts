@@ -1,4 +1,5 @@
 import {parseCorrelationAcceptances,type CorrelationAcceptance} from "./correlationDecisions";
+import {parseBedAssignments,type BedAssignment} from "./bedAssignments";
 // The data editor's tables: a project as rows of text a person can type or paste, and back. A project is rebuilt from
 // the tables through the CSV importer, so data typed in are checked exactly as imported files are.
 import {GeoProject,UnitRule,Borehole,boreholeDepth} from "./schema";
@@ -43,6 +44,7 @@ export interface EditorTables {
   // Design properties without their own editor column, including those inherited by a new bed.
   extraUnitParams?:Record<string,Record<string,number>>;
   correlationAcceptances?:CorrelationAcceptance[];
+  bedAssignments?:BedAssignment[];
   evidence?:EvidenceCollection;
   corePhotos?:CoreCollection;
   // Entries move with their rows when the editor inserts, removes or reorders rows. null is an unsourced row.
@@ -84,6 +86,7 @@ export function tablesFromProject(p:GeoProject):EditorTables{
     ...(Object.keys(extras).length?{extraUnitParams:extras}:{}),
     ...(p.groundwater?{groundwaterDraft:{mode:p.groundwater.mode,depth:p.groundwater.mode==="assumed-depth"?String(p.groundwater.depth):"",
       date:p.groundwater.mode==="as-of"?p.groundwater.date:"",includeUndated:p.groundwater.mode==="as-of"&&!!p.groundwater.includeUndated}}:{}),
+    ...(p.bedAssignments?{bedAssignments:structuredClone(p.bedAssignments)}:{}),
     ...(p.correlationAcceptances?{correlationAcceptances:structuredClone(p.correlationAcceptances)}:{}),
     ...(p.evidence?{evidence:structuredClone(p.evidence)}:{}),
     ...(p.corePhotos?{corePhotos:structuredClone(p.corePhotos)}:{}),
@@ -171,6 +174,8 @@ function projectFromEditorTables(t:EditorTables,base:GeoProject|undefined,forCor
   if(evidence)result.project.evidence=structuredClone(evidence);
   result.warnings.push(...notes);
   const p=result.project,f=t.project,num=(s:string)=>s.trim()===""?undefined:Number(s.replace(",","."));
+  const assignments=t.bedAssignments??base?.bedAssignments;
+  if(assignments)p.bedAssignments=parseBedAssignments(assignments);
   const acceptances=t.correlationAcceptances??base?.correlationAcceptances;
   if(acceptances)p.correlationAcceptances=parseCorrelationAcceptances(acceptances);
   p.name=f.name.trim()||"Untitled project";
