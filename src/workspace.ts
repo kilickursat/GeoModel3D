@@ -1,4 +1,5 @@
 import {parseCorrelationAcceptances} from "./correlationDecisions";
+import {parseBedAssignments} from "./bedAssignments";
 // A saved editing draft and immutable build checkpoints. Projects remain compatible with the existing project
 // JSON format; workspace files add history without changing that format or making the model depend on the editor.
 import pkg from "../package.json";
@@ -279,6 +280,7 @@ function parseTables(value:unknown,image:ImageResolver,path="draft.tables"):Edit
     const field=`${path}.extraUnitParams.${id}`;
     for(const [key,value] of Object.entries(record(values,field)))number(value,`${field}.${key}`);
   }
+  if(t.bedAssignments!==undefined)parsed.bedAssignments=parseBedAssignments(t.bedAssignments);
   if(t.correlationAcceptances!==undefined)parsed.correlationAcceptances=parseCorrelationAcceptances(t.correlationAcceptances);
   for(const row of parsed.rows.units)if(row.length===COLUMNS.units.length-1)row.push("");
   if(t.evidence!==undefined)parsed.evidence=evidenceCollection(t.evidence,`${path}.evidence`,image);
@@ -327,6 +329,7 @@ function parseProject(value:unknown,path:string,image:ImageResolver):GeoProject{
   delete p.format;delete p.version;
   text(p.name,`${path}.name`,true);optionalStrings(p,["description","source","crs","crsCode","crsProj4"],path);
   optionalNumbers(p,["base","groundwaterDepth","margin"],path);optionalBoolean(p,"cptLayers",path);
+  if(p.bedAssignments!==undefined)p.bedAssignments=parseBedAssignments(p.bedAssignments);
   if(p.correlationAcceptances!==undefined)p.correlationAcceptances=parseCorrelationAcceptances(p.correlationAcceptances);
   if(p.groundwater!==undefined)try{p.groundwater=parseGroundwater(p.groundwater)}catch(error){invalid(`${path}.groundwater`,(error as Error).message)}
   if(p.evidence!==undefined)p.evidence=evidenceCollection(p.evidence,`${path}.evidence`,image);

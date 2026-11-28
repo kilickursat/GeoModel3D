@@ -1,8 +1,92 @@
 import {test,expect} from "@playwright/test";
 import type {GeoProject} from "../../src/schema";
+import {evidenceProject} from "./fixtures/evidence-project";
 import {build,downloadJson,expectComplete,importFixture,importJson,openInput,prepare,rename,resume,saved} from "./helpers";
 
 test.beforeEach(async({page})=>{await prepare(page);await page.goto("/?backend=webgl#input")});
+
+const reviewFile=(...rows:string[])=>({
+  name:"interpretation.csv",mimeType:"text/csv",
+  buffer:Buffer.from(["hole_id,from,to,material_id,expected_bed,source_sha256,evidence_id,reviewed_bed,bed_rank,review_reason",...rows].join("\n"))
+});
+
+test("bed review import preserves live edits, source evidence and revision history on apply, replay and refusal",async({page})=>{
+  await openInput(page);
+  await importJson(page,await evidenceProject(page),"investigation.json");
+  await expect(page.locator(".ws-status")).toContainText("Imported investigation.json");
+  await build(page);
+  await rename(page,"Unbuilt interpretation");
+  await page.locator('[data-step="tests"]').click();
+  await page.locator('input[data-r="0"][data-c="4"]').fill("lab result pending");
+  const before=await downloadJson(page);
+  const row="BH-01,0,2,fill,fill,,layer-fill-bh1,Upper fill,1,Continuous shallow horizon";
+  const upload=page.locator(".file");
+  await upload.setInputFiles(reviewFile(row));
+  await expect(page.locator(".ws-status")).toContainText("Applied the reviewed bed assignments");
+  const after=await downloadJson(page),tables=after.draft.tables;
+  expect(after.id).toBe(before.id);
+  expect(after.activeScenarioId).toBe(before.activeScenarioId);
+  expect(after.revisions).toEqual(before.revisions);
+  expect(after.draft.base).toEqual(before.draft.base);
+  expect(tables.project.name).toBe("Unbuilt interpretation");
+  expect(tables.rows.tests[0][4]).toBe("lab result pending");
+  expect(tables.rows.logs[0]).toEqual(["BH-01","0","2","Upper fill","Made ground"]);
+  expect(tables.rows.logs.slice(1)).toEqual(before.draft.tables.rows.logs.slice(1));
+  expect(tables.rows.units.map(r=>r[0])).toEqual(["Upper fill","fill","sand"]);
+  expect(tables.extraUnitParams?.["Upper fill"]?.customStiffness).toBe(42);
+  expect(tables.bedAssignments).toHaveLength(1);
+  expect(tables.evidence?.sources).toEqual(before.draft.tables.evidence?.sources);
+  const original=before.draft.tables.evidence!.records.find(r=>r.id==="layer-fill-bh1")!.fields.unit;
+  const unit=tables.evidence!.records.find(r=>r.id==="layer-fill-bh1")!.fields.unit;
+  expect(unit).toMatchObject({original:"fill",current:"Upper fill",boxes:original.boxes});
+  expect(unit.events).toHaveLength(1);
+
+  await upload.setInputFiles(reviewFile(row));
+  await expect(page.locator(".ws-status")).toContainText("already in the draft");
+  await upload.setInputFiles(reviewFile("BH-01,0,2,fill,fill,,layer-fill-bh1,,,"));
+  await expect(page.locator(".ws-status")).toContainText("no bed assignments");
+  // The second row has a stale depth. Neither decision may reach the draft.
+  await upload.setInputFiles(reviewFile("BH-02,0,3,fill,fill,,,Upper fill,1,Same horizon","BH-03,0,2,fill,fill,,,Upper fill,1,Same horizon"));
+  await expect(page.locator(".ws-status")).toContainText("Missing or ambiguous logged interval");
+  await upload.setInputFiles([reviewFile(row),{name:"other.pdf",mimeType:"application/pdf",buffer:Buffer.from("%PDF-1.7")}]);
+  await expect(page.locator(".ws-status")).toContainText("Import one bed review worksheet");
+  await expect(page.locator("dialog:modal")).toHaveCount(0);
+  await resume(page);
+  const reopened=await downloadJson(page);
+  expect(reopened.draft).toEqual(after.draft);
+  expect(reopened.revisions).toEqual(before.revisions);
+});
+
+test("bed review from the displayed model stages against the matching live scenario and refuses a different one",async({page})=>{
+  await importFixture(page);
+  await build(page);
+  const review=reviewFile("BH-01,0,2,fill,fill,,,Upper fill,1,Continuous shallow horizon");
+  await rename(page,"Unbuilt field edits");
+  const before=await downloadJson(page);
+  const modelTab=page.getByRole("tab",{name:"3-D model",exact:true});
+  await modelTab.click();
+  await page.locator(".file").setInputFiles(review);
+  await expect(page.locator(".ws-status")).toBeVisible();
+  const staged=await downloadJson(page);
+  expect(staged.draft.tables.project.name).toBe("Unbuilt field edits");
+  expect(staged.draft.tables.rows.logs[0][3]).toBe("Upper fill");
+  expect(staged.revisions).toEqual(before.revisions);
+
+  await page.locator('[data-step="scenarios"]').click();
+  await page.locator(".ws-scenario-name").fill("Alternative");
+  await page.locator(".ws-scenario-create").click();
+  await saved(page);
+  const alternative=await downloadJson(page);
+  expect(alternative.activeScenarioId).not.toBe(before.activeScenarioId);
+  await modelTab.click();
+  await page.locator(".file").setInputFiles(review);
+  await expect(page.locator(".notice-body")).toContainText("different active scenario");
+  await openInput(page);
+  const unchanged=await downloadJson(page);
+  expect(unchanged.draft).toEqual(alternative.draft);
+  expect(unchanged.revisions).toEqual(alternative.revisions);
+  expect(unchanged.scenarios).toEqual(alternative.scenarios);
+});
 
 test("reload preserves the full project and the latest draft edit",async({page})=>{
   await importFixture(page);

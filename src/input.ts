@@ -4,6 +4,8 @@
 // the log of one borehole with the stresses down it, and what the importer and the model report. The tables become CSV
 // and go through the importer, so typed data are checked exactly as imported files are.
 import {GeoProject} from "./schema";
+import type {BedAssignment} from "./bedAssignments";
+import {applyBedReviewToDraft} from "./bedAssignmentTables";
 import {createCorrelationReview, type CorrelationReviewSelection} from "./correlationReview";
 import {loggedIntervalsTable} from "./report";
 import {WorkspaceDocument,createWorkspace,updateDraft,checkpoint,restoreRevision,toWorkspaceJson,createScenario,switchScenario,renameScenario} from "./workspace";
@@ -83,6 +85,8 @@ export interface InputWorkspace {
   element:HTMLElement; show():void; edit(project:GeoProject,message:string,notes?:string[]):void;
   open(tables:EditorTables,message:string,notes?:string[]):boolean;
   openWorkspace(document:WorkspaceDocument,message:string):void; status(message:string):void;
+  draftContext():Pick<InputModelContext,"workspaceId"|"scenarioId">|undefined;
+  applyBedReview(decisions:BedAssignment[],expected:Pick<InputModelContext,"workspaceId"|"scenarioId">|undefined):boolean;
 }
 
 export function createInputWorkspace(o:InputOptions):InputWorkspace{
@@ -656,6 +660,19 @@ ${lines}<g font-size="9.5" fill="#d9edf5">${labels}</g>
 
   return {
     element:el,
+    draftContext(){return workspaceDocument?{workspaceId:workspaceDocument.id,scenarioId:workspaceDocument.activeScenarioId}:undefined},
+    applyBedReview(decisions,expected){
+      if(!t||!workspaceDocument)throw new Error("Open the project in Input data before importing its bed review.");
+      if(!expected||workspaceDocument.id!==expected.workspaceId||workspaceDocument.activeScenarioId!==expected.scenarioId)
+        throw new Error("The bed review belongs to a different active scenario. Open its draft in Input data before applying it.");
+      const next=applyBedReviewToDraft(t,base,decisions);
+      if(next===t){
+        message=decisions.length?"These bed assignments are already in the draft.":"The worksheet contains no bed assignments.";
+        status.textContent=message;status.title=message;return false;
+      }
+      t=next;message="Applied the reviewed bed assignments to this scenario. Build model to record a revision.";
+      render();refresh(true);return true;
+    },
     show(){if(!t&&step!=="start")step="start";render();refresh(true)},
     edit(project,text,notes){begin(tablesFromProject(project),project,"boreholes",text,notes)},
     open(tables,text,notes){return begin(tables,undefined,"boreholes",text,notes)},

@@ -1,3 +1,7 @@
+import {parseCsv,toCsv} from "./csv";
+export {parseCsv,toCsv} from "./csv";
+import {isBedReviewCsv,readBedReviewCsv} from "./bedReviewCsv";
+import {applyBedAssignments,parseBedAssignments} from "./bedAssignments";
 import {parseCorrelationAcceptances} from "./correlationDecisions";
 import proj4 from "proj4";
 import {Borehole,GeoProject,Interval,UnitDef,UnitRule,SptTest,WaterLevel,TestResult,Alignment,AlignmentPoint,DesignLevel,Cpt,boreholeDepth,sptN,cptDepth} from "./schema";
@@ -35,40 +39,6 @@ export function decodeText(bytes:Uint8Array):string{
 
 // ---------- CSV ----------
 
-export function parseCsv(text:string,delimiter?:string):string[][]{
-  text=text.replace(/^﻿/,"");
-  const d=delimiter??sniffDelimiter(text);
-  const rows:string[][]=[];
-  let row:string[]=[],field="",quoted=false;
-  for(let i=0;i<text.length;i++){
-    const ch=text[i];
-    if(quoted){
-      if(ch==='"'&&text[i+1]==='"'){field+='"';i++}
-      else if(ch==='"')quoted=false;
-      else field+=ch;
-    }else if(ch==='"')quoted=true;
-    else if(ch===d){row.push(field);field=""}
-    else if(ch==="\n"||ch==="\r"){
-      if(ch==="\r"&&text[i+1]==="\n")i++;
-      row.push(field);field="";
-      if(row.some(f=>f.trim()!==""))rows.push(row);
-      row=[];
-    }else field+=ch;
-  }
-  row.push(field);
-  if(row.some(f=>f.trim()!==""))rows.push(row);
-  return rows;
-}
-function sniffDelimiter(text:string){
-  const line=text.split(/\r?\n/).find(l=>l.trim())??"";
-  const count=(c:string)=>line.split('"').filter((_,i)=>i%2===0).join("").split(c).length-1;
-  return [",",";","\t"].reduce((best,c)=>count(c)>count(best)?c:best,",");
-}
-function csvField(v:string|number|undefined){
-  const s=v===undefined||Number.isNaN(v)?"":String(v);
-  return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;
-}
-export function toCsv(rows:Array<Array<string|number|undefined>>){return rows.map(r=>r.map(csvField).join(",")).join("\n")+"\n"}
 
 // Header names are matched without case, punctuation or a unit in brackets: "Depth From (m)" is "depthfrom".
 const norm=(h:string)=>h.toLowerCase().replace(/\([^)]*\)|\[[^\]]*\]/g,"").replace(/[^a-z0-9]/g,"");
@@ -509,6 +479,7 @@ function readProjectJson(doc:any,file:string):ImportResult{
   if(doc.source)result.project.source=String(doc.source);
   if(Number.isFinite(doc.base))result.project.base=Number(doc.base);
   if(Number.isFinite(doc.groundwaterDepth))result.project.groundwaterDepth=Number(doc.groundwaterDepth);
+  if(doc.bedAssignments!==undefined)result.project.bedAssignments=parseBedAssignments(doc.bedAssignments);
   if(doc.correlationAcceptances!==undefined)result.project.correlationAcceptances=parseCorrelationAcceptances(doc.correlationAcceptances);
   if(doc.groundwater!==undefined)result.project.groundwater=parseGroundwater(doc.groundwater);
   if(Number.isFinite(doc.margin)&&doc.margin>0)result.project.margin=Number(doc.margin);
@@ -564,7 +535,7 @@ function readProjectJson(doc:any,file:string):ImportResult{
 export function toProjectJson(p:GeoProject){
   const doc={format:"geomodel3d-project",version:1,name:p.name,description:p.description,source:p.source,crs:p.crs,crsCode:p.crsCode,crsProj4:p.crsProj4,
     base:p.base,groundwaterDepth:p.groundwaterDepth,groundwater:p.groundwater,margin:p.margin,units:p.units,rules:p.rules,boreholes:p.boreholes,alignments:p.alignments,
-    cpts:p.cpts,cptLayers:p.cptLayers,cptRules:p.cptRules,terrain:p.terrain,evidence:p.evidence,corePhotos:p.corePhotos,correlationAcceptances:p.correlationAcceptances};
+    cpts:p.cpts,cptLayers:p.cptLayers,cptRules:p.cptRules,terrain:p.terrain,evidence:p.evidence,corePhotos:p.corePhotos,correlationAcceptances:p.correlationAcceptances,bedAssignments:p.bedAssignments};
   // Long lists of numbers (the terrain grid, CPT readings) take one line each, and so does each layer of a CPT.
   return JSON.stringify(doc,null,1).replace(/"(z|depth|qc|fs|u2|rf|qt)": \[[^\]{}"]*\]/g,m=>m.replace(/\s+/g,""))
     .replace(/\{\s*"from": [^{}\]]*?"name": "[^"]*"\s*\}/g,m=>m.replace(/\n\s*/g,""))+"\n";
@@ -1352,6 +1323,11 @@ function readAlignmentFiles(lineFiles:TextFile[],profiles:TextFile[],project:Geo
 // (positions given by latitude and longitude are placed in it).
 export function importFiles(files:TextFile[],current?:GeoProject,declared?:Crs):ImportResult{
   if(!files.length)throw new Error("No files to import");
+  if(files.some(f=>isBedReviewCsv(f.text))){
+    if(files.length!==1)throw new Error("Import the bed review worksheet on its own after opening its project.");
+    if(!current)throw new Error("Open the source project before importing its bed review worksheet.");
+    return {project:applyBedAssignments(current,readBedReviewCsv(files[0].text)),warnings:[]};
+  }
   const lineFiles=files.filter(f=>!isTerrainFile(f.name,f.text)&&(isLandXml(f.text)||isDxf(f)||isGeoJsonLines(f)||lineTableKind(f)==="line"));
   const profiles=files.filter(f=>!isTerrainFile(f.name,f.text)&&lineTableKind(f)==="profile");
   if(lineFiles.length||profiles.length){

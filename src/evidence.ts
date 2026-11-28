@@ -43,11 +43,11 @@ export function changeEvidenceField(record:EvidenceRecord,key:string,value:strin
   field.events.push({at:eventTime(field),action:"corrected",value,previous:field.current,...(reason===undefined?{}:{reason})});
   field.current=value;field.status="corrected";
 }
-export function acceptEvidenceField(record:EvidenceRecord,key:string):void{
+export function acceptEvidenceField(record:EvidenceRecord,key:string,reason?:string):void{
   fieldKey(key);
   const field=Object.hasOwn(record.fields,key)?record.fields[key]:undefined;
   if(!field)throw new Error("That field has no evidence to accept.");
-  field.events.push({at:eventTime(field),action:"accepted",value:field.current});
+  field.events.push({at:eventTime(field),action:"accepted",value:field.current,...(reason===undefined?{}:{reason})});
   field.status="accepted";
 }
 

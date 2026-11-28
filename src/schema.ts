@@ -1,3 +1,4 @@
+import type {BedAssignment} from "./bedAssignments";
 import type {CorrelationAcceptance} from "./correlationDecisions";
 // The project schema: units, boreholes and their logs, tests and water levels, and the project itself. It holds no
 // data, so the modelling kernel (and a worker running it) can use it without the bundled datasets in src/geology.ts.
@@ -62,6 +63,8 @@ export interface GeoProject {
   units:UnitDef[]; rules?:UnitRule[]; boreholes:Borehole[]; terrain?:TerrainGrid; alignments?:Alignment[]; cpts?:Cpt[];
   cptLayers?:boolean; cptRules?:UnitRule[];
   correlationAcceptances?:CorrelationAcceptance[];
+  /** Interval-specific engineering decisions; retain their recorded source and order for review. */
+  bedAssignments?:BedAssignment[];
   evidence?:EvidenceCollection;
   // Registered core photographs and reviewed photo-derived observations. These are separate from measured tests.
   corePhotos?:CoreCollection;

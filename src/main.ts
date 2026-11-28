@@ -6,6 +6,8 @@ import {CSS2DRenderer,CSS2DObject} from "three/addons/renderers/CSS2DRenderer.js
 import pkg from "../package.json";
 import {GeoProject,UnitDef,UnitRule,Alignment,Cpt,sampleProjects,realSites,boreholeDepth,cptDepth} from "./geology";
 import {buildGeologicalModel,GeoModel,unitVolume,unitCubicMetres,modelBounds,footprintArea,sampleModel} from "./model";
+import {applyBedAssignments} from "./bedAssignments";
+import {isBedReviewCsv,readBedReviewCsv} from "./bedReviewCsv";
 import {readCollarReview,collarReviewLabel} from "./correlationSummary";
 import {volumeGeometry} from "./volume";
 import {terrainOutside,convexHull,TerrainGrid} from "./terrain";
@@ -1549,10 +1551,30 @@ function loadProject(p:GeoProject,importWarnings:string[]=[],keepView:boolean|"i
 
 async function importFileList(list:FileList|File[]){
   const pdfs=[...list].filter(isDocument),others=[...list].filter(f=>!isDocument(f));
-  if(pdfs.length)void readPdfs(pdfs);
-  if(!others.length)return;
+  if(!others.length){if(pdfs.length)void readPdfs(pdfs);return}
+  const mode=document.body.dataset.mode,shown=project,context=mode==="input"?workspace.draftContext():workspaceContext;
   try{
     const files=await Promise.all(others.map(async f=>({name:f.name,text:decodeText(new Uint8Array(await f.arrayBuffer()))})));
+    const review=files.find(f=>isBedReviewCsv(f.text));
+    if(review){
+      if(files.length!==1||pdfs.length)throw new Error("Import one bed review worksheet at a time, after opening its project.");
+      if(mode!==document.body.dataset.mode||mode!=="input"&&shown!==project)
+        throw new Error("The selected project changed while the bed review was being read. Import it again for the intended case.");
+      const decisions=readBedReviewCsv(review.text);
+      if(mode==="input"||context){
+        const changed=workspace.applyBedReview(decisions,context);
+        if(mode!=="input"){
+          if(changed)setMode("input");
+          else showNotice("Bed review",[decisions.length?"These bed assignments are already in the draft.":"The worksheet contains no bed assignments."]);
+        }
+      }else{
+        const next=applyBedAssignments(project,decisions);
+        if(next!==project)loadProject(next,["Applied the reviewed bed assignments."],true,null);
+        else showNotice("Bed review",[decisions.length?"These bed assignments are already in the project.":"The worksheet contains no bed assignments."]);
+      }
+      return;
+    }
+    if(pdfs.length)void readPdfs(pdfs);
     const documents=files.map(f=>{
       try{return JSON.parse(f.text)}catch{return null}
     }).filter(d=>d?.format==="geomodel3d-workspace");
