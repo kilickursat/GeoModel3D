@@ -181,6 +181,14 @@ Choose **Other devices (exploratory)** for optional mobile or other-device tests
 
 The borehole logs in a PDF report, or in an image of a log, can become the boreholes of your case. GeoModel3D reads them in the browser and shows each value beside the page it was read from, and you check them before they are used. Drop the PDF or image (PNG, JPEG or WebP) on the page, choose it with **Import…**, or use **Read logs from PDFs…** at the start of the **Input data** tab. Several documents can be read at once.
 
+**Choose pages to read.** For mixed reports, the reader first indexes the PDF's native text on your device. Preview a page or change its checkbox before detailed extraction and OCR. **Select log and location pages** narrows the selection. Check the count of excluded scans and preview any you need. A scanned appendix can contain the only copy of a log.
+
+**Local Qwen page suggestions** can look for measured layers, completed borehole locations, or both. The initial search covers likely evidence pages. You can also search your checked pages or all indexed text. Qwen evaluates a short source passage for each question. Open the passage and the original page to check the context before including a suggestion. You can stop mid-search and keep the completed suggestions. Pages without readable text still need a preview or OCR.
+
+Starting Qwen for the first time downloads approximately 620 MiB of text weights from Hugging Face. The browser can cache the download. The worker uses hardware WebGPU when available or the CPU using WebAssembly. CPU analysis can take minutes even on a short selection.
+
+**Collar schedule.** A matching printed borehole ID can link a log to a location table elsewhere in the same PDF. Review the row, reference system and original page before using its fields. For conflicting rows or coordinate systems, choose a supported position explicitly or keep the current fields. Combining projected positions from unrelated local grids requires a verified common grid. The workspace retains the compared source evidence and your decision. A printed drilled length can be reviewed separately. Ellipsoidal heights require a verified vertical reference before using them as ground elevations.
+
 The model uses metres. When the reader recognizes a depth heading in feet, the review lists the affected borehole and its sheets under **Pages not read**. Convert the depths and elevations to metres before entering the borehole in **Input data**. Check the source units when a depth heading is missing or illegible. An SPT column labelled `blows/ft` gives the drive length and can occur on a metric depth scale.
 
 **The agreement.** The first time, GeoModel3D asks you to agree to reading documents. A document is read on your device and is not uploaded or sent anywhere. Reading is automatic and can be wrong, so you check every value before you use it. Scanned pages and images need a text-reading model, which is downloaded the first time (see below). If you disagree, the document is not read and everything else works as before. Your answer is kept in this browser: **Help (?)** says when you agreed, and **Withdraw** takes it back, so that you are asked again.
@@ -222,7 +230,7 @@ Edit any value or description, add a layer below another with **+**, delete one 
 - each layer's unit comes from the grouping of soil and rock names by principal material (Japanese names by their own grouping). The **Units** table lists them in their order down the logs, ready for unit weights and design values;
 - positions given as eastings and northings are in a coordinate system the document does not name: give it under **Project**, or the model stays on a local grid. Latitudes and longitudes are converted as for imported files.
 
-**Your documents stay with you.** A PDF or image is read in this browser and is not uploaded. The reader, the reading model and the files they need (fonts, character maps, image decoders) come from GeoModel3D's own site, and only after you agree. The offline file does not read documents: open the app at [kilickursat.github.io/GeoModel3D](https://kilickursat.github.io/GeoModel3D/) to read them.
+**Your documents stay with you.** PDFs, images and their excerpts are processed in the browser. The hosted app serves the PDF reader, OCR model, fonts, character maps and image decoders. Qwen's optional weights come from its pinned Hugging Face revision when you request page suggestions. Document reading is available in the hosted app. [Open GeoModel3D](https://kilickursat.github.io/GeoModel3D/)
 
 ## Inspecting source evidence
 

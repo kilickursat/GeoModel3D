@@ -3,11 +3,13 @@
 // and becomes the Input data tables, where it is checked again as typed data. Nothing is fixed silently: problems are
 // reported, and the engineer decides.
 import type {ReadLog,TextLine,HeaderField,CoreSheet} from "./reconstruct";
+import type {CollarScheduleMatch,CollarScheduleRow} from "./collarSchedule";
+import {acceptedGridRow,hasPendingSchedule,positionBasis,sourceBoxes,type DraftSchedule} from "./reviewSchedule";
 import {applyUnitRules,lithologyRules,japaneseLithologyRules} from "../rules";
 import {inferUnitOrder} from "../io";
 import {COLUMNS,EditorTables,emptyTables} from "../tables";
 import type {Borehole} from "../schema";
-import {newEvidenceId,changeEvidenceField,EvidenceCollection,EvidenceRecord,EvidenceSource,EvidenceField,EvidenceBox} from "../evidence";
+import {newEvidenceId,changeEvidenceField,EvidenceCollection,EvidenceRecord,EvidenceSource,EvidenceField} from "../evidence";
 
 export type Field=HeaderField;
 export const FIELDS:Array<{key:Field;label:string;numeric:boolean}>=[
@@ -25,9 +27,10 @@ export interface DraftLayer { from:string; to:string; unit:string; description:s
 // `spt`: its Standard Penetration Tests, as the SPT table of Input data takes them: depth (m), blows and penetration (mm).
 export interface DraftSpt { depth:string; blows:string; penetration:string; src:TextLine[] }
 export interface DraftHole {
-  use:boolean; doc:number; file:string; pages:number[]; kind:"scale"|"table"; ocr:boolean; ocrWhy?:string; samples?:boolean;
+  use:boolean; doc:number; file:string; pages:number[]; kind:"scale"|"table"; ocr:boolean; ocrWhy?:string; samples?:boolean; rangeLabels?:boolean;
   core?:CoreSheet&{pages:number[]};
   values:Record<Field,string>; flags:Partial<Record<Field,string>>; src:Partial<Record<Field,TextLine>>;
+  schedule?:DraftSchedule;
   layers:DraftLayer[]; evidence?:EvidenceRecord; waterEvidence?:EvidenceRecord; ocrPages?:number[]; spt?:DraftSpt[];
 }
 
@@ -60,15 +63,15 @@ export function unitFor(description:string,soilName?:string){
 
 // The logs of one document as drafts. A log whose ID was not read is named after its first page, and flagged.
 // `scanned` lists the pages read by the reading model, and `why` why each was.
-export function draftHoles(doc:number,file:string,logs:ReadLog[],scanned:ReadonlySet<number>=new Set(),why:ReadonlyMap<number,string>=new Map()):DraftHole[]{
-  return logs.map(log=>{
+export function draftHoles(doc:number,file:string,logs:ReadLog[],scanned:ReadonlySet<number>=new Set(),why:ReadonlyMap<number,string>=new Map(),matches:readonly CollarScheduleMatch[]=[]):DraftHole[]{
+  return logs.map((log,i)=>{
     const reasons=[...new Set(log.pages.filter(p=>scanned.has(p)).map(p=>why.get(p)).filter((w):w is string=>!!w))];
     const flags:Partial<Record<Field,string>>={};
     if(!log.src?.id)flags.id="no borehole ID read: type its name";
     if(log.groundFlag)flags.ground=log.groundFlag;
     if(log.waterFlag)flags.water=log.waterFlag;
     if(log.xyFlag){flags.x=log.xyFlag;flags.y=log.xyFlag}
-    return {use:true,doc,file,pages:log.pages,kind:log.kind,...(log.samples?{samples:true}:{}),ocr:log.pages.some(p=>scanned.has(p)),
+    const hole:DraftHole={use:true,doc,file,pages:log.pages,kind:log.kind,...(log.samples?{samples:true}:{}),...(log.rangeLabels?{rangeLabels:true}:{}),ocr:log.pages.some(p=>scanned.has(p)),
       ...(reasons.length?{ocrWhy:reasons.join("; ")}:{}),...(log.core?{core:log.core}:{}),ocrPages:[...scanned],
       values:{id:log.src?.id?log.id??"":`Page ${log.pages[0]}`,x:text(log.x),y:text(log.y),lat:text(log.lat),lon:text(log.lon),
         ground:text(log.ground),final:text(log.final),water:text(log.water)},
@@ -77,6 +80,9 @@ export function draftHoles(doc:number,file:string,logs:ReadLog[],scanned:Readonl
         ...(l.flagged?{flag:l.why??"check this depth against the page"}:{}),...(l.gap?{gap:l.gap}:{}),autoUnit:true,src:l.src})),
       // Penetration in mm, as the SPT table takes it; left empty where the log does not give it ("50+").
       ...(log.spt?.length?{spt:log.spt.map(t=>({depth:text(t.depth),blows:text(t.blows),penetration:t.penetration===undefined?"":text(Math.round(t.penetration*10)),src:t.src}))}:{})};
+    const match=matches[i];
+    if(match?.candidates.length)hole.schedule={match,sourceId:hole.values.id,originalBasis:positionBasis(hole)};
+    return hole;
   });
 }
 
@@ -85,17 +91,8 @@ export function draftHoles(doc:number,file:string,logs:ReadLog[],scanned:Readonl
 export const evidenceField=(field:Field)=>field==="ground"?"z":field==="final"?"depth":field;
 export type PageSize={width:number;height:number};
 export function captureDraftEvidence(holes:DraftHole[],sources:EvidenceSource[],size:(doc:number,page:number)=>PageSize|undefined){
-  const boxes=(h:DraftHole,read:TextLine[]):EvidenceBox[]=>read.flatMap(l=>{
-    // A line of a page read turned keeps its place on the page as shown.
-    const line={...l,...(l.shown??{})};
-    const page=line.page??h.pages[0],s=size(h.doc,page);
-    if(!s||!(s.width>0&&s.height>0)||![line.x0,line.y0,line.x1,line.y1].every(Number.isFinite))return [];
-    const clamp=(n:number)=>Math.max(0,Math.min(1,n));
-    const x0=clamp(line.x0/s.width),x1=clamp(line.x1/s.width),y0=clamp(line.y0/s.height),y1=clamp(line.y1/s.height);
-    return x1>x0&&y1>y0?[{page,x0,y0,x1,y1,text:line.text}]:[];
-  });
   const field=(h:DraftHole,value:string,lines:TextLine[],note?:string):EvidenceField=>({original:value,current:value,
-    boxes:boxes(h,lines),status:"unreviewed",events:[],...(note?{note}:{})});
+    boxes:sourceBoxes(lines,h.pages[0],page=>size(h.doc,page)),status:"unreviewed",events:[],...(note?{note}:{})});
   const record=(h:DraftHole,fields:Record<string,EvidenceField>,lines:TextLine[]):EvidenceRecord=>({id:newEvidenceId(),sourceId:sources[h.doc].id,
     method:lines.some(l=>h.ocrPages?.includes(l.page??h.pages[0]))?"ocr":"pdf-text",fields});
   for(const h of holes){
@@ -107,12 +104,13 @@ export function captureDraftEvidence(holes:DraftHole[],sources:EvidenceSource[],
     }
     if(!h.waterEvidence)h.waterEvidence=record(h,{boreholeId:field(h,h.values.id,h.src.id?[h.src.id]:[]),depth:field(h,h.values.water,h.src.water?[h.src.water]:[],h.flags.water),date:field(h,"",[],"No measurement date was read.")},h.src.water?[h.src.water]:[]);
     for(const layer of h.layers)if(layer.src.length&&!layer.evidence){
+      const boundaries=h.rangeLabels?layer.src.slice(0,1):layer.src,description=h.rangeLabels?layer.src.slice(1):layer.src;
       layer.evidence=record(h,{
         boreholeId:field(h,h.values.id,h.src.id?[h.src.id]:[]),
-        from:field(h,layer.from,layer.src,"Top depth reconstructed with this layer's log; compare it with the page."),
-        to:field(h,layer.to,layer.src,layer.flag),
-        unit:field(h,layer.unit,layer.src,"Assigned by unit rules from the logged description."),
-        description:field(h,layer.description,layer.src)
+        from:field(h,layer.from,boundaries,h.rangeLabels?undefined:"Top depth reconstructed with this layer's log; compare it with the page."),
+        to:field(h,layer.to,boundaries,layer.flag),
+        unit:field(h,layer.unit,description,"Assigned by unit rules from the logged description."),
+        description:field(h,layer.description,description)
       },layer.src);
     }
   }
@@ -123,11 +121,55 @@ export function captureDraftEvidence(holes:DraftHole[],sources:EvidenceSource[],
 // A check points at a value of a borehole: one of its fields, or one of its layers. Errors stop "Use these boreholes";
 // warnings are values to look at; notes are for information.
 export interface Check { hole:number; field?:Field; layer?:number; level:"error"|"warn"|"note"; text:string }
+
+function completePair(h:DraftHole,a:Field,b:Field){
+  return Number.isFinite(num(h.values[a]))&&Number.isFinite(num(h.values[b]));
+}
+
+// Without a named CRS, positions printed under the same pair of table headings can share a local model.
+// Another coordinate table on the same page (or a visually identical table in another PDF) is a separate source.
+function localScheduleTable(h:DraftHole,row:CollarScheduleRow){
+  return JSON.stringify([h.doc,row.page,...[row.fields.x!.heading,row.fields.y!.heading].map(l=>[l.x0,l.y0,l.x1,l.y1])]);
+}
+
+function draftGrid(used:DraftHole[]):{code?:string;issue?:{hole:DraftHole;field:Field;text:string}}{
+  if(!used.some(h=>h.schedule))return {};
+  const projected=used.filter(h=>completePair(h,"x","y")),geographic=used.filter(h=>!completePair(h,"x","y")&&completePair(h,"lat","lon"));
+  const stop=(hole:DraftHole,text:string,field:Field="x")=>({issue:{hole,text,field}});
+  const candidates=(h:DraftHole)=>h.schedule?.match.candidates.filter(r=>r.id.trim()===h.values.id.trim())??[];
+  for(const h of geographic){
+    if(candidates(h).some(r=>r.projectedFromGeographic&&r.fields.lat?.value===num(h.values.lat)&&r.fields.lon?.value===num(h.values.lon)))
+      return stop(h,`The schedule identifies a coordinate reference for the printed angles of ${h.values.id}. Choose its geographic row to convert those angles, or clear the position until its reference is verified.`,"lat");
+  }
+  const positions=projected.map(h=>{
+    const row=acceptedGridRow(h);
+    // Matching numbers also expose conflicting printed reference systems when the reviewer kept the original log.
+    const matches=row?[row]:candidates(h).filter(r=>r.fields.x?.value===num(h.values.x)&&r.fields.y?.value===num(h.values.y));
+    return {h,row,matches};
+  });
+  const codes=new Set(positions.flatMap(p=>p.matches.flatMap(r=>r.crsCode?[r.crsCode]:[])));
+  const [code]=codes;
+  if(codes.size>1)return stop(positions.find(p=>p.matches.some(r=>r.crsCode&&r.crsCode!==code))!.h,
+    `The selected boreholes have different projected coordinate systems (${[...codes].join(", ")}). Choose a common grid, enter verified WGS84 positions with both projected fields cleared, or exclude incompatible boreholes.`);
+  const unknown=positions.find(p=>!p.row?.crsCode);
+  if(unknown&&code&&positions.length+geographic.length>1)return stop(unknown.h,
+    `${unknown.h.values.id} has no accepted grid for its easting and northing. Other source evidence names ${code}. Choose a schedule row verified in that grid, enter a verified WGS84 position with both projected fields cleared, or exclude the borehole.`);
+  if(positions.length>1&&positions.some(p=>p.matches.length)&&unknown){
+    const tables=positions.map(p=>p.matches.length===1&&p.matches[0].fields.x&&p.matches[0].fields.y?localScheduleTable(p.h,p.matches[0]):undefined);
+    const mismatch=tables.findIndex(t=>!t||t!==tables[0]);
+    if(mismatch>=0)return stop(positions[mismatch].h,
+      `The projected collar positions come from separate coordinate sources without a verified common grid. Use rows from one surveyed table, enter verified WGS84 positions with both projected fields cleared, or exclude incompatible boreholes.`);
+  }
+  return {code:unknown?undefined:code};
+}
+
 export function checkDraft(holes:DraftHole[]):Check[]{
   const out:Check[]=[],used=holes.filter(h=>h.use),many=used.length>1;
   const placed=(h:DraftHole)=>{const x=num(h.values.x),y=num(h.values.y),la=num(h.values.lat),lo=num(h.values.lon),ok=(v:number|undefined)=>v!==undefined&&Number.isFinite(v);return (ok(x)&&ok(y))||(ok(la)&&ok(lo))};
   // Where no borehole in use has a position, that is said once: the model cannot place any of them.
   const nowhere=many&&!used.some(placed);
+  const {issue}=draftGrid(used);
+  if(issue)out.push({hole:holes.indexOf(issue.hole),field:issue.field,level:"error",text:issue.text});
   if(nowhere)out.push({hole:holes.indexOf(used[0]),field:"x",level:"warn",text:`No borehole has a position: none of the ${used.length} boreholes in use gives an easting and northing, or a latitude and longitude, so the model cannot place them. Type them here, or under Input data.`});
   const named=new Map<string,number>();
   for(const h of used){const id=h.values.id.trim();if(id)named.set(id,(named.get(id)??0)+1)}
@@ -136,6 +178,8 @@ export function checkDraft(holes:DraftHole[]):Check[]{
     const add=(level:Check["level"],text:string,at:{field?:Field;layer?:number}={})=>out.push({hole:i,level,text,...at});
     const v=Object.fromEntries(FIELDS.map(f=>[f.key,f.numeric?num(h.values[f.key]):undefined])) as Record<Field,number|undefined>;
     const id=h.values.id.trim();
+    if(hasPendingSchedule(h))add("error","Review the collar schedule. Choose a source row, keep the current fields, or exclude this borehole.",{field:"id"});
+    if(h.schedule?.depthForId&&h.schedule.depthForId!==id)add("error",`Final depth was selected for ${h.schedule.depthForId}. Verify the borehole ID or enter the final depth for ${id}.`,{field:"final"});
     if(h.ocr)add("warn",`Read by OCR (${h.ocrWhy??"a scanned page"}): compare every value and description with the page.`);
     if(!id)add("error","No borehole ID: type its name.",{field:"id"});
     else if(named.get(id)!>1)add("error",`Another borehole is also named ${id}: rename one.`,{field:"id"});
@@ -149,6 +193,7 @@ export function checkDraft(holes:DraftHole[]):Check[]{
     // One borehole on its own needs neither a position nor a ground level (Input data places it at 0, 0 and 0 m).
     if(many&&!nowhere&&!(has("x")&&has("y"))&&!(has("lat")&&has("lon")))add("warn","No position: type an easting and northing, or a latitude and longitude, or this borehole is not placed with the others.",{field:"x"});
     if(many&&!has("ground")&&!Number.isNaN(v.ground))add("warn","No ground level: type it, or this borehole is not placed.",{field:"ground"});
+    if(!many&&h.schedule&&!has("ground")&&!Number.isNaN(v.ground))add("warn","Ground elevation is missing. The single-hole preview will use 0 m as a local reference for depths.",{field:"ground"});
     const valid:Array<{l:DraftLayer;k:number;from:number;to:number}>=[];
     h.layers.forEach((l,k)=>{
       const from=num(l.from),to=num(l.to);
@@ -199,10 +244,16 @@ const cell=(s:string)=>{const n=num(s);return n!==undefined&&Number.isFinite(n)?
 // levels, and the units in their order down the logs (as the importer infers it), ready for design values.
 export function draftTables(holes:DraftHole[],files:string[],sources?:EvidenceSource[]):EditorTables{
   const used=holes.filter(h=>h.use),t=emptyTables();
-  const docs=[...new Set(used.map(h=>h.doc))].map(d=>({file:files[d],pages:used.filter(h=>h.doc===d).flatMap(h=>h.pages)}));
+  const grid=draftGrid(used);
+  if(grid.issue)throw new Error(grid.issue.text);
+  const docs=[...new Set(used.map(h=>h.doc))].map(d=>{
+    const pages=used.filter(h=>h.doc===d).flatMap(h=>[...h.pages,...Object.values(h.evidence?.fields??{}).flatMap(f=>f.boxes.map(b=>b.page))]);
+    return {file:files[d],pages:[...new Set(pages)]};
+  });
   const name=docs.length===1?docs[0].file.replace(/\.pdf$/i,""):"Borehole logs from PDFs";
   t.project={...t.project,name,source:docs.map(d=>d.file).join(", "),
     description:`Borehole logs read from ${docs.map(d=>`${d.file} (page${d.pages.length>1?"s":""} ${pageRanges(d.pages)})`).join(" and ")} and checked in the review.`};
+  if(grid.code)t.project.crs=grid.code;
   t.rows.boreholes=used.map(h=>[h.values.id.trim(),...(["x","y","lat","lon","ground","final"] as Field[]).map(k=>cell(h.values[k]))]);
   t.rows.logs=used.flatMap(h=>h.layers.map(l=>[h.values.id.trim(),cell(l.from),cell(l.to),l.unit.trim(),l.description.trim()]));
   t.rows.water=used.filter(h=>h.values.water.trim()).map(h=>[h.values.id.trim(),cell(h.values.water),""]);

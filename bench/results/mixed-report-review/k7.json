@@ -1,0 +1,18 @@
+{
+  "status": "Manually transcribed from the primary PDF before running GeoModel3D. Independent engineering sign-off outstanding.",
+  "authors": "Ian Schneider, Adrian Costar and Mark Keppel",
+  "title": "SARFIIP SMM Investigations: Groundwater Well Design and Construction on Pike Floodplain and Katarapko Floodplain 2015 (Phase 1 and 2A)",
+  "publication": "DEWNR technical note 2016/15, 2016, Government of South Australia, Department of Environment, Water and Natural Resources",
+  "pdfUrl": "https://www.waterconnect.sa.gov.au/Content/Publications/DEW/DEWNR-TN-2016-15.pdf",
+  "sha256": "4dcc74ea32355b8bfd1aca4ded5529837581d23e72548b6f70885331a0d88c31",
+  "licence": "CC BY 4.0, printed PDF page 3",
+  "originalLengthPages": 77,
+  "case": {
+    "schedule": {"pdfPage": 24, "printedPage": 19, "section": "Table 6, first data row", "unitNumber": "7029-2839", "name": "K7", "permit": "244610", "constructionDate": "7-Sep-15", "easting": 457129, "northing": 6199953, "finalDepthMetres": 11.2, "elevationMetres": null},
+    "log": {"pdfPage": 34, "printedPage": 29, "section": "Appendix A, Phase 1 well construction schematic diagram", "printedName": "K7", "printedUnitNumber": "7029-2839", "printedEasting": 457129, "printedNorthing": 6199953, "coordinateDatumText": "GDA 94", "zone": 54, "correspondingCrs": "EPSG:28354", "printedFinalDepthMetres": 11.2, "groundElevationMetres": null, "hasDuplicateCollarOnLog": true,
+      "majorLithologyIntervals": [{"from": 0, "to": 1.5, "material": "Sand"}, {"from": 1.5, "to": 2.5, "material": "Silt"}, {"from": 2.5, "to": 4, "material": "Clay"}, {"from": 4, "to": 11.2, "material": "Sand"}],
+      "stratigraphicUnits": [{"from": 0, "to": 4, "name":"Coonambidgal Formation"}, {"from": 4, "to": 11.2, "name":"Monoman Formation"}],
+      "descriptionBoundaryDepthsMetres": [0,0.5,1,1.5,2.5,3,4,5,7,11.2],
+      "notes": "Boundaries read graphically from the original scale and its legend, not printed numerically. The blue waterline near 3 m is not a logged soil contact. Construction screen 7.2–10.2 m is not a geological interval. No collar elevation appears on these two pages and no missing ground height should be inferred."}
+  }
+}

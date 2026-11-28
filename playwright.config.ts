@@ -24,6 +24,7 @@ export default defineConfig({
     launchOptions:{executablePath,args:["--enable-unsafe-swiftshader"]}
   },
   projects:[
+    {name:"mixed-report",testMatch:/mixed-report\.spec\.ts$/,use:{...devices["Desktop Chrome"],viewport:{width:1440,height:1000}}},
     {name:"desktop",testMatch:/workspace\.spec\.ts$/,use:{...devices["Desktop Chrome"],viewport:{width:1440,height:1000}}},
     {name:"mobile",testMatch:/mobile\.spec\.ts$/,use:{...devices["Pixel 7"]}},
     {name:"evidence",testMatch:/evidence\.spec\.ts$/,grepInvert:/mobile evidence inspector/,use:{...devices["Desktop Chrome"],viewport:{width:1440,height:1000}}},

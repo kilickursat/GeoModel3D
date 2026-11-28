@@ -64,7 +64,8 @@ export const lithologyRules:UnitRule[]=[
   {match:"made ground|\\b(?:back)?fill\\b|top\\s?soil|concrete|asphalt|tarmac|rubble|hardcore|\\bbrick|\\bslag\\b|\\baggregate\\b|granular (?:base|sub-?base)|base course|\\bsub-?base\\b|antropogeen|ophoging|^\\s*aangevulde\\s+grond\\b|\\bpuin\\b|\\bbeton\\b|remblai|terrain rapporté|terre végétale|auff[üu]llung|mutterboden|relleno|aterro|riporto",unit:"Made ground"},
   {match:firstNoun("peat"),unit:"Peat"},
   {match:rockFirst(words("mudstone|siltstone|claystone|shale|marl|argillite|mudrock")),unit:"Mudstone and siltstone"},
-  {match:rockFirst(words("sandstone|conglomerate|(?<!volcanic )breccia|greywacke|graywacke|arkose|wacke|arenite|gritstone")),unit:"Sandstone"},
+  {match:`^(?:(?!\\b(?:${ALL_SOILS}|sandstone|limestone|basalt|granite|with|containing)\\b).)*\\b(?:conglomerates?|(?<!volcanic )breccias?)\\b`,unit:"Conglomerate and breccia"},
+  {match:rockFirst(words("sandstone|greywacke|graywacke|arkose|wacke|arenite|gritstone")),unit:"Sandstone"},
   {match:rockFirst(`${words("limestone|chalk|dolomite|dolostone|travertine|tufa")}|kalksteen|krijt\\b`),unit:"Limestone and chalk"},
   // Metamorphosed rocks named by what they were ("metagreywacke", "metasandstone") are metamorphic rocks.
   {match:rockFirst(words(`${IGNEOUS}|${METAMORPHIC}|chert|ironstone|rock|bedrock|meta[a-z]{4,}`)),unit:"Rock"},

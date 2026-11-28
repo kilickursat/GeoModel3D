@@ -22,6 +22,7 @@ GeoModel3D builds a layered ground model from borehole logs and cone penetration
 
 - Builds the model from boreholes, CPTs or both: horizons between the boreholes and a closed volume for each unit. One borehole is enough to start. If a single log contradicts the chosen stratigraphic order, the viewer and report show its measured intervals and withhold the continuous model. For multiple boreholes the summary counts intervals assigned a different unit in the model.
 - Reads borehole logs from PDF reports and images on your device, logs drawn with a depth scale, set out as tables or described sample by sample, over all their sheets, scanned pages included. You check each value beside the page it was read from before it is used. Logs with recognized depth headings in feet are held for manual conversion to metres.
+- For mixed reports, choose the pages to extract. Optional local Qwen3.5 can look for completed collar locations and measured layers. Inspect the original passages and review conflicting measurements before use. [Mixed-report trials](bench/results/mixed-report-review/README.md)
 - Registers core-box photographs to depth, assists piece and lithology logging, and calculates reviewed photo-derived RQD. Accepted intervals link back to their highlighted photographs in the model; drafts and review history travel with the workspace ([workflow](docs/guide.md#core-photographs-to-a-ground-model)). Works locally and in the standalone HTML.
 - Compares registered core pieces and gaps with the current borehole log on a shared depth axis. Select an interval to highlight its exact photograph region, inspect differing unit labels, and export a source-linked interval CSV. Works locally and offline.
 - Has an opt-in lab (`?labs=core-ai`) that describes a registered row or core piece with local Hugging Face SmolVLM models. It is hidden by default: no model has passed a geologist's review, and in the pilot below SmolVLM 500M gave no useful answer on eight images ([lab](docs/guide.md#local-ai-for-core-intervals)).
@@ -54,7 +55,7 @@ We compared two pinned local models on eight reproducibly selected real image pa
 | Nonresponsive answers | 6/8 | 0/8 |
 | Reached the 128-token limit | 2/8 | 0/8 |
 
-This is a promising description result, not geological accuracy or human-geologist validation. Qwen still made substantive visual errors on two images and 14 claims the crops could not verify; even answers meeting the usefulness rule can contain unverified interpretations. It remains a **benchmark candidate**, outside the app's model selector. CPU quality runs do not measure iPhone or browser speed.
+Qwen made substantive visual errors on two images and 14 claims the crops could not verify. Its use for core-photo descriptions remains experimental. The PDF reader has a separate, text-only use for Qwen to help locate evidence. CPU quality runs do not measure iPhone or browser speed.
 
 [Read all 16 answers, images, scores, source credits and reproduction steps](docs/benchmarks/0.25.0-core-ai/README.md). The study is exploratory: eight public patches, unverified borehole independence and unknown pretraining overlap. The app's default remains unchanged pending a larger expert-reviewed and real-device evaluation.
 

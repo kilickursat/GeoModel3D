@@ -3,6 +3,7 @@ import {behaviourIndex,soilBehaviour,cptLayers,layerUnits,joinLayers,waterTableA
 import {importFiles,toProjectJson} from "../src/io";
 import {buildGeologicalModel} from "../src/model";
 import {crossValidate} from "../src/validation";
+import {lithologyRules} from "../src/rules";
 import {Cpt,GeoProject,rotterdamProject} from "../src/geology";
 
 describe("soil behaviour type (Robertson 2009)",()=>{
@@ -91,7 +92,8 @@ describe("CPT layers in the model",()=>{
   it("models CPTs alone from their layers, grouped by principal soil",()=>{
     const {project,warnings}=importFiles([table]);
     expect(project.boreholes).toEqual([]);
-    expect([project.cptLayers,project.cptRules?.length]).toEqual([true,10]);
+    expect(project.cptLayers).toBe(true);
+    expect(project.cptRules).toEqual(lithologyRules);
     expect(project.units.map(u=>u.id)).toEqual(["Clay","Sand"]);
     expect(warnings.join(" ")).toMatch(/The model is built from the CPTs alone/);
     const m=buildGeologicalModel(project);
@@ -104,7 +106,7 @@ describe("CPT layers in the model",()=>{
     expect(v.notes.join(" ")).toMatch(/3 of the logs are CPT layers/);
     // The project file keeps the layers, their rules and the choice.
     const back=importFiles([{name:"p.json",text:toProjectJson(project)}]).project;
-    expect([back.cptLayers,back.cptRules?.length,back.cpts![1].layers]).toEqual([true,10,project.cpts![1].layers]);
+    expect([back.cptLayers,back.cptRules,back.cpts![1].layers]).toEqual([true,project.cptRules,project.cpts![1].layers]);
   });
 
   it("splits a soil that lies above and below other units into an upper and a lower unit",()=>{

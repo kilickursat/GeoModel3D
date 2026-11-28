@@ -6,6 +6,8 @@
 import type {Doc} from "./pdftext";
 import {DraftHole,Check,FIELDS,Field,checkDraft,draftTables,captureDraftEvidence,evidenceField,unitFor,pageRanges,num} from "./draft";
 import {FEET_DEPTH_REASON,type TextLine} from "./reconstruct";
+import {clearedPositionFields,decideSchedule,drilledLengthIssue,drilledLengthRow,hasPendingSchedule,positionBasis,positionFields,rowSelectionIssue,scheduleValueLines,useDrilledLength} from "./reviewSchedule";
+import "./scheduleReview.css";
 import {lithologyRules,japaneseLithologyRules} from "../rules";
 import type {EditorTables} from "../tables";
 import {newEvidenceId,changeEvidenceField,acceptEvidenceField,EvidenceSource,EvidenceRecord} from "../evidence";
@@ -33,6 +35,7 @@ export function createReview(host:ReviewHost){
   let rereader:Rereader|null=null;
   // The pages read by OCR, by `doc#page`, and why.
   const ocrDone=new Map<string,string>();
+  const selectedPages=new Map<number,Set<number>>();
   let captureJob:{cancel():void}|null=null;
 
   const el=document.createElement("section");
@@ -67,7 +70,7 @@ export function createReview(host:ReviewHost){
     const item=(c:Check)=>`<li class="${c.level}"><button data-hole="${c.hole}" data-go="${where(c)}"><b>${esc(label(holes[c.hole]))}</b> ${esc(c.text)}</button></li>`;
     const order={error:0,warn:1,note:2},list=[...checks].sort((a,b)=>order[a.level]-order[b.level]||a.hole-b.hole);
     checksEl.innerHTML=summary+(list.length?`<ul>${list.slice(0,5).map(item).join("")}</ul>${list.length>5?`<details><summary>${list.length-5} more</summary><ul>${list.slice(5).map(item).join("")}</ul></details>`:""}`:"");
-    useButton.disabled=!used;
+    useButton.disabled=!used||busy||saving;
   }
   function renderTabs(){
     tabs.innerHTML=holes.map((h,i)=>{
@@ -77,6 +80,48 @@ export function createReview(host:ReviewHost){
   }
   // A description box is as tall as its text.
   const fit=(t:HTMLTextAreaElement)=>{t.style.height="auto";t.style.height=`${t.scrollHeight+2}px`};
+  function schedulePanel(h:DraftHole){
+    const s=h.schedule;
+    if(!s)return "";
+    const changed=s.originalBasis!==positionBasis(h),pending=hasPendingSchedule(h);
+    const chosen=s.decision&&typeof s.decision.choice==="number"?s.match.candidates[s.decision.choice]:undefined;
+    const state=s.decision&&!pending?(chosen?`Using the ${chosen.coordinateKind??"collar"} position for ${chosen.id} on page ${chosen.page}.`:"Kept current fields."):
+      changed?"The ID or position fields have changed. Compare them with the source before using this borehole.":
+      ({ambiguous:"Multiple records share this ID. Compare the source rows before choosing one.",conflict:s.match.candidates.some(r=>r.coordinateConflict)?"The schedule gives conflicting positions. Choose which position to use.":"Check the schedule values against the log.",
+        proposed:"A schedule row supplies collar fields for this log.",confirmed:"The schedule agrees with the log.",missing:""}[s.match.status]);
+    const notesForAll=new Set([...s.match.notes,...s.match.candidates[0].notes.filter(n=>s.match.candidates.every(candidate=>candidate.notes.includes(n)))]);
+    const rows=s.match.candidates.map((row,i)=>{
+      const issue=rowSelectionIssue(h,row),notes=row.notes.filter(n=>!notesForAll.has(n)).map(n=>`<li>${esc(n)}</li>`).join("");
+      const values=FIELDS.filter(f=>positionFields.some(k=>k===f.key)).map(f=>{
+        const cell=row.fields[f.key as typeof positionFields[number]];
+        if(!cell)return "";
+        return `<tr><th scope="row">${esc(f.label)}</th><td>${esc(h.values[f.key])||"—"}</td><td>${esc(String(cell.value))}</td></tr>`;
+      }).join("");
+      const clear=clearedPositionFields(row).filter(k=>h.values[k].trim()).map(k=>FIELDS.find(f=>f.key===k)!.label);
+      const converted=row.projectedFromGeographic;
+      return `<div class="dr-schedule-row" data-key="r:${i}"><strong>${esc(row.id)} · page ${row.page}${row.coordinateKind?` · ${esc(row.coordinateKind)}`:""}</strong>
+<table class="dr-layers"><thead><tr><th>Field</th><th>Current</th><th>Schedule</th></tr></thead><tbody>${values}</tbody></table>
+${converted?`<p>The printed angles give a calculated easting of ${converted.x.toFixed(2)} m and northing of ${converted.y.toFixed(2)} m in ${esc(row.crsCode??"")}.</p>`:""}
+${clear.length?`<p>Choosing this row clears the previous ${esc(clear.join(" and "))}.</p>`:""}
+${notes?`<ul>${notes}</ul>`:""}${issue?`<p>${esc(issue)}</p>`:""}
+<button type="button" data-schedule-view="${i}">View row on page ${row.page}</button>
+<button type="button" data-schedule-use="${i}"${issue?" disabled":""}>${row.coordinateConflict?`Use ${esc(row.coordinateKind??"these")} coordinates`:"Use this row"}</button></div>`;
+    }).join("");
+    const depthRow=drilledLengthRow(h),depth=depthRow?.finalDepth;
+    let drilled="";
+    if(depthRow&&depth){
+      const issue=drilledLengthIssue(h,depthRow);
+      const replace=h.values.final.trim()&&num(h.values.final)!==depth.value;
+      drilled=`<div class="dr-schedule-row" data-key="d:final"><strong>Drilled length · page ${depthRow.page}</strong>
+<p>${esc(depthRow.id)} has a printed drilled length of ${depth.value} m. The current final depth is ${h.values.final.trim()?`${esc(h.values.final)} m`:"unknown"}.</p>
+${issue?`<p>${esc(issue)}</p>`:""}<button type="button" data-depth-view>View drilled length on page ${depthRow.page}</button>
+<button type="button" data-depth-use${issue?" disabled":""}>${replace?"Replace final depth with drilled length":"Use drilled length"}</button></div>`;
+    }
+    return `<section class="dr-schedule" aria-label="Collar schedule"><h3>Collar schedule</h3>
+<p>Log ${esc(s.sourceId)} · ${h.pages.length===1?"page":"pages"} ${pageRanges(h.pages)}. ${esc(state)}</p>
+${notesForAll.size?`<ul>${[...notesForAll].map(n=>`<li>${esc(n)}</li>`).join("")}</ul>`:""}${rows}
+<button type="button" data-schedule-keep>Keep current fields</button>${drilled}</section>`;
+  }
   function renderHole(){
     const h=holes[current];
     if(!h){panel.innerHTML="";return}
@@ -93,8 +138,8 @@ export function createReview(host:ReviewHost){
 <td class="dr-acts"><button class="dr-ins" data-layer="${k}" title="Add a layer below" aria-label="Add a layer below layer ${k+1}">+</button><button class="dr-del" data-layer="${k}" title="Delete this layer" aria-label="Delete layer ${k+1}">×</button></td></tr>${
         l.flag?`<tr class="dr-why" data-key="${key}"><td></td><td colspan="5">${esc(l.to)} m: ${esc(l.flag)} <button class="dr-ok" data-ok="${key}">Looks right</button></td></tr>`:""}`;
     };
-    panel.innerHTML=`<div class="dr-fields">${FIELDS.map(field).join("")}</div>
-<div class="dr-layers-head"><b>Layers</b><span>${h.kind==="table"?"read from the From and To columns of a table":h.samples?"read from the sample depths that start the descriptions, by the depth scale on the page":"read by the depth scale on the page"}${h.ocr?`, by OCR (${esc(h.ocrWhy??"a scanned page")})`:""}</span><button class="dr-add">Add layer</button></div>
+    panel.innerHTML=`<div class="dr-fields">${FIELDS.map(field).join("")}</div>${h.schedule?`<div class="dr-schedule-slot">${schedulePanel(h)}</div>`:""}
+<div class="dr-layers-head"><b>Layers</b><span>${h.rangeLabels?"read from labelled depth ranges in the graphic log":h.kind==="table"?"read from the From and To columns of a table":h.samples?"read from the sample depths that start the descriptions, by the depth scale on the page":"read by the depth scale on the page"}${h.ocr?`, by OCR (${esc(h.ocrWhy??"a scanned page")})`:""}</span><button class="dr-add">Add layer</button></div>
 <div class="dr-table-wrap"><table class="dr-layers"><thead><tr><th></th><th>From (m)</th><th>To (m)</th><th>Unit</th><th>Description</th><th></th></tr></thead><tbody>${h.layers.map(layer).join("")}</tbody></table>${
       h.layers.length?"":'<p class="dr-empty">No layers: add them, or leave this borehole out.</p>'}</div>${spt(h)}${core(h)}`;
     $("#dr-units").innerHTML=[...new Set([...holes.flatMap(h=>h.layers.map(l=>l.unit.trim())),...RULE_UNITS])].filter(Boolean).map(u=>`<option value="${esc(u)}">`).join("");
@@ -163,6 +208,14 @@ export function createReview(host:ReviewHost){
   const key=(doc:number,page:number)=>`${doc}#${page}`;
   // The lines a value was read from.
   function evidence(h:DraftHole,k:string):TextLine[]{
+    if(k==="d:final"){
+      const row=drilledLengthRow(h),d=row?.finalDepth;
+      return row&&d?[d.line,d.heading,row.idLine]:[];
+    }
+    if(k.startsWith("r:")){
+      const row=h.schedule?.match.candidates[Number(k.slice(2))];
+      return row?scheduleValueLines(row):[];
+    }
     if(k.startsWith("f:")){const s=h.src[k.slice(2) as Field];return s?[s]:[]}
     if(k.startsWith("l:"))return h.layers[Number(k.slice(2))]?.src??[];
     if(k.startsWith("c:"))return h.core?.runs[Number(k.slice(2))]?.src??[];
@@ -178,8 +231,9 @@ export function createReview(host:ReviewHost){
     $<HTMLButtonElement>(".dr-next").disabled=view.page>=d.pages;
     // How this page was read: by OCR, and why; or from its own text, which can be read by OCR instead.
     const by=ocrDone.get(key(view.doc,view.page));
-    readBy.textContent=by?`Read by OCR: ${by}`:"";
-    ocrButton.hidden=!!by||!rereader||d.kind!=="pdf"||unread.some(u=>u.doc===view.doc&&u.page===view.page&&u.error===FEET_DEPTH_REASON);
+    const excluded=selectedPages.has(view.doc)&&!selectedPages.get(view.doc)!.has(view.page);
+    readBy.textContent=excluded?"Excluded from extraction":by?`Read by OCR: ${by}`:"";
+    ocrButton.hidden=excluded||!!by||!rereader||d.kind!=="pdf"||unread.some(u=>u.doc===view.doc&&u.page===view.page&&u.error===FEET_DEPTH_REASON);
     ocrButton.disabled=busy;
     const size=sizes.get(key(view.doc,view.page))??{width:1275,height:1650};
     const fit=Math.max(240,scroller.clientWidth-24),css=Math.round(fit*(ZOOMS[view.zoom]??1));
@@ -212,6 +266,7 @@ export function createReview(host:ReviewHost){
       out.push(`<div class="dr-box${flag?" flag":""}${k===active?" on":""}" data-key="${k}" title="${esc(title)}" style="left:${(l.x0/size.width*100).toFixed(3)}%;top:${(l.y0/size.height*100).toFixed(3)}%;width:${((l.x1-l.x0)/size.width*100).toFixed(3)}%;height:${((l.y1-l.y0)/size.height*100).toFixed(3)}%"></div>`);
     };
     for(const f of FIELDS){const s=h.src[f.key];if(s)box(s,`f:${f.key}`,!!h.flags[f.key],`${f.label}: ${h.values[f.key]}`)}
+    if(active.startsWith("r:")||active==="d:final")for(const line of evidence(h,active))box(line,active,false,line.text);
     h.layers.forEach((l,k)=>l.src.forEach(s=>box(s,`l:${k}`,!!l.flag,`Layer ${k+1}: ${l.from}–${l.to} m${l.unit?`, ${l.unit}`:""}`)));
     h.core?.runs.forEach((r,k)=>r.src.forEach(s=>box(s,`c:${k}`,false,`Core run ${r.run}: ${r.from??"?"}–${r.to??"?"} m`)));
     h.spt?.forEach((t,k)=>t.src.forEach(s=>box(s,`s:${k}`,false,`SPT at ${t.depth} m: ${t.blows} blows${t.penetration?` over ${t.penetration} mm`:""}`)));
@@ -220,7 +275,9 @@ export function createReview(host:ReviewHost){
   }
   // Lights a value and its boxes; `turn` also brings its first box into view, turning the page where needed.
   function setActive(k:string,turn=false){
+    const redraw=active.startsWith("r:")||k.startsWith("r:")||active==="d:final"||k==="d:final";
     active=k;
+    if(redraw)drawBoxes();
     for(const e of el.querySelectorAll<HTMLElement>("[data-key]"))e.classList.toggle("on",!!k&&e.dataset.key===k);
     if(!turn||!k)return;
     const h=holes[current],first=evidence(h,k).find(l=>l.page!==undefined);
@@ -284,6 +341,23 @@ export function createReview(host:ReviewHost){
     if(b.classList.contains("dr-ocr")){void reread(view.doc,view.page);return}
     if(b.dataset.rereadPage){void reread(Number(b.dataset.rereadDoc),Number(b.dataset.rereadPage));return}
     if(b.classList.contains("dr-use")){void use();return}
+    if(b.hasAttribute("data-depth-view")){setActive("d:final",true);return}
+    if(b.hasAttribute("data-depth-use")){
+      const h=holes[current];
+      try{useDrilledLength(h,page=>sizes.get(key(h.doc,page)))}
+      catch(error){say((error as Error).message);return}
+      edited=true;renderAll();setActive("d:final",true);say("Drilled length applied to final depth.");return;
+    }
+    if(b.dataset.scheduleView!==undefined){setActive(`r:${b.dataset.scheduleView}`,true);return}
+    if(b.dataset.scheduleUse!==undefined||b.hasAttribute("data-schedule-keep")){
+      const h=holes[current],choice=b.dataset.scheduleUse===undefined?"keep":Number(b.dataset.scheduleUse);
+      try{decideSchedule(h,choice,page=>sizes.get(key(h.doc,page)))}
+      catch(error){say((error as Error).message);return}
+      edited=true;renderAll();
+      if(choice!=="keep")setActive(`r:${choice}`,true);else drawBoxes();
+      say(choice==="keep"?"Current collar fields retained.":"Selected collar schedule values applied.");
+      return;
+    }
     if(b.dataset.go!==undefined){go(Number(b.dataset.hole),b.dataset.go);return}
     if(b.dataset.hole!==undefined){select(Number(b.dataset.hole));return}
     if(b.dataset.ok){accept(b.dataset.ok);unflag(b.dataset.ok);edited=true;recheck();return}
@@ -310,6 +384,11 @@ export function createReview(host:ReviewHost){
       if(r)changeEvidenceField(r,f==="water"?"depth":evidenceField(f),t.value,"Edited in document review");
       if(f==="id")for(const row of [h.waterEvidence,...h.layers.map(l=>l.evidence)])if(row)changeEvidenceField(row,"boreholeId",t.value,"Borehole renamed in document review");
       h.values[f]=t.value;
+      if(f==="final"&&h.schedule)delete h.schedule.depthForId;
+      if(h.schedule&&(f==="id"||f==="final"||positionFields.some(k=>k===f))){
+        const slot=panel.querySelector<HTMLElement>(".dr-schedule-slot");
+        if(slot)slot.innerHTML=schedulePanel(h);
+      }
       if(h.flags[f])unflag(`f:${f}`);
     }else if(t.dataset.layer!==undefined){
       const k=Number(t.dataset.layer),l=h.layers[k],c=t.dataset.c as "from"|"to"|"unit"|"description";
@@ -320,6 +399,7 @@ export function createReview(host:ReviewHost){
       if(c==="description"&&l.autoUnit){l.unit=unitFor(t.value);if(l.evidence)changeEvidenceField(l.evidence,"unit",l.unit,"Unit rules applied to the edited description");const u=panel.querySelector<HTMLInputElement>(`input[data-layer="${k}"][data-c="unit"]`);if(u)u.value=l.unit}
       if(t instanceof HTMLTextAreaElement)fit(t);
       if(c==="to"&&l.flag)unflag(`l:${k}`);
+      if(c==="to"&&h.schedule)panel.querySelector<HTMLElement>(".dr-schedule-slot")!.innerHTML=schedulePanel(h);
     }else if(t.dataset.spt!==undefined){
       const test=h.spt?.[Number(t.dataset.spt)];
       if(!test)return;
@@ -340,9 +420,9 @@ export function createReview(host:ReviewHost){
   // The page is read by OCR and the document's logs read again; the corrections made to its boreholes are lost, so
   // that is asked first where any were made.
   async function reread(doc:number,page:number){
-    if(!rereader||busy||saving)return;
+    if(!rereader||busy||saving||selectedPages.has(doc)&&!selectedPages.get(doc)!.has(page))return;
     if(edited&&holes.some(h=>h.doc===doc)&&!confirm(`Read page ${page} by OCR? The boreholes of ${docs[doc].name} are read again, and the corrections made to them are lost.`))return;
-    busy=true;showPage();say(`Reading page ${page} of ${docs[doc].name} by OCR…`);
+    busy=true;$(".dr-side").inert=true;useButton.disabled=true;showPage();say(`Reading page ${page} of ${docs[doc].name} by OCR…`);
     try{
       const r=await rereader(doc,page);
       if(closed)return;
@@ -357,7 +437,7 @@ export function createReview(host:ReviewHost){
       if(at>=0)select(at);else{current=Math.min(current,Math.max(0,holes.length-1));renderTabs();renderHole();view.doc=doc;view.page=page;showPage()}
       say(at>=0?`Page ${page} read by OCR: ${label(holes[at])} read again.`:`Page ${page} read by OCR: no borehole log found on it.`);
     }catch(err){if(!closed)say(`Page ${page} could not be read by OCR: ${(err as Error).message}`)}
-    finally{busy=false;if(!closed)showPage()}
+    finally{busy=false;if(!closed){$(".dr-side").inert=false;renderChecks();showPage()}}
   }
 
   // ---------- leaving ----------
@@ -406,14 +486,14 @@ export function createReview(host:ReviewHost){
     return out;
   }
   async function use(){
-    if(saving)return;
+    if(saving||busy)return;
     checks=checkDraft(holes);
     renderChecks();renderTabs();
     const errors=checks.filter(c=>c.level==="error");
     if(errors.length){say(`Fix the ${plural(errors.length,"problem")} marked first.`);go(errors[0].hole,where(errors[0]));return}
     const used=holes.filter(h=>h.use),files=docs.map(d=>d.name);
     const notes=checks.filter(c=>c.level!=="error").map(c=>`${label(holes[c.hole])}: ${c.text}`);
-    if(used.some(h=>Number.isFinite(num(h.values.x)??NaN)))notes.push("Positions read as eastings and northings are in a coordinate system the document does not name: give it under Project (an EPSG code or a name), or the model stays on a local grid");
+    if(used.some(h=>Number.isFinite(num(h.values.x)??NaN)))notes.push("Check the project coordinate system against the source of each easting and northing. An unassigned grid stays local until you set it under Project.");
     const names=[...new Set(used.map(h=>docs[h.doc].name))];
     saving=true;
     const controls=[...el.querySelectorAll<HTMLInputElement|HTMLButtonElement|HTMLTextAreaElement>("input,button,textarea")].filter(c=>!c.classList.contains("dr-cancel"));
@@ -443,6 +523,7 @@ export function createReview(host:ReviewHost){
     progress(text:string){sub.textContent=text},
     // What to stop when the review closes (the reading model in the middle of a page).
     onClose(f:()=>void){closing.push(f)},
+    selectedPages(doc:number,pages:ReadonlySet<number>){selectedPages.set(doc,new Set(pages))},
     addDoc(d:Doc,source?:EvidenceSource){docs.push(d);sources.push(source??{id:newEvidenceId(),name:d.name,pages:[]});return docs.length-1},
     size(doc:number,page:number,width:number,height:number){
       sizes.set(key(doc,page),{width,height});
