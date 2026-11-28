@@ -7,6 +7,7 @@ import {alignmentProblem,alignmentSection,chainages,pointAt} from "./alignment";
 import {compatibleCrs} from "./comparison";
 import {projectCrs} from "./crs";
 import {toCsv} from "./io";
+import {bedPredictionIssue,bedPredictionSupport} from "./observedContacts";
 
 export interface DisagreementCase { id:string;label?:string;project:GeoProject }
 export interface PreparedDisagreementCase { id:string;label?:string;name:string;model:GeoModel }
@@ -35,6 +36,8 @@ const unique=(values:number[])=>values.sort((a,b)=>a-b).filter((n,i,all)=>i===0|
 const ranges=(section:Section):Range[]=>sectionRuns(section).map(([a,b])=>[section.s[a],section.s[b]] as Range).filter(([a,b])=>finite(a)&&finite(b));
 const covered=(runs:Range[],at:number)=>runs.some(([a,b])=>at>=a-1e-8&&at<=b+1e-8);
 const indices=new WeakMap<GeoModel,Map<string,number>>();
+const bedSupport=new WeakMap<GeoModel,ReturnType<typeof bedPredictionSupport>>();
+type ContactEvidence="geometry"|"logged";
 
 export function prepareDisagreementModels(cases:DisagreementCase[]):PreparedDisagreementCase[]{
   if(cases.length<2||cases.length>6)throw new Error("Select two to six saved interpretations for a disagreement range.");
@@ -46,12 +49,20 @@ export function prepareDisagreementModels(cases:DisagreementCase[]):PreparedDisa
   return cases.map(c=>({id:c.id,...(c.label===undefined?{}:{label:c.label}),name:c.project.name,model:buildGeologicalModel(c.project)}));
 }
 
-export function sampleDisagreement(models:PreparedDisagreementCase[],x:number,y:number,unitId:string):DisagreementSample{
+export function sampleDisagreement(models:PreparedDisagreementCase[],x:number,y:number,unitId:string,evidence:ContactEvidence="geometry"):DisagreementSample{
   if(!finite(x)||!finite(y))throw new Error("Disagreement sample coordinates must be finite.");
   const values=models.map(({id:caseId,model})=>{
     let lookup=indices.get(model);if(!lookup){lookup=new Map(model.units.map((u,k)=>[u.id,k]));indices.set(model,lookup)}
-    const k=lookup.get(unitId),value=k===undefined?undefined:sampleModel(model,x,y)?.[k];
-    return {caseId,...(finite(value)?{elevation:value}:{})};
+    const k=lookup.get(unitId);
+    if(k===undefined)return {caseId};
+    const column=sampleModel(model,x,y),value=column?.[k];
+    if(!finite(value))return {caseId};
+    if(evidence==="logged"){
+      let support=bedSupport.get(model);
+      if(!support){support=bedPredictionSupport(model);bedSupport.set(model,support)}
+      if(bedPredictionIssue(support,unitId,k,column))return {caseId};
+    }
+    return {caseId,elevation:value};
   });
   const elevations=values.flatMap(v=>v.elevation===undefined?[]:[v.elevation]);
   const complete=models.length>=2&&elevations.length===models.length;
@@ -61,6 +72,15 @@ export function sampleDisagreement(models:PreparedDisagreementCase[],x:number,y:
 }
 
 export function buildDisagreement(cases:DisagreementCase[],options:DisagreementOptions):DisagreementReport{
+  return disagreementReport(options,()=>prepareDisagreementModels(cases),"geometry");
+}
+
+// Calibration already fits its training models for audit and calibration rows. Reuse that exact fit on the map.
+export function buildPreparedDisagreement(models:PreparedDisagreementCase[],options:DisagreementOptions,evidence:ContactEvidence):DisagreementReport{
+  return disagreementReport(options,()=>models,evidence);
+}
+
+function disagreementReport(options:DisagreementOptions,prepare:()=>PreparedDisagreementCase[],evidence:ContactEvidence):DisagreementReport{
   if(options.mode!=="section"&&options.mode!=="alignment")throw new Error("Choose a straight section or a reference alignment.");
   if(typeof options.unitId!=="string"||!options.unitId.trim())throw new Error("Choose a geological unit ID for the contact range.");
   const step=options.step??10,size=options.gridSize??15,cap=options.maxSamples??501;
@@ -72,15 +92,15 @@ export function buildDisagreement(cases:DisagreementCase[],options:DisagreementO
     if(!options.alignment)throw new Error("Choose an explicit reference alignment.");
     const problem=alignmentProblem(options.alignment);if(problem)throw new Error(`The reference alignment is invalid: ${problem}.`);
   }
-  const models=prepareDisagreementModels(cases),footprints=models.filter(c=>c.model.triangles.length&&c.model.nodes.length);
+  const models=prepare(),footprints=models.filter(c=>c.model.triangles.length&&c.model.nodes.length);
   if(!footprints.length)throw new Error("The selected interpretations have no usable model footprints.");
-  const definitions=new Map<string,string>();for(const c of cases)for(const u of c.project.units)if(!definitions.has(u.id))definitions.set(u.id,u.name);
+  const definitions=new Map<string,string>();for(const c of models)for(const u of c.model.project.units)if(!definitions.has(u.id))definitions.set(u.id,u.name);
   const surfaces=[...definitions].map(([unitId,name])=>({unitId,name,presentCaseIds:models.filter(c=>c.model.units.some(u=>u.id===unitId)).map(c=>c.id)}));
   const definition=surfaces.find(s=>s.unitId===options.unitId);if(!definition)throw new Error("The selected contact ID is not declared in these interpretations.");
   const bounds=footprints.map(c=>modelBounds(c.model));
   const minX=Math.min(...bounds.map(b=>b.minX)),maxX=Math.max(...bounds.map(b=>b.maxX)),minY=Math.min(...bounds.map(b=>b.minY)),maxY=Math.max(...bounds.map(b=>b.maxY));
   if(![minX,maxX,minY,maxY].every(finite)||!(maxX>minX)||!(maxY>minY))throw new Error("The selected footprints do not define a usable map extent.");
-  const gridPoints=Array.from({length:size*size},(_,i)=>sampleDisagreement(models,minX+(maxX-minX)*(i%size)/(size-1),minY+(maxY-minY)*Math.floor(i/size)/(size-1),options.unitId));
+  const gridPoints=Array.from({length:size*size},(_,i)=>sampleDisagreement(models,minX+(maxX-minX)*(i%size)/(size-1),minY+(maxY-minY)*Math.floor(i/size)/(size-1),options.unitId,evidence));
   const path:DisagreementReport["path"]={mode:options.mode,axisLabel:options.mode==="section"?"Distance (m)":"Chainage (m)",start:0,end:0,actualStep:0};
   const normal:DisagreementReport["options"]={unitId:options.unitId,mode:options.mode,step,gridSize:size,maxSamples:cap};
   const notes=["The range is the minimum and maximum contact elevation across the selected interpretations. It is conditional on this explicit selection, not a confidence interval or a probability distribution.",
@@ -89,7 +109,8 @@ export function buildDisagreement(cases:DisagreementCase[],options:DisagreementO
     "All elevations use the supplied datum. Confirm a common vertical datum and project-coordinate origin, orientation and units; the file format cannot verify them.",
     "Map values and path extrema describe sampled locations. Conditions between samples may be missed; displayed bands join sampled envelopes and are not exact continuous extrema.",
     "Selected projects are rebuilt with the current engine. Their saved engine versions describe the original revisions, not separate historical execution environments."];
-  if(!projectCrs(cases[0].project))notes.push("These projects use a local or unrecognised grid. Matching grid names do not establish a common physical reference.");
+  if(evidence==="logged")notes.push("The fitted interpretations must each contain a directly observed top and no unresolved repeated or out-of-order run of this bed. The bed must have positive modelled thickness at each scored coordinate.");
+  if(!projectCrs(models[0].model.project))notes.push("These projects use a local or unrecognised grid. Matching grid names do not establish a common physical reference.");
   let start:number,end:number,allRanges:Range[][],at:(s:number)=>{x:number;y:number},required:number[];
   if(options.mode==="section"){
     const reference=models[0].model,azimuth=options.azimuth??principalAzimuth(reference),offset=options.offset??0;
@@ -122,7 +143,7 @@ export function buildDisagreement(cases:DisagreementCase[],options:DisagreementO
   if(mandatory.length>cap)throw new Error("The path sample limit is too small to retain alignment vertices, design knots and model gaps. Increase it or simplify the reference path.");
   const segments=Math.max(1,Math.min(Math.ceil((end-start)/step),cap-mandatory.length+1)),actualStep=(end-start)/segments;
   const positions=unique([...mandatory,...Array.from({length:segments-1},(_,i)=>start+(i+1)*actualStep)]);
-  const points=positions.map(distance=>{const xy=at(distance);return {...sampleDisagreement(models,xy.x,xy.y,options.unitId),distance}});
+  const points=positions.map(distance=>{const xy=at(distance);return {...sampleDisagreement(models,xy.x,xy.y,options.unitId,evidence),distance}});
   path.start=start;path.end=end;path.actualStep=actualStep;
   if(actualStep>step*(1+1e-9))notes.push(`The regular path spacing increased from ${step} to ${actualStep} to stay within ${cap} samples; required boundaries and gaps were retained.`);
   const maxWidth=(samples:DisagreementSample[])=>{const values=samples.flatMap(p=>p.width===undefined?[]:[p.width]);return values.length?Math.max(...values):undefined};

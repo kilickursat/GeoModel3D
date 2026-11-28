@@ -72,6 +72,21 @@ describe("held-out selected-interpretation envelopes",()=>{
     expect(middle(order).unavailableReason).toMatch(/out of stratigraphic order/);
   });
 
+  it("withholds a finite-looking top when a fitted interpretation has ambiguous runs, no observed top or zero local thickness",()=>{
+    const repeated=project();
+    repeated.boreholes[0].intervals=[{from:0,to:2,unit:"fill"},{from:2,to:4,unit:"sand"},
+      {from:4,to:6,unit:"fill"},{from:6,to:12,unit:"sand"}];
+    const censored=project();
+    for(const b of censored.boreholes)b.intervals=[{from:2,to:12,unit:"sand"}];
+    const pinched=project();pinched.base=8;
+    for(const [alternative,reason] of [[repeated,/repeated/],[censored,/directly observed/],[pinched,/thickness/]] as const){
+      const result=validateDisagreement(cases(project(),alternative),selected),row=middle(result);
+      expect(row).toMatchObject({logged:8,referencePrediction:8,missingCaseIds:["alternative"]});
+      expect(row.predictions[1].prediction).toBeUndefined();expect(row.predictions[1].unavailableReason).toMatch(reason);
+      expect(row.covered).toBeUndefined();expect(result.summary).toEqual({nScored:0,nCovered:0});
+    }
+  });
+
   it("removes every co-located raw borehole/CPT before folds, including initially discarded duplicates",()=>{
     const p=project(2,6),q=project(4),input=cases(p,q);
     for(const c of input){

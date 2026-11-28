@@ -6,6 +6,7 @@ import {buildGeologicalModel,GeoModel,sampleModel} from "./model";
 import {compatibleCrs} from "./comparison";
 import {convexHull} from "./terrain";
 import {toCsv} from "./io";
+import {bedPredictionIssue,bedPredictionSupport,cachedBedTops,loggedBedTops} from "./observedContacts";
 import type {XY} from "./tin";
 
 export interface DisagreementValidationOptions { unitId:string;maxHoldouts?:number;groupRadius?:number }
@@ -86,35 +87,23 @@ export function locationGroups(cases:DisagreementCase[],radius=0){
 export function observedTop(hole:Borehole,project:GeoProject,unitId:string):{logged?:number;reason?:string}{
   const order=new Map(project.units.map((u,i)=>[u.id,i]));
   if(!order.has(unitId))return {reason:"The selected unit is not declared in the reference interpretation."};
-  const intervals=hole.intervals.slice().sort((a,b)=>a.from-b.from||a.to-b.to);
-  if(intervals.some(i=>!finite(i.from)||!finite(i.to)||i.from<0||i.to<=i.from))return {reason:"Invalid logged intervals make this contact unavailable."};
-  if(intervals.some((i,k)=>k>0&&i.from<intervals[k-1].to-epsilon))return {reason:"Overlapping logged intervals make the contact ambiguous."};
-  const runs=new Map<string,number>();
-  intervals.forEach((i,k)=>{if(!k||i.unit!==intervals[k-1].unit||Math.abs(i.from-intervals[k-1].to)>epsilon)runs.set(i.unit,(runs.get(i.unit)??0)+1)});
-  if(!runs.has(unitId))return {reason:"The selected unit's top is not logged at this reference borehole."};
-  if(runs.get(unitId)!>1)return {reason:"The selected unit occurs in repeated separated runs; its top is ambiguous."};
-  let highest=-1;
-  for(let k=0;k<intervals.length;k++){
-    const interval=intervals[k],rank=order.get(interval.unit)??-1;
-    if(interval.unit===unitId){
-      if(rank<highest)return {reason:"The selected unit is out of stratigraphic order; its top is ambiguous."};
-      if(!k&&interval.from>epsilon)return {reason:"The log starts below the collar; this unit's top was not observed."};
-      if(k&&interval.from>intervals[k-1].to+epsilon)return {reason:"An unlogged gap precedes this unit; its top was not observed."};
-      const logged=hole.z-interval.from;
-      return finite(logged)?{logged}:{reason:"The logged contact elevation is not finite."};
-    }
-    highest=Math.max(highest,rank);
-  }
-  return {reason:"The selected unit's top is not logged at this reference borehole."};
+  const {tops,problem}=loggedBedTops(hole,order);
+  return problem?{reason:problem}:tops.get(unitId)??{reason:"The selected unit's top is not logged at this reference borehole."};
 }
 
+const trainingHulls=new WeakMap<GeoModel,XY[]>();
 export function withinTrainingHull(model:GeoModel,point:XY):boolean{
-  const hull=convexHull([...model.boreholes,...model.cptLogs]);
+  let hull=trainingHulls.get(model);
+  if(!hull){
+    hull=convexHull([...model.boreholes,...model.cptLogs]);
+    const origin=hull[0];
+    let area=0;
+    for(let i=0,j=hull.length-1;i<hull.length;j=i++)area+=(hull[j].x-origin.x)*(hull[i].y-origin.y)-(hull[j].y-origin.y)*(hull[i].x-origin.x);
+    if(Math.abs(area)<=epsilon*epsilon)hull=[];
+    trainingHulls.set(model,hull);
+  }
   if(hull.length<3)return false;
-  const origin=hull[0];
-  let area=0,inside=false;
-  for(let i=0,j=hull.length-1;i<hull.length;j=i++)area+=(hull[j].x-origin.x)*(hull[i].y-origin.y)-(hull[j].y-origin.y)*(hull[i].x-origin.x);
-  if(Math.abs(area)<=epsilon*epsilon)return false;
+  let inside=false;
   for(let i=0,j=hull.length-1;i<hull.length;j=i++){
     const a=hull[j],b=hull[i],dx=b.x-a.x,dy=b.y-a.y,l2=dx*dx+dy*dy;
     const t=l2?Math.min(1,Math.max(0,((point.x-a.x)*dx+(point.y-a.y)*dy)/l2)):0;
@@ -173,7 +162,7 @@ export function validateDisagreement(cases:DisagreementCase[],options:Disagreeme
     "Each selected reference borehole is held out of every interpretation before prediction. All linked boreholes/CPTs are removed: rounded 1 mm positions connect co-located records, and matching record IDs connect their positions across interpretations, including moved collars and co-located records at those moved positions. Renamed and relocated observations without a shared identity or position link cannot be identified automatically.",
     "Reference targets are directly observed raw tops of the selected stable unit ID. Gap contacts, partial starts, overlapping intervals and repeated or out-of-order tops are unavailable, not inferred observations.",
     "Fold models retain their supplied extent and are not extended to reach a held-out location. The probe-node calculation evaluates the remaining model at the requested point without building its full refined mesh; terrain/erosion are evaluated there as in the existing cross-validation method.",
-    "An envelope is scored only when every selected interpretation supplies a finite held-out prediction and the reference top is observed. Missing predictions do not become zero widths, successes or failures in the coverage denominator.",
+    "Each fitted interpretation must contain a directly observed top and no unresolved repeated or out-of-order run of the selected bed. The bed must have positive modelled thickness at the held-out location. Every interpretation must supply a prediction to score the envelope.",
     "Reference error is the first interpretation's held-out prediction minus the observed contact elevation. MAE, RMSE and bias use only fully scored envelope rows.",
     "Interior rows are within the observation hulls of all remaining admitted model logs, including hull boundaries. Extrapolation rows are outside at least one training hull; configured and automatic model margins do not create observation support.",
     "Observed envelope coverage is a descriptive held-out fraction, not a calibrated probability, confidence interval or guarantee at unobserved locations. Sites and folds are spatially dependent, and small denominators are shown explicitly.",
@@ -187,12 +176,13 @@ export function validateDisagreement(cases:DisagreementCase[],options:Disagreeme
   if(selected.length<holes.length)notes.push(`The held-out limit selected ${selected.length} of ${holes.length} admitted reference boreholes. Selection starts nearest the collar centroid, then spreads by farthest horizontal distance; it precedes contact eligibility checks and does not use residuals. Observations of rare-unit tops may be omitted. The validation does not cover omitted locations.`);
   if(!holes.length)notes.push("There are no admitted reference borehole locations to hold out. CPT interpretations alone are not treated as independent borehole observations.");
   const groupFor=locationGroups(cases,radius);
+  const observations=cases.map(c=>cachedBedTops(c.project.units));
   const rows=selected.map((hole):DisagreementValidationRow=>{
     const observed=observedTop(hole,reference.project,options.unitId),{keys,boreholeIds,cptIds}=groupFor(hole);
     const row:DisagreementValidationRow={id:hole.id,x:hole.x,y:hole.y,...(observed.logged===undefined?{}:{logged:observed.logged}),
       extrapolated:true,predictions:[],missingCaseIds:[...caseIds]};
     if(observed.logged===undefined){row.unavailableReason=observed.reason;return row}
-    row.predictions=cases.map(c=>{
+    row.predictions=cases.map((c,caseIndex)=>{
       const remainingBoreholes=c.project.boreholes.filter(b=>!keys.has(location(b))&&!boreholeIds.has(b.id));
       const remainingCpts=(c.project.cpts??[]).filter(p=>!keys.has(location(p))&&!cptIds.has(p.id));
       const result:DisagreementFoldPrediction={caseId:c.id,extrapolated:true,removedBoreholes:c.project.boreholes.length-remainingBoreholes.length,removedCpts:(c.project.cpts??[]).length-remainingCpts.length};
@@ -206,6 +196,15 @@ export function validateDisagreement(cases:DisagreementCase[],options:Disagreeme
         if(k<0){result.unavailableReason="The selected unit is absent from this fold's training model.";return result}
         const column=sampleModel(model,hole.x,hole.y),value=column?.[k];
         if(!finite(value)){result.unavailableReason="The held-out collar is outside this fold's usable model footprint.";return result}
+        const issue=bedPredictionIssue(bedPredictionSupport(model,observations[caseIndex]),options.unitId,k,column);
+        if(issue){
+          result.unavailableReason={
+            ambiguity:"The selected bed has repeated or out-of-order runs in the training logs.",
+            training:"No admitted training log records a directly observed top for the selected bed.",
+            prediction:"The selected bed lacks positive modelled thickness at this location."
+          }[issue];
+          return result;
+        }
         result.prediction=value;
       }catch(error){result.unavailableReason=`The fold could not build: ${error instanceof Error?error.message:String(error)}`}
       return result;
