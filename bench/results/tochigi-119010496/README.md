@@ -15,6 +15,8 @@ The original fields and target were frozen before the first app run. The referen
 
 The reviewed six-hole project contained all 47 printed bases. The seven recovered endpoints retained boxes on the original second pages. The reviewed identifiers, coordinates, collar elevations and drilled lengths matched the frozen fields at printed precision. In the deliberately incomplete last PDF, the review preserved the drilled length of 18.20 m and flagged the unlogged interval below 12.40 m. No external requests occurred during the measured import and build. The built-in example attempted map tiles on startup.
 
+The six-hole model reported 20 of the 47 source intervals as reassigned under its global stratigraphic order. They included recurring sand, gravel and clay intervals. An accurate list of borehole measurements still requires geological correlation before using this model for volumes or design.
+
 The separate five-PDF project excluded the held-out log and its unit order. We transformed the held-out coordinates independently with GDAL and sampled both the model probe and the rendered mesh inside the training hull. Open the numerical result after recording your source interpretations and acceptance criteria. [Spatial comparison](holdout.json)
 
 ## Transfer to other Tochigi logs

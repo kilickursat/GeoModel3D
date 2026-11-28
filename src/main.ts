@@ -47,8 +47,8 @@ const fmtArea=(v:number)=>v>=1e4?fmt(v/1e4,2)+" ha":fmt(v)+" m²";
 const compactQuery=matchMedia(COMPACT),sideQuery=matchMedia(COMPACT_SIDE),touchQuery=matchMedia("(pointer: coarse)");
 const compact=()=>compactQuery.matches;
 const calm=matchMedia("(prefers-reduced-motion: reduce)");
-// The standalone HTML omits document-reader assets, including when served over HTTP.
-const pdfReading=location.protocol!=="file:"&&!document.querySelector('meta[name="geomodel3d-standalone"]');
+// Borehole logs are read from PDFs in the hosted app; the offline file (opened from disk) leaves the reader out.
+const pdfReading=location.protocol!=="file:";
 // Documents to read: PDFs, and images of logs (scans, photographs).
 const isDocument=(f:File)=>/\.(pdf|png|jpe?g|webp)$/i.test(f.name)||/^(application\/pdf|image\/(png|jpeg|webp))$/.test(f.type);
 const DOCUMENTS=".pdf,.png,.jpg,.jpeg,.webp";
@@ -1592,7 +1592,7 @@ function sayPdf(title:string,lines:string[],error=false){
 // Borehole logs read from PDFs, on this device and only once the user agrees: the reader (src/docread/) loads then,
 // and its review hands the boreholes to the input tab.
 async function readPdfs(files:File[]){
-  if(!pdfReading){
+  if(!pdfReading||document.querySelector('meta[name="geomodel3d-standalone"]')){
     sayPdf("PDFs and images",["The offline file does not read PDFs or images of logs. Open GeoModel3D at kilickursat.github.io/GeoModel3D to read them: there too, they are read in your browser and not uploaded."],true);
     return;
   }
