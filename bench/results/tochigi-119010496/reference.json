@@ -1,0 +1,236 @@
+{
+  "frozenAt": "2026-11-28T08:50:51.402194+00:00",
+  "cohort": "Tochigi 119010496, archive 1; only six source files of this project",
+  "publisher": "栃木県 県土整備部 (Tochigi Prefecture, Department of Land Development)",
+  "landing": "https://data.bodik.jp/dataset/090000_boring-log",
+  "license": "CC BY 2.1 JP",
+  "licenseUrl": "https://creativecommons.org/licenses/by/2.1/jp/",
+  "metadata": "https://data.bodik.jp/api/3/action/package_show?id=090000_boring-log",
+  "archiveUrl": "https://data.bodik.jp/dataset/a6ee71a9-c0d4-4386-803d-e588fb0ed7ca/resource/4cc62581-9adf-4aaa-a970-79dd240494f4/download/72402_2014_boring-log1_04010.zip",
+  "archiveSha256": "83775cf99ae483bb4ed68d757f8e4630314d0994eb4ed66900abbd4082ac0ebe",
+  "selection": "Among new archive-1 projects with 4–8 members, the first lexicographic project with a collar >31 m inside the hull of the others, calculated from printed lat/lon with a local planar approximation. This screen used source coordinates only. Submitting five training PDFs excludes the interior hole and its unit order from inference.",
+  "holdoutPdf": "11901049603.pdf",
+  "predefinedMetrics": [
+    "Signed elevation error of the model ground and the first top of the coarse Gravel model unit at the held-out collar. The reference marker is first 砂礫 (GS) of the held source log. Recurrent gravel/clay and adjacent sandy units mean this is an explicit correlation hypothesis.",
+    "Exact source ID (allow NFKC normalization), printed coordinates, ground level, final depth and depth interval bases on separate all-six extraction replay, with no manual repairs."
+  ],
+  "sourcePrecision": "Positions are printed in degrees, minutes and seconds to whole seconds with trailing decimal zeros, so no sub-metre survey accuracy is inferred. Depths/elevations in metres compared at printed precision. Vertical datum not independently verified.",
+  "status": "Machine transcription of source table columns, arithmetically cross-checked against ground minus elevation and previous base plus thickness; independent qualified engineering review pending.",
+  "holes": [
+    {
+      "pdf": "11901049601.pdf",
+      "sha256": "6cdf018949708ad0d25c8171dc3cc734a70b342516265d760d10f05740307c49",
+      "sourceId": "No.2（2号町道橋-右岸）",
+      "lat": 36.41166666666666,
+      "lon": 139.8997222222222,
+      "printedDms": [
+        [
+          "北",
+          36,
+          24,
+          42.0
+        ],
+        [
+          "東",
+          139,
+          53,
+          59.0
+        ]
+      ],
+      "ground_m": 55.54,
+      "final_m": 17.26,
+      "intervalBases_m": [
+        1.3,
+        1.6,
+        10.7,
+        11.8,
+        12.1,
+        17.26
+      ],
+      "first_GS_top_depth_m": 1.6,
+      "first_GS_top_elevation_m": 53.94,
+      "sourcePages": 2
+    },
+    {
+      "pdf": "11901049602.pdf",
+      "sha256": "2b879c2f537d8a987f3f33ef10ed4e8e24cb53331b36da31dd5cc1bb6c62b09a",
+      "sourceId": "No.3（五分一堰-左岸）",
+      "lat": 36.41222222222222,
+      "lon": 139.90083333333334,
+      "printedDms": [
+        [
+          "北",
+          36,
+          24,
+          44.0
+        ],
+        [
+          "東",
+          139,
+          54,
+          3.0
+        ]
+      ],
+      "ground_m": 55.82,
+      "final_m": 17.33,
+      "intervalBases_m": [
+        0.3,
+        0.9,
+        2.0,
+        3.8,
+        10.0,
+        11.0,
+        11.45,
+        17.33
+      ],
+      "first_GS_top_depth_m": 3.8,
+      "first_GS_top_elevation_m": 52.02,
+      "sourcePages": 2
+    },
+    {
+      "pdf": "11901049603.pdf",
+      "sha256": "78186ad4892890de0a506f61acef6cacbee15933544e025c235e7b3da958d3a6",
+      "sourceId": "No.4（五分一堰-右岸）",
+      "lat": 36.41222222222222,
+      "lon": 139.90027777777777,
+      "printedDms": [
+        [
+          "北",
+          36,
+          24,
+          44.0
+        ],
+        [
+          "東",
+          139,
+          54,
+          1.0
+        ]
+      ],
+      "ground_m": 55.99,
+      "final_m": 17.05,
+      "intervalBases_m": [
+        1.0,
+        1.6,
+        2.0,
+        2.3,
+        5.9,
+        6.5,
+        10.4,
+        11.4,
+        17.05
+      ],
+      "first_GS_top_depth_m": 1.6,
+      "first_GS_top_elevation_m": 54.39,
+      "sourcePages": 2
+    },
+    {
+      "pdf": "11901049604.pdf",
+      "sha256": "3b9011cbee9edf070238e162b75992cfd9f9a034987a2ecf20e2c3d47af3c48f",
+      "sourceId": "No.5（3号町道橋-左岸）",
+      "lat": 36.41722222222222,
+      "lon": 139.89944444444444,
+      "printedDms": [
+        [
+          "北",
+          36,
+          25,
+          2.0
+        ],
+        [
+          "東",
+          139,
+          53,
+          58.0
+        ]
+      ],
+      "ground_m": 57.8,
+      "final_m": 19.32,
+      "intervalBases_m": [
+        0.8,
+        1.1,
+        1.8,
+        2.5,
+        8.6,
+        9.5,
+        11.7,
+        12.6,
+        19.32
+      ],
+      "first_GS_top_depth_m": 2.5,
+      "first_GS_top_elevation_m": 55.3,
+      "sourcePages": 2
+    },
+    {
+      "pdf": "11901049605.pdf",
+      "sha256": "3065cdc32186c4c82a0a106ae5fdbc2b8577b8793c0b3baf27ab4a1eda3e9b06",
+      "sourceId": "No.6（3号町道橋-右岸）",
+      "lat": 36.41722222222222,
+      "lon": 139.89916666666667,
+      "printedDms": [
+        [
+          "北",
+          36,
+          25,
+          2.0
+        ],
+        [
+          "東",
+          139,
+          53,
+          57.0
+        ]
+      ],
+      "ground_m": 57.74,
+      "final_m": 15.43,
+      "intervalBases_m": [
+        0.5,
+        1.1,
+        1.6,
+        7.8,
+        8.6,
+        15.43
+      ],
+      "first_GS_top_depth_m": 1.6,
+      "first_GS_top_elevation_m": 56.14,
+      "sourcePages": 1
+    },
+    {
+      "pdf": "11901049606.pdf",
+      "sha256": "366e287fff89bc06a0260252cfba611fa830bbc11143f7e8261f659bb9919364",
+      "sourceId": "No.1（2号町道橋-左岸）",
+      "lat": 36.41138888888889,
+      "lon": 139.9,
+      "printedDms": [
+        [
+          "北",
+          36,
+          24,
+          41.0
+        ],
+        [
+          "東",
+          139,
+          54,
+          0.0
+        ]
+      ],
+      "ground_m": 56.13,
+      "final_m": 18.2,
+      "intervalBases_m": [
+        1.5,
+        2.15,
+        2.8,
+        10.6,
+        12.25,
+        12.4,
+        17.0,
+        17.6,
+        18.2
+      ],
+      "first_GS_top_depth_m": 2.8,
+      "first_GS_top_elevation_m": 53.33,
+      "sourcePages": 2
+    }
+  ]
+}

@@ -16,6 +16,10 @@ test("standalone HTML can import, build and export a complete workspace without 
   const errors:string[]=[];
   page.on("pageerror",error=>errors.push(error.message));
   await page.goto(`${APP_ORIGIN}/standalone-test.html?backend=webgl#input`);
+  await expect(page.locator(".ws-start")).toBeVisible();
+  await expect(page.locator('[data-start="pdf"]')).toHaveCount(1);
+  await page.locator(".pdf-file").setInputFiles({name:"example.pdf",mimeType:"application/pdf",buffer:Buffer.from("%PDF")});
+  await expect(page.locator(".ws-status")).toContainText("The offline file does not read PDFs");
   await importFixture(page);
   await rename(page,"Offline review");
   await build(page);

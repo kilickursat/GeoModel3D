@@ -14,6 +14,7 @@ import * as ort from "onnxruntime-web/webgpu";
 import wasmUrl from "onnxruntime-web/ort-wasm-simd-threaded.asyncify.wasm?url";
 import {Img,DetSettings,Reading,OcrLine,detInput,dbBoxes,crop,recInput,ctcDecode,ctcClasses,readBox} from "./ocr";
 import {MODEL_CACHE} from "../modelcache";
+import {requestDocumentGpuAdapter} from "../webgpuAdapter";
 
 interface Manifest { model:string; files:Record<string,{size:number;sha256:string}>; runtime?:{file:string;size:number;sha256:string} }
 interface Settings { det:DetSettings; rec:{characters:string[]} }
@@ -68,14 +69,10 @@ async function load(base:string){
   ort.env.logLevel="error";
   ort.env.wasm.numThreads=1;
   ort.env.wasm.wasmBinary=files.wasm??new Uint8Array(await (await fetch(wasmUrl)).arrayBuffer());
-  // WebGPU where an adapter is offered: the high-performance one, so that a computer with a graphics card beside the
-  // processor's own graphics reads on the card (the browser decides which it gives). The adapter is handed to ONNX
-  // Runtime, so the model runs on the very GPU asked for. The processor otherwise, or where WebGPU cannot build the model.
-  type Adapter={info?:{vendor?:string}};
-  const gpu=(navigator as Navigator&{gpu?:{requestAdapter(o?:{powerPreference?:string}):Promise<Adapter|null>}}).gpu;
-  const adapter=gpu?await gpu.requestAdapter({powerPreference:"high-performance"}).catch(()=>null):null;
+  // Hand ONNX the same hardware adapter we checked. Software or unknown adapters use WebAssembly.
+  const adapter=await requestDocumentGpuAdapter();
   if(adapter){
-    ort.env.webgpu.adapter=adapter;
+    ort.env.webgpu.adapter=adapter as typeof ort.env.webgpu.adapter;
     ort.env.webgpu.powerPreference="high-performance";
     vendor=adapter.info?.vendor??"";
     try{await sessions("webgpu");return}catch{/* falls back below */}

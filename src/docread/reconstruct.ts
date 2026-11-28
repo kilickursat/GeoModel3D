@@ -1,5 +1,6 @@
 import {DMS,SOIL_CODE,SOIL_NAME} from "./nativeLogFields";
 import {Rule,isVertical,xAt,yAt} from "./ruling";
+import {adjacentMetricStrips,checkMetricHead,metricStrip,recoverMetricStrips} from "./metricContinuation";
 import {graphicRangeLog} from "./graphicLog";
 // Borehole logs from the text of a page: lines of text with their boxes, from a PDF's own text layer or from OCR of a
 // page image, become logs (header values and layers) with no template for any layout. Drawn logs are read by their
@@ -33,6 +34,7 @@ export interface LogHeader {
 // more. `src`: the lines it was read from.
 export interface SptTest { depth:number; blows:number; penetration?:number; src:TextLine[] }
 export interface PageLog extends LogHeader {
+  printedBeds?:boolean; // Continuation rows verified against the first sheet’s metric columns.
   rangeLabels?:boolean;
   depthInFeet?:boolean;
   spt?:SptTest[];
@@ -1243,6 +1245,11 @@ function joinLayers(pages:Array<PageLog&{page:number}>,head:LogHeader,at:number[
     return {...head,kind:"scale",pages:at,layers:read.layers,flagged:read.flagged,samples:true};
   }
   if(pages.length===1&&first.samples?.length)return {...head,kind:"scale",pages:at,layers:first.layers,flagged:first.flagged,samples:true};
+  const tail=pages.findIndex(p=>p.printedBeds);
+  if(tail>0&&pages.slice(tail).every(p=>p.printedBeds)){
+    const prefix=joinLayers(pages.slice(0,tail),head,at.slice(0,tail),final);
+    return {...prefix,pages:at,layers:[...prefix.layers,...pages.slice(tail).flatMap(p=>p.layers)]};
+  }
   if(pages.length===1||pages.every(p=>p.kind==="table"))
     return {...head,kind:first.kind,...(pages.every(p=>p.rangeLabels)?{rangeLabels:true}:{}),pages:at,
       layers:pages.flatMap(p=>p.layers).sort((a,b)=>a.from-b.from),flagged:pages.flatMap(p=>p.flagged)};
@@ -1329,15 +1336,19 @@ export function upright(p:PageLines):PageLines{
 export function readDocument(pages:PageLines[]){
   const turned=pages.map(p=>upright({...p,lines:p.lines.map(l=>({...l,page:p.page}))}));
   const read=turned.map(p=>readPage(p.lines,p.width,p.height,p.rules).map(log=>({...log,page:p.page})));
+  const strips=turned.map(metricStrip);
   // A sheet with a depth scale but no title or headings, after a sheet with a log, may be that log's next sheet: read
   // as one, it is kept where its scale carries on below the log before it.
   for(let i=1;i<turned.length;i++){
     const before=read[i-1].filter(x=>x.layers.length).at(-1),here=read[i];
     if(!before||turned[i].page!==turned[i-1].page+1||here.some(x=>x.layers.length)||!here.some(x=>x.error==="no log title or description heading"))continue;
+    const strip=strips[i];
+    if(strip&&strip.number>1&&!adjacentMetricStrips(turned[i-1],turned[i],strips[i-1],strip))continue;
     const again=readPage(turned[i].lines,turned[i].width,turned[i].height,turned[i].rules,true).map(log=>({...log,page:turned[i].page}));
     const last=Math.max(...before.layers.map(l=>l.to));
     if(again[0]?.layers.length&&again[0].top!==undefined&&again[0].top>=last-1)read[i]=again;
   }
+  recoverMetricStrips(turned,read,strips);
   const parts=read.flat();
   const logIds=new Set(parts.filter(p=>!p.core&&p.layers.length&&p.id).map(p=>sameId(p.id)));
   const cores=parts.filter(p=>p.core&&p.id&&logIds.has(sameId(p.id))),corePages=new Set(cores.map(p=>p.page));
@@ -1366,7 +1377,13 @@ export function readDocument(pages:PageLines[]){
     if(g)g.pages.push(part);else groups.push({id:part.id??`page ${part.page}`,pages:[part]});
   }
   // Pages in order of their sheet numbers where every page gives one; else in their order in the document.
-  const logs=groups.map(g=>({...joinPages(g.pages.every(p=>p.sheet)?g.pages.sort((p,q)=>p.sheet![0]-q.sheet![0]):g.pages),id:g.id}));
+  const pageIndex=new Map(turned.map((p,i)=>[p.page,i]));
+  const logs=groups.map(g=>{
+    if(g.pages.every(p=>p.sheet))g.pages.sort((p,q)=>p.sheet![0]-q.sheet![0]);
+    const log={...joinPages(g.pages),id:g.id},first=g.pages[0],i=pageIndex.get(first.page)!;
+    if(read[i].length===1)checkMetricHead(turned[i],strips[i],first,log);
+    return log;
+  });
   // Each rock core log goes with the log of its ID nearest before it (or after it, where none is before).
   const withCore=new Map<number,Array<PageLog&{page:number}>>();
   for(const c of cores){

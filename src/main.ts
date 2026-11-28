@@ -1592,7 +1592,7 @@ function sayPdf(title:string,lines:string[],error=false){
 // Borehole logs read from PDFs, on this device and only once the user agrees: the reader (src/docread/) loads then,
 // and its review hands the boreholes to the input tab.
 async function readPdfs(files:File[]){
-  if(!pdfReading){
+  if(!pdfReading||document.querySelector('meta[name="geomodel3d-standalone"]')){
     sayPdf("PDFs and images",["The offline file does not read PDFs or images of logs. Open GeoModel3D at kilickursat.github.io/GeoModel3D to read them: there too, they are read in your browser and not uploaded."],true);
     return;
   }

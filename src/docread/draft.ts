@@ -223,6 +223,7 @@ export function checkDraft(holes:DraftHole[]):Check[]{
     });
     const base=Math.max(...valid.map(q=>q.to));
     if(has("final")&&v.final!<base-0.005)add("warn",`The final depth (${fmt(v.final!)} m) is above the base of the log (${fmt(base)} m).`,{field:"final"});
+    if(has("final")&&v.final!>base+0.005)add("warn",`No layer was read from ${fmt(base)} to ${fmt(v.final!)} m. Check for a continuation sheet or confirm that this section was unlogged.`,{field:"final"});
     if(has("water")&&v.water!>Math.max(base,v.final??0)+0.005)add("warn",`The water depth (${fmt(v.water!)} m) is below the bottom of the hole.`,{field:"water"});
     if(has("water")&&v.water!<0)add("note","The water depth is negative: water above the ground (artesian).",{field:"water"});
   });

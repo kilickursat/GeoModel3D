@@ -4,6 +4,7 @@ import wasmFactoryUrl from "onnxruntime-web/ort-wasm-simd-threaded.asyncify.mjs?
 import cpuWasmUrl from "onnxruntime-web/ort-wasm-simd-threaded.wasm?url";
 import cpuWasmFactoryUrl from "onnxruntime-web/ort-wasm-simd-threaded.mjs?url";
 import {CORE_BENCHMARK_CACHE,CORE_BENCHMARK_MODEL} from "../coreBenchmark";
+import {requestDocumentGpuAdapter} from "../webgpuAdapter";
 import {benchmarkDiagnosticText} from "../coreBenchmarkDiagnostics";
 import {benchmarkModelResource} from "../coreBenchmarkTransport";
 import type {ReportPageRole,ReportQwenRequest,ReportQwenResponse} from "./reportQwen";
@@ -40,9 +41,8 @@ class PageClassTokens extends LogitsProcessor{
 }
 
 async function classify(pages:ReportQwenRequest):Promise<ReportPageRole[]>{
-  const gpu=(navigator as unknown as {gpu?:{requestAdapter():Promise<{info?:{isFallbackAdapter?:boolean;architecture?:string};isFallbackAdapter?:boolean}|null>}}).gpu;
-  const adapter=await gpu?.requestAdapter().catch(()=>null);
-  const useGpu=!!adapter&&!adapter.isFallbackAdapter&&!adapter.info?.isFallbackAdapter&&adapter.info?.architecture!=="swiftshader";
+  const adapter=await requestDocumentGpuAdapter();
+  const useGpu=!!adapter;
   if(useGpu)env.backends.onnx.webgpu!.adapter=adapter as NonNullable<typeof env.backends.onnx.webgpu>["adapter"];
   // ONNX Runtime's CPU distribution contains the quantized token-embedding kernel.
   env.backends.onnx.wasm!.wasmPaths=useGpu?{wasm:wasmUrl,mjs:wasmFactoryUrl}:{wasm:cpuWasmUrl,mjs:cpuWasmFactoryUrl};

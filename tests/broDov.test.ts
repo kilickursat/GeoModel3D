@@ -102,6 +102,7 @@ describe("reference sites in Belgium and the Netherlands",()=>{
     expect(rotterdamProject.boreholes.reduce((n,b)=>n+(b.tests?.length??0),0)).toBeGreaterThan(3000);
     expect(m.water!.source).toMatch(/water levels logged in \d+ of 100 boreholes/);
     expect(m.warnings.length).toBeLessThan(5);
+    expect(m.warnings.join("\n")).toMatch(/final depth in 27 logs\. BHR000000338403 \(12–30 m\), CPT000000155923 \(32\.07–32\.17 m\)/);
   });
 });
 
@@ -111,7 +112,13 @@ describe("reference site in Australia",()=>{
     expect(deepleadsProject.crsCode).toBe("EPSG:28354");
     expect(m.boreholes.length).toBe(150);
     expect(m.units.map(u=>u.id)).toEqual(["Alluvium","Upper basalt","Interbasalt clay","Lower basalt","Clay","Deep lead","Bedrock"]);
-    expect(m.warnings).toEqual([]);
+    // Several drilled depths extend below the last classified interval in the source data.
+    const tails=deepleadsProject.boreholes.map(b=>({id:b.id,from:Math.max(...b.intervals.map(i=>i.to)),to:b.depth??0}))
+      .filter(t=>t.to>t.from+1e-6);
+    expect(tails).toHaveLength(47);
+    expect(m.warnings).toHaveLength(1);
+    expect(m.warnings[0]).toContain("inferred to final depth in 47 logs.");
+    for(const t of tails)expect(m.warnings[0]).toContain(`${t.id} (${t.from}–${t.to} m)`);
     // Positions: the collars carry their geographic position, inside the MGA zone 54 area of use.
     for(const b of deepleadsProject.boreholes){
       expect(b.lon!).toBeGreaterThan(143.85);expect(b.lon!).toBeLessThan(143.98);
